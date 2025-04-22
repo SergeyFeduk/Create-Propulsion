@@ -34,6 +34,8 @@ public class ForceInducedShip implements ShipForcesInducer {
 
     public void removeApplier(BlockPos pos){
         appliersMapping.remove(pos);
+        //TODO: We can remove attachment by using  ship.saveAttachment(ForceInducedShip.class, null)
+        //TODO: We should do this if there are no more appliers left on ship to clean up
     }
 
     //Getters

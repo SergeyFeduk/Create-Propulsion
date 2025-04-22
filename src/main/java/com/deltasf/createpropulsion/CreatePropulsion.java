@@ -6,6 +6,8 @@ import com.deltasf.createpropulsion.optical_sensors.OpticalSensorBlock;
 import com.deltasf.createpropulsion.optical_sensors.OpticalSensorBlockEntity;
 import com.deltasf.createpropulsion.optical_sensors.rendering.OpticalSensorRenderer;
 import com.deltasf.createpropulsion.particles.ParticleTypes;
+import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerBlock;
+import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerBlockEntity;
 import com.deltasf.createpropulsion.thruster.ThrusterBlock;
 import com.deltasf.createpropulsion.thruster.ThrusterBlockEntity;
 import com.simibubi.create.foundation.data.CreateRegistrate;
@@ -49,6 +51,7 @@ import com.tterrag.registrate.util.entry.BlockEntityEntry;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab.Output;
+//import org.valkyrienskies.mod.common.assembly.ShipAssemblyKt;
 
 @Mod(CreatePropulsion.ID)
 public class CreatePropulsion {
@@ -75,7 +78,7 @@ public class CreatePropulsion {
     
     //Inline optical sensor
     public static final BlockEntry<InlineOpticalSensorBlock> INLINE_OPTICAL_SENSOR_BLOCK = REGISTRATE.block("inline_optical_sensor", InlineOpticalSensorBlock::new)
-        .properties(p -> p.mapColor(MapColor.METAL))
+        .properties(p -> p.mapColor(MapColor.COLOR_YELLOW))
         .properties(p -> p.sound(SoundType.METAL))
         .properties(p -> p.strength(1.5F, 1.0F))
         .properties(p -> p.noOcclusion())
@@ -90,7 +93,7 @@ public class CreatePropulsion {
     
     //Optical sensor
     public static final BlockEntry<OpticalSensorBlock> OPTICAL_SENSOR_BLOCK = REGISTRATE.block("optical_sensor", OpticalSensorBlock::new)
-        .properties(p -> p.mapColor(MapColor.METAL))
+        .properties(p -> p.mapColor(MapColor.COLOR_YELLOW))
         .properties(p -> p.sound(SoundType.METAL))
         .properties(p -> p.strength(2.5F, 2.0F))
         .properties(p -> p.noOcclusion())
@@ -102,12 +105,25 @@ public class CreatePropulsion {
         .validBlocks(OPTICAL_SENSOR_BLOCK)
         .renderer(() -> OpticalSensorRenderer::new)
         .register();
-        
+    
+    //Physics assembler
+    public static final BlockEntry<PhysicsAssemblerBlock> PHYSICS_ASSEMBLER_BLOCK = REGISTRATE.block("physics_assembler", PhysicsAssemblerBlock::new)
+        .properties(p -> p.mapColor(MapColor.COLOR_YELLOW))
+        .properties(p -> p.sound(SoundType.METAL))
+        .properties(p -> p.strength(2.5F, 2.0F))
+        .properties(p -> p.noOcclusion())
+        .simpleItem()
+        .register();
+    
+    public static final BlockEntityEntry<PhysicsAssemblerBlockEntity> PHYSICAL_ASSEMBLER_BLOCK_ENTITY =
+        REGISTRATE.blockEntity("physics_assembler_block_entity", PhysicsAssemblerBlockEntity::new)
+        .validBlock(PHYSICS_ASSEMBLER_BLOCK)
+        .register();
+
     public CreatePropulsion() {
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
         ParticleTypes.register(modBus);
         
-        //Config
         MinecraftForge.EVENT_BUS.register(this);
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, Config.SPEC);
 

@@ -5,7 +5,7 @@ license="MIT"
 modId="createpropulsion"
 version="0.1.0"
 displayName="Create: Propulsion"
-# A file name (in the root of the mod JAR) containing a logo for display
+displayURL="https://modrinth.com/mod/create-propulsion"
 logoFile="icon.png"
 authors="Sergey Feduk"
 modClass="com.deltasf.createpropulsion.CreatePropulsion"

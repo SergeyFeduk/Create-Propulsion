@@ -133,6 +133,7 @@ public class ThrusterBlock extends DirectionalBlock implements EntityBlock {
         if (level.isClientSide()) return;
         doRedstoneCheck(level, state, pos);
     }
+    
     private void doRedstoneCheck(Level level, BlockState state, BlockPos pos){
         //Get redstone powers
         int newRedstonePower = level.getBestNeighborSignal(pos);
