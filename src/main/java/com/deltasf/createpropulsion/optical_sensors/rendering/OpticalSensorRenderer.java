@@ -40,16 +40,16 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<InlineOptical
 
     // Colors
     private static final Vector4f START_COLOR = new Vector4f(
-        RAY_COLOR.x(), RAY_COLOR.y(), RAY_COLOR.z(), RAY_COLOR.w() * START_ALPHA
+        RAY_COLOR.x(), RAY_COLOR.y(), RAY_COLOR.z(), RAY_COLOR.w() * (START_ALPHA * 2.0f)
     );
     private static final Vector4f START_POWERED_COLOR = new Vector4f(
-        RAY_POWERED_COLOR.x(), RAY_POWERED_COLOR.y(), RAY_POWERED_COLOR.z(), RAY_POWERED_COLOR.w() * START_ALPHA
+        RAY_POWERED_COLOR.x(), RAY_POWERED_COLOR.y(), RAY_POWERED_COLOR.z(), RAY_POWERED_COLOR.w() * (START_ALPHA * 2.0f)
     );
     private static final Vector4f END_COLOR = new Vector4f(
-        RAY_COLOR.x(), RAY_COLOR.y(), RAY_COLOR.z(), RAY_COLOR.w() * END_ALPHA
+        RAY_COLOR.x(), RAY_COLOR.y(), RAY_COLOR.z(), RAY_COLOR.w() * (END_ALPHA * 2.0f)
     );
     private static final Vector4f END_POWERED_COLOR = new Vector4f(
-        RAY_POWERED_COLOR.x(), RAY_POWERED_COLOR.y(), RAY_POWERED_COLOR.z(), RAY_POWERED_COLOR.w() * END_ALPHA
+        RAY_POWERED_COLOR.x(), RAY_POWERED_COLOR.y(), RAY_POWERED_COLOR.z(), RAY_POWERED_COLOR.w() * (END_ALPHA * 2.0f)
     );
 
     // Positions
@@ -145,18 +145,17 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<InlineOptical
 
         //Rendering setup
         poseStack.pushPose();
-        //RenderType
         VertexConsumer buffer = bufferSource.getBuffer(OpticalSensorBeamRenderType.SOLID_TRANSLUCENT_BEAM);
         Matrix4f pose = poseStack.last().pose();
 
         Vector4f startColor = powered ? START_POWERED_COLOR : START_COLOR;
         Vector4f endColor = powered ? END_POWERED_COLOR : END_COLOR;
 
-        //Normals
-        this.normalBottom.set(this.upVector).negate();
-        this.normalRight.set(this.sideVector);
-        this.normalTop.set(this.upVector);
-        this.normalLeft.set(this.sideVector).negate();
+        //Normals, I actually flip them every second mod update just because I have no clue if they are correct or not
+        this.normalBottom.set(this.upVector);
+        this.normalRight.set(this.sideVector).negate();
+        this.normalTop.set(this.upVector).negate();
+        this.normalLeft.set(this.sideVector);
 
         //Rendering
         drawQuad(buffer, pose, this.sBottomLeft, this.sBottomRight, this.eBottomRight, this.eBottomLeft, startColor, endColor, this.normalBottom);

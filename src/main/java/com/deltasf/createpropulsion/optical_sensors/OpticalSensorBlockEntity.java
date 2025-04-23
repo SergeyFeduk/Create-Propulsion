@@ -57,9 +57,8 @@ public class OpticalSensorBlockEntity extends InlineOpticalSensorBlockEntity {
             BlockState updatedState = state.setValue(OpticalSensorBlock.POWER, newPower).setValue(OpticalSensorBlock.POWERED, newPower > 0);
             level.setBlock(pos, updatedState, Block.UPDATE_CLIENTS | Block.UPDATE_NEIGHBORS);
             //Update block behind
-            Direction facingDir = state.getValue(InlineOpticalSensorBlock.FACING).getOpposite();
-            BlockPos adjacentPos = pos.relative(facingDir);
-            level.updateNeighborsAt(adjacentPos, state.getBlock());
+            Direction facingDir = state.getValue(OpticalSensorBlock.FACING).getOpposite();
+            level.updateNeighborsAt(pos.relative(facingDir), state.getBlock());
         }
     }
 

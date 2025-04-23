@@ -21,12 +21,12 @@ public class OpticalSensorBeamRenderType extends RenderType {
             .setShaderState(POSITION_COLOR_SHADER)
             .setTextureState(NO_TEXTURE)
             .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
-            .setCullState(NO_CULL)
+            .setCullState(CULL)
             .setLightmapState(NO_LIGHTMAP)
             .setOverlayState(NO_OVERLAY)
             .setOutputState(TRANSLUCENT_TARGET)
             .setDepthTestState(LEQUAL_DEPTH_TEST)
             .setWriteMaskState(COLOR_DEPTH_WRITE) //Without depth it is behind water
-            .createCompositeState(true)
+            .createCompositeState(false)
     );
 }

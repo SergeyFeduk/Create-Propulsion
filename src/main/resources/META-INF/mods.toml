@@ -3,7 +3,7 @@ loaderVersion="${loader_version_range}"
 license="MIT"
 [[mods]]
 modId="createpropulsion"
-version="0.1.0"
+version="0.1.1"
 displayName="Create: Propulsion"
 displayURL="https://modrinth.com/mod/create-propulsion"
 logoFile="icon.png"

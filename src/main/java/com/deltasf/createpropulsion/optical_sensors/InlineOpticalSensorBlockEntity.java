@@ -74,6 +74,7 @@ public class InlineOpticalSensorBlockEntity extends SmartBlockEntity {
         performRaycast(level);
     }
 
+    @SuppressWarnings("null") //Because VSCode
     private void performRaycast(Level level) {
         BlockState state = this.getBlockState();
         BlockPos shipLocalPos = this.getBlockPos();
@@ -83,9 +84,8 @@ public class InlineOpticalSensorBlockEntity extends SmartBlockEntity {
         Pair<Vec3, Vec3> raycastPositions = calculateRaycastPositions(shipLocalPos, state.getValue(InlineOpticalSensorBlock.FACING), maxRaycastDistance); 
 
         //Perform raycast using world coordinates
-        //Probably a good idea to allow to clip fluids too, probably via config, probably
-        @SuppressWarnings("null") //Because VSCode
-        ClipContext context = new ClipContext(raycastPositions.getFirst(), raycastPositions.getSecond(), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null);
+        ClipContext.Fluid clipFluid = Config.OPTICAL_SENSOR_CLIP_FLUID.get() ? ClipContext.Fluid.ANY : ClipContext.Fluid.NONE;
+        ClipContext context = new ClipContext(raycastPositions.getFirst(), raycastPositions.getSecond(), ClipContext.Block.COLLIDER, clipFluid, null);
         BlockHitResult hit = level.clip(context);
 
         // Calculate power based on world distance
@@ -148,13 +148,9 @@ public class InlineOpticalSensorBlockEntity extends SmartBlockEntity {
         if (oldPower != newPower) {
             BlockState updatedState = state.setValue(InlineOpticalSensorBlock.POWER, newPower).setValue(InlineOpticalSensorBlock.POWERED, newPower > 0);
             level.setBlock(pos, updatedState, Block.UPDATE_CLIENTS | Block.UPDATE_NEIGHBORS);
-            
-            //TODO: DO WE LIKE REALLY NEED TO UPDATE THE BLOCK IN FRONT OF THE SENSOR, OR WAS I JUST WRONG WHEN I WROTE THIS?
-            Direction facingDir = state.getValue(InlineOpticalSensorBlock.FACING);
-            BlockPos adjacentPos = pos.relative(facingDir);
-            level.updateNeighborsAt(adjacentPos, state.getBlock());
-            //Block behind the optical sensor also needs to be updated so stuff touching it also updates redstone signal
-            level.updateNeighborsAt(pos.relative(state.getValue(InlineOpticalSensorBlock.FACING).getOpposite()), state.getBlock());
+            //Update block behind
+            Direction facingDir = state.getValue(InlineOpticalSensorBlock.FACING).getOpposite();
+            level.updateNeighborsAt(pos.relative(facingDir), state.getBlock());
         }
     }
 

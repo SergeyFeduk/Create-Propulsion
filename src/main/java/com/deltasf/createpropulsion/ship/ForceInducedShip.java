@@ -16,7 +16,6 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 @SuppressWarnings("deprecation")
 public class ForceInducedShip implements ShipForcesInducer {
-
     public Map<BlockPos, IForceApplier> appliersMapping = new ConcurrentHashMap<>();
     public ForceInducedShip() {}
     
@@ -32,10 +31,12 @@ public class ForceInducedShip implements ShipForcesInducer {
         appliersMapping.put(pos, applier);
     }
 
-    public void removeApplier(BlockPos pos){
+    public void removeApplier(ServerLevel level, BlockPos pos){
         appliersMapping.remove(pos);
-        //TODO: We can remove attachment by using  ship.saveAttachment(ForceInducedShip.class, null)
-        //TODO: We should do this if there are no more appliers left on ship to clean up
+        //Remove attachment by using passing null as attachment instance in order to clean up after ourselves
+        if (appliersMapping.isEmpty()) {
+            getShipAt(level, pos).saveAttachment(ForceInducedShip.class, null);
+        }
     }
 
     //Getters
@@ -48,17 +49,13 @@ public class ForceInducedShip implements ShipForcesInducer {
         return attachment;
     }
 
-    public static ForceInducedShip getOrCreate(ServerShip ship){
-        return getOrCreateAsAttachment(ship);
-    }
-
     public static ForceInducedShip get(Level level, BlockPos pos) {
         ServerShip ship = getShipAt((ServerLevel)level, pos);
-        return ship != null ? getOrCreate(ship) : null;
+        return ship != null ? getOrCreateAsAttachment(ship) : null;
     }
 
     private static ServerShip getShipAt(ServerLevel serverLevel, BlockPos pos){
-        //Do not even dare to ask me
+        //For some reason (which I don't remember anymore) it has to be just like that
         ServerShip ship = VSGameUtilsKt.getShipObjectManagingPos(serverLevel, pos);
         if (ship == null){
             ship = VSGameUtilsKt.getShipManagingPos(serverLevel, pos);

@@ -2,6 +2,7 @@ package com.deltasf.createpropulsion.thruster;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.DirectionalBlock;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -119,7 +120,7 @@ public class ThrusterBlock extends DirectionalBlock implements EntityBlock {
         if (!level.isClientSide()) {
             ForceInducedShip ship = ForceInducedShip.get(level, pos);
             if (ship != null) {
-                ship.removeApplier(pos);
+                ship.removeApplier((ServerLevel)level, pos);
             }
         }
         BlockEntity entity = level.getBlockEntity(pos);
