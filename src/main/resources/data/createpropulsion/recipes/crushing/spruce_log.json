@@ -1,0 +1,15 @@
+{
+    "type": "create:crushing",
+    "ingredients": [
+      {
+        "item": "minecraft:spruce_log"
+      }
+    ],
+    "processingTime": 150,
+    "results": [
+      {
+        "chance": 0.6,
+        "item": "createpropulsion:pine_resin"
+      }
+    ]
+  }

@@ -29,5 +29,9 @@
 
     "createpropulsion.thruster.tooltip.summary": "Provides thrust up to _200 KN_ to push vehicles.",
     "createpropulsion.thruster.tooltip.condition1": "When fueled and powered",
-    "createpropulsion.thruster.tooltip.behaviour1": "Pushes vehicles. Thrust depends on _redstone signal_ strength."
+    "createpropulsion.thruster.tooltip.behaviour1": "Pushes vehicles. Thrust depends on _redstone signal_ strength.",
+
+    "item.createpropulsion.pine_resin": "Pine Resin",
+    "fluid.createpropulsion.turpentine": "Turpentine",
+    "item.createpropulsion.turpentine_bucket": "Turpentine Bucket"
 }
