@@ -11,6 +11,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DirectionalBlock;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
@@ -69,4 +71,13 @@ public class PhysicsAssemblerBlock extends DirectionalBlock implements EntityBlo
             physicsAssemblerBlockEntity.shipify();
         }
     }
+
+    /*@Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(@Nonnull Level level, @Nonnull BlockState state, @Nonnull BlockEntityType<T> type) {
+        return (cleintLevel, pos, state1, blockEntity) -> {
+            if (blockEntity instanceof PhysicsAssemblerBlockEntity thrusterBlockEntity) {
+                thrusterBlockEntity.tick();
+            }
+        };
+    }*/
 }
