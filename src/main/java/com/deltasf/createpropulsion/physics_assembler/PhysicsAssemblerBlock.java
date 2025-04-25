@@ -69,5 +69,4 @@ public class PhysicsAssemblerBlock extends DirectionalBlock implements EntityBlo
             physicsAssemblerBlockEntity.shipify();
         }
     }
-
 }

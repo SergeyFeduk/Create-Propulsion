@@ -52,6 +52,7 @@ import com.jesz.createdieselgenerators.fluids.FluidRegistry;
 public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggleInformation {
     private static final int OBSTRUCTION_LENGTH = 10; //Prob should be a config
     private static final int BASE_MAX_THRUST = 200000; // 200 kN
+    private static final float BASE_CONSUMPTION_MULTIPLIER = 1.5f;
     //Thruster data
     private ThrusterData thrusterData;
     public SmartFluidTankBehaviour tank;
@@ -62,7 +63,6 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
     private boolean isThrustDirty = false;
     //Particles
     private ParticleType<PlumeParticleData> particleType;
-
 
     private static Set<Fluid> validFluids = new HashSet<Fluid>() {
         {
@@ -77,6 +77,7 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
             }
         }
     };
+
     //Yeah this is pretty ugly
     private static Dictionary<Fluid, FluidThrusterProperties> fluidsProperties = new Hashtable<Fluid, FluidThrusterProperties>();
     static {
@@ -167,7 +168,8 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
     }
 
     private int calculateFuelConsumption(float powerPercentage, float fluidPropertiesConsumptionMultiplier, int tick_rate){
-        return (int)Math.ceil(Config.THRUSTER_CONSUMPTION_MULTIPLIER.get() * powerPercentage * fluidPropertiesConsumptionMultiplier * 1.5f * tick_rate);
+        float baseConsumption = Config.THRUSTER_CONSUMPTION_MULTIPLIER.get() * BASE_CONSUMPTION_MULTIPLIER;
+        return (int)Math.ceil(baseConsumption * powerPercentage * fluidPropertiesConsumptionMultiplier * tick_rate);
     }
 
     public void clientTick(Level level, BlockPos pos, BlockState state, ThrusterBlockEntity blockEntity){
