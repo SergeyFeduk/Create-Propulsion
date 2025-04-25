@@ -10,6 +10,7 @@ import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerBlock;
 import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerBlockEntity;
 import com.deltasf.createpropulsion.thruster.ThrusterBlock;
 import com.deltasf.createpropulsion.thruster.ThrusterBlockEntity;
+import com.deltasf.createpropulsion.utility.BurnableItem;
 import com.mojang.blaze3d.shaders.FogShape;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.simibubi.create.foundation.data.CreateRegistrate;
@@ -146,10 +147,11 @@ public class CreatePropulsion {
         .register();
     
     //Turpentine and pine resin
-    public static final ItemEntry<Item> PINE_RESIN = REGISTRATE.item("pine_resin", p -> new Item(p)).register(); //TODO: Make burnable
+    public static final ItemEntry<BurnableItem> PINE_RESIN = REGISTRATE.item("pine_resin", p -> new BurnableItem(p, 1200)).register();
 
     public static final FluidEntry<ForgeFlowingFluid.Flowing> TURPENTINE = REGISTRATE.standardFluid("turpentine", 
-        SolidRenderedPlaceableFluidType.create(/*0xf2b65c*/0xd69e49, () -> 1.0f / 32.0f * 8f, 0xffd69e49)).renderType(() -> {return RenderType.translucent();})
+        SolidRenderedPlaceableFluidType.create(0xd69e49, () -> 1.0f / 4.0f, 0xffd69e49))
+        .renderType(() -> RenderType.translucent())
         .lang("Turpentine")
         .properties(p -> p.viscosity(1000).density(500))
         .fluidProperties(p -> p.levelDecreasePerBlock(1)
@@ -202,6 +204,8 @@ public class CreatePropulsion {
                 output.accept(INLINE_OPTICAL_SENSOR_BLOCK);
                 output.accept(OPTICAL_SENSOR_BLOCK);
                 output.accept(THRUSTER_BLOCK);
+                output.accept(TURPENTINE.getBucket().get());
+                output.accept(PINE_RESIN);
             }
         }
     }
@@ -289,7 +293,6 @@ public class CreatePropulsion {
 
 		public static FluidTypeFactory create(int fogColor, Supplier<Float> fogDistance, int tintColor) {
 			return (p, s, f) -> {
-                //new ResourceLocation();
                 s = new ResourceLocation("block/water_still");
                 f = new ResourceLocation("block/water_flow");
 				SolidRenderedPlaceableFluidType fluidType = new SolidRenderedPlaceableFluidType(p, s, f);
@@ -308,13 +311,11 @@ public class CreatePropulsion {
 		@Override
 		protected int getTintColor(FluidStack stack) {
             return tintColor;
-            //return 0x703F76E4;
 		}
 
 		@Override
 		public int getTintColor(FluidState state, BlockAndTintGetter world, BlockPos pos) {
             return tintColor;
-            //return 0x703F76E4;
 		}
 
 		@Override
