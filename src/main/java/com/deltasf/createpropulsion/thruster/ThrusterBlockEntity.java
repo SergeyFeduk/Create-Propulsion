@@ -81,7 +81,7 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
             fluidsProperties.put(TFMGFluids.GASOLINE.get().getSource(), new FluidThrusterProperties(1.05f, 0.95f));
             fluidsProperties.put(TFMGFluids.DIESEL.get().getSource(), new FluidThrusterProperties(1.0f, 0.9f));     
         } else {
-            fluidsProperties.put(net.minecraft.world.level.material.Fluids.LAVA, FluidThrusterProperties.DEFAULT);
+            fluidsProperties.put(CreatePropulsion.TURPENTINE.get().getSource(), FluidThrusterProperties.DEFAULT);
         }
         //Fuels from tags
         ITagManager<Fluid> fluidTags = ForgeRegistries.FLUIDS.tags();

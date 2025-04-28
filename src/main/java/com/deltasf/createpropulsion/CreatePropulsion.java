@@ -78,7 +78,6 @@ import com.tterrag.registrate.util.entry.ItemEntry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab.Output;
-//import org.valkyrienskies.mod.common.assembly.ShipAssemblyKt;
 
 @Mod(CreatePropulsion.ID)
 public class CreatePropulsion {

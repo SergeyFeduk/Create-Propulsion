@@ -28,7 +28,6 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.Clearable;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -36,12 +35,10 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DirectionalBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.ticks.ScheduledTick;
 
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import org.valkyrienskies.mod.common.block.WingBlock;
 import org.valkyrienskies.mod.common.networking.PacketRestartChunkUpdates;
 import org.valkyrienskies.mod.common.networking.PacketStopChunkUpdates;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
@@ -196,12 +193,8 @@ public class PhysicsAssemblerBlockEntity extends BlockEntity {
         if (level.getBlockTicks().hasScheduledTick(from, state.getBlock())) {
             level.getBlockTicks().schedule(new ScheduledTick<Block>(state.getBlock(), to, 0, 0));
         }
-        /*if (state.getBlock() instanceof WingBlock a) {
-            System.out.println("SPECIAL HANDLING FOR WINGS");
-        }*/
         //Transfer block entity and its data. This is even more concerning as neurocorellate of consciousness is probably located somewhere in blockEntity
         if (state.hasBlockEntity() && blockEntity != null) {
-            //CompoundTag data = blockEntity.saveWithId();
             CompoundTag tdata = blockEntity.saveWithFullMetadata();
             level.setBlockEntity(blockEntity);
             BlockEntity newBlockEntity = level.getBlockEntity(to);
@@ -217,7 +210,7 @@ public class PhysicsAssemblerBlockEntity extends BlockEntity {
     }
 
     private void updateBlock(Level level, BlockPos from, BlockPos to, BlockState toState){
-        int flags = 11;
+        int flags = 11 | Block.UPDATE_MOVE_BY_PISTON | Block.UPDATE_SUPPRESS_DROPS;
         int recursionLeft = 511;
 
         //FROM
