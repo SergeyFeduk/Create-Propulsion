@@ -18,6 +18,7 @@ public class Config {
     public static final ForgeConfigSpec.ConfigValue<Integer> INLINE_OPTICAL_SENSOR_MAX_DISTANCE;
     public static final ForgeConfigSpec.ConfigValue<Integer> OPTICAL_SENSOR_MAX_DISTANCE;
     public static final ForgeConfigSpec.ConfigValue<Boolean> OPTICAL_SENSOR_CLIP_FLUID;
+    public static final ForgeConfigSpec.ConfigValue<Boolean> OPTICAL_SENSOR_VISIBLE_ONLY_WITH_GOGGLES;
 
     static {
         BUILDER.push("Thruster");
@@ -25,8 +26,8 @@ public class Config {
                 .define("Thrust multiplier", 1.0f);
             THRUSTER_CONSUMPTION_MULTIPLIER = BUILDER.comment("Fuel consumption is multiplied by that.")
                 .define("Fuel consumption", 1.0f);
-            THRUSTER_MAX_SPEED = BUILDER.comment("Thrusters stop accelerate ships upon reaching this speed. Defined in blocks per second.")
-                .defineInRange("Thruster max speed", 100, 10, 200);
+            THRUSTER_MAX_SPEED = BUILDER.comment("Thrusters stop accelerating ships upon reaching this speed. Defined in blocks per second.")
+                .defineInRange("Thruster speed limit", 100, 10, 200);
             THRUSTER_TICKS_PER_UPDATE = BUILDER.comment("Thruster tick rate. Lower values make fluid consumption a little more precise.")
                 .defineInRange("Thruster tick rate", 10, 1, 100);
         BUILDER.pop();
@@ -39,6 +40,8 @@ public class Config {
             OPTICAL_SENSOR_MAX_DISTANCE = BUILDER.comment("Length of the raycast ray. Very high values may degrade performance. Change with caution!")
                 .defineInRange("Optical sensor max raycast distance", 64, 8, 128);
             OPTICAL_SENSOR_CLIP_FLUID = BUILDER.comment("If true - optical sensors will detect fluids too.").define("Clip fluids", true);
+            OPTICAL_SENSOR_VISIBLE_ONLY_WITH_GOGGLES = BUILDER.comment("Optical sensor beam will render only if goggles are equiped.")
+                .define("Beam visible only with goggles", false);
         BUILDER.pop();
 
         SPEC = BUILDER.build();

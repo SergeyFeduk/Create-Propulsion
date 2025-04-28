@@ -2,28 +2,34 @@ package com.deltasf.createpropulsion.optical_sensors.rendering;
 
 import javax.annotation.Nonnull;
 
-import org.joml.Matrix4f;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
+import com.deltasf.createpropulsion.Config;
 import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.optical_sensors.InlineOpticalSensorBlock;
 import com.deltasf.createpropulsion.optical_sensors.InlineOpticalSensorBlockEntity;
+import com.deltasf.createpropulsion.utility.TranslucentBeamRenderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.simibubi.create.foundation.blockEntity.renderer.SafeBlockEntityRenderer;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+
+import com.simibubi.create.AllItems;
 import com.simibubi.create.foundation.blockEntity.behaviour.filtering.FilteringRenderer;
 
 public class OpticalSensorRenderer extends SafeBlockEntityRenderer<InlineOpticalSensorBlockEntity>{
@@ -40,16 +46,16 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<InlineOptical
 
     // Colors
     private static final Vector4f START_COLOR = new Vector4f(
-        RAY_COLOR.x(), RAY_COLOR.y(), RAY_COLOR.z(), RAY_COLOR.w() * (START_ALPHA * 2.0f)
+        RAY_COLOR.x(), RAY_COLOR.y(), RAY_COLOR.z(), RAY_COLOR.w() * START_ALPHA
     );
     private static final Vector4f START_POWERED_COLOR = new Vector4f(
-        RAY_POWERED_COLOR.x(), RAY_POWERED_COLOR.y(), RAY_POWERED_COLOR.z(), RAY_POWERED_COLOR.w() * (START_ALPHA * 2.0f)
+        RAY_POWERED_COLOR.x(), RAY_POWERED_COLOR.y(), RAY_POWERED_COLOR.z(), RAY_POWERED_COLOR.w() * START_ALPHA
     );
     private static final Vector4f END_COLOR = new Vector4f(
-        RAY_COLOR.x(), RAY_COLOR.y(), RAY_COLOR.z(), RAY_COLOR.w() * (END_ALPHA * 2.0f)
+        RAY_COLOR.x(), RAY_COLOR.y(), RAY_COLOR.z(), RAY_COLOR.w() * END_ALPHA
     );
     private static final Vector4f END_POWERED_COLOR = new Vector4f(
-        RAY_POWERED_COLOR.x(), RAY_POWERED_COLOR.y(), RAY_POWERED_COLOR.z(), RAY_POWERED_COLOR.w() * (END_ALPHA * 2.0f)
+        RAY_POWERED_COLOR.x(), RAY_POWERED_COLOR.y(), RAY_POWERED_COLOR.z(), RAY_POWERED_COLOR.w() * END_ALPHA
     );
 
     // Positions
@@ -97,6 +103,14 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<InlineOptical
         if (blockEntity.getType() == CreatePropulsion.OPTICAL_SENSOR_BLOCK_ENTITY.get()) {
             FilteringRenderer.renderOnBlockEntity(blockEntity, partialTicks, poseStack, bufferSource, light, overlay);
         }
+        //Skip rendering if no goggles and configured for that
+        if (Config.OPTICAL_SENSOR_VISIBLE_ONLY_WITH_GOGGLES.get()) {
+            LocalPlayer player = Minecraft.getInstance().player;
+            if (player != null) {
+                ItemStack headItemStack = player.getItemBySlot(EquipmentSlot.HEAD);
+                if (headItemStack.getItem() != AllItems.GOGGLES.get()) return; //No goggles -> no rendering for ya
+            }
+        }
             
         //Laser beam
         float distance = blockEntity.getRaycastDistance();
@@ -143,57 +157,28 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<InlineOptical
         this.localEndPos.add(this.offset_TR, this.eTopRight);
         this.localEndPos.add(this.offset_TL, this.eTopLeft);
 
-        //Rendering setup
-        poseStack.pushPose();
-        VertexConsumer buffer = bufferSource.getBuffer(OpticalSensorBeamRenderType.SOLID_TRANSLUCENT_BEAM);
-        Matrix4f pose = poseStack.last().pose();
-
-        Vector4f startColor = powered ? START_POWERED_COLOR : START_COLOR;
-        Vector4f endColor = powered ? END_POWERED_COLOR : END_COLOR;
-
-        //Normals, I actually flip them every second mod update just because I have no clue if they are correct or not
         this.normalBottom.set(this.upVector);
         this.normalRight.set(this.sideVector).negate();
         this.normalTop.set(this.upVector).negate();
         this.normalLeft.set(this.sideVector);
 
-        //Rendering
-        drawQuad(buffer, pose, this.sBottomLeft, this.sBottomRight, this.eBottomRight, this.eBottomLeft, startColor, endColor, this.normalBottom);
-        drawQuad(buffer, pose, this.sBottomRight, this.sTopRight, this.eTopRight, this.eBottomRight, startColor, endColor, this.normalRight);
-        drawQuad(buffer, pose, this.sTopRight, this.sTopLeft, this.eTopLeft, this.eTopRight, startColor, endColor, this.normalTop);
-        drawQuad(buffer, pose, this.sTopLeft, this.sBottomLeft, this.eBottomLeft, this.eTopLeft, startColor, endColor, this.normalLeft);
+        Vector4f startColor = powered ? START_POWERED_COLOR : START_COLOR;
+        Vector4f endColor = powered ? END_POWERED_COLOR : END_COLOR;
 
+        //Rendering setup
+        PoseStack.Pose pose = poseStack.last();
+        var brd = new BeamRenderData(startColor, endColor, this.normalBottom, this.normalRight, this.normalTop, this.normalLeft, this.sBottomLeft,  
+            this.sBottomRight, this.sTopRight, this.sTopLeft, this.eBottomLeft, this.eBottomRight, this.eTopRight, this.eTopLeft, pose);
+        //The first pass (behind translucent)
+        poseStack.pushPose();
+        VertexConsumer buffer = bufferSource.getBuffer(OpticalSensorBeamRenderType.SOLID_TRANSLUCENT_BEAM);
+        TranslucentBeamRenderer.drawBeam(buffer, brd);
         poseStack.popPose();
+        //Schedule the second pass
+        TranslucentBeamRenderer.scheduleBeamRender(brd);
     }
 
-    private void drawQuad(VertexConsumer buffer, Matrix4f pose,
-                          Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4,
-                          Vector4f startColor, Vector4f endColor, Vector3f normal) {
-
-        // Vertex 1 (Start)
-        buffer.vertex(pose, v1.x(), v1.y(), v1.z())
-              .color(startColor.x(), startColor.y(), startColor.z(), startColor.w())
-              .normal(normal.x(), normal.y(), normal.z())
-              .endVertex();
-
-        // Vertex 2 (Start)
-        buffer.vertex(pose, v2.x(), v2.y(), v2.z())
-              .color(startColor.x(), startColor.y(), startColor.z(), startColor.w())
-              .normal(normal.x(), normal.y(), normal.z())
-              .endVertex();
-
-        // Vertex 3 (End)
-        buffer.vertex(pose, v3.x(), v3.y(), v3.z())
-              .color(endColor.x(), endColor.y(), endColor.z(), endColor.w())
-              .normal(normal.x(), normal.y(), normal.z())
-              .endVertex();
-
-        // Vertex 4 (End)
-        buffer.vertex(pose, v4.x(), v4.y(), v4.z())
-              .color(endColor.x(), endColor.y(), endColor.z(), endColor.w())
-              .normal(normal.x(), normal.y(), normal.z())
-              .endVertex();
-    }
+    
     
     @Override
     public boolean shouldRender(@Nonnull InlineOpticalSensorBlockEntity blockEntity, @Nonnull Vec3 cameraPos) {

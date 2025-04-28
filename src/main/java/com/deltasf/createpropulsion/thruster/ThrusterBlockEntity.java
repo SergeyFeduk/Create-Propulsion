@@ -16,6 +16,7 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
@@ -24,14 +25,9 @@ import com.simibubi.create.foundation.blockEntity.behaviour.fluid.SmartFluidTank
 import com.simibubi.create.foundation.utility.Lang;
 import com.simibubi.create.foundation.utility.LangBuilder;
 
-import static com.deltasf.createpropulsion.thruster.ThrusterBlock.FACING;
-import static com.deltasf.createpropulsion.thruster.ThrusterBlock.POWER;
-
 import java.util.Dictionary;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Set;
 
 import org.joml.Quaterniond;
 import org.joml.Quaterniondc;
@@ -41,18 +37,22 @@ import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraftforge.registries.tags.ITagManager;
 
 import com.deltasf.createpropulsion.Config;
 import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.particles.ParticleTypes;
 import com.deltasf.createpropulsion.particles.PlumeParticleData;
 import com.jesz.createdieselgenerators.fluids.FluidRegistry;
+import com.drmangotea.tfmg.registry.TFMGFluids;
 
-@SuppressWarnings({ "deprecation", "unchecked"})
+@SuppressWarnings({"deprecation", "unchecked"})
 public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggleInformation {
     private static final int OBSTRUCTION_LENGTH = 10; //Prob should be a config
-    private static final int BASE_MAX_THRUST = 200000; // 200 kN
-    private static final float BASE_CONSUMPTION_MULTIPLIER = 1.5f;
+    public static final int BASE_MAX_THRUST = 400000;
+    public static final float BASE_FUEL_CONSUMPTION = 2;
     //Thruster data
     private ThrusterData thrusterData;
     public SmartFluidTankBehaviour tank;
@@ -64,36 +64,40 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
     //Particles
     private ParticleType<PlumeParticleData> particleType;
 
-    private static Set<Fluid> validFluids = new HashSet<Fluid>() {
-        {
-            //Not sure where to show these in game
-            add(CreatePropulsion.TURPENTINE.get().getSource());
-            if (CreatePropulsion.CDG_ACTIVE) {
-                add(FluidRegistry.PLANT_OIL.get().getSource());
-                add(FluidRegistry.BIODIESEL.get().getSource());
-                add(FluidRegistry.DIESEL.get().getSource());
-                add(FluidRegistry.GASOLINE.get().getSource());
-                add(FluidRegistry.ETHANOL.get().getSource());
-            }
-        }
-    };
-
-    //Yeah this is pretty ugly
+    public static final TagKey<Fluid> FORGE_FUEL_TAG = TagKey.create(ForgeRegistries.FLUIDS.getRegistryKey(), new ResourceLocation("forge", "fuel")); 
     private static Dictionary<Fluid, FluidThrusterProperties> fluidsProperties = new Hashtable<Fluid, FluidThrusterProperties>();
     static {
-        fluidsProperties.put(CreatePropulsion.TURPENTINE.get().getSource(), new FluidThrusterProperties(1,1.05f));
+        //Not sure where to show these in game, perhaps in item tooltip if wearing goggles/design goggles
+        //Defined fuels
         if (CreatePropulsion.CDG_ACTIVE) {
             fluidsProperties.put(FluidRegistry.PLANT_OIL.get().getSource(), new FluidThrusterProperties(0.8f, 1.1f));
             fluidsProperties.put(FluidRegistry.BIODIESEL.get().getSource(), new FluidThrusterProperties(0.9f, 1f));
             fluidsProperties.put(FluidRegistry.DIESEL.get().getSource(), new FluidThrusterProperties(1.0f, 0.9f));
             fluidsProperties.put(FluidRegistry.GASOLINE.get().getSource(), new FluidThrusterProperties(1.05f, 0.95f));
             fluidsProperties.put(FluidRegistry.ETHANOL.get().getSource(), new FluidThrusterProperties(0.85f, 1.2f));
+        } if (CreatePropulsion.TFMG_ACTIVE) {
+            fluidsProperties.put(TFMGFluids.NAPHTHA.get().getSource(), new FluidThrusterProperties(0.95f, 1.0f));
+            fluidsProperties.put(TFMGFluids.KEROSENE.get().getSource(), new FluidThrusterProperties(1.0f, 0.9f));
+            fluidsProperties.put(TFMGFluids.GASOLINE.get().getSource(), new FluidThrusterProperties(1.05f, 0.95f));
+            fluidsProperties.put(TFMGFluids.DIESEL.get().getSource(), new FluidThrusterProperties(1.0f, 0.9f));     
+        } else {
+            fluidsProperties.put(net.minecraft.world.level.material.Fluids.LAVA, FluidThrusterProperties.DEFAULT);
         }
-    }
+        //Fuels from tags
+        ITagManager<Fluid> fluidTags = ForgeRegistries.FLUIDS.tags();
+        var tagContents = fluidTags.getTag(FORGE_FUEL_TAG);
+        for (Fluid fluid : tagContents) {
+            if (fluidsProperties.get(fluid) == null) {
+                fluidsProperties.put(fluid, FluidThrusterProperties.DEFAULT);
+            }
+        }
+    };
 
     private static class FluidThrusterProperties {
         public float thrustMultiplier;
         public float consumptionMultiplier;
+        
+        public static final FluidThrusterProperties DEFAULT = new FluidThrusterProperties(1,1 );
 
         public FluidThrusterProperties(float thrustMultiplier, float consumptionMultiplier) {
             this.thrustMultiplier = thrustMultiplier;
@@ -120,7 +124,7 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
 
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-        if (side == state.getValue(FACING) && cap == ForgeCapabilities.FLUID_HANDLER) {
+        if (side == state.getValue(ThrusterBlock.FACING) && cap == ForgeCapabilities.FLUID_HANDLER) {
             return tank.getCapability().cast();
         }
         
@@ -142,7 +146,7 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
         if (currentTick % (tick_rate * 2) == 0) {
             //Every second fluid tick update obstruction
             int previousEmptyBlocks = emptyBlocks;
-            calculateObstruction(level, worldPosition, state.getValue(FACING));
+            calculateObstruction(level, worldPosition, state.getValue(ThrusterBlock.FACING));
             if (previousEmptyBlocks != emptyBlocks) {
                 setChanged();
                 level.sendBlockUpdated(worldPosition, state, state, Block.UPDATE_CLIENTS);
@@ -151,7 +155,7 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
         isThrustDirty = false;
         float thrust = 0;
         //Has fluid and powered
-        int power = state.getValue(POWER);
+        int power = state.getValue(ThrusterBlock.POWER);
         if (validFluid() && power > 0){
             var properties = fluidsProperties.get(fluidStack().getRawFluid());
             float powerPercentage = power / 15.0f;
@@ -168,8 +172,8 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
     }
 
     private int calculateFuelConsumption(float powerPercentage, float fluidPropertiesConsumptionMultiplier, int tick_rate){
-        float baseConsumption = Config.THRUSTER_CONSUMPTION_MULTIPLIER.get() * BASE_CONSUMPTION_MULTIPLIER;
-        return (int)Math.ceil(baseConsumption * powerPercentage * fluidPropertiesConsumptionMultiplier * tick_rate);
+        float base_consumption = BASE_FUEL_CONSUMPTION * Config.THRUSTER_CONSUMPTION_MULTIPLIER.get();
+        return (int)Math.ceil(base_consumption * powerPercentage * fluidPropertiesConsumptionMultiplier * tick_rate);
     }
 
     public void clientTick(Level level, BlockPos pos, BlockState state, ThrusterBlockEntity blockEntity){
@@ -178,7 +182,7 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
 
     private void emitParticles(Level level, BlockPos pos, BlockState state, ThrusterBlockEntity blockEntity){
         if (blockEntity.emptyBlocks == 0) return;
-        int power = state.getValue(POWER);
+        int power = state.getValue(ThrusterBlock.POWER);
         if (power == 0) return;
         if (!validFluid()) return; 
 
@@ -186,7 +190,7 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
         float velocity = 4f * powerPercentage;
         float shipVelocityModifier = 0.15f;
 
-        Direction direction = state.getValue(FACING);
+        Direction direction = state.getValue(ThrusterBlock.FACING);
         Direction oppositeDirection = direction.getOpposite();
 
         double particleX = pos.getX() + 0.5 + oppositeDirection.getStepX() * 0.85;
@@ -217,18 +221,16 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
 
     @Override
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking){
-        //Calculate obstruction if we just placed the thruster block 
-        //isThrustDirty used as a obstruction calculation flag so we do not run it multiple times during the same tick
-        if (currentTick == 0 && !isThrustDirty) {
-            calculateObstruction(getLevel(), worldPosition, getBlockState().getValue(FACING));
-        }
+        //Calculate obstruction if player looks at thruster with goggles. Always
+        calculateObstruction(getLevel(), worldPosition, getBlockState().getValue(ThrusterBlock.FACING));
+
         //Thruster status
         LangBuilder status;
         if (fluidStack().isEmpty()) {
             status = Lang.translate("gui.goggles.thruster.status.no_fuel", new Object[0]).style(ChatFormatting.RED);
         } else if (!validFluid()) {
             status = Lang.translate("gui.goggles.thruster.status.wrong_fuel", new Object[0]).style(ChatFormatting.RED);
-        } else if (getBlockState().getValue(POWER) == 0) {
+        } else if (getBlockState().getValue(ThrusterBlock.POWER) == 0) {
             status = Lang.translate("gui.goggles.thruster.status.not_powered", new Object[0]).style(ChatFormatting.GOLD);
         } else if (emptyBlocks == 0) {
             status = Lang.translate("gui.goggles.thruster.obstructed", new Object[0]).style(ChatFormatting.RED);
@@ -274,7 +276,7 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
 
     private boolean validFluid(){
         if (fluidStack().isEmpty()) return false;
-        return validFluids.contains(fluidStack().getRawFluid());
+        return fluidsProperties.get(fluidStack().getRawFluid()) != null;
     }
 
     public void calculateObstruction(Level level, BlockPos pos, Direction forwardDirection){

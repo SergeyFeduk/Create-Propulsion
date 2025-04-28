@@ -80,6 +80,8 @@ dependencies {
     runtimeOnly(fg.deobf("dev.engine-room.flywheel:flywheel-forge-1.20.1:1.0.0-215"))
     //CDG
     implementation(fg.deobf("curse.maven:createdieselgenerators-869316:5401010"))
+    //TFMG
+    implementation(fg.deobf("curse.maven:createindustry-693815:5811638"))
     //VS2
     implementation("org.valkyrienskies.core:api:${vs_core_version}")
     implementation("org.valkyrienskies.core:impl:${vs_core_version}")

@@ -1,4 +1,4 @@
-modLoader="javafml" #mandatory
+modLoader="javafml"
 loaderVersion="${loader_version_range}"
 license="MIT"
 [[mods]]
@@ -54,4 +54,10 @@ description='''A mod that adds optical sensors and thruster to the Create mod. A
 	mandatory = false
 	versionRange = "[5.6.0,)"
 	ordering = "NONE"
+	side = "BOTH"
+[[dependencies.${mod_id}]]
+	modId = "tfmg"
+	mandatory = false
+	versionRange = "*"
+	ordering = "AFTER"
 	side = "BOTH"
