@@ -69,6 +69,7 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
     static {
         //Not sure where to show these in game, perhaps in item tooltip if wearing goggles/design goggles
         //Defined fuels
+        fluidsProperties.put(CreatePropulsion.TURPENTINE.get().getSource(), FluidThrusterProperties.DEFAULT);
         if (CreatePropulsion.CDG_ACTIVE) {
             fluidsProperties.put(FluidRegistry.PLANT_OIL.get().getSource(), new FluidThrusterProperties(0.8f, 1.1f));
             fluidsProperties.put(FluidRegistry.BIODIESEL.get().getSource(), new FluidThrusterProperties(0.9f, 1f));
@@ -80,8 +81,6 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
             fluidsProperties.put(TFMGFluids.KEROSENE.get().getSource(), new FluidThrusterProperties(1.0f, 0.9f));
             fluidsProperties.put(TFMGFluids.GASOLINE.get().getSource(), new FluidThrusterProperties(1.05f, 0.95f));
             fluidsProperties.put(TFMGFluids.DIESEL.get().getSource(), new FluidThrusterProperties(1.0f, 0.9f));     
-        } else {
-            fluidsProperties.put(CreatePropulsion.TURPENTINE.get().getSource(), FluidThrusterProperties.DEFAULT);
         }
         //Fuels from tags
         ITagManager<Fluid> fluidTags = ForgeRegistries.FLUIDS.tags();
