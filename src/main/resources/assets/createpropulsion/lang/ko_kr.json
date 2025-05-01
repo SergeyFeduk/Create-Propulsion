@@ -1,0 +1,33 @@
+{
+    "itemGroup.createpropulsion.base": "Create: Propulsion",
+
+    "block.createpropulsion.thruster": "추진기",
+    "item.createpropulsion.thruster": "추진기",
+
+    "block.createpropulsion.inline_optical_sensor": "인라인 광학 센서",
+    "item.createpropulsion.inline_optical_sensor": "인라인 광학 센서",
+
+    "block.createpropulsion.optical_sensor": "광학 센서",
+    "item.createpropulsion.optical_sensor": "광학 센서",
+    "create.gui.optical_sensor.distance_behaviour": "레이캐스트 거리",
+
+    "create.gui.goggles.thruster.status": "추진기 상태",
+    "create.gui.goggles.thruster.status.no_fuel": "연료 없음",
+    "create.gui.goggles.thruster.status.wrong_fuel": "잘못된 연료",
+    "create.gui.goggles.thruster.status.not_powered": "레드스톤 신호 없음",
+    "create.gui.goggles.thruster.status.working": "작동 중",
+    "create.gui.goggles.thruster.obstructed": "막힘",
+    "create.gui.goggles.thruster.efficiency": "효율",
+
+    "createpropulsion.inline_optical_sensor.tooltip.summary": "_광선_을 발사하여 최대 {}블록 거리까지 블록을 감지합니다.",
+    "createpropulsion.inline_optical_sensor.tooltip.condition1": "블록을 감지하면",
+    "createpropulsion.inline_optical_sensor.tooltip.behaviour1": "_레드스톤 신호_를 방출합니다. 가까운 블록일수록 출력이 강해집니다.",
+
+    "createpropulsion.optical_sensor.tooltip.summary": "설정 가능한 _레이캐스트 센서_입니다. _거리_와 블록 종류별 _필터_를 설정할 수 있습니다.",
+    "createpropulsion.optical_sensor.tooltip.condition1": "블록을 감지하면",
+    "createpropulsion.optical_sensor.tooltip.behaviour1": "일치하는 블록을 감지하면 _레드스톤 신호_를 출력합니다. 가까운 블록일수록 출력이 강해집니다.",
+
+    "createpropulsion.thruster.tooltip.summary": "최대 _{}kN_의 추진력을 제공하여 차량을 밀어냅니다.",
+    "createpropulsion.thruster.tooltip.condition1": "연료가 공급되고 레드스톤 신호가 있을 때",
+    "createpropulsion.thruster.tooltip.behaviour1": "차량을 밀어냅니다. 추진력은 레드스톤 신호 세기에 따라 달라집니다."
+}

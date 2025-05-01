@@ -178,8 +178,6 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<InlineOptical
         TranslucentBeamRenderer.scheduleBeamRender(brd);
     }
 
-    
-    
     @Override
     public boolean shouldRender(@Nonnull InlineOpticalSensorBlockEntity blockEntity, @Nonnull Vec3 cameraPos) {
         //Distance pre-check

@@ -355,7 +355,7 @@ public class CreatePropulsion {
                     tooltipList.add(Lang.translateDirect("tooltip.holdForDescription", Component.translatable("create.tooltip.keyShift").withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.DARK_GRAY));
                     tooltipList.add(Component.empty());
                     
-                    //Yeah this is VERY UGLY, I know but I don't want to add interface and implement custom handling for that interface
+                    //Yeah this is VERY UGLY, I know but I don't want to add interface and implement custom handling for it
                     boolean modifiedSummary = false;
                     String summary = "";
                     if (item == THRUSTER_BLOCK.asItem()) {
