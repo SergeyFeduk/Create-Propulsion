@@ -1,5 +1,7 @@
 package com.deltasf.createpropulsion;
 
+import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerBlock;
+import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerBlockEntity;
 import com.deltasf.createpropulsion.optical_sensors.InlineOpticalSensorBlock;
 import com.deltasf.createpropulsion.optical_sensors.InlineOpticalSensorBlockEntity;
 import com.deltasf.createpropulsion.optical_sensors.OpticalSensorBlock;
@@ -147,6 +149,20 @@ public class CreatePropulsion {
         .validBlock(PHYSICS_ASSEMBLER_BLOCK)
         .register();
     
+    //Lodestone tracker
+    public static final BlockEntry<LodestoneTrackerBlock> LODESTONE_TRACKER_BLOCK = REGISTRATE.block("lodestone_tracker", LodestoneTrackerBlock::new)
+        .properties(p -> p.mapColor(MapColor.COLOR_YELLOW))
+        .properties(p -> p.sound(SoundType.METAL))
+        .properties(p -> p.strength(2.5F, 2.0F))
+        .properties(p -> p.noOcclusion())
+        .simpleItem()
+        .register();
+    
+    public static final BlockEntityEntry<LodestoneTrackerBlockEntity> LODESTONE_TRACKER_BLOCK_ENTITY = 
+        REGISTRATE.blockEntity("lodestone_tracker_block_entity", LodestoneTrackerBlockEntity::new)
+        .validBlock(LODESTONE_TRACKER_BLOCK)
+        .register();
+    
     //Turpentine and pine resin
     public static final ItemEntry<BurnableItem> PINE_RESIN = REGISTRATE.item("pine_resin", p -> new BurnableItem(p, 1200)).register();
 
@@ -203,9 +219,14 @@ public class CreatePropulsion {
 
             @Override
             public void accept(@Nonnull ItemDisplayParameters parameters, @Nonnull Output output) {
+                //From 0.1
                 output.accept(INLINE_OPTICAL_SENSOR_BLOCK);
                 output.accept(OPTICAL_SENSOR_BLOCK);
                 output.accept(THRUSTER_BLOCK);
+                //From 0.2
+                output.accept(PHYSICS_ASSEMBLER_BLOCK);
+                output.accept(LODESTONE_TRACKER_BLOCK);
+                //From 0.2 (items)
                 output.accept(TURPENTINE.getBucket().get());
                 output.accept(PINE_RESIN);
             }
