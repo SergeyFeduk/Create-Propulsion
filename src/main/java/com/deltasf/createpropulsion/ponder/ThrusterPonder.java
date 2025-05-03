@@ -3,13 +3,13 @@ package com.deltasf.createpropulsion.ponder;
 import com.simibubi.create.foundation.ponder.SceneBuilder;
 import com.simibubi.create.foundation.ponder.SceneBuildingUtil;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
+/*import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;*/
 
 
 public class ThrusterPonder {
     public static void ponder(SceneBuilder scene, SceneBuildingUtil util) {
-        scene.title("thruster", "Setting up a Thruster");
+        /*scene.title("thruster", "Setting up a Thruster");
         scene.configureBasePlate(0, 0, 5);
         scene.showBasePlate();
 
@@ -19,6 +19,6 @@ public class ThrusterPonder {
         BlockPos leverPos = util.grid.at(1,1,1);
         scene.effects.indicateRedstone(leverPos);
         scene.world.toggleRedstonePower(util.select.fromTo(leverPos, leverPos));
-        scene.idle(15);
+        scene.idle(15);*/
     }
 }

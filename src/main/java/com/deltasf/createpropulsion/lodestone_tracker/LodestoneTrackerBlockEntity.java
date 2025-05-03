@@ -32,6 +32,8 @@ import net.minecraftforge.items.IItemHandler;
 public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
 
     private ItemStack compass = ItemStack.EMPTY;
+    private int currentTick = 0; //TODO: Save
+    private float targetAngle;
     private final LodestoneTrackerItemHandler itemHandler = new LodestoneTrackerItemHandler(this);
     private final LazyOptional<IItemHandler> itemHandlerCap = LazyOptional.of(() -> itemHandler);
 
@@ -39,15 +41,31 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
         super(typeIn, pos, state);
     }
 
+    public float getAngle() {
+        return targetAngle;
+    }
+
     @Override
     public void tick() {
         super.tick();
+        currentTick++;
         if (compass.isEmpty()) return;
+        targetAngle = getAngleFromCompass(compass);
+        System.out.println(targetAngle);
+    }
+
+    private float getAngleFromCompass(ItemStack compass) {
         //Acquire target block position
         boolean targetLodestone = CompassItem.isLodestoneCompass(compass);
         GlobalPos targetBlockPosition;
         if (targetLodestone) {
             targetBlockPosition = CompassItem.getLodestonePosition(compass.getShareTag());
+            if (targetBlockPosition == null) {
+                //This is triggered with lodestone compass which has its lodestone block destroyed
+                //In this case we just rotate the angle
+                float angle = ((float)currentTick / 10.0f) % 360.0f;
+                return angle;
+            }
         } else {
             targetBlockPosition = CompassItem.getSpawnPosition(getLevel());
         }
@@ -57,6 +75,7 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
         Vector3d trackerPosition = getWorldSpacePosition(worldPosition);
         //Calculate angle between two positions
         float angle = getDirectionAngle(trackerPosition, targetPosition);
+        return angle;
     }
 
     private float getDirectionAngle(Vector3d posA, Vector3d posB) {

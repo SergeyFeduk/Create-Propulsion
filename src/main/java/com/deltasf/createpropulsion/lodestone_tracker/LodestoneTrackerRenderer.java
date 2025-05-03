@@ -23,16 +23,38 @@ public class LodestoneTrackerRenderer extends SafeBlockEntityRenderer<LodestoneT
     protected void renderSafe(LodestoneTrackerBlockEntity blockEntity, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int light, int overlay) {
         ItemStack compass = blockEntity.getCompass();
         if (compass.isEmpty()) return;
-        float y = 0.9f;
-        renderItem(blockEntity.getLevel(), poseStack, bufferSource, light, overlay, compass, 0, new Vec3(0.5,y,0.5));
+        float targetAngle = blockEntity.getAngle();
+        int modelIndex = getIndexFromAngle(targetAngle);
+        renderCompass(blockEntity.getLevel(), poseStack, bufferSource, light, overlay, compass, 0, new Vec3(0.5,0.9f,0.5), modelIndex);
     }
 
-    private static void renderItem(Level level, PoseStack ms, MultiBufferSource buffer, int light, int overlay, 
-        ItemStack item, int angle, Vec3 position) {
+    private int getIndexFromAngle(float targetAngle) {
+        //Angle is in degrees in range of 0..360
+        //Model index is from 0 to 31
+        //Compass is always pointing to north, and index 31 is pointing west
+        final int TOTAL_INDICES = 32;
+        final float DEGREES_PER_CIRCLE = 360.0f;
+        final float SLICE_SIZE = DEGREES_PER_CIRCLE / TOTAL_INDICES;
+
+        float normalizedAngle = targetAngle % DEGREES_PER_CIRCLE;
+        if (normalizedAngle < 0) {
+            normalizedAngle += DEGREES_PER_CIRCLE;
+        }
+         if (normalizedAngle >= DEGREES_PER_CIRCLE) {
+             normalizedAngle = 0.0f;
+         }
+
+        int index = (int)(normalizedAngle / SLICE_SIZE);
+
+        return index;
+    }
+
+
+    private static void renderCompass(Level level, PoseStack ms, MultiBufferSource buffer, int light, int overlay, 
+        ItemStack item, int angle, Vec3 position, int modelIndex) {
         ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
         //Acquire target compass model
-        boolean test = Minecraft.getInstance().player.isCrouching();
-        BakedModel model = Bakery.BAKED_COMPASS_MODELS[test ? 0 : 10];
+        BakedModel model = Bakery.BAKED_COMPASS_MODELS[modelIndex];
 
         ms.pushPose();
         //Move and twist compass around to make it look fine
