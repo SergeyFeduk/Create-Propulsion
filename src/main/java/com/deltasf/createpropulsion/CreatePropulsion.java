@@ -2,6 +2,7 @@ package com.deltasf.createpropulsion;
 
 import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerBlock;
 import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerBlockEntity;
+import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerRenderer;
 import com.deltasf.createpropulsion.optical_sensors.InlineOpticalSensorBlock;
 import com.deltasf.createpropulsion.optical_sensors.InlineOpticalSensorBlockEntity;
 import com.deltasf.createpropulsion.optical_sensors.OpticalSensorBlock;
@@ -15,7 +16,6 @@ import com.deltasf.createpropulsion.thruster.ThrusterBlockEntity;
 import com.deltasf.createpropulsion.utility.BurnableItem;
 import com.mojang.blaze3d.shaders.FogShape;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.deltasf.createpropulsion.utility.TranslucentBeamRenderer;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.simibubi.create.foundation.item.TooltipHelper;
 import com.simibubi.create.foundation.utility.Color;
@@ -161,6 +161,7 @@ public class CreatePropulsion {
     public static final BlockEntityEntry<LodestoneTrackerBlockEntity> LODESTONE_TRACKER_BLOCK_ENTITY = 
         REGISTRATE.blockEntity("lodestone_tracker_block_entity", LodestoneTrackerBlockEntity::new)
         .validBlock(LODESTONE_TRACKER_BLOCK)
+        .renderer(() -> LodestoneTrackerRenderer::new)
         .register();
     
     //Turpentine and pine resin
@@ -182,7 +183,6 @@ public class CreatePropulsion {
         ParticleTypes.register(modBus);
         
         MinecraftForge.EVENT_BUS.register(this);
-        MinecraftForge.EVENT_BUS.register(TranslucentBeamRenderer.class);
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, Config.SPEC);
 
         REGISTRATE.registerEventListeners(modBus);
