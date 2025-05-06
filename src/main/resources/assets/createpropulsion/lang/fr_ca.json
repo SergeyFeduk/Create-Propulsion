@@ -1,0 +1,33 @@
+{
+    "itemGroup.createpropulsion.base": "Create: Propulsion",
+
+    "block.createpropulsion.thruster": "Propulseur",
+    "item.createpropulsion.thruster": "Propulseur",
+
+    "block.createpropulsion.inline_optical_sensor": "Capteur Optique En Ligne",
+    "item.createpropulsion.inline_optical_sensor": "Capteur Optique En Ligne",
+
+    "block.createpropulsion.optical_sensor": "Capteur Optique",
+    "item.createpropulsion.optical_sensor": "Capteur Optique",
+    "create.gui.optical_sensor.distance_behaviour": "Distance De Raycasting",
+
+    "create.gui.goggles.thruster.status": "État De Propulseur",
+    "create.gui.goggles.thruster.status.no_fuel": "Pas De Carburant",
+    "create.gui.goggles.thruster.status.wrong_fuel": "Mauvais Carburant",
+    "create.gui.goggles.thruster.status.not_powered": "Inactif",
+    "create.gui.goggles.thruster.status.working": "Actif",
+    "create.gui.goggles.thruster.obstructed": "Obstrué",
+    "create.gui.goggles.thruster.efficiency": "Efficacité",
+
+    "createpropulsion.inline_optical_sensor.tooltip.summary": "Émet un _rayon_ jusqu'à _{} blocs de distance_, detectant les blocs.",
+    "createpropulsion.inline_optical_sensor.tooltip.condition1": "Lorsqu'un bloc est détecté.",
+    "createpropulsion.inline_optical_sensor.tooltip.behaviour1": "Émettre un _signal de redstone_. La puissance est plus forte pour les blocs plus proches.",
+
+    "createpropulsion.optical_sensor.tooltip.summary": "_Capteur a raycasting_ configurable. Mettre la _distance_ et _un filtre_ par type de bloc.",
+    "createpropulsion.optical_sensor.tooltip.condition1": "Quand un bloc est détecté.",
+    "createpropulsion.optical_sensor.tooltip.behaviour1": "Si un bloc correspondant est détecté, émettre un _signal de redstone_. La Puissance est plus forte pour les blocs plus proches.",
+
+    "createpropulsion.thruster.tooltip.summary": "Fournit une poussée jusqu'à _{} kN_ pour pousser des vehicles.",
+    "createpropulsion.thruster.tooltip.condition1": "Quand activé par la redstone et que du carburant et fourni",
+    "createpropulsion.thruster.tooltip.behaviour1": "Pousse des vehicles. La force de la poussée depend de la force du _signal de redstone_."
+}

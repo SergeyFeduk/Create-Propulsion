@@ -31,6 +31,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DirectionalBlock;
 import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -40,6 +41,8 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -47,10 +50,11 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 @SuppressWarnings("deprecation")
-public class InlineOpticalSensorBlock extends DirectionalBlock implements EntityBlock, IWrenchable {
+public class InlineOpticalSensorBlock extends DirectionalBlock implements EntityBlock, IWrenchable, SimpleWaterloggedBlock {
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
     public static final IntegerProperty POWER = IntegerProperty.create("redstone_power", 0, 15);
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
+    public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final VoxelShaper BLOCK_SHAPE;
 
     //CBC placement on projectiles compat
@@ -69,7 +73,13 @@ public class InlineOpticalSensorBlock extends DirectionalBlock implements Entity
         super(properties);
         this.registerDefaultState(this.stateDefinition.any()
             .setValue(FACING, Direction.NORTH)
-            .setValue(POWERED, false));
+            .setValue(POWERED, false)
+            .setValue(WATERLOGGED, false));
+    }
+
+    @Override
+    public FluidState getFluidState(@Nonnull BlockState state) {
+        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
 
     @Override
@@ -79,7 +89,12 @@ public class InlineOpticalSensorBlock extends DirectionalBlock implements Entity
 
     @Override
     public BlockState getStateForPlacement(@Nonnull BlockPlaceContext context) {
-		return defaultBlockState().setValue(FACING, context.getClickedFace());
+        FluidState fluidstate = context.getLevel().getFluidState(context.getClickedPos());
+        boolean isWaterlogged = fluidstate.getType() == Fluids.WATER;
+
+        return this.defaultBlockState()
+                   .setValue(FACING, context.getClickedFace())
+                   .setValue(WATERLOGGED, isWaterlogged);
     }
 
     @Override
@@ -111,6 +126,7 @@ public class InlineOpticalSensorBlock extends DirectionalBlock implements Entity
         builder.add(FACING);
         builder.add(POWER);
         builder.add(POWERED);
+        builder.add(WATERLOGGED);
         super.createBlockStateDefinition(builder);
     }
 

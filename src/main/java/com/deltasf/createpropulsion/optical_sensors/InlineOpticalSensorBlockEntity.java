@@ -18,6 +18,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
@@ -26,12 +28,25 @@ import org.joml.Quaterniondc;
 import org.joml.Vector3d;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
+import com.deltasf.createpropulsion.optical_sensors.rendering.BeamRenderData;
 import com.deltasf.createpropulsion.Config;
 import com.mojang.datafixers.util.Pair;
 
 public class InlineOpticalSensorBlockEntity extends SmartBlockEntity {
     private int currentTick = -1; // -1 to run raycast immediately after placement
     private float raycastDistance = getMaxRaycastDistanceNormalized();
+
+    @OnlyIn(Dist.CLIENT)
+    private BeamRenderData beamRenderData;
+
+    @OnlyIn(Dist.CLIENT)
+    public BeamRenderData getClientBeamRenderData() {
+        // Initialize lazily on first access on the client
+        if (this.beamRenderData == null) {
+            this.beamRenderData = new BeamRenderData();
+        }
+        return this.beamRenderData;
+    }
 
     public InlineOpticalSensorBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn == null ? CreatePropulsion.INLINE_OPTICAL_SENSOR_BLOCK_ENTITY.get() : typeIn, pos, state);

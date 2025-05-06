@@ -22,43 +22,26 @@ public class BeamRenderData {
     public Vector3f eBottomRight;
     public Vector3f eTopRight;
     public Vector3f eTopLeft;
-    public final PoseStack.Pose poseSnapshot;
+    public PoseStack.Pose poseSnapshot;
     
-    public BeamRenderData(
-        Vector4f startColor,
-        Vector4f endColor,
+    public BeamRenderData() {
+        this.startColor = new Vector4f();
+        this.endColor = new Vector4f();
 
-        Vector3f normalBottom,
-        Vector3f normalRight,
-        Vector3f normalTop,
-        Vector3f normalLeft,
+        this.normalBottom = new Vector3f();
+        this.normalRight = new Vector3f();
+        this.normalTop = new Vector3f();
+        this.normalLeft = new Vector3f();
 
-        Vector3f sBottomLeft,
-        Vector3f sBottomRight,
-        Vector3f sTopRight,
-        Vector3f sTopLeft,
-        Vector3f eBottomLeft,
-        Vector3f eBottomRight,
-        Vector3f eTopRight,
-        Vector3f eTopLeft,
-        PoseStack.Pose poseSnapshot
-    ) {
-        this.startColor = new Vector4f(startColor);
-        this.endColor = new Vector4f(endColor);
+        this.sBottomLeft = new Vector3f();
+        this.sBottomRight = new Vector3f();
+        this.sTopRight = new Vector3f();
+        this.sTopLeft = new Vector3f();
+        this.eBottomLeft = new Vector3f();
+        this.eBottomRight = new Vector3f();
+        this.eTopRight = new Vector3f();
+        this.eTopLeft = new Vector3f();
 
-        this.normalBottom = new Vector3f(normalBottom);
-        this.normalRight = new Vector3f(normalRight);
-        this.normalTop = new Vector3f(normalTop);
-        this.normalLeft = new Vector3f(normalLeft);
-
-        this.sBottomLeft = new Vector3f(sBottomLeft);
-        this.sBottomRight = new Vector3f(sBottomRight);
-        this.sTopRight = new Vector3f(sTopRight);
-        this.sTopLeft = new Vector3f(sTopLeft);
-        this.eBottomLeft = new Vector3f(eBottomLeft);
-        this.eBottomRight = new Vector3f(eBottomRight);
-        this.eTopRight = new Vector3f(eTopRight);
-        this.eTopLeft = new Vector3f(eTopLeft);
-        this.poseSnapshot = poseSnapshot;
+        this.poseSnapshot = null;
     }
 }

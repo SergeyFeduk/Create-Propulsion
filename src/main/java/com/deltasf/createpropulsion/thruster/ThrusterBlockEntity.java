@@ -6,11 +6,15 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
@@ -25,16 +29,20 @@ import com.simibubi.create.foundation.blockEntity.behaviour.fluid.SmartFluidTank
 import com.simibubi.create.foundation.utility.Lang;
 import com.simibubi.create.foundation.utility.LangBuilder;
 
+import java.awt.Color;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 
 import org.joml.Quaterniond;
 import org.joml.Quaterniondc;
+import org.joml.Quaternionf;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.valkyrienskies.core.api.ships.ClientShip;
+import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -43,16 +51,23 @@ import net.minecraftforge.registries.tags.ITagManager;
 
 import com.deltasf.createpropulsion.Config;
 import com.deltasf.createpropulsion.CreatePropulsion;
+import com.deltasf.createpropulsion.debug.DebugRenderer;
+import com.simibubi.create.foundation.collision.Matrix3d;
+import com.simibubi.create.foundation.collision.OrientedBB;
 import com.deltasf.createpropulsion.particles.ParticleTypes;
 import com.deltasf.createpropulsion.particles.PlumeParticleData;
+import com.deltasf.createpropulsion.utility.MathUtility;
 import com.jesz.createdieselgenerators.fluids.FluidRegistry;
 import com.drmangotea.tfmg.registry.TFMGFluids;
 
+//Abandon all hope, ye who enter here
 @SuppressWarnings({"deprecation", "unchecked"})
 public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggleInformation {
     private static final int OBSTRUCTION_LENGTH = 10; //Prob should be a config
     public static final int BASE_MAX_THRUST = 400000;
     public static final float BASE_FUEL_CONSUMPTION = 2;
+    public static final int TICKS_PER_ENTITY_CHECK = 5;
+    public static final int LOWEST_POWER_THRSHOLD = 5; 
     //Thruster data
     private ThrusterData thrusterData;
     public SmartFluidTankBehaviour tank;
@@ -60,6 +75,7 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
     private int emptyBlocks;
     //Ticking
     private int currentTick = 0;
+    private int clientTick = 0;
     private boolean isThrustDirty = false;
     //Particles
     private ParticleType<PlumeParticleData> particleType;
@@ -138,9 +154,14 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
         currentTick++;
         
         int tick_rate = Config.THRUSTER_TICKS_PER_UPDATE.get();
+        boolean isFluidValid = validFluid();
+        int power = state.getValue(ThrusterBlock.POWER);
+        //Damage entities
+        if (Config.THRUSTER_DAMAGE_ENTITIES.get() && isFluidValid && power > 0) doEntityDamageCheck(currentTick);
         if (!(isThrustDirty || currentTick % tick_rate == 0)) {
             return;
         }
+        //Recalculate obstruction
         state = getBlockState();
         if (currentTick % (tick_rate * 2) == 0) {
             //Every second fluid tick update obstruction
@@ -151,11 +172,10 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
                 level.sendBlockUpdated(worldPosition, state, state, Block.UPDATE_CLIENTS);
             }
         }
+        //Calculate thrust
         isThrustDirty = false;
         float thrust = 0;
-        //Has fluid and powered
-        int power = state.getValue(ThrusterBlock.POWER);
-        if (validFluid() && power > 0){
+        if (isFluidValid && power > 0){
             var properties = fluidsProperties.get(fluidStack().getRawFluid());
             float powerPercentage = power / 15.0f;
             //Redstone power clamped by obstruction value
@@ -165,13 +185,14 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
             //Consume fluid
             tank.getPrimaryHandler().drain(consumption, IFluidHandler.FluidAction.EXECUTE);
             //Calculate thrust
-            thrust = BASE_MAX_THRUST * Config.THRUSTER_THRUST_MULTIPLIER.get() * thrustPercentage * properties.thrustMultiplier;
+            float thrustMultiplier = (float)(double)Config.THRUSTER_THRUST_MULTIPLIER.get();
+            thrust = BASE_MAX_THRUST * thrustMultiplier * thrustPercentage * properties.thrustMultiplier;
         }
         thrusterData.setThrust(thrust);
     }
 
     private int calculateFuelConsumption(float powerPercentage, float fluidPropertiesConsumptionMultiplier, int tick_rate){
-        float base_consumption = BASE_FUEL_CONSUMPTION * Config.THRUSTER_CONSUMPTION_MULTIPLIER.get();
+        float base_consumption = BASE_FUEL_CONSUMPTION * (float)(double)Config.THRUSTER_CONSUMPTION_MULTIPLIER.get();
         return (int)Math.ceil(base_consumption * powerPercentage * fluidPropertiesConsumptionMultiplier * tick_rate);
     }
 
@@ -183,9 +204,12 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
         if (blockEntity.emptyBlocks == 0) return;
         int power = state.getValue(ThrusterBlock.POWER);
         if (power == 0) return;
-        if (!validFluid()) return; 
+        if (!validFluid()) return;
+        //Limit minumum velocity and particle count when power is lower than that
+        clientTick++;
+        if (power < LOWEST_POWER_THRSHOLD && clientTick % 2 == 0) {clientTick = 0; return; }
 
-        float powerPercentage = Math.max(power, 3) / 15.0f;
+        float powerPercentage = Math.max(power, LOWEST_POWER_THRSHOLD) / 15.0f;
         float velocity = 4f * powerPercentage;
         float shipVelocityModifier = 0.15f;
 
@@ -304,6 +328,95 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
         currentTick = compound.getInt("currentTick");
         isThrustDirty = compound.getBoolean("isThrustDirty");
     }
+    
+    //This is ugly af, fix it
+    @SuppressWarnings("null")
+    private void doEntityDamageCheck(int tick) {
+        if (tick % TICKS_PER_ENTITY_CHECK != 0) return;
+        int power = state.getValue(ThrusterBlock.POWER);
+        float visualPowerPercent = ((float)Math.max(power, LOWEST_POWER_THRSHOLD) - LOWEST_POWER_THRSHOLD) / 15.0f;
+        float distanceByPower = org.joml.Math.lerp(0.55f,1.5f, visualPowerPercent);
+
+        Direction plumeDirection = getBlockState().getValue(ThrusterBlock.FACING).getOpposite();
+        //Define OBB Dimensions
+        double plumeStartOffset = 0.8;
+        double plumeEndOffset = emptyBlocks * distanceByPower + plumeStartOffset;
+        double plumeLength = Math.max(0, plumeEndOffset - plumeStartOffset);
+        if (plumeLength <= 0.01) return;
+
+        // Calculate OBB World Position and Orientation
+        Vector3d obbCenterWorldJOML;
+        Quaterniond obbRotationWorldJOML;
+        Vector3d thrusterCenterBlockWorldJOML;
+        double centerOffsetDistance = plumeStartOffset + (plumeLength / 2.0);
+        Vector3d relativeCenterOffsetJOML = VectorConversionsMCKt.toJOMLD(plumeDirection.getNormal()).mul(centerOffsetDistance);
+        Quaterniond relativeRotationJOML = new Quaterniond().rotateTo(new Vector3d(0, 0, 1), VectorConversionsMCKt.toJOMLD(plumeDirection.getNormal()));
+
+        Vector3d thrusterCenterBlockShipCoordsJOMLD = VectorConversionsMCKt.toJOML(Vec3.atCenterOf(worldPosition));
+
+        Ship ship = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
+        if (ship != null) {
+            //Ship-space
+            thrusterCenterBlockWorldJOML = ship.getShipToWorld().transformPosition(thrusterCenterBlockShipCoordsJOMLD, new Vector3d());
+            obbCenterWorldJOML = ship.getShipToWorld().transformPosition(relativeCenterOffsetJOML.add(thrusterCenterBlockShipCoordsJOMLD, new Vector3d()), new Vector3d());
+            obbRotationWorldJOML = ship.getTransform().getShipToWorldRotation().mul(relativeRotationJOML, new Quaterniond());
+        } else {
+            // World space
+            thrusterCenterBlockWorldJOML = thrusterCenterBlockShipCoordsJOMLD;
+            obbCenterWorldJOML = thrusterCenterBlockWorldJOML.add(relativeCenterOffsetJOML, new Vector3d());
+            obbRotationWorldJOML = relativeRotationJOML;
+        }
+
+        //Calculate actuall nozzle position for distance-based damage calculation
+        Vector3d nozzleOffsetLocal = new Vector3d(0, 0, 0.5); // Offset from block center to face along local Z
+        Vector3d nozzleOffsetWorld = obbRotationWorldJOML.transform(nozzleOffsetLocal, new Vector3d()); // Rotate offset into world orientation
+        Vector3d thrusterNozzleWorldPos = thrusterCenterBlockWorldJOML.add(nozzleOffsetWorld, new Vector3d());
+        Vec3 thrusterNozzleWorldPosMC = VectorConversionsMCKt.toMinecraft(thrusterNozzleWorldPos);
+
+        //Calculate AABB for Broad-Phase Query
+        BlockPos blockBehind = worldPosition.relative(plumeDirection);
+        int aabbEndOffset = (int)Math.floor(emptyBlocks * distanceByPower) + 1;
+        BlockPos blockEnd = worldPosition.relative(plumeDirection, aabbEndOffset);
+        AABB plumeAABB = new AABB(blockBehind).minmax(new AABB(blockEnd)).inflate(1.0); //Inflation is optional but it makes me a bit more confident
+
+        //Calculate OBB for Narrow check
+        Vector3d plumeHalfExtentsJOML = new Vector3d(0.7, 0.7, plumeLength / 2.0);
+        Vec3 plumeCenterMC = VectorConversionsMCKt.toMinecraft(obbCenterWorldJOML);
+        Vec3 plumeHalfExtentsMC = VectorConversionsMCKt.toMinecraft(plumeHalfExtentsJOML);
+        
+        Matrix3d plumeRotationMatrix = MathUtility.createMatrixFromQuaternion(obbRotationWorldJOML);
+        OrientedBB plumeOBB = new OrientedBB(plumeCenterMC, plumeHalfExtentsMC, plumeRotationMatrix);
+
+        //Debug OBB
+        boolean debug = false;
+        if (debug) {
+            String identifier = "thruster_" + this.hashCode() + "_obb";
+            Quaternionf debugRotation = new Quaternionf((float)obbRotationWorldJOML.x, (float)obbRotationWorldJOML.y, (float)obbRotationWorldJOML.z, (float)obbRotationWorldJOML.w);
+            Vec3 debugSize = new Vec3(plumeHalfExtentsJOML.x * 2, plumeHalfExtentsJOML.y * 2, plumeHalfExtentsJOML.z * 2);
+            Vec3 debugCenter = VectorConversionsMCKt.toMinecraft(obbCenterWorldJOML);
+
+            DebugRenderer.drawBox(identifier, debugCenter, debugSize, debugRotation, Color.ORANGE, false, TICKS_PER_ENTITY_CHECK + 1);
+        }
+
+        //Query damage candidates
+        List<Entity> damageCandidates = level.getEntities(null, plumeAABB);
+        if (damageCandidates.isEmpty()) return;
+
+        //Apply damage
+        DamageSource fireDamageSource = level.damageSources().onFire();
+        for (Entity entity : damageCandidates) {
+            if (entity.isRemoved() || entity.fireImmune()) continue;
+            AABB entityAABB = entity.getBoundingBox();
+            if (plumeOBB.intersect(entityAABB) != null) {
+                float invSqrDistance = visualPowerPercent * 8.0f / (float)Math.max(1, entity.position().distanceToSqr(thrusterNozzleWorldPosMC));
+                float damageAmount = 3 + invSqrDistance;
+
+                // Apply damage and fire
+                entity.hurt(fireDamageSource, damageAmount);
+                entity.setSecondsOnFire(3); 
+            }
+        }
+    }
 
     //Just reversed version of create TooltipHelper.makeProgressBar
     public static String makeObstructionBar(int length, int filledLength) {
@@ -317,5 +430,5 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
            bar = bar + "█";
         }
         return bar + " ";
-     }
+    }
 }

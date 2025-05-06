@@ -182,12 +182,11 @@ public class CreatePropulsion {
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
         ParticleTypes.register(modBus);
         
-        MinecraftForge.EVENT_BUS.register(this);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, Config.SPEC);
-
-        REGISTRATE.registerEventListeners(modBus);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, Config.SPEC, ID + "-server.toml");
 
         CreativeModTab.register(modBus);
+
+        REGISTRATE.registerEventListeners(modBus);
     }
 
     @EventBusSubscriber(modid = ID, bus = Bus.MOD, value = Dist.CLIENT)
@@ -380,7 +379,8 @@ public class CreatePropulsion {
                     boolean modifiedSummary = false;
                     String summary = "";
                     if (item == THRUSTER_BLOCK.asItem()) {
-                        int thrusterStrength = Math.round(ThrusterBlockEntity.BASE_MAX_THRUST / 1000.0f * Config.THRUSTER_THRUST_MULTIPLIER.get());
+                        float thrustMultiplier = (float)(double)Config.THRUSTER_THRUST_MULTIPLIER.get();
+                        int thrusterStrength = Math.round(ThrusterBlockEntity.BASE_MAX_THRUST / 1000.0f * thrustMultiplier);
                         summary = Component.translatable(path + ".tooltip.summary").getString().replace("{}", String.valueOf(thrusterStrength));
                         modifiedSummary = true;
                     }

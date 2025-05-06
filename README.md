@@ -19,4 +19,4 @@
 ### Thrusters are over/underpowered
 - Modify thrust multiplier in config.
 ### Do you plan to add *X*?
-- Check my Discord for roadmap (when I create one, if you see this - there is no discord server yet).
+- Check my [Discord](https://discord.gg/knB8UV3bzZ) for roadmap.

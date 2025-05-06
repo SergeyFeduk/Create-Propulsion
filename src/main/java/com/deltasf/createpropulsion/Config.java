@@ -1,18 +1,17 @@
 package com.deltasf.createpropulsion;
 
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = CreatePropulsion.ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class Config {
     public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
     public static final ForgeConfigSpec SPEC;
 
     //Thruster
-    public static final ForgeConfigSpec.ConfigValue<Float> THRUSTER_THRUST_MULTIPLIER;
-    public static final ForgeConfigSpec.ConfigValue<Float> THRUSTER_CONSUMPTION_MULTIPLIER;
+    public static final ForgeConfigSpec.ConfigValue<Double> THRUSTER_THRUST_MULTIPLIER;
+    public static final ForgeConfigSpec.ConfigValue<Double> THRUSTER_CONSUMPTION_MULTIPLIER;
     public static final ForgeConfigSpec.ConfigValue<Integer> THRUSTER_MAX_SPEED;
     public static final ForgeConfigSpec.ConfigValue<Integer> THRUSTER_TICKS_PER_UPDATE;
+    public static final ForgeConfigSpec.ConfigValue<Boolean> THRUSTER_DAMAGE_ENTITIES;
     //Optical sensors
     public static final ForgeConfigSpec.ConfigValue<Integer> OPTICAL_SENSOR_TICKS_PER_UPDATE;
     public static final ForgeConfigSpec.ConfigValue<Integer> INLINE_OPTICAL_SENSOR_MAX_DISTANCE;
@@ -23,13 +22,15 @@ public class Config {
     static {
         BUILDER.push("Thruster");
             THRUSTER_THRUST_MULTIPLIER = BUILDER.comment("Thrust is multiplied by that.")
-                .define("Thrust multiplier", 1.0f);
+                .define("Thrust multiplier", 1.0);
             THRUSTER_CONSUMPTION_MULTIPLIER = BUILDER.comment("Fuel consumption is multiplied by that.")
-                .define("Fuel consumption", 1.0f);
+                .define("Fuel consumption", 1.0);
             THRUSTER_MAX_SPEED = BUILDER.comment("Thrusters stop accelerating ships upon reaching this speed. Defined in blocks per second.")
                 .defineInRange("Thruster speed limit", 100, 10, 200);
             THRUSTER_TICKS_PER_UPDATE = BUILDER.comment("Thruster tick rate. Lower values make fluid consumption a little more precise.")
                 .defineInRange("Thruster tick rate", 10, 1, 100);
+            THRUSTER_DAMAGE_ENTITIES = BUILDER.comment("If true - thrusters will damage entities. May have negative effect on performance if a lot of thrusters are used.")
+                .define("Thrusters damage entities", true);
         BUILDER.pop();
 
         BUILDER.push("Optical sensors");

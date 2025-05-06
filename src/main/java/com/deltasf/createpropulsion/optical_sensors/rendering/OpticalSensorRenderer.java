@@ -72,24 +72,6 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<InlineOptical
     private final Vector3f offset_TR = new Vector3f(); // Top-Right offset
     private final Vector3f offset_TL = new Vector3f(); // Top-Left offset
 
-    // Start vertices
-    private final Vector3f sBottomLeft = new Vector3f();
-    private final Vector3f sBottomRight = new Vector3f();
-    private final Vector3f sTopRight = new Vector3f();
-    private final Vector3f sTopLeft = new Vector3f();
-
-    // End vertices
-    private final Vector3f eBottomLeft = new Vector3f();
-    private final Vector3f eBottomRight = new Vector3f();
-    private final Vector3f eTopRight = new Vector3f();
-    private final Vector3f eTopLeft = new Vector3f();
-
-    // Normals
-    private final Vector3f normalBottom = new Vector3f();
-    private final Vector3f normalRight = new Vector3f();
-    private final Vector3f normalTop = new Vector3f();
-    private final Vector3f normalLeft = new Vector3f();
-
     // AABB Calculation Vectors
     private static final float HALF_THICKNESS = RAY_THICKNESS * 0.5f;
     private final Vector3d worldStart = new Vector3d();
@@ -111,6 +93,8 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<InlineOptical
                 if (headItemStack.getItem() != AllItems.GOGGLES.get()) return; //No goggles -> no rendering for ya
             }
         }
+
+        BeamRenderData beamData = blockEntity.getClientBeamRenderData();
             
         //Laser beam
         float distance = blockEntity.getRaycastDistance();
@@ -147,35 +131,33 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<InlineOptical
         this.offset_TR.set(this.sideVector).add(this.upVector);          // +side + up
         this.offset_TL.set(this.sideVector).negate().add(this.upVector); // -side + up
 
-        this.localStartPos.add(this.offset_BL, this.sBottomLeft);
-        this.localStartPos.add(this.offset_BR, this.sBottomRight);
-        this.localStartPos.add(this.offset_TR, this.sTopRight);
-        this.localStartPos.add(this.offset_TL, this.sTopLeft);
+        this.localStartPos.add(this.offset_BL, beamData.sBottomLeft);
+        this.localStartPos.add(this.offset_BR, beamData.sBottomRight);
+        this.localStartPos.add(this.offset_TR, beamData.sTopRight);
+        this.localStartPos.add(this.offset_TL, beamData.sTopLeft);
 
-        this.localEndPos.add(this.offset_BL, this.eBottomLeft);
-        this.localEndPos.add(this.offset_BR, this.eBottomRight);
-        this.localEndPos.add(this.offset_TR, this.eTopRight);
-        this.localEndPos.add(this.offset_TL, this.eTopLeft);
+        this.localEndPos.add(this.offset_BL, beamData.eBottomLeft);
+        this.localEndPos.add(this.offset_BR, beamData.eBottomRight);
+        this.localEndPos.add(this.offset_TR, beamData.eTopRight);
+        this.localEndPos.add(this.offset_TL, beamData.eTopLeft);
 
-        this.normalBottom.set(this.upVector);
-        this.normalRight.set(this.sideVector).negate();
-        this.normalTop.set(this.upVector).negate();
-        this.normalLeft.set(this.sideVector);
+        beamData.normalBottom.set(this.upVector);
+        beamData.normalRight.set(this.sideVector).negate();
+        beamData.normalTop.set(this.upVector).negate();
+        beamData.normalLeft.set(this.sideVector);
 
-        Vector4f startColor = powered ? START_POWERED_COLOR : START_COLOR;
-        Vector4f endColor = powered ? END_POWERED_COLOR : END_COLOR;
+        beamData.startColor.set(powered ? START_POWERED_COLOR : START_COLOR);
+        beamData.endColor.set(powered ? END_POWERED_COLOR : END_COLOR);
+        beamData.poseSnapshot = poseStack.last();
 
         //Rendering setup
-        PoseStack.Pose pose = poseStack.last();
-        var brd = new BeamRenderData(startColor, endColor, this.normalBottom, this.normalRight, this.normalTop, this.normalLeft, this.sBottomLeft,  
-            this.sBottomRight, this.sTopRight, this.sTopLeft, this.eBottomLeft, this.eBottomRight, this.eTopRight, this.eTopLeft, pose);
         //The first pass (behind translucent)
         poseStack.pushPose();
         VertexConsumer buffer = bufferSource.getBuffer(OpticalSensorBeamRenderType.SOLID_TRANSLUCENT_BEAM);
-        TranslucentBeamRenderer.drawBeam(buffer, brd);
+        TranslucentBeamRenderer.drawBeam(buffer, beamData);
         poseStack.popPose();
-        //Schedule the second pass
-        TranslucentBeamRenderer.scheduleBeamRender(brd);
+        //Schedule the second 
+        TranslucentBeamRenderer.scheduleBeamRender(beamData);
     }
 
     @Override

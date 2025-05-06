@@ -1,4 +1,6 @@
 {
+    "itemGroup.createpropulsion.base": "Create: Propulsion",
+    
     "block.createpropulsion.thruster": "Реактивный двигатель",
     "item.createpropulsion.thruster": "Реактивный двигатель",
 

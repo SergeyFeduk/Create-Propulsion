@@ -1,0 +1,33 @@
+{
+    "itemGroup.createpropulsion.base": "Create: Propulsion",
+
+    "block.createpropulsion.thruster": "Propulsor",
+    "item.createpropulsion.thruster": "Propulsor",
+
+    "block.createpropulsion.inline_optical_sensor": "Sensor Óptico en linea",
+    "item.createpropulsion.inline_optical_sensor": "Sensor Óptico en línea",
+
+    "block.createpropulsion.optical_sensor": "Sensor Óptico",
+    "item.createpropulsion.optical_sensor": "Sensor Óptico",
+    "create.gui.optical_sensor.distance_behaviour": "Longitud de rayo",
+
+    "create.gui.goggles.thruster.status": "Estado del propulsor",
+    "create.gui.goggles.thruster.status.no_fuel": "Sin Combustible",
+    "create.gui.goggles.thruster.status.wrong_fuel": "Combustible Erróneo",
+    "create.gui.goggles.thruster.status.not_powered": "Sin Encender",
+    "create.gui.goggles.thruster.status.working": "Encendido",
+    "create.gui.goggles.thruster.obstructed": "Obstruido",
+    "create.gui.goggles.thruster.efficiency": "Eficiencia",
+
+    "createpropulsion.inline_optical_sensor.tooltip.summary": "Dispara un _rayo_ de hasta _{} bloques de distancia_, detectando bloques.",
+    "createpropulsion.inline_optical_sensor.tooltip.condition1": "Cuando un bloque es detectado",
+    "createpropulsion.inline_optical_sensor.tooltip.behaviour1": "Emite una _señal de redstone_. El poder es proporcional a la cercanía del bloque.",
+
+    "createpropulsion.optical_sensor.tooltip.summary": "Configurable _sensor de rayos_. Configura la _distancia_ y _filtro_ por tipo de bloque.",
+    "createpropulsion.optical_sensor.tooltip.condition1": "Cuando un bloque es detectado",
+    "createpropulsion.optical_sensor.tooltip.behaviour1": "Si se detecta un bloque coincidente, emite una _señal de redstone_. El poder es proporcional a la cercanía del bloque.",
+
+    "createpropulsion.thruster.tooltip.summary": "Proporciona fuerza de hasta _{} kN_ para empujar vehículos.",
+    "createpropulsion.thruster.tooltip.condition1": "Cuando se alimenta y se enciende",
+    "createpropulsion.thruster.tooltip.behaviour1": "Empuja vehículos. La potencia es proporcional a la _señal de redstone_ ."
+}

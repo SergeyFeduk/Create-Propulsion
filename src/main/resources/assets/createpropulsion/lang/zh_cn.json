@@ -1,33 +1,33 @@
 {
-    "itemGroup.createpropulsion.base": "Create: Propulsion",
+  "itemGroup.createpropulsion.base": "机械动力：推进工程",
 
-    "block.createpropulsion.thruster": "推进器",
-    "item.createpropulsion.thruster": "推进器",
+  "block.createpropulsion.thruster": "推进器",
+  "item.createpropulsion.thruster": "推进器",
 
-    "block.createpropulsion.inline_optical_sensor": "直列式光学传感器",
-    "item.createpropulsion.inline_optical_sensor": "直列式光学传感器",
+  "block.createpropulsion.inline_optical_sensor": "内嵌式光学传感器",
+  "item.createpropulsion.inline_optical_sensor": "内嵌式光学传感器",
 
-    "block.createpropulsion.optical_sensor": "光学传感器",
-    "item.createpropulsion.optical_sensor": "光学传感器",
-    "create.gui.optical_sensor.distance_behaviour": "光线投射距离",
+  "block.createpropulsion.optical_sensor": "光学传感器",
+  "item.createpropulsion.optical_sensor": "光学传感器",
+  "create.gui.optical_sensor.distance_behaviour": "光线投射距离",
 
-    "create.gui.goggles.thruster.status": "推进器状态",
-    "create.gui.goggles.thruster.status.no_fuel": "燃料耗尽",
-    "create.gui.goggles.thruster.status.wrong_fuel": "燃料错误",
-    "create.gui.goggles.thruster.status.not_powered": "未红石充能",
-    "create.gui.goggles.thruster.status.working": "启用",
-    "create.gui.goggles.thruster.obstructed": "被遮挡",
-    "create.gui.goggles.thruster.efficiency": "效率",
+  "create.gui.goggles.thruster.status": "推进器状态",
+  "create.gui.goggles.thruster.status.no_fuel": "燃料耗尽",
+  "create.gui.goggles.thruster.status.wrong_fuel": "燃料错误",
+  "create.gui.goggles.thruster.status.not_powered": "未被红石充能",
+  "create.gui.goggles.thruster.status.working": "启用",
+  "create.gui.goggles.thruster.obstructed": "被遮挡",
+  "create.gui.goggles.thruster.efficiency": "效率",
 
-    "createpropulsion.inline_optical_sensor.tooltip.summary": "投射出最长 _{} 方块长度_ 的 _光线_ 以检测方块。",
-    "createpropulsion.inline_optical_sensor.tooltip.condition1": "当检测到方块时",
-    "createpropulsion.inline_optical_sensor.tooltip.behaviour1": "发出 _红石信号_。方块距离越近，信号越强。",
+  "createpropulsion.inline_optical_sensor.tooltip.summary": "投射出最长_{} 方块长度_的_光线_以检测方块。",
+  "createpropulsion.inline_optical_sensor.tooltip.condition1": "当检测到方块时",
+  "createpropulsion.inline_optical_sensor.tooltip.behaviour1": "发出_红石信号_。方块距离越近，信号越强。",
 
-    "createpropulsion.optical_sensor.tooltip.summary": "可配置的 _光学传感器_。可以设置 _距离_ 并以方块类型进行 _筛选_。",
-    "createpropulsion.optical_sensor.tooltip.condition1": "当检测到方块时",
-    "createpropulsion.optical_sensor.tooltip.behaviour1": "当检测到符合条件的方块时，发出 _红石信号_。方块距离越近，信号越强。",
+  "createpropulsion.optical_sensor.tooltip.summary": "可配置的_光学传感器_。可以设置_距离_并以方块类型进行_筛选_。",
+  "createpropulsion.optical_sensor.tooltip.condition1": "当检测到方块时",
+  "createpropulsion.optical_sensor.tooltip.behaviour1": "当检测到符合条件的方块时，发出_红石信号_。方块距离越近，信号越强。",
 
-    "createpropulsion.thruster.tooltip.summary": "提供最大 _{} kN_ 的推力推动物理结构",
-    "createpropulsion.thruster.tooltip.condition1": "当供应燃料且红石激活时",
-    "createpropulsion.thruster.tooltip.behaviour1": "对物理结构施加推力。推力大小取决于 _红石信号_ 强度。"
+  "createpropulsion.thruster.tooltip.summary": "提供最大_{} kN_的推力推动物理结构",
+  "createpropulsion.thruster.tooltip.condition1": "当供应燃料且被红石充能时",
+  "createpropulsion.thruster.tooltip.behaviour1": "对物理结构施加推力。推力大小取决于_红石信号_的强度。"
 }
