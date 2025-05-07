@@ -41,12 +41,11 @@ public class LodestoneTrackerRenderer extends SafeBlockEntityRenderer<LodestoneT
         if (normalizedAngle < 0) {
             normalizedAngle += DEGREES_PER_CIRCLE;
         }
-         if (normalizedAngle >= DEGREES_PER_CIRCLE) {
-             normalizedAngle = 0.0f;
-         }
+        if (normalizedAngle >= DEGREES_PER_CIRCLE) {
+            normalizedAngle = 0.0f;
+        }
 
-        int index = (int)(normalizedAngle / SLICE_SIZE);
-
+        int index = (int)(targetAngle / SLICE_SIZE);
         return index;
     }
 
@@ -55,6 +54,7 @@ public class LodestoneTrackerRenderer extends SafeBlockEntityRenderer<LodestoneT
         ItemStack item, int angle, Vec3 position, int modelIndex) {
         ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
         //Acquire target compass model
+        modelIndex = Math.min(Math.max(0, modelIndex), 31);
         BakedModel model = Bakery.BAKED_COMPASS_MODELS[modelIndex];
 
         ms.pushPose();

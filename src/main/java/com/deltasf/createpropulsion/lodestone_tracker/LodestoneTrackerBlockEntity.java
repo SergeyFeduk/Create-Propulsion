@@ -1,5 +1,7 @@
 package com.deltasf.createpropulsion.lodestone_tracker;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -8,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.Quaterniondc;
 import org.joml.Vector2f;
 import org.joml.Vector3d;
+import org.joml.Vector4i;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import com.deltasf.createpropulsion.utility.MathUtility;
@@ -36,6 +39,7 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
     private ItemStack compass = ItemStack.EMPTY;
     private int currentTick = 0; //TODO: Save
     private float targetAngle;
+    private float previousAngle;
     private final LodestoneTrackerItemHandler itemHandler = new LodestoneTrackerItemHandler(this);
     private final LazyOptional<IItemHandler> itemHandlerCap = LazyOptional.of(() -> itemHandler);
 
@@ -53,6 +57,7 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
         currentTick++;
         if (compass.isEmpty()) return;
         targetAngle = getAngleFromCompass(compass);
+        updateRedstoneOutput(targetAngle);
     }
 
     //All angular calculations are done in horizontal coordinate system due to simplicity
@@ -93,7 +98,83 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
         return angle;
     }
 
-    public static Vector2f getHorizontalAndVerticalAngles(Vector3d targetPosition, Vector3d trackerPosition) {
+    private void updateRedstoneOutput(float angle) {
+        //Angle of 0/360 is pointing south
+        if (isAngleWithingTolerance(previousAngle, angle, 1.0f / 32.0f * 360.0f / 2.0f)) return;
+        previousAngle = targetAngle;
+        Vector4i outputs = calculateRedstoneOutput(angle);
+
+        BlockState updatedState = getBlockState()
+            .setValue(LodestoneTrackerBlock.POWER_NORTH, outputs.x)
+            .setValue(LodestoneTrackerBlock.POWER_EAST, outputs.y)
+            .setValue(LodestoneTrackerBlock.POWER_SOUTH, outputs.z)
+            .setValue(LodestoneTrackerBlock.POWER_WEST, outputs.w);
+        getLevel().setBlock(worldPosition, updatedState, 3);
+    }
+
+    private boolean isAngleWithingTolerance(float value, float target, float tolerance) {
+        return target > value - tolerance && target < value + tolerance;
+    }
+
+    private Vector4i calculateRedstoneOutput(float angle) {
+        float normalizedAngle = angle % 360.0f;
+        if (normalizedAngle < 0) {
+            normalizedAngle += 360.0f;
+        }
+
+        double angleRad = Math.toRadians(normalizedAngle);
+        double cosA = Math.cos(angleRad);
+        double sinA = Math.sin(angleRad);
+
+        double weightN = Math.max(0, -cosA);
+        double weightE = Math.max(0, -sinA);
+        double weightS = Math.max(0, cosA);
+        double weightW = Math.max(0, sinA);
+
+        double sumWeights = weightN + weightE + weightS + weightW;
+
+        if (sumWeights == 0) { // Should ideally not happen with unit vector logic, but as a fallback
+            sumWeights = 1.0; // Prevent division by zero; distribute evenly or default (e.g. to North)
+             // For this specific problem, sumWeights (|cosA|+|sinA|) is always >= 1.0
+        }
+
+        double[] fPowers = new double[4];
+        fPowers[0] = (weightN / sumWeights) * 15.0; // North
+        fPowers[1] = (weightE / sumWeights) * 15.0; // East
+        fPowers[2] = (weightS / sumWeights) * 15.0; // South
+        fPowers[3] = (weightW / sumWeights) * 15.0; // West
+
+        int[] intPowers = new int[4];
+        int currentSumInt = 0;
+
+        for (int i = 0; i < 4; i++) {
+            intPowers[i] = (int) Math.floor(fPowers[i]);
+            currentSumInt += intPowers[i];
+        }
+
+        int remainderToDistribute = 15 - currentSumInt;
+
+        Integer[] indices = {0, 1, 2, 3};
+        Arrays.sort(indices, new Comparator<Integer>() {
+            @Override
+            public int compare(Integer idx1, Integer idx2) {
+                double rem1 = fPowers[idx1] - intPowers[idx1];
+                double rem2 = fPowers[idx2] - intPowers[idx2];
+                if (rem1 != rem2) {
+                    return Double.compare(rem2, rem1); // Sort descending by remainder
+                }
+                return Integer.compare(idx1, idx2); // Tie-break by original index
+            }
+        });
+
+        for (int k = 0; k < remainderToDistribute; k++) {
+            intPowers[indices[k]]++;
+        }
+        return new Vector4i(intPowers[0], intPowers[1], intPowers[2], intPowers[3]);
+    }
+
+
+    private static Vector2f getHorizontalAndVerticalAngles(Vector3d targetPosition, Vector3d trackerPosition) {
         Vector3d direction = new Vector3d();
         targetPosition.sub(trackerPosition, direction);
 

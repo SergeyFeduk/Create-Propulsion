@@ -26,6 +26,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -34,6 +36,11 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class LodestoneTrackerBlock extends Block implements EntityBlock {
     public static final VoxelShaper BLOCK_SHAPE;
+    public static final IntegerProperty POWER_NORTH = IntegerProperty.create("north_power", 0, 15);
+    public static final IntegerProperty POWER_EAST = IntegerProperty.create("east_power", 0, 15);
+    public static final IntegerProperty POWER_SOUTH = IntegerProperty.create("south_power", 0, 15);
+    public static final IntegerProperty POWER_WEST = IntegerProperty.create("west_power", 0, 15);
+
     static {
         VoxelShape shape = Shapes.empty();
 
@@ -51,6 +58,16 @@ public class LodestoneTrackerBlock extends Block implements EntityBlock {
 
     public LodestoneTrackerBlock(Properties properties){
         super(properties);
+        this.registerDefaultState(this.stateDefinition.any()
+            .setValue(POWER_NORTH, 0)
+            .setValue(POWER_EAST, 0)
+            .setValue(POWER_SOUTH, 0)
+            .setValue(POWER_WEST, 0));
+    }
+
+    @Override
+    protected void createBlockStateDefinition(@Nonnull StateDefinition.Builder<net.minecraft.world.level.block.Block, BlockState> builder) {
+        builder.add(POWER_NORTH, POWER_EAST, POWER_SOUTH, POWER_WEST);
     }
 
     @Override
@@ -91,5 +108,36 @@ public class LodestoneTrackerBlock extends Block implements EntityBlock {
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(@Nonnull Level level, @Nonnull BlockState state, @Nonnull BlockEntityType<T> type) {
         return new SmartBlockEntityTicker<>();
+    }
+    //Redstone
+
+    @Override
+	public boolean canConnectRedstone(BlockState state, BlockGetter world, BlockPos pos, Direction side) {
+		return side != Direction.DOWN && side != Direction.UP;
+	}
+
+    @Override
+    public int getSignal(@Nonnull BlockState blockState, @Nonnull BlockGetter blockAccess, @Nonnull BlockPos pos, @Nonnull Direction side){
+        boolean invertedDirection = true;
+        if (invertedDirection) {
+            if (side == Direction.NORTH) return blockState.getValue(POWER_NORTH);
+            if (side == Direction.EAST) return blockState.getValue(POWER_EAST);
+            if (side == Direction.SOUTH) return blockState.getValue(POWER_SOUTH);
+            if (side == Direction.WEST) return blockState.getValue(POWER_WEST);
+        } else {
+            if (side == Direction.NORTH) return blockState.getValue(POWER_SOUTH);
+            if (side == Direction.EAST) return blockState.getValue(POWER_WEST);
+            if (side == Direction.SOUTH) return blockState.getValue(POWER_NORTH);
+            if (side == Direction.WEST) return blockState.getValue(POWER_EAST);
+        }
+        return 0;
+    }
+
+    @Override
+    public boolean isSignalSource(@Nonnull BlockState state){
+        return  state.getValue(POWER_NORTH) > 0 || 
+                state.getValue(POWER_EAST)  > 0 ||
+                state.getValue(POWER_SOUTH) > 0 ||
+                state.getValue(POWER_WEST)  > 0;
     }
 }
