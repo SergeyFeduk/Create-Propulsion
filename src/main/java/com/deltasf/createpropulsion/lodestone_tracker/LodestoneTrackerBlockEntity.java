@@ -5,10 +5,12 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import org.jetbrains.annotations.NotNull;
+import org.joml.Vector2f;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
-
+import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
+import com.deltasf.createpropulsion.debug.DebugRenderer;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 
@@ -51,7 +53,7 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
         currentTick++;
         if (compass.isEmpty()) return;
         targetAngle = getAngleFromCompass(compass);
-        System.out.println(targetAngle);
+        //System.out.println(targetAngle);
     }
 
     private float getAngleFromCompass(ItemStack compass) {
@@ -69,32 +71,45 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
         } else {
             targetBlockPosition = CompassItem.getSpawnPosition(getLevel());
         }
+        
         BlockPos targetBlock = targetBlockPosition.pos();
         //Acquire target and tracker world space positions
         Vector3d targetPosition = getWorldSpacePosition(targetBlock);
         Vector3d trackerPosition = getWorldSpacePosition(worldPosition);
+        if (targetPosition == null || trackerPosition == null) return 0; // In case anything is on unloaded ship - set angle to 0 
+
+        /*String identifier = String.valueOf(this.hashCode());
+        DebugRenderer.drawBox(identifier + "_A", VectorConversionsMCKt.toMinecraft(targetPosition), new Vec3(1,1,1), 2);
+        DebugRenderer.drawBox(identifier + "_B", VectorConversionsMCKt.toMinecraft(trackerPosition), new Vec3(1,1,1), 2);*/
+
         //Calculate angle between two positions
-        float angle = getDirectionAngle(trackerPosition, targetPosition);
+        float angle = getHorizontalAndVerticalAngles(targetPosition, trackerPosition).x + 180;
+
+        //Account for tracker's ship rotation
+
         return angle;
     }
 
-    private float getDirectionAngle(Vector3d posA, Vector3d posB) {
+    public static Vector2f getHorizontalAndVerticalAngles(Vector3d targetPosition, Vector3d trackerPosition) {
         Vector3d direction = new Vector3d();
-        posB.sub(posA, direction);
+        targetPosition.sub(trackerPosition, direction);
 
-        double dx = direction.x;
-        double dy = direction.y;
-
-        //double angleRad = Math.atan2(dy, dx);
-        double angleRad = Math.atan2(dx, dy);
-        double angleClockwise = -angleRad;
-
-        if (angleClockwise < 0) {
-            angleClockwise += Math.PI * 2.0f;
+        if (direction.lengthSquared() == 0.0) {
+            return new Vector2f(0.0f, 0.0f);
         }
 
-        double angleDegrees = Math.toDegrees(angleClockwise);
-        return (float)angleDegrees;
+        double horizontalDistance = Math.sqrt(direction.x * direction.x + direction.z * direction.z);
+
+        float horizontalAngle;
+        if (horizontalDistance == 0.0) {
+            horizontalAngle = 0.0f;
+        } else {
+            horizontalAngle = (float) Math.toDegrees(Math.atan2(direction.x, -direction.z));
+        }
+        
+        float verticalAngle = (float) Math.toDegrees(Math.atan2(direction.y, horizontalDistance));
+
+        return new Vector2f(horizontalAngle, verticalAngle);
     }
 
     private Vector3d getWorldSpacePosition(BlockPos pos) {
@@ -103,6 +118,10 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
         if (trackerInShipyard) {
             Ship targetShip = VSGameUtilsKt.getShipManagingPos(level, pos);
             Vec3 blockCenter = pos.getCenter();
+            if (targetShip == null) {
+                //Ship is unloaded, return null for handling this in higher stage.
+                return null;
+            }
             trackerPosition = VSGameUtilsKt.toWorldCoordinates(targetShip, blockCenter.x, blockCenter.y, blockCenter.z);
         } else {
             Vec3 blockCenter = pos.getCenter();

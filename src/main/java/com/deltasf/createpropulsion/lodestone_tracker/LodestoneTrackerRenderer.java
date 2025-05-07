@@ -25,7 +25,8 @@ public class LodestoneTrackerRenderer extends SafeBlockEntityRenderer<LodestoneT
         if (compass.isEmpty()) return;
         float targetAngle = blockEntity.getAngle();
         int modelIndex = getIndexFromAngle(targetAngle);
-        renderCompass(blockEntity.getLevel(), poseStack, bufferSource, light, overlay, compass, 0, new Vec3(0.5,0.9f,0.5), modelIndex);
+        System.out.println(modelIndex);
+        renderCompass(blockEntity.getLevel(), poseStack, bufferSource, light, overlay, compass, 0, new Vec3(0.5,0.85f,0.5), modelIndex);
     }
 
     private int getIndexFromAngle(float targetAngle) {

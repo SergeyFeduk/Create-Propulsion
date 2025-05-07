@@ -16,7 +16,13 @@ public class Bakery {
     public static final ModelResourceLocation[] COMPASS_MODELS = new ModelResourceLocation[32];
     static {
         for (int i = 0; i < 32; ++i) {
-            String modelPath = String.format("compass_%02d", i);
+            String modelPath;
+            //Cuz minecraft was developed by corporation who does not know about number 16
+            if (i == 16) {
+                modelPath = "compass";
+            } else {
+                modelPath = String.format("compass_%02d", i);
+            }
             COMPASS_MODELS[i] = ModelResourceLocation.vanilla(modelPath, "inventory");
         }
     }
