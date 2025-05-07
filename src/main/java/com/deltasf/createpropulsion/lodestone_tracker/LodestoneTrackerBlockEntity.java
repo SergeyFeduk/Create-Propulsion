@@ -5,12 +5,12 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import org.jetbrains.annotations.NotNull;
+import org.joml.Quaterniondc;
 import org.joml.Vector2f;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
-import com.deltasf.createpropulsion.debug.DebugRenderer;
+import com.deltasf.createpropulsion.utility.MathUtility;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 
@@ -53,10 +53,10 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
         currentTick++;
         if (compass.isEmpty()) return;
         targetAngle = getAngleFromCompass(compass);
-        //System.out.println(targetAngle);
     }
 
-    private float getAngleFromCompass(ItemStack compass) {
+    //All angular calculations are done in horizontal coordinate system due to simplicity
+    public float getAngleFromCompass(ItemStack compass) {
         //Acquire target block position
         boolean targetLodestone = CompassItem.isLodestoneCompass(compass);
         GlobalPos targetBlockPosition;
@@ -65,7 +65,7 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
             if (targetBlockPosition == null) {
                 //This is triggered with lodestone compass which has its lodestone block destroyed
                 //In this case we just rotate the angle
-                float angle = ((float)currentTick / 10.0f) % 360.0f;
+                float angle = (float)currentTick % 360.0f;
                 return angle;
             }
         } else {
@@ -78,14 +78,17 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
         Vector3d trackerPosition = getWorldSpacePosition(worldPosition);
         if (targetPosition == null || trackerPosition == null) return 0; // In case anything is on unloaded ship - set angle to 0 
 
-        /*String identifier = String.valueOf(this.hashCode());
-        DebugRenderer.drawBox(identifier + "_A", VectorConversionsMCKt.toMinecraft(targetPosition), new Vec3(1,1,1), 2);
-        DebugRenderer.drawBox(identifier + "_B", VectorConversionsMCKt.toMinecraft(trackerPosition), new Vec3(1,1,1), 2);*/
-
         //Calculate angle between two positions
         float angle = getHorizontalAndVerticalAngles(targetPosition, trackerPosition).x + 180;
 
         //Account for tracker's ship rotation
+        boolean trackerInShipyard = VSGameUtilsKt.isBlockInShipyard(level, worldPosition);
+        if (trackerInShipyard) {
+            Ship targetShip = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
+            Quaterniondc rotation = targetShip.getTransform().getShipToWorldRotation();
+            Vector2f rotationHCS = MathUtility.toHorizontalCoordinateSystem(rotation);
+            angle -= rotationHCS.x;
+        }
 
         return angle;
     }
@@ -113,21 +116,21 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
     }
 
     private Vector3d getWorldSpacePosition(BlockPos pos) {
-        Vector3d trackerPosition;
-        boolean trackerInShipyard = VSGameUtilsKt.isBlockInShipyard(level, pos);
-        if (trackerInShipyard) {
+        Vector3d position;
+        boolean blockInShipyard = VSGameUtilsKt.isBlockInShipyard(level, pos);
+        if (blockInShipyard) {
             Ship targetShip = VSGameUtilsKt.getShipManagingPos(level, pos);
             Vec3 blockCenter = pos.getCenter();
             if (targetShip == null) {
                 //Ship is unloaded, return null for handling this in higher stage.
                 return null;
             }
-            trackerPosition = VSGameUtilsKt.toWorldCoordinates(targetShip, blockCenter.x, blockCenter.y, blockCenter.z);
+            position = VSGameUtilsKt.toWorldCoordinates(targetShip, blockCenter.x, blockCenter.y, blockCenter.z);
         } else {
             Vec3 blockCenter = pos.getCenter();
-            trackerPosition = new Vector3d(blockCenter.x, blockCenter.y, blockCenter.z);
+            position = new Vector3d(blockCenter.x, blockCenter.y, blockCenter.z);
         }
-        return trackerPosition;
+        return position;
     }
 
     @Override
