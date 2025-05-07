@@ -1,7 +1,5 @@
 package com.deltasf.createpropulsion.lodestone_tracker;
 
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -25,6 +23,7 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.item.CompassItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -40,6 +39,7 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
     private int currentTick = 0; //TODO: Save
     private float targetAngle;
     private float previousAngle;
+    private Vector4i redstoneOutputs = new Vector4i();
     private final LodestoneTrackerItemHandler itemHandler = new LodestoneTrackerItemHandler(this);
     private final LazyOptional<IItemHandler> itemHandlerCap = LazyOptional.of(() -> itemHandler);
 
@@ -56,7 +56,7 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
         super.tick();
         currentTick++;
         if (compass.isEmpty()) return;
-        targetAngle = getAngleFromCompass(compass);
+        targetAngle = getAngleFromCompass(compass);;
         updateRedstoneOutput(targetAngle);
     }
 
@@ -93,6 +93,8 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
             Quaterniondc rotation = targetShip.getTransform().getShipToWorldRotation();
             Vector2f rotationHCS = MathUtility.toHorizontalCoordinateSystem(rotation);
             angle -= rotationHCS.x;
+            angle = angle % 360.0f;
+            if (angle < 0) angle += 360.0f;
         }
 
         return angle;
@@ -100,77 +102,80 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
 
     private void updateRedstoneOutput(float angle) {
         //Angle of 0/360 is pointing south
-        if (isAngleWithingTolerance(previousAngle, angle, 1.0f / 32.0f * 360.0f / 2.0f)) return;
+        if (isAngleWithinTolerance(previousAngle, angle, 1.0f / 32.0f * 360.0f / 2.0f)) return;
         previousAngle = targetAngle;
-        Vector4i outputs = calculateRedstoneOutput(angle);
+        calculateRedstoneOutput(angle);
 
         BlockState updatedState = getBlockState()
-            .setValue(LodestoneTrackerBlock.POWER_NORTH, outputs.x)
-            .setValue(LodestoneTrackerBlock.POWER_EAST, outputs.y)
-            .setValue(LodestoneTrackerBlock.POWER_SOUTH, outputs.z)
-            .setValue(LodestoneTrackerBlock.POWER_WEST, outputs.w);
-        getLevel().setBlock(worldPosition, updatedState, 3);
+            .setValue(LodestoneTrackerBlock.POWER_NORTH, redstoneOutputs.x)
+            .setValue(LodestoneTrackerBlock.POWER_EAST, redstoneOutputs.y)
+            .setValue(LodestoneTrackerBlock.POWER_SOUTH, redstoneOutputs.z)
+            .setValue(LodestoneTrackerBlock.POWER_WEST, redstoneOutputs.w);
+            level.setBlock(worldPosition, updatedState, Block.UPDATE_CLIENTS | Block.UPDATE_NEIGHBORS);
     }
 
-    private boolean isAngleWithingTolerance(float value, float target, float tolerance) {
+    private boolean isAngleWithinTolerance(float value, float target, float tolerance) {
         return target > value - tolerance && target < value + tolerance;
     }
 
-    private Vector4i calculateRedstoneOutput(float angle) {
-        float normalizedAngle = angle % 360.0f;
-        if (normalizedAngle < 0) {
-            normalizedAngle += 360.0f;
-        }
+    public void calculateRedstoneOutput(float angle) {
+        float angleRad = (float)Math.toRadians(angle);
+        float cosA = (float)Math.cos(angleRad);
+        float sinA = (float)Math.sin(angleRad);
 
-        double angleRad = Math.toRadians(normalizedAngle);
-        double cosA = Math.cos(angleRad);
-        double sinA = Math.sin(angleRad);
+        float weightN = Math.max(0.0f, -cosA);
+        float weightE = Math.max(0.0f, -sinA);
+        float weightS = Math.max(0.0f, cosA);
+        float weightW = Math.max(0.0f, sinA);
 
-        double weightN = Math.max(0, -cosA);
-        double weightE = Math.max(0, -sinA);
-        double weightS = Math.max(0, cosA);
-        double weightW = Math.max(0, sinA);
+        float sumWeights = weightN + weightE + weightS + weightW;
 
-        double sumWeights = weightN + weightE + weightS + weightW;
+        float fPowerN = (weightN / sumWeights) * 15.0f;
+        float fPowerE = (weightE / sumWeights) * 15.0f;
+        float fPowerS = (weightS / sumWeights) * 15.0f;
+        float fPowerW = (weightW / sumWeights) * 15.0f;
 
-        if (sumWeights == 0) { // Should ideally not happen with unit vector logic, but as a fallback
-            sumWeights = 1.0; // Prevent division by zero; distribute evenly or default (e.g. to North)
-             // For this specific problem, sumWeights (|cosA|+|sinA|) is always >= 1.0
-        }
+        int intPowerN = (int) fPowerN;
+        int intPowerE = (int) fPowerE;
+        int intPowerS = (int) fPowerS;
+        int intPowerW = (int) fPowerW;
 
-        double[] fPowers = new double[4];
-        fPowers[0] = (weightN / sumWeights) * 15.0; // North
-        fPowers[1] = (weightE / sumWeights) * 15.0; // East
-        fPowers[2] = (weightS / sumWeights) * 15.0; // South
-        fPowers[3] = (weightW / sumWeights) * 15.0; // West
-
-        int[] intPowers = new int[4];
-        int currentSumInt = 0;
-
-        for (int i = 0; i < 4; i++) {
-            intPowers[i] = (int) Math.floor(fPowers[i]);
-            currentSumInt += intPowers[i];
-        }
-
+        int currentSumInt = intPowerN + intPowerE + intPowerS + intPowerW;
         int remainderToDistribute = 15 - currentSumInt;
 
-        Integer[] indices = {0, 1, 2, 3};
-        Arrays.sort(indices, new Comparator<Integer>() {
-            @Override
-            public int compare(Integer idx1, Integer idx2) {
-                double rem1 = fPowers[idx1] - intPowers[idx1];
-                double rem2 = fPowers[idx2] - intPowers[idx2];
-                if (rem1 != rem2) {
-                    return Double.compare(rem2, rem1); // Sort descending by remainder
-                }
-                return Integer.compare(idx1, idx2); // Tie-break by original index
-            }
-        });
+        if (remainderToDistribute > 0) {
+            float fracN = fPowerN - intPowerN;
+            float fracE = fPowerE - intPowerE;
+            float fracS = fPowerS - intPowerS;
+            float fracW = fPowerW - intPowerW;
 
-        for (int k = 0; k < remainderToDistribute; k++) {
-            intPowers[indices[k]]++;
+            for (int k = 0; k < remainderToDistribute; k++) {
+                float maxFrac = -1.0f;
+                int bestDir = -1; // 0:N, 1:E, 2:S, 3:W
+
+                if (fracN > maxFrac) { maxFrac = fracN; bestDir = 0; }
+                if (fracE > maxFrac) { maxFrac = fracE; bestDir = 1; }
+                if (fracS > maxFrac) { maxFrac = fracS; bestDir = 2; }
+                if (fracW > maxFrac) { maxFrac = fracW; bestDir = 3; }
+            
+                if (bestDir == 0) {
+                    intPowerN++;
+                    fracN = -2.0f; // Mark as used
+                } else if (bestDir == 1) {
+                    intPowerE++;
+                    fracE = -2.0f;
+                } else if (bestDir == 2) {
+                    intPowerS++;
+                    fracS = -2.0f;
+                } else if (bestDir == 3) {
+                    intPowerW++;
+                    fracW = -2.0f;
+                } else {
+                    break;
+                }
+            }
         }
-        return new Vector4i(intPowers[0], intPowers[1], intPowers[2], intPowers[3]);
+        redstoneOutputs.set(intPowerN, intPowerE, intPowerS, intPowerW);
     }
 
 

@@ -34,16 +34,7 @@ public class LodestoneTrackerRenderer extends SafeBlockEntityRenderer<LodestoneT
         //Model index is from 0 to 31
         //Compass is always pointing to north, and index 31 is pointing west
         final int TOTAL_INDICES = 32;
-        final float DEGREES_PER_CIRCLE = 360.0f;
-        final float SLICE_SIZE = DEGREES_PER_CIRCLE / TOTAL_INDICES;
-
-        float normalizedAngle = targetAngle % DEGREES_PER_CIRCLE;
-        if (normalizedAngle < 0) {
-            normalizedAngle += DEGREES_PER_CIRCLE;
-        }
-        if (normalizedAngle >= DEGREES_PER_CIRCLE) {
-            normalizedAngle = 0.0f;
-        }
+        final float SLICE_SIZE = 360.0f / TOTAL_INDICES;
 
         int index = (int)(targetAngle / SLICE_SIZE);
         return index;
