@@ -65,7 +65,7 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
             if (targetBlockPosition == null) {
                 //This is triggered with lodestone compass which has its lodestone block destroyed
                 //In this case we just rotate the angle
-                float angle = (float)currentTick % 360.0f;
+                float angle = ((float)currentTick * 10.0f) % 360.0f;
                 return angle;
             }
         } else {
