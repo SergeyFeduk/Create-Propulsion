@@ -40,6 +40,7 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
     private float targetAngle;
     private float previousAngle;
     private Vector4i redstoneOutputs = new Vector4i();
+    public boolean isOutputDirty = false;
     private final LodestoneTrackerItemHandler itemHandler = new LodestoneTrackerItemHandler(this);
     private final LazyOptional<IItemHandler> itemHandlerCap = LazyOptional.of(() -> itemHandler);
 
@@ -55,8 +56,10 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
     public void tick() {
         super.tick();
         currentTick++;
-        if (compass.isEmpty()) return;
-        targetAngle = getAngleFromCompass(compass);;
+        if (!compass.isEmpty()) {
+            targetAngle = getAngleFromCompass(compass);
+        }
+        
         updateRedstoneOutput(targetAngle);
     }
 
@@ -102,9 +105,15 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
 
     private void updateRedstoneOutput(float angle) {
         //Angle of 0/360 is pointing south
-        if (isAngleWithinTolerance(previousAngle, angle, 1.0f / 32.0f * 360.0f / 2.0f)) return;
+        if (!isOutputDirty && isAngleWithinTolerance(previousAngle, angle, 1.0f / 32.0f * 360.0f / 2.0f)) return;
+        isOutputDirty = false;
         previousAngle = targetAngle;
-        calculateRedstoneOutput(angle);
+        if (compass.isEmpty()) {
+            redstoneOutputs.set(0, 0, 0, 0);
+        } else {
+            calculateRedstoneOutput(angle);
+        }
+        
 
         BlockState updatedState = getBlockState()
             .setValue(LodestoneTrackerBlock.POWER_NORTH, redstoneOutputs.x)

@@ -93,6 +93,7 @@ public class LodestoneTrackerBlock extends Block implements EntityBlock {
             ItemStack compassToPlace = heldStack.split(1);
             trackerBE.setCompass(compassToPlace);
             AllSoundEvents.DEPOT_SLIDE.playOnServer(level, pos);
+            dirtyBlockEntity(level, pos);
             return InteractionResult.CONSUME;
 
         } else if (heldStack.isEmpty() && trackerHasCompass) {
@@ -100,17 +101,24 @@ public class LodestoneTrackerBlock extends Block implements EntityBlock {
             ItemStack takenCompass = trackerBE.removeCompass();
             player.getInventory().placeItemBackInInventory(takenCompass);
             level.playSound(null, pos, SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, 0.2f, 1.0f);
+            dirtyBlockEntity(level, pos);
             return InteractionResult.SUCCESS;
         }
         return InteractionResult.SUCCESS;
+    }
+
+    private void dirtyBlockEntity(Level level, BlockPos pos) {
+        if (level.getBlockEntity(pos) instanceof LodestoneTrackerBlockEntity trackerBlockEntity) {
+            trackerBlockEntity.isOutputDirty = true;
+        }
     }
 
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(@Nonnull Level level, @Nonnull BlockState state, @Nonnull BlockEntityType<T> type) {
         return new SmartBlockEntityTicker<>();
     }
-    //Redstone
 
+    //Redstone
     @Override
 	public boolean canConnectRedstone(BlockState state, BlockGetter world, BlockPos pos, Direction side) {
 		return side != Direction.DOWN && side != Direction.UP;
