@@ -50,7 +50,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraftforge.registries.tags.ITagManager;
 
 import com.deltasf.createpropulsion.Config;
-import com.deltasf.createpropulsion.CreatePropulsion;
+import com.deltasf.createpropulsion.PropulsionCompatibility;
 import com.deltasf.createpropulsion.PropulsionFluids;
 import com.deltasf.createpropulsion.debug.DebugRenderer;
 import com.simibubi.create.foundation.collision.Matrix3d;
@@ -87,13 +87,13 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
         //Not sure where to show these in game, perhaps in item tooltip if wearing goggles/design goggles
         //Defined fuels
         fluidsProperties.put(PropulsionFluids.TURPENTINE.get().getSource(), FluidThrusterProperties.DEFAULT);
-        if (CreatePropulsion.CDG_ACTIVE) {
+        if (PropulsionCompatibility.CDG_ACTIVE) {
             fluidsProperties.put(FluidRegistry.PLANT_OIL.get().getSource(), new FluidThrusterProperties(0.8f, 1.1f));
             fluidsProperties.put(FluidRegistry.BIODIESEL.get().getSource(), new FluidThrusterProperties(0.9f, 1f));
             fluidsProperties.put(FluidRegistry.DIESEL.get().getSource(), new FluidThrusterProperties(1.0f, 0.9f));
             fluidsProperties.put(FluidRegistry.GASOLINE.get().getSource(), new FluidThrusterProperties(1.05f, 0.95f));
             fluidsProperties.put(FluidRegistry.ETHANOL.get().getSource(), new FluidThrusterProperties(0.85f, 1.2f));
-        } if (CreatePropulsion.TFMG_ACTIVE) {
+        } if (PropulsionCompatibility.TFMG_ACTIVE) {
             fluidsProperties.put(TFMGFluids.NAPHTHA.get().getSource(), new FluidThrusterProperties(0.95f, 1.0f));
             fluidsProperties.put(TFMGFluids.KEROSENE.get().getSource(), new FluidThrusterProperties(1.0f, 0.9f));
             fluidsProperties.put(TFMGFluids.GASOLINE.get().getSource(), new FluidThrusterProperties(1.05f, 0.95f));

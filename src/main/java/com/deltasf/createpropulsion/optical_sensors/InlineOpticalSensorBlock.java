@@ -8,8 +8,8 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.PropulsionBlockEntities;
+import com.deltasf.createpropulsion.PropulsionCompatibility;
 import com.deltasf.createpropulsion.PropulsionShapes;
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntityTicker;
@@ -170,7 +170,7 @@ public class InlineOpticalSensorBlock extends DirectionalBlock implements Entity
         boolean faceIsSturdy = supportState.isFaceSturdy(level, supportPos, facing);
         if (faceIsSturdy) return true;
         //We can place optical sensors on projectiles too
-        if (CreatePropulsion.CBC_ACTIVE) {
+        if (PropulsionCompatibility.CBC_ACTIVE) {
             Set<Block> projectileBlocks = getOrCreateProjectileBlocks();
             boolean isOnProjectile = projectileBlocks.contains(supportState.getBlock());
             //Can only be placed on elongated sides
@@ -188,7 +188,7 @@ public class InlineOpticalSensorBlock extends DirectionalBlock implements Entity
         if (validCbcSupportBlocks == null) {
             synchronized (initLock) {
                 if (validCbcSupportBlocks == null) {
-                    if (!CreatePropulsion.CBC_ACTIVE) {
+                    if (!PropulsionCompatibility.CBC_ACTIVE) {
                         validCbcSupportBlocks = Collections.emptySet();
                     } else {
                         Set<Block> tempSet = new HashSet<>();

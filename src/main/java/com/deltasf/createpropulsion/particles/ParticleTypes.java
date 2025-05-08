@@ -3,6 +3,7 @@ package com.deltasf.createpropulsion.particles;
 import java.util.function.Supplier;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
+import com.deltasf.createpropulsion.PropulsionCompatibility;
 import com.simibubi.create.foundation.particle.ICustomParticleData;
 import com.simibubi.create.foundation.utility.Lang;
 
@@ -47,7 +48,7 @@ public enum ParticleTypes {
             synchronized (cacheLock) {
                 result = cachedPlumeType;
                 if (result == null) {
-                    result = CreatePropulsion.SHIMMER_ACTIVE ? PLUME_SHIMMER.get() : PLUME_DEFAULT.get();
+                    result = PropulsionCompatibility.SHIMMER_ACTIVE ? PLUME_SHIMMER.get() : PLUME_DEFAULT.get();
                     cachedPlumeType = result;
                 }
             }
