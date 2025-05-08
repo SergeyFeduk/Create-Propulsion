@@ -4,10 +4,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.deltasf.createpropulsion.PropulsionBlockEntities;
-import com.deltasf.createpropulsion.utility.ShapeBuilder;
+import com.deltasf.createpropulsion.PropulsionShapes;
 import com.simibubi.create.AllSoundEvents;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntityTicker;
-import com.simibubi.create.foundation.utility.VoxelShaper;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -29,31 +28,18 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class LodestoneTrackerBlock extends Block implements EntityBlock {
-    public static final VoxelShaper BLOCK_SHAPE;
     public static final IntegerProperty POWER_NORTH = IntegerProperty.create("north_power", 0, 15);
     public static final IntegerProperty POWER_EAST = IntegerProperty.create("east_power", 0, 15);
     public static final IntegerProperty POWER_SOUTH = IntegerProperty.create("south_power", 0, 15);
     public static final IntegerProperty POWER_WEST = IntegerProperty.create("west_power", 0, 15);
 
-    static {
-        VoxelShape shape = Shapes.empty();
-
-        shape = Shapes.join(shape, Block.box(1, 0, 1, 15, 2, 15), BooleanOp.OR);
-        shape = Shapes.join(shape, Block.box(2, 2, 2, 14, 9, 14), BooleanOp.OR);
-        shape = Shapes.join(shape, Block.box(0, 9, 0, 16, 14, 16), BooleanOp.OR);
-
-        BLOCK_SHAPE = ShapeBuilder.shapeBuilder(shape).forDirectional(Direction.NORTH);
-    }
-
     @Override
     public VoxelShape getShape(@Nullable BlockState pState, @Nullable BlockGetter pLevel, @Nullable BlockPos pPos, @Nullable CollisionContext pContext) {
-        return BLOCK_SHAPE.get(Direction.NORTH);
+        return PropulsionShapes.LODESTONE_TRACKER.get(Direction.NORTH);
     }
 
     public LodestoneTrackerBlock(Properties properties){

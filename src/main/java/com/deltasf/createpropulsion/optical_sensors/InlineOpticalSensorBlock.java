@@ -9,10 +9,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
-import com.deltasf.createpropulsion.utility.ShapeBuilder;
+import com.deltasf.createpropulsion.PropulsionShapes;
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntityTicker;
-import com.simibubi.create.foundation.utility.VoxelShaper;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -44,9 +43,7 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.pathfinder.PathComputationType;
-import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 @SuppressWarnings("deprecation")
@@ -55,19 +52,12 @@ public class InlineOpticalSensorBlock extends DirectionalBlock implements Entity
     public static final IntegerProperty POWER = IntegerProperty.create("redstone_power", 0, 15);
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
-    public static final VoxelShaper BLOCK_SHAPE;
 
     //CBC placement on projectiles compat
     public static final TagKey<Item> CBC_PROJECTILE_ITEM_TAG =
         TagKey.create(Registries.ITEM, new ResourceLocation("createbigcannons", "big_cannon_projectiles"));
     private static Set<Block> validCbcSupportBlocks = null;
     private static final Object initLock = new Object();
-
-    static {
-        VoxelShape shape = Shapes.empty();
-        shape = Shapes.join(shape, Block.box(4, 4, 10, 12, 12, 16), BooleanOp.OR);
-        BLOCK_SHAPE = ShapeBuilder.shapeBuilder(shape).forDirectional(Direction.NORTH);
-    }
 
     public InlineOpticalSensorBlock(Properties properties){
         super(properties);
@@ -114,11 +104,11 @@ public class InlineOpticalSensorBlock extends DirectionalBlock implements Entity
     @Override
     public VoxelShape getShape(@Nullable BlockState pState, @Nullable BlockGetter pLevel, @Nullable BlockPos pPos, @Nullable CollisionContext pContext) {
         if (pState == null) {
-            return BLOCK_SHAPE.get(Direction.NORTH);
+            return PropulsionShapes.INLINE_OPTICAL_SENSOR.get(Direction.NORTH);
         }
         Direction direction = pState.getValue(FACING);
         if (direction == Direction.UP || direction == Direction.DOWN) direction = direction.getOpposite(); //Because WTF
-        return BLOCK_SHAPE.get(direction);
+        return PropulsionShapes.INLINE_OPTICAL_SENSOR.get(direction);
     }
 
     @Override

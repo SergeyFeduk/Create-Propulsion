@@ -20,6 +20,10 @@ public class ShapeBuilder {
         return new ShapeBuilder(shape);
     }
 
+    public static ShapeBuilder shape() {
+        return new ShapeBuilder(Shapes.empty());
+    }
+
     private static VoxelShape cuboid(double x1, double y1, double z1, double x2, double y2, double z2) {
         return Block.box(x1, y1, z1, x2, y2, z2);
     }

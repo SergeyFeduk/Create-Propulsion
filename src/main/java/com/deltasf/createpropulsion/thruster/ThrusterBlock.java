@@ -12,9 +12,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -30,27 +28,15 @@ import javax.annotation.Nullable;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
 import com.deltasf.createpropulsion.PropulsionBlockEntities;
+import com.deltasf.createpropulsion.PropulsionShapes;
 import com.deltasf.createpropulsion.ship.ForceInducedShip;
-import com.deltasf.createpropulsion.utility.ShapeBuilder;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntityTicker;
-import com.simibubi.create.foundation.utility.VoxelShaper;
 
 @SuppressWarnings("deprecation")
 public class ThrusterBlock extends DirectionalBlock implements EntityBlock {
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
     public static final IntegerProperty POWER = IntegerProperty.create("redstone_power", 0, 15);
-    public static final VoxelShaper BLOCK_SHAPE;
-
-    static {
-        VoxelShape shape = Shapes.empty();
-
-        shape = Shapes.join(shape, Block.box(2, 2, 0, 14, 14, 2), BooleanOp.OR);
-        shape = Shapes.join(shape, Block.box(1, 1, 2, 15, 15, 14), BooleanOp.OR);
-        shape = Shapes.join(shape, Block.box(3, 3, 14, 13, 13, 16), BooleanOp.OR);
-
-        BLOCK_SHAPE = ShapeBuilder.shapeBuilder(shape).forDirectional(Direction.NORTH);
-    }
 
     public ThrusterBlock(Properties properties){
         super(properties);
@@ -60,11 +46,11 @@ public class ThrusterBlock extends DirectionalBlock implements EntityBlock {
     @Override
     public VoxelShape getShape(@Nullable BlockState pState, @Nullable BlockGetter pLevel, @Nullable BlockPos pPos, @Nullable CollisionContext pContext) {
         if (pState == null) {
-            return BLOCK_SHAPE.get(Direction.NORTH);
+            return PropulsionShapes.THRUSTER.get(Direction.NORTH);
         }
         Direction direction = pState.getValue(FACING);
         if (direction == Direction.UP || direction == Direction.DOWN) direction = direction.getOpposite(); //Because WTF
-        return BLOCK_SHAPE.get(direction);
+        return PropulsionShapes.THRUSTER.get(direction);
     }
 
     @Override
