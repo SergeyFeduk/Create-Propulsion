@@ -74,7 +74,7 @@ public class ThrusterBlock extends DirectionalBlock implements EntityBlock {
 
     @Override
     public BlockEntity newBlockEntity(@Nonnull BlockPos pos, @Nonnull BlockState state) {
-        return new ThrusterBlockEntity(null, pos, state);
+        return new ThrusterBlockEntity(PropulsionBlockEntities.THRUSTER_BLOCK_ENTITY.get(), pos, state);
     }
 
     //Add/remove thruster force applier to the ship

@@ -3,7 +3,6 @@ package com.deltasf.createpropulsion.optical_sensors;
 import java.util.List;
 
 import com.deltasf.createpropulsion.Config;
-import com.deltasf.createpropulsion.PropulsionBlockEntities;
 import com.deltasf.createpropulsion.optical_sensors.optical_sensor.OpticalSensorDistanceScrollBehaviour;
 import com.deltasf.createpropulsion.optical_sensors.optical_sensor.OpticalSensorFilterValueBox;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
@@ -23,7 +22,7 @@ public class OpticalSensorBlockEntity extends InlineOpticalSensorBlockEntity {
     public ScrollValueBehaviour targetDistance;
 
     public OpticalSensorBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state){
-        super(PropulsionBlockEntities.OPTICAL_SENSOR_BLOCK_ENTITY.get(), pos, state);
+        super(typeIn, pos, state);
     }
 
     @Override

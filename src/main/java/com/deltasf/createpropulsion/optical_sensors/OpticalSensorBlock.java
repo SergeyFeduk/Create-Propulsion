@@ -3,6 +3,7 @@ package com.deltasf.createpropulsion.optical_sensors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.deltasf.createpropulsion.PropulsionBlockEntities;
 import com.deltasf.createpropulsion.PropulsionShapes;
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntityTicker;
@@ -52,7 +53,7 @@ public class OpticalSensorBlock extends DirectionalBlock implements EntityBlock,
 
     @Override
     public BlockEntity newBlockEntity(@Nonnull BlockPos pos, @Nonnull BlockState state) {
-        return new OpticalSensorBlockEntity(null, pos, state);
+        return new OpticalSensorBlockEntity(PropulsionBlockEntities.OPTICAL_SENSOR_BLOCK_ENTITY.get(), pos, state);
     }
 
     @Override

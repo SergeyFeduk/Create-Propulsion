@@ -2,6 +2,8 @@ package com.deltasf.createpropulsion.physics_assembler;
 
 import javax.annotation.Nonnull;
 
+import com.deltasf.createpropulsion.PropulsionBlockEntities;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
@@ -43,7 +45,7 @@ public class PhysicsAssemblerBlock extends DirectionalBlock implements EntityBlo
 
     @Override
     public BlockEntity newBlockEntity(@Nonnull BlockPos pos, @Nonnull BlockState state) {
-        return new PhysicsAssemblerBlockEntity(null, pos, state);
+        return new PhysicsAssemblerBlockEntity(PropulsionBlockEntities.PHYSICAL_ASSEMBLER_BLOCK_ENTITY.get(), pos, state);
     }
 
     //Handle redstone signal

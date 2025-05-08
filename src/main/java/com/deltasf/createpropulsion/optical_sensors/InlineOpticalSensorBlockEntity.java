@@ -27,7 +27,6 @@ import org.joml.Math;
 import org.joml.Quaterniondc;
 import org.joml.Vector3d;
 
-import com.deltasf.createpropulsion.PropulsionBlockEntities;
 import com.deltasf.createpropulsion.optical_sensors.rendering.BeamRenderData;
 import com.deltasf.createpropulsion.Config;
 import com.mojang.datafixers.util.Pair;
@@ -49,7 +48,7 @@ public class InlineOpticalSensorBlockEntity extends SmartBlockEntity {
     }
 
     public InlineOpticalSensorBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
-        super(typeIn == null ? PropulsionBlockEntities.INLINE_OPTICAL_SENSOR_BLOCK_ENTITY.get() : typeIn, pos, state);
+        super(typeIn, pos, state);
     }
 
     @Override

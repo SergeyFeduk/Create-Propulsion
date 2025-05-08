@@ -51,7 +51,6 @@ import net.minecraftforge.registries.tags.ITagManager;
 
 import com.deltasf.createpropulsion.Config;
 import com.deltasf.createpropulsion.CreatePropulsion;
-import com.deltasf.createpropulsion.PropulsionBlockEntities;
 import com.deltasf.createpropulsion.PropulsionFluids;
 import com.deltasf.createpropulsion.debug.DebugRenderer;
 import com.simibubi.create.foundation.collision.Matrix3d;
@@ -123,7 +122,7 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
     }
 
     public ThrusterBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
-        super(PropulsionBlockEntities.THRUSTER_BLOCK_ENTITY.get(), pos, state);
+        super(typeIn, pos, state);
         thrusterData = new ThrusterData();
         this.state = state;
         particleType = (ParticleType<PlumeParticleData>)ParticleTypes.getPlumeType();

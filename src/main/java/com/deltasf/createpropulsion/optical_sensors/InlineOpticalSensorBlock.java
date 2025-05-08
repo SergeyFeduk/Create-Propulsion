@@ -9,6 +9,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
+import com.deltasf.createpropulsion.PropulsionBlockEntities;
 import com.deltasf.createpropulsion.PropulsionShapes;
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntityTicker;
@@ -74,7 +75,7 @@ public class InlineOpticalSensorBlock extends DirectionalBlock implements Entity
 
     @Override
     public BlockEntity newBlockEntity(@Nonnull BlockPos pos, @Nonnull BlockState state) {
-        return new InlineOpticalSensorBlockEntity(null, pos, state);
+        return new InlineOpticalSensorBlockEntity(PropulsionBlockEntities.INLINE_OPTICAL_SENSOR_BLOCK_ENTITY.get(), pos, state);
     }
 
     @Override
