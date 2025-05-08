@@ -18,7 +18,7 @@ import org.valkyrienskies.core.api.ships.properties.ChunkClaim;
 import org.valkyrienskies.core.impl.game.ships.ShipDataCommon;
 import org.valkyrienskies.core.impl.game.ships.ShipTransformImpl;
 import org.valkyrienskies.core.impl.networking.simple.SimplePackets;
-import com.deltasf.createpropulsion.CreatePropulsion;
+import com.deltasf.createpropulsion.PropulsionBlockEntities;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -47,7 +47,7 @@ import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 public class PhysicsAssemblerBlockEntity extends BlockEntity {
     private final BlockState AIR = Blocks.AIR.defaultBlockState();
     public PhysicsAssemblerBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
-        super(CreatePropulsion.PHYSICAL_ASSEMBLER_BLOCK_ENTITY.get(), pos, state);
+        super(PropulsionBlockEntities.PHYSICAL_ASSEMBLER_BLOCK_ENTITY.get(), pos, state);
         //Set poses here
         calculateBounds(pos, state);
     }

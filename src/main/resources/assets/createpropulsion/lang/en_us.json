@@ -33,5 +33,7 @@
 
     "item.createpropulsion.pine_resin": "Pine Resin",
     "fluid.createpropulsion.turpentine": "Turpentine",
-    "item.createpropulsion.turpentine_bucket": "Turpentine Bucket"
+    "item.createpropulsion.turpentine_bucket": "Turpentine Bucket",
+
+    "block.createpropulsion.lodestone_tracker": "Lodestone Tracker"
 }

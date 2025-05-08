@@ -3,7 +3,7 @@ package com.deltasf.createpropulsion.lodestone_tracker;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.deltasf.createpropulsion.CreatePropulsion;
+import com.deltasf.createpropulsion.PropulsionBlockEntities;
 import com.deltasf.createpropulsion.utility.ShapeBuilder;
 import com.simibubi.create.AllSoundEvents;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntityTicker;
@@ -60,9 +60,9 @@ public class LodestoneTrackerBlock extends Block implements EntityBlock {
         super(properties);
         this.registerDefaultState(this.stateDefinition.any()
             .setValue(POWER_NORTH, 0)
-            .setValue(POWER_EAST, 0)
+            .setValue(POWER_EAST,  0)
             .setValue(POWER_SOUTH, 0)
-            .setValue(POWER_WEST, 0));
+            .setValue(POWER_WEST,  0));
     }
 
     @Override
@@ -72,7 +72,7 @@ public class LodestoneTrackerBlock extends Block implements EntityBlock {
 
     @Override
     public BlockEntity newBlockEntity(@Nonnull BlockPos pos, @Nonnull BlockState state) {
-        return new LodestoneTrackerBlockEntity(CreatePropulsion.LODESTONE_TRACKER_BLOCK_ENTITY.get(), pos, state);
+        return new LodestoneTrackerBlockEntity(PropulsionBlockEntities.LODESTONE_TRACKER_BLOCK_ENTITY.get(), pos, state);
     }
 
     //Handling hand interactions

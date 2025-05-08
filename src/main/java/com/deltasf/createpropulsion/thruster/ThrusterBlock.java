@@ -29,7 +29,7 @@ import javax.annotation.Nullable;
 
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
-import com.deltasf.createpropulsion.CreatePropulsion;
+import com.deltasf.createpropulsion.PropulsionBlockEntities;
 import com.deltasf.createpropulsion.ship.ForceInducedShip;
 import com.deltasf.createpropulsion.utility.ShapeBuilder;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
@@ -163,7 +163,7 @@ public class ThrusterBlock extends DirectionalBlock implements EntityBlock {
                 }
             };
         } else {
-            if (type == CreatePropulsion.THRUSTER_BLOCK_ENTITY.get()) {
+            if (type == PropulsionBlockEntities.THRUSTER_BLOCK_ENTITY.get()) {
                 return new SmartBlockEntityTicker<>();
             }
         }

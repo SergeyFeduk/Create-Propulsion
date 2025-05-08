@@ -7,7 +7,7 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 import com.deltasf.createpropulsion.Config;
-import com.deltasf.createpropulsion.CreatePropulsion;
+import com.deltasf.createpropulsion.PropulsionBlockEntities;
 import com.deltasf.createpropulsion.optical_sensors.InlineOpticalSensorBlock;
 import com.deltasf.createpropulsion.optical_sensors.InlineOpticalSensorBlockEntity;
 import com.deltasf.createpropulsion.utility.TranslucentBeamRenderer;
@@ -82,7 +82,7 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<InlineOptical
     @Override
     protected void renderSafe(InlineOpticalSensorBlockEntity blockEntity, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int light, int overlay) {
         //Filtering if we are OPTICAL_SENSOR_BLOCK_ENTITY
-        if (blockEntity.getType() == CreatePropulsion.OPTICAL_SENSOR_BLOCK_ENTITY.get()) {
+        if (blockEntity.getType() == PropulsionBlockEntities.OPTICAL_SENSOR_BLOCK_ENTITY.get()) {
             FilteringRenderer.renderOnBlockEntity(blockEntity, partialTicks, poseStack, bufferSource, light, overlay);
         }
         //Skip rendering if no goggles and configured for that

@@ -51,6 +51,8 @@ import net.minecraftforge.registries.tags.ITagManager;
 
 import com.deltasf.createpropulsion.Config;
 import com.deltasf.createpropulsion.CreatePropulsion;
+import com.deltasf.createpropulsion.PropulsionBlockEntities;
+import com.deltasf.createpropulsion.PropulsionFluids;
 import com.deltasf.createpropulsion.debug.DebugRenderer;
 import com.simibubi.create.foundation.collision.Matrix3d;
 import com.simibubi.create.foundation.collision.OrientedBB;
@@ -85,7 +87,7 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
     static {
         //Not sure where to show these in game, perhaps in item tooltip if wearing goggles/design goggles
         //Defined fuels
-        fluidsProperties.put(CreatePropulsion.TURPENTINE.get().getSource(), FluidThrusterProperties.DEFAULT);
+        fluidsProperties.put(PropulsionFluids.TURPENTINE.get().getSource(), FluidThrusterProperties.DEFAULT);
         if (CreatePropulsion.CDG_ACTIVE) {
             fluidsProperties.put(FluidRegistry.PLANT_OIL.get().getSource(), new FluidThrusterProperties(0.8f, 1.1f));
             fluidsProperties.put(FluidRegistry.BIODIESEL.get().getSource(), new FluidThrusterProperties(0.9f, 1f));
@@ -121,7 +123,7 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
     }
 
     public ThrusterBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
-        super(CreatePropulsion.THRUSTER_BLOCK_ENTITY.get(), pos, state);
+        super(PropulsionBlockEntities.THRUSTER_BLOCK_ENTITY.get(), pos, state);
         thrusterData = new ThrusterData();
         this.state = state;
         particleType = (ParticleType<PlumeParticleData>)ParticleTypes.getPlumeType();
