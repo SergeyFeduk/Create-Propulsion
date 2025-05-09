@@ -25,7 +25,7 @@ public class CreatePropulsion {
         PropulsionItems.register();
         PropulsionFluids.register();
         
-        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, Config.SPEC, ID + "-server.toml");
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, PropulsionConfig.SPEC, ID + "-server.toml");
         PropulsionCreativeTab.register(modBus);
         REGISTRATE.registerEventListeners(modBus);
     }

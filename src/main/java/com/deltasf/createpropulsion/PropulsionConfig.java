@@ -2,7 +2,7 @@ package com.deltasf.createpropulsion;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 
-public class Config {
+public class PropulsionConfig {
     public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
     public static final ForgeConfigSpec SPEC;
 

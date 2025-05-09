@@ -49,7 +49,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraftforge.registries.tags.ITagManager;
 
-import com.deltasf.createpropulsion.Config;
+import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.PropulsionCompatibility;
 import com.deltasf.createpropulsion.PropulsionFluids;
 import com.deltasf.createpropulsion.debug.DebugRenderer;
@@ -154,11 +154,11 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
         super.tick();
         currentTick++;
         
-        int tick_rate = Config.THRUSTER_TICKS_PER_UPDATE.get();
+        int tick_rate = PropulsionConfig.THRUSTER_TICKS_PER_UPDATE.get();
         boolean isFluidValid = validFluid();
         int power = state.getValue(ThrusterBlock.POWER);
         //Damage entities
-        if (Config.THRUSTER_DAMAGE_ENTITIES.get() && isFluidValid && power > 0) doEntityDamageCheck(currentTick);
+        if (PropulsionConfig.THRUSTER_DAMAGE_ENTITIES.get() && isFluidValid && power > 0) doEntityDamageCheck(currentTick);
         if (!(isThrustDirty || currentTick % tick_rate == 0)) {
             return;
         }
@@ -186,14 +186,14 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
             //Consume fluid
             tank.getPrimaryHandler().drain(consumption, IFluidHandler.FluidAction.EXECUTE);
             //Calculate thrust
-            float thrustMultiplier = (float)(double)Config.THRUSTER_THRUST_MULTIPLIER.get();
+            float thrustMultiplier = (float)(double)PropulsionConfig.THRUSTER_THRUST_MULTIPLIER.get();
             thrust = BASE_MAX_THRUST * thrustMultiplier * thrustPercentage * properties.thrustMultiplier;
         }
         thrusterData.setThrust(thrust);
     }
 
     private int calculateFuelConsumption(float powerPercentage, float fluidPropertiesConsumptionMultiplier, int tick_rate){
-        float base_consumption = BASE_FUEL_CONSUMPTION * (float)(double)Config.THRUSTER_CONSUMPTION_MULTIPLIER.get();
+        float base_consumption = BASE_FUEL_CONSUMPTION * (float)(double)PropulsionConfig.THRUSTER_CONSUMPTION_MULTIPLIER.get();
         return (int)Math.ceil(base_consumption * powerPercentage * fluidPropertiesConsumptionMultiplier * tick_rate);
     }
 

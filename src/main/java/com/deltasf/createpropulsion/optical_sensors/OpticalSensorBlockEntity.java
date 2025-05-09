@@ -5,7 +5,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.deltasf.createpropulsion.Config;
+import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.optical_sensors.optical_sensor.OpticalSensorDistanceScrollBehaviour;
 import com.deltasf.createpropulsion.optical_sensors.optical_sensor.OpticalSensorFilterValueBox;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
@@ -27,10 +27,11 @@ public class OpticalSensorBlockEntity extends AbstractOpticalSensorBlockEntity {
     public OpticalSensorBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state){
         super(typeIn, pos, state);
     }
+    
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
         behaviours.add(filtering = new FilteringBehaviour(this, new OpticalSensorFilterValueBox(true)));
-        targetDistance = new OpticalSensorDistanceScrollBehaviour(this).between(1, Config.OPTICAL_SENSOR_MAX_DISTANCE.get());
+        targetDistance = new OpticalSensorDistanceScrollBehaviour(this).between(1, PropulsionConfig.OPTICAL_SENSOR_MAX_DISTANCE.get());
         behaviours.add(targetDistance);
         targetDistance.setValue(32);
     }
@@ -80,5 +81,4 @@ public class OpticalSensorBlockEntity extends AbstractOpticalSensorBlockEntity {
 
         return this.filtering.test(blockAsStack);
     }
-
 }

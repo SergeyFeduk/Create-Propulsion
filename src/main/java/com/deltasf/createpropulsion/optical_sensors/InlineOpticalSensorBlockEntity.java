@@ -5,7 +5,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.deltasf.createpropulsion.Config;
+import com.deltasf.createpropulsion.PropulsionConfig;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 
 import net.minecraft.core.BlockPos;
@@ -30,7 +30,7 @@ public class InlineOpticalSensorBlockEntity extends AbstractOpticalSensorBlockEn
 
     @Override
     protected float getMaxRaycastDistance() {
-        return Config.INLINE_OPTICAL_SENSOR_MAX_DISTANCE.get();
+        return PropulsionConfig.INLINE_OPTICAL_SENSOR_MAX_DISTANCE.get();
     }
 
     @Override

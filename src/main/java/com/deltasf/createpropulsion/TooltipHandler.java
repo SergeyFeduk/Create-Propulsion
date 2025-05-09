@@ -75,13 +75,13 @@ public class TooltipHandler {
     private static void populateModifiables() {
         //Thruster
         tooltipModificationLookup.put(PropulsionBlocks.THRUSTER_BLOCK.asItem(), (payload) -> {
-            float thrustMultiplier = (float)(double)Config.THRUSTER_THRUST_MULTIPLIER.get();
+            float thrustMultiplier = (float)(double)PropulsionConfig.THRUSTER_THRUST_MULTIPLIER.get();
             int thrusterStrength = Math.round(ThrusterBlockEntity.BASE_MAX_THRUST / 1000.0f * thrustMultiplier);
             return Component.translatable(payload.path + ".tooltip.summary").getString().replace("{}", String.valueOf(thrusterStrength));
         });
         //Inline optical sensor
         tooltipModificationLookup.put(PropulsionBlocks.INLINE_OPTICAL_SENSOR_BLOCK.asItem(), (payload) -> {
-            int raycastDistance = Config.INLINE_OPTICAL_SENSOR_MAX_DISTANCE.get();
+            int raycastDistance = PropulsionConfig.INLINE_OPTICAL_SENSOR_MAX_DISTANCE.get();
             return Component.translatable(payload.path + ".tooltip.summary").getString().replace("{}", String.valueOf(raycastDistance));
         });
     }

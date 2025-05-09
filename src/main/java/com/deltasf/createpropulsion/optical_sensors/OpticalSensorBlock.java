@@ -33,7 +33,7 @@ public class OpticalSensorBlock extends AbstractOpticalSensorBlock {
         Direction placeDirection;
         Player player = context.getPlayer();
         if (player != null) {
-            placeDirection = player.isShiftKeyDown() ? baseDirection.getOpposite() : baseDirection;
+            placeDirection = player.isShiftKeyDown() ? baseDirection : baseDirection.getOpposite();
         } else {
             placeDirection = baseDirection.getOpposite();
         }
@@ -55,9 +55,9 @@ public class OpticalSensorBlock extends AbstractOpticalSensorBlock {
     }
 
     @Override
-    protected VoxelShaper getShapeMap() {
-        return PropulsionShapes.OPTICAL_SENSOR;
-    }
+    protected VoxelShaper getShapeMap() { return PropulsionShapes.OPTICAL_SENSOR; }
+
+    //Redstone
 
     @Override
     public int getSignal(@Nonnull BlockState blockState, @Nonnull BlockGetter blockAccess, @Nonnull BlockPos pos, @Nonnull Direction side){

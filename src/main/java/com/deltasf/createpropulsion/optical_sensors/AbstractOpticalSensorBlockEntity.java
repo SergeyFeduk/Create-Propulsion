@@ -10,7 +10,7 @@ import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
-import com.deltasf.createpropulsion.Config;
+import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.optical_sensors.rendering.BeamRenderData;
 import com.mojang.datafixers.util.Pair;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
@@ -75,10 +75,10 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
         }
 
         currentTick++;
-        if (currentTick % Config.OPTICAL_SENSOR_TICKS_PER_UPDATE.get() != 0) return;
+        if (currentTick % PropulsionConfig.OPTICAL_SENSOR_TICKS_PER_UPDATE.get() != 0) return;
 
         // Reset tick counter to prevent overflow
-        if (currentTick >= Config.OPTICAL_SENSOR_TICKS_PER_UPDATE.get()) {
+        if (currentTick >= PropulsionConfig.OPTICAL_SENSOR_TICKS_PER_UPDATE.get()) {
             currentTick = 0;
         }
 
@@ -106,7 +106,7 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
         Vec3 worldTo = raycastPositions.getSecond();
 
         // Perform raycast using world coordinates
-        ClipContext.Fluid clipFluid = Config.OPTICAL_SENSOR_CLIP_FLUID.get() ? ClipContext.Fluid.ANY : ClipContext.Fluid.NONE;
+        ClipContext.Fluid clipFluid = PropulsionConfig.OPTICAL_SENSOR_CLIP_FLUID.get() ? ClipContext.Fluid.ANY : ClipContext.Fluid.NONE;
         ClipContext context = new ClipContext(worldFrom, worldTo, ClipContext.Block.COLLIDER, clipFluid, null);
         BlockHitResult hit = level.clip(context);
 

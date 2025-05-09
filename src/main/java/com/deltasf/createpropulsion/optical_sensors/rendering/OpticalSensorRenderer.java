@@ -6,7 +6,7 @@ import org.joml.Vector3d;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-import com.deltasf.createpropulsion.Config;
+import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.PropulsionBlockEntities;
 import com.deltasf.createpropulsion.optical_sensors.AbstractOpticalSensorBlock;
 import com.deltasf.createpropulsion.optical_sensors.AbstractOpticalSensorBlockEntity;
@@ -86,7 +86,7 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<AbstractOptic
             FilteringRenderer.renderOnBlockEntity(blockEntity, partialTicks, poseStack, bufferSource, light, overlay);
         }
         //Skip rendering if no goggles and configured for that
-        if (Config.OPTICAL_SENSOR_VISIBLE_ONLY_WITH_GOGGLES.get()) {
+        if (PropulsionConfig.OPTICAL_SENSOR_VISIBLE_ONLY_WITH_GOGGLES.get()) {
             LocalPlayer player = Minecraft.getInstance().player;
             if (player != null) {
                 ItemStack headItemStack = player.getItemBySlot(EquipmentSlot.HEAD);
