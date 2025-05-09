@@ -12,6 +12,6 @@ public class PropulsionItems {
 
     public static final ItemEntry<BurnableItem> PINE_RESIN = REGISTRATE.item("pine_resin", p -> new BurnableItem(p, 1200)).register();
     public static final ItemEntry<Item> OPTICAL_LENS = REGISTRATE.item("optical_lens", Item::new).register();
-    public static final ItemEntry<Item> LIQUID_LENS = REGISTRATE.item("liquid_lens", Item::new).register();
-    public static final ItemEntry<Item> INVISIBILITY_LENS = REGISTRATE.item("invisibility_lens", Item::new).register();
+    public static final ItemEntry<Item> FLUID_LENS = REGISTRATE.item("fluid_lens", Item::new).register();
+    //public static final ItemEntry<Item> INVISIBILITY_LENS = REGISTRATE.item("invisibility_lens", Item::new).register();
 }

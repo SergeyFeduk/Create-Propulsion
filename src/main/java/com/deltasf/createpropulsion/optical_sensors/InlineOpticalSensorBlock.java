@@ -6,13 +6,11 @@ import java.util.Optional;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import com.deltasf.createpropulsion.PropulsionBlockEntities;
 import com.deltasf.createpropulsion.PropulsionCompatibility;
 import com.deltasf.createpropulsion.PropulsionShapes;
-import com.simibubi.create.content.equipment.wrench.IWrenchable;
-import com.simibubi.create.foundation.blockEntity.SmartBlockEntityTicker;
+import com.simibubi.create.foundation.utility.VoxelShaper;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -30,31 +28,14 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DirectionalBlock;
-import net.minecraft.world.level.block.EntityBlock;
-import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityTicker;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.pathfinder.PathComputationType;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.VoxelShape;
 
 @SuppressWarnings("deprecation")
-public class InlineOpticalSensorBlock extends DirectionalBlock implements EntityBlock, IWrenchable, SimpleWaterloggedBlock {
-    public static final DirectionProperty FACING = BlockStateProperties.FACING;
-    public static final IntegerProperty POWER = IntegerProperty.create("redstone_power", 0, 15);
-    public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
-    public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
-
-    //CBC placement on projectiles compat
+public class InlineOpticalSensorBlock extends AbstractOpticalSensorBlock {
     public static final TagKey<Item> CBC_PROJECTILE_ITEM_TAG =
         TagKey.create(Registries.ITEM, new ResourceLocation("createbigcannons", "big_cannon_projectiles"));
     private static Set<Block> validCbcSupportBlocks = null;
@@ -62,16 +43,8 @@ public class InlineOpticalSensorBlock extends DirectionalBlock implements Entity
 
     public InlineOpticalSensorBlock(Properties properties){
         super(properties);
-        this.registerDefaultState(this.stateDefinition.any()
-            .setValue(FACING, Direction.NORTH)
-            .setValue(POWERED, false)
-            .setValue(WATERLOGGED, false));
     }
 
-    @Override
-    public FluidState getFluidState(@Nonnull BlockState state) {
-        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
-    }
 
     @Override
     public BlockEntity newBlockEntity(@Nonnull BlockPos pos, @Nonnull BlockState state) {
@@ -89,49 +62,50 @@ public class InlineOpticalSensorBlock extends DirectionalBlock implements Entity
     }
 
     @Override
-    public BlockState getRotatedBlockState(BlockState originalState, Direction targetedFace) {
-        return originalState;
-    }
-
-    @Override
     public void onRemove(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull BlockState newState, boolean isMoving) {
-        if (!state.is(newState.getBlock())) {   
+        if (!state.is(newState.getBlock())) {
+            Direction facing = state.getValue(FACING);
             level.updateNeighborsAt(pos, state.getBlock());
-            level.updateNeighborsAt(pos.relative(state.getValue(InlineOpticalSensorBlock.FACING).getOpposite()), state.getBlock());
+            level.updateNeighborsAt(pos.relative(facing.getOpposite()), state.getBlock());
         }
-        super.onRemove(state, level, pos, newState, isMoving);
     }
 
     @Override
-    public VoxelShape getShape(@Nullable BlockState pState, @Nullable BlockGetter pLevel, @Nullable BlockPos pPos, @Nullable CollisionContext pContext) {
-        if (pState == null) {
-            return PropulsionShapes.INLINE_OPTICAL_SENSOR.get(Direction.NORTH);
-        }
-        Direction direction = pState.getValue(FACING);
-        if (direction == Direction.UP || direction == Direction.DOWN) direction = direction.getOpposite(); //Because WTF
-        return PropulsionShapes.INLINE_OPTICAL_SENSOR.get(direction);
+    protected VoxelShaper getShapeMap() {
+        return PropulsionShapes.INLINE_OPTICAL_SENSOR;
+    }
+
+    //Redstone
+
+    @Override
+    public int getSignal(@Nonnull BlockState blockState, @Nonnull BlockGetter blockAccess, @Nonnull BlockPos pos, @Nonnull Direction side){
+        int power = blockState.getValue(POWER);
+        return blockState.getValue(FACING) == side ? power : 0;
     }
 
     @Override
-    protected void createBlockStateDefinition(@Nonnull StateDefinition.Builder<net.minecraft.world.level.block.Block, BlockState> builder) {
-        builder.add(FACING);
-        builder.add(POWER);
-        builder.add(POWERED);
-        builder.add(WATERLOGGED);
-        super.createBlockStateDefinition(builder);
+    public int getDirectSignal(@Nonnull BlockState blockState, @Nonnull BlockGetter blockAccess, @Nonnull BlockPos pos, @Nonnull Direction side) {
+        int power = blockState.getValue(POWER);
+        return blockState.getValue(FACING) == side ? power : 0;
     }
+
+    @Override
+	public boolean canConnectRedstone(BlockState state, BlockGetter world, BlockPos pos, Direction side) {
+		return side == state.getValue(FACING);
+	}
 
     @Override
 	public void neighborChanged(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull Block block, @Nonnull BlockPos fromPos, boolean isMoving) {
         super.neighborChanged(state, level, pos, block, fromPos, isMoving);
+
         if (level.isClientSide)
 			return;
-        
+
         Direction blockFacing = state.getValue(FACING);
 		if (fromPos.equals(pos.relative(blockFacing.getOpposite()))) {
 			if (!canSurvive(state, level, pos)) {
 				level.destroyBlock(pos, true);
-				return;
+				return; 
 			}
 		}
     }
@@ -141,50 +115,33 @@ public class InlineOpticalSensorBlock extends DirectionalBlock implements Entity
 		return false;
 	}
 
-    //Redstone signal emitter is strictly to the FACING side
-    @Override
-    public int getSignal(@Nonnull BlockState blockState, @Nonnull BlockGetter blockAccess, @Nonnull BlockPos pos, @Nonnull Direction side){
-        return blockState.getValue(FACING) == side ? blockState.getValue(POWER) : 0;
-    }
-
-    @Override
-    public int getDirectSignal(@Nonnull BlockState blockState, @Nonnull BlockGetter blockAccess, @Nonnull BlockPos pos, @Nonnull Direction side) {
-        return blockState.getValue(FACING) == side ? blockState.getValue(POWER) : 0;
-    }
-
-    @Override
-    public boolean isSignalSource(@Nonnull BlockState state){
-        return state.getValue(POWER) > 0;
-    }
-
-    @Override
-	public boolean canConnectRedstone(BlockState state, BlockGetter world, BlockPos pos, Direction side) {
-		return side == state.getValue(FACING);
-	}
-
     @Override
 	public boolean canSurvive(@Nonnull BlockState state, @Nonnull LevelReader level, @Nonnull BlockPos pos) {
         Direction facing = state.getValue(FACING);
         BlockPos supportPos = pos.relative(facing.getOpposite());
         BlockState supportState = level.getBlockState(supportPos);
+
         boolean faceIsSturdy = supportState.isFaceSturdy(level, supportPos, facing);
-        if (faceIsSturdy) return true;
-        //We can place optical sensors on projectiles too
+        if (faceIsSturdy) {
+            return true;
+        }
+
         if (PropulsionCompatibility.CBC_ACTIVE) {
             Set<Block> projectileBlocks = getOrCreateProjectileBlocks();
             boolean isOnProjectile = projectileBlocks.contains(supportState.getBlock());
-            //Can only be placed on elongated sides
+
             if (isOnProjectile) {
-                Direction blockDirection = supportState.getValue(DirectionalBlock.FACING);
-                return blockDirection == facing || blockDirection.getOpposite() == facing;
+                if (supportState.hasProperty(DirectionalBlock.FACING)) {
+                    Direction projectileDirection = supportState.getValue(DirectionalBlock.FACING);
+                    return projectileDirection == facing || projectileDirection.getOpposite() == facing;
+                }
             }
         }
+
         return false;
 	}
 
-    //CBC compat projectile check
     private static Set<Block> getOrCreateProjectileBlocks() {
-        // Double-checked locking pattern for thread-safe lazy initialization
         if (validCbcSupportBlocks == null) {
             synchronized (initLock) {
                 if (validCbcSupportBlocks == null) {
@@ -193,26 +150,21 @@ public class InlineOpticalSensorBlock extends DirectionalBlock implements Entity
                     } else {
                         Set<Block> tempSet = new HashSet<>();
                         Optional<HolderSet.Named<Item>> tagOptional = BuiltInRegistries.ITEM.getTag(CBC_PROJECTILE_ITEM_TAG);
-                        HolderSet.Named<Item> itemHolders = tagOptional.get();
-                        for (Holder<Item> itemHolder : itemHolders) {
-                            Item item = itemHolder.value();
-                            Block block = Block.byItem(item);
-                            if (block != null && block != Blocks.AIR) {
-                                tempSet.add(block);
+                        if (tagOptional.isPresent()) {
+                            HolderSet.Named<Item> itemHolders = tagOptional.get();
+                            for (Holder<Item> itemHolder : itemHolders) {
+                                Item item = itemHolder.value();
+                                Block block = Block.byItem(item);
+                                if (block != Blocks.AIR) {
+                                    tempSet.add(block);
+                                }
                             }
                         }
-                        validCbcSupportBlocks = tempSet;
+                        validCbcSupportBlocks = Collections.unmodifiableSet(tempSet); 
                     }
                 }
             }
         }
         return validCbcSupportBlocks;
     }
-
-    //Ticker
-    @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(@Nonnull Level level, @Nonnull BlockState state, @Nonnull BlockEntityType<T> type) {
-        return new SmartBlockEntityTicker<>();
-    }
-
 }

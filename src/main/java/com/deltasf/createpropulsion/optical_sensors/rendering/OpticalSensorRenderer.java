@@ -8,8 +8,8 @@ import org.joml.Vector4f;
 
 import com.deltasf.createpropulsion.Config;
 import com.deltasf.createpropulsion.PropulsionBlockEntities;
-import com.deltasf.createpropulsion.optical_sensors.InlineOpticalSensorBlock;
-import com.deltasf.createpropulsion.optical_sensors.InlineOpticalSensorBlockEntity;
+import com.deltasf.createpropulsion.optical_sensors.AbstractOpticalSensorBlock;
+import com.deltasf.createpropulsion.optical_sensors.AbstractOpticalSensorBlockEntity;
 import com.deltasf.createpropulsion.utility.TranslucentBeamRenderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -32,7 +32,7 @@ import net.minecraft.world.phys.Vec3;
 import com.simibubi.create.AllItems;
 import com.simibubi.create.foundation.blockEntity.behaviour.filtering.FilteringRenderer;
 
-public class OpticalSensorRenderer extends SafeBlockEntityRenderer<InlineOpticalSensorBlockEntity>{
+public class OpticalSensorRenderer extends SafeBlockEntityRenderer<AbstractOpticalSensorBlockEntity>{
     
     public OpticalSensorRenderer(BlockEntityRendererProvider.Context context) { super();}
 
@@ -80,7 +80,7 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<InlineOptical
     //#endregion
 
     @Override
-    protected void renderSafe(InlineOpticalSensorBlockEntity blockEntity, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int light, int overlay) {
+    protected void renderSafe(AbstractOpticalSensorBlockEntity blockEntity, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int light, int overlay) {
         //Filtering if we are OPTICAL_SENSOR_BLOCK_ENTITY
         if (blockEntity.getType() == PropulsionBlockEntities.OPTICAL_SENSOR_BLOCK_ENTITY.get()) {
             FilteringRenderer.renderOnBlockEntity(blockEntity, partialTicks, poseStack, bufferSource, light, overlay);
@@ -101,7 +101,7 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<InlineOptical
         if (distance <= 1e-6f) return; // Same position case
         BlockState state = blockEntity.getBlockState();
         Direction facing = state.getValue(BlockStateProperties.FACING);
-        boolean powered = state.getValue(InlineOpticalSensorBlock.POWERED);
+        boolean powered = state.getValue(AbstractOpticalSensorBlock.POWERED);
 
         //Get start and end pos
         this.directionVec.set(facing.getStepX(), facing.getStepY(), facing.getStepZ());
@@ -161,7 +161,7 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<InlineOptical
     }
 
     @Override
-    public boolean shouldRender(@Nonnull InlineOpticalSensorBlockEntity blockEntity, @Nonnull Vec3 cameraPos) {
+    public boolean shouldRender(@Nonnull AbstractOpticalSensorBlockEntity blockEntity, @Nonnull Vec3 cameraPos) {
         //Distance pre-check
         if (!super.shouldRender(blockEntity, cameraPos)) { 
             return false; 
@@ -178,7 +178,7 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<InlineOptical
         return frustum == null || frustum.isVisible(beamAABB);
     }
 
-    private AABB calculateBeamAABB(InlineOpticalSensorBlockEntity blockEntity) {
+    private AABB calculateBeamAABB(AbstractOpticalSensorBlockEntity blockEntity) {
         float distance = blockEntity.getRaycastDistance();
         if (distance <= 1e-6f) return null;
         BlockPos blockPos = blockEntity.getBlockPos();
@@ -214,7 +214,7 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<InlineOptical
     }
 
     @Override
-    public boolean shouldRenderOffScreen(@Nonnull InlineOpticalSensorBlockEntity pBlockEntity) {
+    public boolean shouldRenderOffScreen(@Nonnull AbstractOpticalSensorBlockEntity pBlockEntity) {
         return true;
     }
 

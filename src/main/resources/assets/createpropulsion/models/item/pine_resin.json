@@ -1,6 +1,6 @@
 {
-    "parent": "minecraft:item/generated",
-    "textures": {
-      "layer0": "createpropulsion:item/pine_resin"
-    }
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "createpropulsion:item/pine_resin"
   }
+}

@@ -46,6 +46,8 @@ public class PropulsionCreativeTab {
                 //From 0.2 (items)
                 output.accept(PropulsionFluids.TURPENTINE.getBucket().get());
                 output.accept(PropulsionItems.PINE_RESIN);
+                output.accept(PropulsionItems.OPTICAL_LENS);
+                output.accept(PropulsionItems.FLUID_LENS);
             }
         }
 }
