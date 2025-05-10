@@ -3,6 +3,7 @@ package com.deltasf.createpropulsion;
 import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerBlock;
 import com.deltasf.createpropulsion.optical_sensors.InlineOpticalSensorBlock;
 import com.deltasf.createpropulsion.optical_sensors.OpticalSensorBlock;
+import com.deltasf.createpropulsion.optical_sensors.OpticalSensorItem;
 import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerBlock;
 import com.deltasf.createpropulsion.thruster.ThrusterBlock;
 import com.simibubi.create.foundation.data.CreateRegistrate;
@@ -29,7 +30,7 @@ public class PropulsionBlocks {
         .properties(p -> p.sound(SoundType.METAL))
         .properties(p -> p.strength(1.5F, 1.0F))
         .properties(p -> p.noOcclusion())
-        .simpleItem()
+        .item(OpticalSensorItem::new).model((ctx, prov) -> prov.blockItem(ctx::getEntry)).build()
         .register();
 
     public static final BlockEntry<OpticalSensorBlock> OPTICAL_SENSOR_BLOCK = REGISTRATE.block("optical_sensor", OpticalSensorBlock::new)
@@ -37,7 +38,7 @@ public class PropulsionBlocks {
         .properties(p -> p.sound(SoundType.METAL))
         .properties(p -> p.strength(2.5F, 2.0F))
         .properties(p -> p.noOcclusion())
-        .simpleItem()
+        .item(OpticalSensorItem::new).model((ctx, prov) -> prov.blockItem(ctx::getEntry)).build()
         .register();
 
     public static final BlockEntry<PhysicsAssemblerBlock> PHYSICS_ASSEMBLER_BLOCK = REGISTRATE.block("physics_assembler", PhysicsAssemblerBlock::new)

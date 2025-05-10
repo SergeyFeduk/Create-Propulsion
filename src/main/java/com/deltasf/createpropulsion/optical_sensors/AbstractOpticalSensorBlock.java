@@ -9,6 +9,10 @@ import com.simibubi.create.foundation.utility.VoxelShaper;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -26,6 +30,7 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
@@ -78,6 +83,45 @@ public abstract class AbstractOpticalSensorBlock extends DirectionalBlock implem
         }
     }
 
+    @Override
+    public InteractionResult use(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull Player player, @Nonnull InteractionHand hand, @Nonnull BlockHitResult hit) {
+        //Lenses actions are applicable to the front face only
+        if (hit.getDirection() != state.getValue(FACING)) {
+            return super.use(state, level, pos, player, hand, hit);
+        }
+        //Safety check + get sensorBE
+        BlockEntity be = level.getBlockEntity(pos);
+        if (!(be instanceof AbstractOpticalSensorBlockEntity sensorBE)) {
+            return super.use(state, level, pos, player, hand, hit);
+        }
+        ItemStack heldStack = player.getItemInHand(hand);
+        //Handle client
+        if (level.isClientSide) {
+            if (heldStack.getItem() instanceof LensItem || heldStack.isEmpty()) {
+                return InteractionResult.sidedSuccess(level.isClientSide);
+            }
+        }
+        //Handle server
+        if (heldStack.getItem() instanceof LensItem) {
+            if (sensorBE.insertLens(heldStack)) {
+                return InteractionResult.CONSUME;
+            } else {
+                return InteractionResult.FAIL;
+            }
+        } else if (heldStack.isEmpty()) {
+            ItemStack extractedLens = sensorBE.extractLastLens();
+            if (!extractedLens.isEmpty()) {
+                player.getInventory().placeItemBackInInventory(extractedLens);
+                return InteractionResult.SUCCESS;
+            }
+        } else {
+            //Not lens and not empty hand
+            return InteractionResult.PASS;
+        }
+        //Should not happen
+        return super.use(state, level, pos, player, hand, hit);
+    }
+
     // Abstract methods
 
     @Override
@@ -87,7 +131,9 @@ public abstract class AbstractOpticalSensorBlock extends DirectionalBlock implem
     public abstract BlockState getStateForPlacement(@Nonnull BlockPlaceContext context);
 
     @Override
-    public abstract void onRemove(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull BlockState newState, boolean isMoving);
+    public void onRemove(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull BlockState newState, boolean isMoving) {
+        super.onRemove(state, level, pos, newState, isMoving);
+    }
 
     protected abstract VoxelShaper getShapeMap();
 
@@ -109,4 +155,5 @@ public abstract class AbstractOpticalSensorBlock extends DirectionalBlock implem
 
     @Override
 	public abstract boolean canConnectRedstone(BlockState state, BlockGetter world, BlockPos pos, Direction side);
+
 }

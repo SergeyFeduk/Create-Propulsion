@@ -51,6 +51,7 @@ public class OpticalSensorBlock extends AbstractOpticalSensorBlock {
             Direction facing = state.getValue(FACING);
             level.updateNeighborsAt(pos, state.getBlock());
             level.updateNeighborsAt(pos.relative(facing.getOpposite()), state.getBlock());
+            super.onRemove(state, level, pos, newState, isMoving);
         }
     }
 

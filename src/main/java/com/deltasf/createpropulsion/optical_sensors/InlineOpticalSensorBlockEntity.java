@@ -29,6 +29,11 @@ public class InlineOpticalSensorBlockEntity extends AbstractOpticalSensorBlockEn
     }
 
     @Override
+    public int getLensLimit() {
+        return 1;
+    }
+
+    @Override
     protected float getMaxRaycastDistance() {
         return PropulsionConfig.INLINE_OPTICAL_SENSOR_MAX_DISTANCE.get();
     }

@@ -11,6 +11,7 @@ import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import com.deltasf.createpropulsion.PropulsionConfig;
+import com.deltasf.createpropulsion.PropulsionItems;
 import com.deltasf.createpropulsion.optical_sensors.rendering.BeamRenderData;
 import com.mojang.datafixers.util.Pair;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
@@ -19,9 +20,12 @@ import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -47,12 +51,16 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
         return this.beamRenderData;
     }
 
+    protected NonNullList<ItemStack> lenses; // List to store the lens items
+    public static final String NBT_LENSES_KEY = "Lenses"; 
+
     public float getRaycastDistance() {
         return raycastDistance;
     }
 
     protected AbstractOpticalSensorBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
+        this.lenses = NonNullList.withSize(getLensLimit(), ItemStack.EMPTY);
     }
 
     //Abstract methods
@@ -63,6 +71,8 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
     public abstract float getZAxisOffset();
 
     protected abstract float getMaxRaycastDistance();
+
+    protected abstract int getLensLimit();
 
     protected abstract void updateRedstoneSignal(@Nonnull Level level, @Nonnull BlockState state, @Nonnull BlockPos pos, int rawNewPower, @Nullable BlockPos hitBlockPos);
 
@@ -106,7 +116,8 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
         Vec3 worldTo = raycastPositions.getSecond();
 
         // Perform raycast using world coordinates
-        ClipContext.Fluid clipFluid = PropulsionConfig.OPTICAL_SENSOR_CLIP_FLUID.get() ? ClipContext.Fluid.ANY : ClipContext.Fluid.NONE;
+        //ClipContext.Fluid clipFluid = PropulsionConfig.OPTICAL_SENSOR_CLIP_FLUID.get() ? ClipContext.Fluid.ANY : ClipContext.Fluid.NONE;
+        ClipContext.Fluid clipFluid = hasLens(PropulsionItems.FLUID_LENS.get()) ? ClipContext.Fluid.ANY : ClipContext.Fluid.NONE;
         ClipContext context = new ClipContext(worldFrom, worldTo, ClipContext.Block.COLLIDER, clipFluid, null);
         BlockHitResult hit = level.clip(context);
 
@@ -175,6 +186,90 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
         return new Pair<>(worldFrom, worldTo);
     }
 
+    // Lenses
+
+    public NonNullList<ItemStack> getLenses() {
+        return lenses;
+    }
+
+    public int getCurrentLensCount() {
+        int count = 0;
+        for (ItemStack stack : this.lenses) {
+            if (!stack.isEmpty()) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public boolean hasSpaceForLens() {
+        return getCurrentLensCount() < getLensLimit();
+    }
+
+    public boolean canInsertLens(ItemStack lensStack) {
+        if (lensStack.isEmpty() || !(lensStack.getItem() instanceof LensItem)) {
+            return false; // Not a lens or empty stack
+        }
+        return hasSpaceForLens(); // Check if there's space
+    }
+
+    @SuppressWarnings("null")
+    public boolean insertLens(ItemStack lensStack) {
+        if (!canInsertLens(lensStack)) {
+            return false;
+        }
+
+        for (int i = 0; i < this.lenses.size(); i++) {
+            if (this.lenses.get(i).isEmpty()) {
+                ItemStack stackToInsert = lensStack.copy();
+                stackToInsert.setCount(1);
+                this.lenses.set(i, stackToInsert);
+
+                // sync
+                setChanged();
+                level.sendBlockUpdated(this.worldPosition, getBlockState(), getBlockState(), 3);
+
+                lensStack.shrink(1);
+                return true;
+            }
+        }
+        return false; // Should not happen
+    }
+
+    public boolean canExtractLens() {
+        return getCurrentLensCount() > 0;
+    }
+
+    @SuppressWarnings("null")
+    public ItemStack extractLastLens() {
+        if (!canExtractLens()) {
+            return ItemStack.EMPTY;
+        }
+
+        for (int i = this.lenses.size() - 1; i >= 0; i--) {
+            if (!this.lenses.get(i).isEmpty()) {
+                ItemStack extractedStack = this.lenses.get(i);
+                this.lenses.set(i, ItemStack.EMPTY);
+
+                // sync
+                setChanged();
+                level.sendBlockUpdated(this.worldPosition, getBlockState(), getBlockState(), 3);
+
+                return extractedStack;
+            }
+        }
+        return ItemStack.EMPTY; // Should not happen
+    }
+
+    public boolean hasLens(LensItem lensItem) {
+        for (ItemStack stack : this.lenses) {
+            if (stack.getItem() == lensItem) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // Networking and nbt
 
     @Override
@@ -201,6 +296,13 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
     protected void write(CompoundTag tag, boolean clientPacket) {
         super.write(tag, clientPacket);
         tag.putFloat("raycastDistance", this.raycastDistance);
+        //Handle lenses
+        ListTag lensesTag = new ListTag();
+        for (ItemStack stack : lenses) {
+            lensesTag.add(stack.save(new CompoundTag()));
+        }
+        tag.put(NBT_LENSES_KEY, lensesTag);
+
     }
 
     @Override
@@ -212,5 +314,18 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
         } else {
             this.raycastDistance = getMaxRaycastDistance();
         }
+
+        //Handle lenses
+        this.lenses = NonNullList.withSize(getLensLimit(), ItemStack.EMPTY);
+        if (tag.contains(NBT_LENSES_KEY, CompoundTag.TAG_LIST)) {
+            ListTag lensesTag = tag.getList(NBT_LENSES_KEY, CompoundTag.TAG_COMPOUND);
+            for (int i = 0; i < lensesTag.size(); i++) {
+                if (i < this.lenses.size()) { // Only load up to the current limit
+                    CompoundTag itemTag = lensesTag.getCompound(i);
+                    this.lenses.set(i, ItemStack.of(itemTag));
+                }
+            }
+        }
+        
     }
 }

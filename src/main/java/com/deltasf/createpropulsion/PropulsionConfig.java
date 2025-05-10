@@ -16,7 +16,7 @@ public class PropulsionConfig {
     public static final ForgeConfigSpec.ConfigValue<Integer> OPTICAL_SENSOR_TICKS_PER_UPDATE;
     public static final ForgeConfigSpec.ConfigValue<Integer> INLINE_OPTICAL_SENSOR_MAX_DISTANCE;
     public static final ForgeConfigSpec.ConfigValue<Integer> OPTICAL_SENSOR_MAX_DISTANCE;
-    public static final ForgeConfigSpec.ConfigValue<Boolean> OPTICAL_SENSOR_CLIP_FLUID;
+    //public static final ForgeConfigSpec.ConfigValue<Boolean> OPTICAL_SENSOR_CLIP_FLUID;
     public static final ForgeConfigSpec.ConfigValue<Boolean> OPTICAL_SENSOR_VISIBLE_ONLY_WITH_GOGGLES;
 
     static {
@@ -40,7 +40,7 @@ public class PropulsionConfig {
                 .defineInRange("Inline optical sensor max raycast distance", 16, 4, 32);
             OPTICAL_SENSOR_MAX_DISTANCE = BUILDER.comment("Length of the raycast ray. Very high values may degrade performance. Change with caution!")
                 .defineInRange("Optical sensor max raycast distance", 64, 8, 128);
-            OPTICAL_SENSOR_CLIP_FLUID = BUILDER.comment("If true - optical sensors will detect fluids too.").define("Clip fluids", true);
+            //OPTICAL_SENSOR_CLIP_FLUID = BUILDER.comment("If true - optical sensors will detect fluids too.").define("Clip fluids", true);
             OPTICAL_SENSOR_VISIBLE_ONLY_WITH_GOGGLES = BUILDER.comment("Optical sensor beam will render only if goggles are equiped.")
                 .define("Beam visible only with goggles", false);
         BUILDER.pop();

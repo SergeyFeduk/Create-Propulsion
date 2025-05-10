@@ -42,6 +42,11 @@ public class OpticalSensorBlockEntity extends AbstractOpticalSensorBlockEntity {
     }
 
     @Override
+    public int getLensLimit() {
+        return 2;
+    }
+
+    @Override
     protected float getMaxRaycastDistance(){
         return targetDistance.getValue();
     }
