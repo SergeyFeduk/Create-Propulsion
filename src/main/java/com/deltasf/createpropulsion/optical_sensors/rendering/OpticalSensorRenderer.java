@@ -21,6 +21,10 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.item.DyeableLeatherItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.AABB;
@@ -136,8 +140,27 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<AbstractOptic
         beamData.normalTop.set(this.upVector).negate();
         beamData.normalLeft.set(this.sideVector);
 
-        beamData.startColor.set(powered ? START_POWERED_COLOR : START_COLOR);
-        beamData.endColor.set(powered ? END_POWERED_COLOR : END_COLOR);
+        //Apply custom color if not powered and has optical lenses inserted
+        if (!powered && blockEntity.hasLens(PropulsionItems.OPTICAL_LENS.get())) {
+            //Get all lenses of type PropulsionItems.OPTICAL_LENS as item stacks and mix their colors in rgb space
+            //TODO: Remove all Vector4f allocations and deduplicate
+            Vector4f finalColor = calculateFinalColor(blockEntity.getLenses());
+            if (finalColor == null) { // No colored lens, default behaviour
+                beamData.startColor.set(powered ? START_POWERED_COLOR : START_COLOR);
+                beamData.endColor.set(powered ? END_POWERED_COLOR : END_COLOR);
+            } else {
+                Vector4f startColor = new Vector4f(finalColor);
+                startColor.w = START_ALPHA;
+                Vector4f endColor = new Vector4f(finalColor);
+                endColor.w = END_ALPHA;
+                beamData.startColor.set(startColor);
+                beamData.endColor.set(endColor);
+            }
+        } else {
+            beamData.startColor.set(powered ? START_POWERED_COLOR : START_COLOR);
+            beamData.endColor.set(powered ? END_POWERED_COLOR : END_COLOR);
+        }
+
         beamData.poseSnapshot = poseStack.last();
 
         //Rendering setup
@@ -166,6 +189,16 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<AbstractOptic
         AABB beamAABB = calculateBeamAABB(blockEntity);
         if (beamAABB == null) return false;
         return frustum == null || frustum.isVisible(beamAABB);
+    }
+
+    @Override
+    public boolean shouldRenderOffScreen(@Nonnull AbstractOpticalSensorBlockEntity pBlockEntity) {
+        return true;
+    }
+
+    @Override
+    public int getViewDistance() {
+        return 256;
     }
 
     private AABB calculateBeamAABB(AbstractOpticalSensorBlockEntity blockEntity) {
@@ -203,13 +236,43 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<AbstractOptic
         return new AABB(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
-    @Override
-    public boolean shouldRenderOffScreen(@Nonnull AbstractOpticalSensorBlockEntity pBlockEntity) {
-        return true;
-    }
+    private Vector4f calculateFinalColor(NonNullList<ItemStack> lenses) {
+        float totalRed = 0;
+        float totalGreen = 0;
+        float totalBlue = 0;
+        int dyedLensCount = 0;
 
-    @Override
-    public int getViewDistance() {
-        return 256;
+        Item opticalLensItem = PropulsionItems.OPTICAL_LENS.get();
+
+        for (ItemStack stack : lenses) {
+            if (stack.is(opticalLensItem)) {
+                Item item = stack.getItem();
+                DyeableLeatherItem dyeableItem = (DyeableLeatherItem) item;
+                if (dyeableItem.hasCustomColor(stack)) {
+                    int color = dyeableItem.getColor(stack);
+
+                    // Extract RGB values from hex
+                    int r = (color >> 16) & 0xFF;
+                    int g = (color >> 8) & 0xFF;
+                    int b = color & 0xFF;
+
+                    // Accumulate RGB values
+                    totalRed += r;
+                    totalGreen += g;
+                    totalBlue += b;
+                    dyedLensCount++;
+                }
+            }
+        }
+
+        if (dyedLensCount == 0) {
+            return null;
+        } else {
+            float avgRed = totalRed / dyedLensCount;
+            float avgGreen = totalGreen / dyedLensCount;
+            float avgBlue = totalBlue / dyedLensCount;
+
+            return new Vector4f(avgRed / 255.0f, avgGreen / 255.0f, avgBlue / 255.0f, 1.0f);
+        }
     }
 }
