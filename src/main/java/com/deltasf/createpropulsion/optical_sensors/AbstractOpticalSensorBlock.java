@@ -3,6 +3,7 @@ package com.deltasf.createpropulsion.optical_sensors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.deltasf.createpropulsion.PropulsionItems;
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntityTicker;
 import com.simibubi.create.foundation.utility.VoxelShaper;
@@ -98,12 +99,12 @@ public abstract class AbstractOpticalSensorBlock extends DirectionalBlock implem
         ItemStack heldStack = player.getItemInHand(hand);
         //Handle client
         if (level.isClientSide) {
-            if (heldStack.getItem() instanceof LensItem || heldStack.isEmpty()) {
+            if (heldStack.is(PropulsionItems.OPTICAL_LENS_TAG) || heldStack.isEmpty()) {
                 return InteractionResult.sidedSuccess(level.isClientSide);
             }
         }
         //Handle server
-        if (heldStack.getItem() instanceof LensItem) {
+        if (heldStack.is(PropulsionItems.OPTICAL_LENS_TAG)) {
             if (sensorBE.insertLens(heldStack)) {
                 return InteractionResult.CONSUME;
             } else {

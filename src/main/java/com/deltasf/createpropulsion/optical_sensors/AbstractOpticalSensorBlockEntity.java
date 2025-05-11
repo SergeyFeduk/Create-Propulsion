@@ -25,6 +25,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
@@ -207,7 +208,7 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
     }
 
     public boolean canInsertLens(ItemStack lensStack) {
-        if (lensStack.isEmpty() || !(lensStack.getItem() instanceof LensItem)) {
+        if (lensStack.isEmpty() || !(lensStack.is(PropulsionItems.OPTICAL_LENS_TAG))) {
             return false; // Not a lens or empty stack
         }
         return hasSpaceForLens(); // Check if there's space
@@ -261,7 +262,7 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
         return ItemStack.EMPTY; // Should not happen
     }
 
-    public boolean hasLens(LensItem lensItem) {
+    public boolean hasLens(Item lensItem) {
         for (ItemStack stack : this.lenses) {
             if (stack.getItem() == lensItem) {
                 return true;
