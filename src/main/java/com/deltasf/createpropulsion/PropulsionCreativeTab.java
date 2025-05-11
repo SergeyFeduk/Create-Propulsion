@@ -48,6 +48,7 @@ public class PropulsionCreativeTab {
                 output.accept(PropulsionItems.PINE_RESIN);
                 output.accept(PropulsionItems.OPTICAL_LENS);
                 output.accept(PropulsionItems.FLUID_LENS);
+                output.accept(PropulsionItems.INVISIBILITY_LENS);
             }
         }
 }

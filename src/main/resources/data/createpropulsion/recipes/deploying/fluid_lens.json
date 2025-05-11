@@ -1,0 +1,16 @@
+{
+    "type": "create:deploying",
+    "ingredients": [
+      {
+        "item": "createpropulsion:optical_lens"
+      },
+      {
+        "item": "minecraft:glowstone_dust"
+      }
+    ],
+    "results": [
+      {
+        "item": "createpropulsion:fluid_lens"
+      }
+    ]
+  }

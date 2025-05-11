@@ -7,6 +7,7 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 import com.deltasf.createpropulsion.PropulsionConfig;
+import com.deltasf.createpropulsion.PropulsionItems;
 import com.deltasf.createpropulsion.PropulsionBlockEntities;
 import com.deltasf.createpropulsion.optical_sensors.AbstractOpticalSensorBlock;
 import com.deltasf.createpropulsion.optical_sensors.AbstractOpticalSensorBlockEntity;
@@ -86,13 +87,14 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<AbstractOptic
             FilteringRenderer.renderOnBlockEntity(blockEntity, partialTicks, poseStack, bufferSource, light, overlay);
         }
         //Skip rendering if no goggles and configured for that
-        if (PropulsionConfig.OPTICAL_SENSOR_VISIBLE_ONLY_WITH_GOGGLES.get()) {
+        /*if (PropulsionConfig.OPTICAL_SENSOR_VISIBLE_ONLY_WITH_GOGGLES.get()) {
             LocalPlayer player = Minecraft.getInstance().player;
             if (player != null) {
                 ItemStack headItemStack = player.getItemBySlot(EquipmentSlot.HEAD);
-                if (headItemStack.getItem() != AllItems.GOGGLES.get()) return; //No goggles -> no rendering for ya
+                if (headItemStack.getItem() != AllItems.GOGGLES.get()) return; //No goggles 
             }
-        }
+        }*/
+        if (blockEntity.hasLens(PropulsionItems.INVISIBILITY_LENS.get())) return; //Invisibiliy lens -> no beam rendering for ya
 
         BeamRenderData beamData = blockEntity.getClientBeamRenderData();
             

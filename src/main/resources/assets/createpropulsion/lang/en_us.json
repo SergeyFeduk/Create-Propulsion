@@ -35,5 +35,9 @@
     "fluid.createpropulsion.turpentine": "Turpentine",
     "item.createpropulsion.turpentine_bucket": "Turpentine Bucket",
 
-    "block.createpropulsion.lodestone_tracker": "Lodestone Tracker"
+    "block.createpropulsion.lodestone_tracker": "Lodestone Tracker",
+    "item.createpropulsion.optical_lens": "Optical Lens",
+    "item.createpropulsion.fluid_lens": "Fluid Lens",
+    "item.createpropulsion.invisibility_lens": "Invisibility Lens",
+    "item.createpropulsion.unfinished_lens": "Unfinished Lens"
 }
