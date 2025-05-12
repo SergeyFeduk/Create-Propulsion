@@ -8,7 +8,6 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
-import com.deltasf.createpropulsion.PropulsionItems;
 import com.deltasf.createpropulsion.optical_sensors.rendering.BeamRenderData;
 import com.deltasf.createpropulsion.optical_sensors.rendering.OpticalSensorBeamRenderType;
 
@@ -17,9 +16,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.world.item.DyeableLeatherItem;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RegisterColorHandlersEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -30,19 +27,6 @@ public class TranslucentBeamRenderer {
 
     public static void scheduleBeamRender(BeamRenderData data) {
         RENDER_QUEUE.offer(data);
-    }
-
-    //TODO: TEMP move somewhere else
-    @SubscribeEvent
-    public static void registerItemColors(RegisterColorHandlersEvent.Item event) {
-        event.register((stack, tintIndex) -> {
-            // Check if the item implements DyeableLeatherItem (it should if registered here)
-            // Cast to DyeableLeatherItem
-            DyeableLeatherItem dyeableItem = (DyeableLeatherItem) stack.getItem();
-            // If it's the dyeable layer (tintIndex 1), get and return the color.
-            // Otherwise, return -1, which signifies "no color tint" for this layer.
-            return tintIndex == 1 ? dyeableItem.getColor(stack) : -1;
-        }, PropulsionItems.OPTICAL_LENS.get());
     }
 
     // The idea behind this is to perform two render passes:

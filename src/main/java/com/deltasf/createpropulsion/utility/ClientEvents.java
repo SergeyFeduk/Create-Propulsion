@@ -1,0 +1,46 @@
+package com.deltasf.createpropulsion.utility;
+
+import com.deltasf.createpropulsion.CreatePropulsion;
+import com.deltasf.createpropulsion.PropulsionItems;
+
+import net.minecraft.world.item.DyeableLeatherItem;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.RegisterColorHandlersEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+
+@Mod.EventBusSubscriber(modid = CreatePropulsion.ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+public class ClientEvents {
+    @SubscribeEvent
+    public static void registerItemColors(RegisterColorHandlersEvent.Item event) {
+
+        event.register((stack, tintIndex) -> {
+            if (tintIndex != 0) return -1;
+            DyeableLeatherItem dyeableItem = (DyeableLeatherItem) stack.getItem();
+            //Lerp 0.5 to white to make texture look more natural
+            if (dyeableItem.hasCustomColor(stack)) {
+                int color = dyeableItem.getColor(stack);
+
+                float lerpCoefficient = 0.5f;
+                int r = (color >> 16) & 0xFF;
+                int g = (color >> 8) & 0xFF;
+                int b = color & 0xFF;
+
+                r = (int) (r + (255 - r) * lerpCoefficient);
+                g = (int) (g + (255 - g) * lerpCoefficient);
+                b = (int) (b + (255 - b) * lerpCoefficient);
+
+                r = Math.max(0, Math.min(255, r));
+                g = Math.max(0, Math.min(255, g));
+                b = Math.max(0, Math.min(255, b));
+
+
+                int newColor = (r << 16) | (g << 8) | b;
+                return newColor;
+            } else {
+                return 0x00FFFFFF;
+            }
+
+        }, PropulsionItems.OPTICAL_LENS.get());
+    }
+}
