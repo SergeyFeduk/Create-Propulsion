@@ -10,6 +10,7 @@ import com.simibubi.create.foundation.utility.VoxelShaper;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -134,6 +135,17 @@ public abstract class AbstractOpticalSensorBlock extends DirectionalBlock implem
 
     @Override
     public void onRemove(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull BlockState newState, boolean isMoving) {
+        if (!state.is(newState.getBlock())) {
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof AbstractOpticalSensorBlockEntity sensorBE) {
+                for (ItemStack lens : sensorBE.getLenses()) {
+                    if (!lens.isEmpty()) {
+                        Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), lens);
+                    }
+                }
+            }
+            level.removeBlockEntity(pos);
+        }
         super.onRemove(state, level, pos, newState, isMoving);
     }
 
