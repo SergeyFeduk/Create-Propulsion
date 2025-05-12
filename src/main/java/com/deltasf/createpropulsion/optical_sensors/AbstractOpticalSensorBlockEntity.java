@@ -52,7 +52,7 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
         return this.beamRenderData;
     }
 
-    protected NonNullList<ItemStack> lenses; // List to store the lens items
+    protected NonNullList<ItemStack> lenses;
     public static final String NBT_LENSES_KEY = "Lenses"; 
 
     public float getRaycastDistance() {
@@ -117,7 +117,6 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
         Vec3 worldTo = raycastPositions.getSecond();
 
         // Perform raycast using world coordinates
-        //ClipContext.Fluid clipFluid = PropulsionConfig.OPTICAL_SENSOR_CLIP_FLUID.get() ? ClipContext.Fluid.ANY : ClipContext.Fluid.NONE;
         ClipContext.Fluid clipFluid = hasLens(PropulsionItems.FLUID_LENS.get()) ? ClipContext.Fluid.ANY : ClipContext.Fluid.NONE;
         ClipContext context = new ClipContext(worldFrom, worldTo, ClipContext.Block.COLLIDER, clipFluid, null);
         BlockHitResult hit = level.clip(context);
@@ -263,6 +262,7 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
     }
 
     public boolean hasLens(Item lensItem) {
+        if (this.lenses == null) return false;
         for (ItemStack stack : this.lenses) {
             if (stack.getItem() == lensItem) {
                 return true;

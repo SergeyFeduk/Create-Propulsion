@@ -6,6 +6,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.deltasf.createpropulsion.PropulsionConfig;
+import com.deltasf.createpropulsion.PropulsionItems;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 
 import net.minecraft.core.BlockPos;
@@ -35,7 +36,8 @@ public class InlineOpticalSensorBlockEntity extends AbstractOpticalSensorBlockEn
 
     @Override
     protected float getMaxRaycastDistance() {
-        return PropulsionConfig.INLINE_OPTICAL_SENSOR_MAX_DISTANCE.get();
+        boolean isFocused = hasLens(PropulsionItems.FOCUS_LENS.get());
+        return PropulsionConfig.INLINE_OPTICAL_SENSOR_MAX_DISTANCE.get() * (isFocused ? 2.0f : 1.0f);
     }
 
     @Override

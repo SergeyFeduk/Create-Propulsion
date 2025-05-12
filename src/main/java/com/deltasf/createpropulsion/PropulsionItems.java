@@ -18,6 +18,7 @@ public class PropulsionItems {
     //Lenses
     public static final ItemEntry<OpticalLensItem> OPTICAL_LENS = REGISTRATE.item("optical_lens", OpticalLensItem::new).register();
     public static final ItemEntry<Item> FLUID_LENS = REGISTRATE.item("fluid_lens", Item::new).register();
+    public static final ItemEntry<Item> FOCUS_LENS = REGISTRATE.item("focus_lens", Item::new).register();
     public static final ItemEntry<Item> INVISIBILITY_LENS = REGISTRATE.item("invisibility_lens", Item::new).register();
     public static final ItemEntry<Item> UNFINISHED_LENS = REGISTRATE.item("unfinished_lens", Item::new).register();
 

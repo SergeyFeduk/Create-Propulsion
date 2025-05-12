@@ -6,6 +6,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.deltasf.createpropulsion.PropulsionConfig;
+import com.deltasf.createpropulsion.PropulsionItems;
 import com.deltasf.createpropulsion.optical_sensors.optical_sensor.OpticalSensorDistanceScrollBehaviour;
 import com.deltasf.createpropulsion.optical_sensors.optical_sensor.OpticalSensorFilterValueBox;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
@@ -22,6 +23,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class OpticalSensorBlockEntity extends AbstractOpticalSensorBlockEntity {
     private FilteringBehaviour filtering;
+    private boolean wasFocused;
     public ScrollValueBehaviour targetDistance;
 
     public OpticalSensorBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state){
@@ -31,7 +33,7 @@ public class OpticalSensorBlockEntity extends AbstractOpticalSensorBlockEntity {
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
         behaviours.add(filtering = new FilteringBehaviour(this, new OpticalSensorFilterValueBox(true)));
-        targetDistance = new OpticalSensorDistanceScrollBehaviour(this).between(1, PropulsionConfig.OPTICAL_SENSOR_MAX_DISTANCE.get());
+        targetDistance = new OpticalSensorDistanceScrollBehaviour(this).between(1, PropulsionConfig.OPTICAL_SENSOR_MAX_DISTANCE.get() * 2);
         behaviours.add(targetDistance);
         targetDistance.setValue(32);
     }
@@ -47,7 +49,14 @@ public class OpticalSensorBlockEntity extends AbstractOpticalSensorBlockEntity {
     }
 
     @Override
-    protected float getMaxRaycastDistance(){
+    protected float getMaxRaycastDistance() {
+        boolean isFocused = hasLens(PropulsionItems.FOCUS_LENS.get());
+        if (isFocused != wasFocused) {
+            wasFocused = isFocused;
+            int maxDistance = PropulsionConfig.OPTICAL_SENSOR_MAX_DISTANCE.get() * (isFocused ? 2 : 1);
+            int clampedValue = Math.min(targetDistance.value, maxDistance);
+            targetDistance.setValue(clampedValue);
+        }
         return targetDistance.getValue();
     }
 
@@ -63,10 +72,8 @@ public class OpticalSensorBlockEntity extends AbstractOpticalSensorBlockEntity {
             BlockState updatedState = state.setValue(AbstractOpticalSensorBlock.POWER, finalPower).setValue(AbstractOpticalSensorBlock.POWERED, finalPower > 0);
             level.setBlock(pos, updatedState, Block.UPDATE_CLIENTS | Block.UPDATE_NEIGHBORS);
 
-
             Direction facingDir = state.getValue(AbstractOpticalSensorBlock.FACING);
             level.updateNeighborsAt(pos.relative(facingDir.getOpposite()), state.getBlock());
-
             level.updateNeighborsAt(pos, state.getBlock());
         }
     }
