@@ -1,0 +1,16 @@
+{
+    "type": "create:deploying",
+    "ingredients": [
+      {
+        "item": "createpropulsion:optical_lens"
+      },
+      {
+        "item": "minecraft:amethyst_shard"
+      }
+    ],
+    "results": [
+      {
+        "item": "createpropulsion:focus_lens"
+      }
+    ]
+  }
