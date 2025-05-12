@@ -57,6 +57,7 @@ import com.simibubi.create.foundation.collision.Matrix3d;
 import com.simibubi.create.foundation.collision.OrientedBB;
 import com.deltasf.createpropulsion.particles.ParticleTypes;
 import com.deltasf.createpropulsion.particles.PlumeParticleData;
+import com.deltasf.createpropulsion.utility.GoggleUtils;
 import com.deltasf.createpropulsion.utility.MathUtility;
 import com.jesz.createdieselgenerators.fluids.FluidRegistry;
 import com.drmangotea.tfmg.registry.TFMGFluids;
@@ -269,18 +270,10 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
         if (emptyBlocks < OBSTRUCTION_LENGTH) {
             //Calculate efficiency
             efficiency = calculateObstructionEffect() * 100;
-            if (efficiency < 10) {
-                tooltipColor = ChatFormatting.RED;
-            } else if (efficiency < 60) {
-                tooltipColor = ChatFormatting.GOLD;
-            } else if (efficiency < 100) {
-                tooltipColor = ChatFormatting.YELLOW;
-            } else {
-                tooltipColor = ChatFormatting.GREEN;
-            }
+            tooltipColor = GoggleUtils.efficiencyColor(efficiency);
             //Add obstruction tooltip
             Lang.builder().add(Lang.translate("gui.goggles.thruster.obstructed", new Object[0])).space()
-                .add(Lang.text(makeObstructionBar(emptyBlocks, OBSTRUCTION_LENGTH)))
+                .add(Lang.text(GoggleUtils.makeObstructionBar(emptyBlocks, OBSTRUCTION_LENGTH)))
                 .style(tooltipColor)
             .forGoggles(tooltip);
         }
@@ -419,17 +412,6 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
         }
     }
 
-    //Just reversed version of create TooltipHelper.makeProgressBar
-    public static String makeObstructionBar(int length, int filledLength) {
-        String bar = " ";
-        int i;
-        for(i = 0; i < length; ++i) {
-            bar = bar + "▒";
-        }
-
-        for(i = 0; i < filledLength - length; ++i) {
-           bar = bar + "█";
-        }
-        return bar + " ";
-    }
+    
+    
 }
