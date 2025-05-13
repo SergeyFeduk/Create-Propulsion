@@ -58,6 +58,10 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<AbstractOptic
         RAY_POWERED_COLOR.x(), RAY_POWERED_COLOR.y(), RAY_POWERED_COLOR.z(), RAY_POWERED_COLOR.w() * END_ALPHA
     );
 
+    private static final Vector3f MODIFIED_TEMP_COLOR = new Vector3f();
+    private static final Vector4f MODIFIED_START_COLOR = new Vector4f();
+    private static final Vector4f MODIFIED_END_COLOR = new Vector4f();
+
     // Positions
     private final Vector3f localStartPos = new Vector3f();
     private final Vector3f directionVec = new Vector3f();
@@ -143,22 +147,15 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<AbstractOptic
         //Apply custom color if not powered and has optical lenses inserted
         if (!powered && blockEntity.hasLens(PropulsionItems.OPTICAL_LENS.get())) {
             //Get all lenses of type PropulsionItems.OPTICAL_LENS as item stacks and mix their colors in rgb space
-            //TODO: Remove all Vector4f allocations and deduplicate
-            Vector4f finalColor = calculateFinalColor(blockEntity.getLenses());
-            if (finalColor == null) { // No colored lens, default behaviour
-                beamData.startColor.set(powered ? START_POWERED_COLOR : START_COLOR);
-                beamData.endColor.set(powered ? END_POWERED_COLOR : END_COLOR);
-            } else {
-                Vector4f startColor = new Vector4f(finalColor);
-                startColor.w = START_ALPHA;
-                Vector4f endColor = new Vector4f(finalColor);
-                endColor.w = END_ALPHA;
-                beamData.startColor.set(startColor);
-                beamData.endColor.set(endColor);
+            if (calculateFinalColor(blockEntity.getLenses())) {
+                MODIFIED_START_COLOR.set(MODIFIED_TEMP_COLOR, START_ALPHA);
+                MODIFIED_END_COLOR.set(MODIFIED_TEMP_COLOR, END_ALPHA);
+                setBeamColors(beamData, MODIFIED_START_COLOR, MODIFIED_END_COLOR);
+            } else { // No colored lens, default behaviour
+                setBeamColors(beamData, powered);
             }
         } else {
-            beamData.startColor.set(powered ? START_POWERED_COLOR : START_COLOR);
-            beamData.endColor.set(powered ? END_POWERED_COLOR : END_COLOR);
+            setBeamColors(beamData, powered);
         }
 
         beamData.poseSnapshot = poseStack.last();
@@ -201,6 +198,16 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<AbstractOptic
         return 256;
     }
 
+    private void setBeamColors(BeamRenderData beamData, Vector4f startColor, Vector4f endColor) {
+        beamData.startColor.set(startColor);
+        beamData.endColor.set(endColor);
+    }
+
+    private void setBeamColors(BeamRenderData beamData, boolean powered) {
+        beamData.startColor.set(powered ? START_POWERED_COLOR : START_COLOR);
+        beamData.endColor.set(powered ? END_POWERED_COLOR : END_COLOR);
+    }
+
     private AABB calculateBeamAABB(AbstractOpticalSensorBlockEntity blockEntity) {
         float distance = blockEntity.getRaycastDistance();
         if (distance <= 1e-6f) return null;
@@ -236,7 +243,7 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<AbstractOptic
         return new AABB(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
-    private Vector4f calculateFinalColor(NonNullList<ItemStack> lenses) {
+    private boolean calculateFinalColor(NonNullList<ItemStack> lenses) {
         float totalRed = 0;
         float totalGreen = 0;
         float totalBlue = 0;
@@ -266,13 +273,13 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<AbstractOptic
         }
 
         if (dyedLensCount == 0) {
-            return null;
+            return false;
         } else {
             float avgRed = totalRed / dyedLensCount;
             float avgGreen = totalGreen / dyedLensCount;
             float avgBlue = totalBlue / dyedLensCount;
-
-            return new Vector4f(avgRed / 255.0f, avgGreen / 255.0f, avgBlue / 255.0f, 1.0f);
+            MODIFIED_TEMP_COLOR.set(avgRed / 255.0f, avgGreen / 255.0f, avgBlue / 255.0f);
+            return true;
         }
     }
 }
