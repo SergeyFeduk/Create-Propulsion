@@ -34,15 +34,17 @@ import net.minecraftforge.items.IItemHandler;
 
 @SuppressWarnings("null")
 public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
-
+    //Total of 360 degrees occupied by 32 states, halved to account for angles being centered while segments are not
+    private static final float ANGLE_TOLERANCE = 360.0f / 32.0f / 2.0f; 
+    private final LodestoneTrackerItemHandler itemHandler = new LodestoneTrackerItemHandler(this);
+    private final LazyOptional<IItemHandler> itemHandlerCap = LazyOptional.of(() -> itemHandler);
+    //What am I doing with my life
     private ItemStack compass = ItemStack.EMPTY;
-    private int currentTick = 0; //TODO: Save
+    private int currentTick = 0;
     private float targetAngle;
     private float previousAngle;
     private Vector4i redstoneOutputs = new Vector4i();
     public boolean isOutputDirty = false;
-    private final LodestoneTrackerItemHandler itemHandler = new LodestoneTrackerItemHandler(this);
-    private final LazyOptional<IItemHandler> itemHandlerCap = LazyOptional.of(() -> itemHandler);
 
     public LodestoneTrackerBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state){
         super(typeIn, pos, state);
@@ -105,7 +107,7 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
 
     private void updateRedstoneOutput(float angle) {
         //Angle of 0/360 is pointing south
-        if (!isOutputDirty && isAngleWithinTolerance(previousAngle, angle, 1.0f / 32.0f * 360.0f / 2.0f)) return;
+        if (!isOutputDirty && isAngleWithinTolerance(previousAngle, angle, ANGLE_TOLERANCE)) return;
         isOutputDirty = false;
         previousAngle = targetAngle;
         if (compass.isEmpty()) {
@@ -186,7 +188,6 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
         }
         redstoneOutputs.set(intPowerN, intPowerE, intPowerS, intPowerW);
     }
-
 
     private static Vector2f getHorizontalAndVerticalAngles(Vector3d targetPosition, Vector3d trackerPosition) {
         Vector3d direction = new Vector3d();
@@ -281,12 +282,14 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
     protected void write(CompoundTag tag, boolean clientPacket) {
         super.write(tag, clientPacket);
         tag.put("CompassItem", compass.save(new CompoundTag()));
+        tag.putInt("currentTick", currentTick);
     }
 
     @Override
     public void read(CompoundTag tag, boolean clientPacket) {
         super.read(tag, clientPacket);
         compass = ItemStack.of(tag.getCompound("CompassItem"));
+        currentTick = tag.getInt("currentTick");
     }
 
     //Sync

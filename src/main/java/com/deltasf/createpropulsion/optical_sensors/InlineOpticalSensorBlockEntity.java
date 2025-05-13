@@ -17,6 +17,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class InlineOpticalSensorBlockEntity extends AbstractOpticalSensorBlockEntity {
+    private static final int LENS_LIMIT = 1;
     public InlineOpticalSensorBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
     }
@@ -30,9 +31,7 @@ public class InlineOpticalSensorBlockEntity extends AbstractOpticalSensorBlockEn
     }
 
     @Override
-    public int getLensLimit() {
-        return 1;
-    }
+    public int getLensLimit() { return LENS_LIMIT; }
 
     @Override
     protected float getMaxRaycastDistance() {

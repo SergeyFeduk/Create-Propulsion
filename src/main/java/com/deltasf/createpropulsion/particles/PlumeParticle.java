@@ -10,12 +10,18 @@ import net.minecraft.client.particle.SimpleAnimatedParticle;
 import net.minecraft.client.particle.SpriteSet;
 
 public class PlumeParticle extends SimpleAnimatedParticle {
+    private static final float SPREAD = 0.05f;
+    private static final float BASE_QUAD_SIZE = 2.0f;
+    private static final float FRICTION = 0.99f;
+    private static final float SPEED_MULTIPLIER = 0.144f;
+    private static final int BASE_LIFETIME = 40 - 2;
+
     protected PlumeParticle(ClientLevel level, double x, double y, double z, double dx, double dy, double dz, SpriteSet sprite) {
         super(level, x, y, z,sprite, 0);
-        this.quadSize *= 2f;
+        this.quadSize *= BASE_QUAD_SIZE;
         this.baseSize = this.quadSize;
-        this.lifetime = 40 - 2 + random.nextInt(5);
-        this.friction = 0.99f;
+        this.lifetime = BASE_LIFETIME + random.nextInt(5);
+        this.friction = FRICTION;
         this.dx = dx + gRng(); this.dy = dy + gRng(); this.dz = dz + gRng();
         hasPhysics = true;
 
@@ -25,10 +31,9 @@ public class PlumeParticle extends SimpleAnimatedParticle {
     }
 
     float gRng(){
-        return (random.nextFloat() * 2.0f - 1.0f) * spread;
+        return (random.nextFloat() * 2.0f - 1.0f) * SPREAD;
     }
 
-    private static final float spread = 0.05f;
     double dx; double dy; double dz;
     float baseSize;
 
@@ -48,16 +53,15 @@ public class PlumeParticle extends SimpleAnimatedParticle {
     }
     
     private void move(){
-        double spmul = 0.144; //Temp multiplier as a replacement for baseline dt
         this.xo = this.x;
         this.yo = this.y;
         this.zo = this.z;
         if (this.age++ >= this.lifetime) {
             this.remove();
         } else {
-            double moveX = this.dx * spmul;
-            double moveY = this.dy * spmul;
-            double moveZ = this.dz * spmul;
+            double moveX = this.dx * SPEED_MULTIPLIER;
+            double moveY = this.dy * SPEED_MULTIPLIER;
+            double moveZ = this.dz * SPEED_MULTIPLIER;
             this.move(moveX, moveY, moveZ);
             this.dx *= (double)this.friction;
             this.dy *= (double)this.friction;

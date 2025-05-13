@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class OpticalSensorBlockEntity extends AbstractOpticalSensorBlockEntity {
+    private static final int LENS_LIMIT = 2;
     private FilteringBehaviour filtering;
     private boolean wasFocused;
     public ScrollValueBehaviour targetDistance;
@@ -44,9 +45,7 @@ public class OpticalSensorBlockEntity extends AbstractOpticalSensorBlockEntity {
     }
 
     @Override
-    public int getLensLimit() {
-        return 2;
-    }
+    public int getLensLimit() { return LENS_LIMIT; }
 
     @Override
     protected float getMaxRaycastDistance() {

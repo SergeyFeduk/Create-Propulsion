@@ -138,7 +138,6 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
         }
 
         updateRaycastDistance(level, state, distance);
-
         updateRedstoneSignal(level, state, currentBlockPos, rawNewPower, hitBlockPos);
     }
 
@@ -182,7 +181,6 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
         }
 
         Vec3 worldTo = worldFrom.add(worldDisplacement);
-
         return new Pair<>(worldFrom, worldTo);
     }
 

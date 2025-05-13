@@ -69,7 +69,7 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
     public static final int BASE_MAX_THRUST = 400000;
     public static final float BASE_FUEL_CONSUMPTION = 2;
     public static final int TICKS_PER_ENTITY_CHECK = 5;
-    public static final int LOWEST_POWER_THRSHOLD = 5; 
+    public static final int LOWEST_POWER_THRSHOLD = 5;
     //Thruster data
     private ThrusterData thrusterData;
     public SmartFluidTankBehaviour tank;
@@ -81,6 +81,8 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
     private boolean isThrustDirty = false;
     //Particles
     private ParticleType<PlumeParticleData> particleType;
+    private static final float PARTICLE_VELOCITY = 4;
+    private static final float PARTICLE_SHIP_VELOCITY_MODIFIER = 0.15f;
 
     public static final TagKey<Fluid> FORGE_FUEL_TAG = TagKey.create(ForgeRegistries.FLUIDS.getRegistryKey(), new ResourceLocation("forge", "fuel")); 
     private static Dictionary<Fluid, FluidThrusterProperties> fluidsProperties = new Hashtable<Fluid, FluidThrusterProperties>();
@@ -211,8 +213,6 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
         if (power < LOWEST_POWER_THRSHOLD && clientTick % 2 == 0) {clientTick = 0; return; }
 
         float powerPercentage = Math.max(power, LOWEST_POWER_THRSHOLD) / 15.0f;
-        float velocity = 4f * powerPercentage;
-        float shipVelocityModifier = 0.15f;
 
         Direction direction = state.getValue(ThrusterBlock.FACING);
         Direction oppositeDirection = direction.getOpposite();
@@ -221,7 +221,9 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
         double particleY = pos.getY() + 0.5 + oppositeDirection.getStepY() * 0.85;
         double particleZ = pos.getZ() + 0.5 + oppositeDirection.getStepZ() * 0.85;
 
-        Vector3d baseParticleVelocity = new Vector3d(oppositeDirection.getStepX(), oppositeDirection.getStepY(), oppositeDirection.getStepZ()).mul(velocity);
+
+        Vector3d baseParticleVelocity = new Vector3d(oppositeDirection.getStepX(), oppositeDirection.getStepY(), oppositeDirection.getStepZ())
+            .mul(PARTICLE_VELOCITY * powerPercentage);
         Vector3d rotatedShipVelocity = new Vector3d();
         
         ClientShip ship = VSGameUtilsKt.getShipObjectManagingPos((ClientLevel)level, pos);
@@ -231,7 +233,7 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
             Vector3dc shipVelocity = ship.getVelocity();
             // Rotate ship velocity by reversed ship rotation
             reversedShipRotation.transform(shipVelocity, rotatedShipVelocity);
-            rotatedShipVelocity.mul(shipVelocityModifier);
+            rotatedShipVelocity.mul(PARTICLE_SHIP_VELOCITY_MODIFIER);
             
         }
         baseParticleVelocity.add(rotatedShipVelocity);
@@ -240,7 +242,7 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
     }
 
     private float calculateObstructionEffect(){
-        return (float)emptyBlocks / 10.0f;
+        return (float)emptyBlocks / (float)OBSTRUCTION_LENGTH;
     }
 
     @Override
