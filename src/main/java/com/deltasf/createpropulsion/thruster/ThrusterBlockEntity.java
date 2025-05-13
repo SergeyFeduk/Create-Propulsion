@@ -153,6 +153,9 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
     @Override
     public void tick(){
         super.tick();
+        if (level.isClientSide) {
+            emitParticles(level, worldPosition, state);
+        }
         currentTick++;
         
         int tick_rate = PropulsionConfig.THRUSTER_TICKS_PER_UPDATE.get();
@@ -198,12 +201,8 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
         return (int)Math.ceil(base_consumption * powerPercentage * fluidPropertiesConsumptionMultiplier * tick_rate);
     }
 
-    public void clientTick(Level level, BlockPos pos, BlockState state, ThrusterBlockEntity blockEntity){
-        emitParticles(level, pos, state, blockEntity);
-    }
-
-    private void emitParticles(Level level, BlockPos pos, BlockState state, ThrusterBlockEntity blockEntity){
-        if (blockEntity.emptyBlocks == 0) return;
+    private void emitParticles(Level level, BlockPos pos, BlockState state){
+        if (emptyBlocks == 0) return;
         int power = state.getValue(ThrusterBlock.POWER);
         if (power == 0) return;
         if (!validFluid()) return;
@@ -247,7 +246,9 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
     @Override
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking){
         //Calculate obstruction if player looks at thruster with goggles. Always
+        boolean wasThrustDirty = isThrustDirty;
         calculateObstruction(getLevel(), worldPosition, getBlockState().getValue(ThrusterBlock.FACING));
+        isThrustDirty = wasThrustDirty;
 
         //Thruster status
         LangBuilder status;

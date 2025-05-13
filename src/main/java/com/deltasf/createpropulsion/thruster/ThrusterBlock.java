@@ -142,16 +142,8 @@ public class ThrusterBlock extends DirectionalBlock implements EntityBlock {
 
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(@Nonnull Level level, @Nonnull BlockState state, @Nonnull BlockEntityType<T> type) {
-        if (level.isClientSide()) {
-            return (cleintLevel, pos, state1, blockEntity) -> {
-                if (blockEntity instanceof ThrusterBlockEntity thrusterBlockEntity) {
-                    thrusterBlockEntity.clientTick(cleintLevel, pos, state1, thrusterBlockEntity);
-                }
-            };
-        } else {
-            if (type == PropulsionBlockEntities.THRUSTER_BLOCK_ENTITY.get()) {
-                return new SmartBlockEntityTicker<>();
-            }
+        if (type == PropulsionBlockEntities.THRUSTER_BLOCK_ENTITY.get()) {
+            return new SmartBlockEntityTicker<>();
         }
         return null;
     }
