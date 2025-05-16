@@ -14,16 +14,21 @@ import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.PropulsionItems;
 import com.deltasf.createpropulsion.optical_sensors.rendering.BeamRenderData;
 import com.mojang.datafixers.util.Pair;
+import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.simibubi.create.foundation.utility.Lang;
 
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.Connection;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -36,7 +41,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraft.world.phys.HitResult;
 
-public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity {
+public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity implements IHaveGoggleInformation {
     private int currentTick = -1; // -1 to run raycast immediately after placement/load
     protected float raycastDistance = 0;
 
@@ -267,6 +272,47 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
             }
         }
         return false;
+    }
+
+    //Goggles info
+
+    @Override
+    public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
+        if (getCurrentLensCount() == 0) return false; // No lenses - no need for goggle info
+        //Lenses: 1/2
+        Lang.builder()
+            .add(Lang.translate("gui.goggles.optical_sensor.lenses", new Object[0]))
+            .add(Lang.text(":")).space().add(Lang.number(getCurrentLensCount())).text("/").add(Lang.number(getLensLimit()))
+            .forGoggles(tooltip);
+        //List all lenses starting from the deepest
+        for (ItemStack lensStack : getLenses()) {
+            if (!lensStack.is(PropulsionItems.OPTICAL_LENS_TAG)) continue; //We are somehow not a lens
+            if (lensStack.is(PropulsionItems.OPTICAL_LENS.get())) {
+                //- {Lensname} Colored box (if has custom color)
+                var lensItem = (OpticalLensItem)lensStack.getItem();
+                if (lensItem.hasCustomColor(lensStack)) {
+                    Component coloredBox = Component.literal("█").withStyle(Style.EMPTY.withColor(lensItem.getColor(lensStack)));
+                    Lang.builder()
+                        .text("- ")
+                        .add(Lang.itemName(lensStack).style(ChatFormatting.GREEN))
+                        .space().add(coloredBox)
+                        .forGoggles(tooltip);
+                } else {
+                    LensTooltip(lensStack, tooltip);
+                }
+            } else {
+                LensTooltip(lensStack, tooltip);
+            }
+        }
+        return true;
+    }
+
+    private void LensTooltip(ItemStack lensStack, List<Component> tooltip) {
+        //- {Lensname}
+        Lang.builder()
+            .text("- ")
+            .add(Lang.itemName(lensStack).style(ChatFormatting.GREEN))
+            .forGoggles(tooltip);
     }
 
     // Networking and nbt

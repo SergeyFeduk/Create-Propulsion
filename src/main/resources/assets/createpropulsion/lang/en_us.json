@@ -18,6 +18,7 @@
     "create.gui.goggles.thruster.status.working": "On",
     "create.gui.goggles.thruster.obstructed": "Obstructed",
     "create.gui.goggles.thruster.efficiency": "Efficiency",
+    "create.gui.goggles.optical_sensor.lenses": "Lenses",
 
     "createpropulsion.inline_optical_sensor.tooltip.summary": "Casts a _ray_ up to _{} blocks long_, detecting blocks.",
     "createpropulsion.inline_optical_sensor.tooltip.condition1": "When block is detected",
