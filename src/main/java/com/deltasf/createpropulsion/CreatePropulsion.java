@@ -1,6 +1,8 @@
 package com.deltasf.createpropulsion;
 
+import com.deltasf.createpropulsion.compat.CCProxy;
 import com.deltasf.createpropulsion.particles.ParticleTypes;
+import com.simibubi.create.compat.Mods;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -24,6 +26,8 @@ public class CreatePropulsion {
         PropulsionBlockEntities.register();
         PropulsionItems.register();
         PropulsionFluids.register();
+        //Compat
+        Mods.COMPUTERCRAFT.executeIfInstalled(() -> CCProxy::register);
         
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, PropulsionConfig.SPEC, ID + "-server.toml");
         PropulsionCreativeTab.register(modBus);
