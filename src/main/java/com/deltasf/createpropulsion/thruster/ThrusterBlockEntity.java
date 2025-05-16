@@ -118,7 +118,7 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
         }
     };
 
-    private static class FluidThrusterProperties {
+    public static class FluidThrusterProperties {
         public float thrustMultiplier;
         public float consumptionMultiplier;
         
@@ -139,6 +139,10 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
 
     public ThrusterData getThrusterData() {
         return thrusterData;
+    }
+
+    public FluidThrusterProperties getFuelProperties() {
+        return fluidsProperties.get(fluidStack().getRawFluid());
     }
 
     public int getEmptyBlocks() {return emptyBlocks; }
@@ -197,7 +201,7 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
         isThrustDirty = false;
         float thrust = 0;
         if (isFluidValid && power > 0){
-            var properties = fluidsProperties.get(fluidStack().getRawFluid());
+            var properties = getFuelProperties();
             float powerPercentage = power / 15.0f;
             //Redstone power clamped by obstruction value
             float obstruction = calculateObstructionEffect();
@@ -313,13 +317,13 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
         return state.getValue(ThrusterBlock.POWER);
     }
 
-    private FluidStack fluidStack(){
+    public FluidStack fluidStack(){
         return tank.getPrimaryHandler().getFluid();
     }
 
-    private boolean validFluid(){
+    public boolean validFluid(){
         if (fluidStack().isEmpty()) return false;
-        return fluidsProperties.get(fluidStack().getRawFluid()) != null;
+        return getFuelProperties() != null;
     }
 
     public void calculateObstruction(Level level, BlockPos pos, Direction forwardDirection){
@@ -343,7 +347,6 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
             compound.putInt("overridenPower", overridenPower);
             compound.putBoolean("overridePower", overridePower);
         }
-        
     }
 
     @Override

@@ -30,6 +30,27 @@ public class ThrusterPeripheral extends SyncedPeripheral<ThrusterBlockEntity> {
         blockEntity.overridenPower = clampedPower;
     }
 
+    //Get name of the current fuel
+    @LuaFunction(mainThread = true)
+    public String getFuelName() {
+        if (blockEntity.fluidStack().isEmpty()) return "";
+        return blockEntity.fluidStack().getDisplayName().getString();
+    }
+
+    //Get thrust multiplier of current fuel
+    @LuaFunction(mainThread = true)
+    public float getFuelThrustMultiplier() {
+        if (!blockEntity.validFluid()) return 0;
+        return blockEntity.getFuelProperties().thrustMultiplier;
+    }
+
+    //Get consumption multiplier of current fuel
+    @LuaFunction(mainThread = true)
+    public float getFuelConsumptionMultiplier() {
+        if (!blockEntity.validFluid()) return 0;
+        return blockEntity.getFuelProperties().consumptionMultiplier;
+    }
+
     @Override
     public boolean equals(IPeripheral other) {
         if (this == other) return true;
