@@ -3,6 +3,7 @@
     "values": [
         "createpropulsion:thruster",
         "createpropulsion:inline_optical_sensor",
-        "createpropulsion:optical_sensor"
+        "createpropulsion:optical_sensor",
+        "createpropulsion:lodestone_tracker"
     ]
 }
