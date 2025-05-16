@@ -69,23 +69,37 @@ repositories {
             excludeGroup("org.spongepowered")
         }
     }
+    maven {
+        url = "https://maven.theillusivec4.top/"
+    }
+
+    maven {
+        name = "Jared's maven"
+        url = "https://maven.blamejared.com/"
+    }
+
+    maven {
+        name = "Squiddev maven cct"
+        url = "https://maven.squiddev.cc/"
+        content {
+            includeGroup("cc.tweaked")
+            includeModule("org.squiddev", "Cobalt")
+        }
+    }
 }
 
 dependencies {
     compileOnly fg.deobf("com.tterrag.registrate:Registrate:MC1.20-1.3.3")
     //Create
     implementation (fg.deobf("curse.maven:create-328085:5838779"))
-    //implementation(fg.deobf("net.createmod.ponder:Ponder-Forge-1.20.1:1.0.52"))
-
-    //compileOnly(fg.deobf("dev.engine-room.flywheel:flywheel-forge-1.20.1:1.0.0-215"))
-
-
-    //compileOnly(fg.deobf("dev.engine-room.flywheel:flywheel-forge-api-1.20.1:1.0.0-215"))
-    //runtimeOnly(fg.deobf("dev.engine-room.flywheel:flywheel-forge-1.20.1:1.0.0-215"))
     //CDG
     implementation(fg.deobf("curse.maven:createdieselgenerators-869316:5401010"))
     //TFMG
     implementation(fg.deobf("curse.maven:createindustry-693815:5811638"))
+    //CC
+    implementation fg.deobf("cc.tweaked:cc-tweaked-${minecraft_version}-forge:${cc_version}")
+    //JEI
+    implementation fg.deobf("mezz.jei:jei-1.20.1-forge:15.19.0.85")
     //VS2
     implementation("org.valkyrienskies.core:api:${vs_core_version}")
     implementation("org.valkyrienskies.core:impl:${vs_core_version}")

@@ -61,3 +61,15 @@ description='''A mod that adds optical sensors and thruster to the Create mod. A
 	versionRange = "*"
 	ordering = "AFTER"
 	side = "BOTH"
+[[dependencies.${mod_id}]]
+	modId = "computercraft"
+	mandatory = false
+	versionRange = "*"
+	ordering = "AFTER"
+	side = "BOTH"
+[[dependencies.${mod_id}]]
+	modId = "jei"
+	mandatory = false
+	versionRange = "*"
+	ordering = "AFTER"
+	side = "BOTH"
