@@ -17,7 +17,6 @@ import com.mojang.datafixers.util.Pair;
 import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import com.simibubi.create.foundation.item.TooltipHelper.Palette;
 import com.simibubi.create.foundation.utility.Lang;
 
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -277,11 +276,10 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
 
     //Goggles info
 
-    private static final ChatFormatting LENS_TEXT_COLOR = ChatFormatting.GOLD; //TRY OTHER
+    private static final ChatFormatting LENS_TEXT_COLOR = ChatFormatting.GOLD;
     @Override
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         if (getCurrentLensCount() == 0) return false; // No lenses - no need for goggle info
-        Style s = Palette.STANDARD_CREATE.highlight();
         //Lenses: 1/2
         Lang.builder()
             .add(Lang.translate("gui.goggles.optical_sensor.lenses", new Object[0]))
@@ -295,10 +293,9 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
                 var lensItem = (OpticalLensItem)lensStack.getItem();
                 if (lensItem.hasCustomColor(lensStack)) {
                     Component coloredBox = Component.literal("█").withStyle(Style.EMPTY.withColor(lensItem.getColor(lensStack)));
-                    Component a = Component.literal(lensStack.getHoverName().getString()).withStyle(s);
                     Lang.builder()
                         .text("- ")
-                        .add(a /*Lang.itemName(lensStack).style(LENS_TEXT_COLOR)*/)
+                        .add(Lang.itemName(lensStack).style(LENS_TEXT_COLOR))
                         .space().add(coloredBox)
                         .forGoggles(tooltip);
                 } else {
@@ -313,11 +310,9 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
 
     private void LensTooltip(ItemStack lensStack, List<Component> tooltip) {
         //- {Lensname}
-        Style s = Palette.STANDARD_CREATE.highlight();
-        Component a = Component.literal(lensStack.getHoverName().getString()).withStyle(s);
         Lang.builder()
             .text("- ")
-            .add(a/*Lang.itemName(lensStack).style(LENS_TEXT_COLOR)*/)
+            .add(Lang.itemName(lensStack).style(LENS_TEXT_COLOR))
             .forGoggles(tooltip);
     }
 

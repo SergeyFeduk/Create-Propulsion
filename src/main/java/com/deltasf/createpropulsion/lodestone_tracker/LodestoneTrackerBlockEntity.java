@@ -11,7 +11,11 @@ import org.joml.Vector3d;
 import org.joml.Vector4i;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
+
+import com.deltasf.createpropulsion.PropulsionCompatibility;
+import com.deltasf.createpropulsion.compat.computercraft.ComputerBehaviour;
 import com.deltasf.createpropulsion.utility.MathUtility;
+import com.simibubi.create.compat.computercraft.AbstractComputerBehaviour;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 
@@ -45,6 +49,8 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
     private float previousAngle;
     private Vector4i redstoneOutputs = new Vector4i();
     public boolean isOutputDirty = false;
+    //CC
+    public AbstractComputerBehaviour computerBehaviour;
 
     public LodestoneTrackerBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state){
         super(typeIn, pos, state);
@@ -230,7 +236,11 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
     }
 
     @Override
-	public void addBehaviours(List<BlockEntityBehaviour> behaviours) {}
+	public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
+        if (PropulsionCompatibility.CC_ACTIVE) {
+            behaviours.add(computerBehaviour = new ComputerBehaviour(this));
+        }
+    }
 
     //Compass methods
     public ItemStack getCompass() {
@@ -267,6 +277,9 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
     public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
         if (cap == ForgeCapabilities.ITEM_HANDLER) {
             return itemHandlerCap.cast();
+        }
+        if (PropulsionCompatibility.CC_ACTIVE && computerBehaviour.isPeripheralCap(cap)) {
+            return computerBehaviour.getPeripheralCapability();
         }
         return super.getCapability(cap, side);
     }
