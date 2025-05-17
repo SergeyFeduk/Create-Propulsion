@@ -1,4 +1,4 @@
-package com.deltasf.createpropulsion.compat;
+package com.deltasf.createpropulsion.compat.computercraft;
 
 import java.util.function.Function;
 

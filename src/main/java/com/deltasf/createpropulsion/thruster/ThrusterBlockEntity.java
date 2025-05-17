@@ -23,7 +23,6 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import com.simibubi.create.compat.computercraft.AbstractComputerBehaviour;
-import com.deltasf.createpropulsion.compat.ComputerBehaviour;
 import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
@@ -54,6 +53,7 @@ import net.minecraftforge.registries.tags.ITagManager;
 import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.PropulsionCompatibility;
 import com.deltasf.createpropulsion.PropulsionFluids;
+import com.deltasf.createpropulsion.compat.computercraft.ComputerBehaviour;
 import com.deltasf.createpropulsion.debug.DebugRenderer;
 import com.simibubi.create.foundation.collision.Matrix3d;
 import com.simibubi.create.foundation.collision.OrientedBB;

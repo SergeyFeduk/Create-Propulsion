@@ -1,6 +1,6 @@
 package com.deltasf.createpropulsion;
 
-import com.deltasf.createpropulsion.compat.CCProxy;
+import com.deltasf.createpropulsion.compat.computercraft.CCProxy;
 import com.deltasf.createpropulsion.particles.ParticleTypes;
 import com.simibubi.create.compat.Mods;
 import com.simibubi.create.foundation.data.CreateRegistrate;
