@@ -1,5 +1,7 @@
 package com.deltasf.createpropulsion.compat.computercraft;
 
+import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerBlockEntity;
+import com.deltasf.createpropulsion.optical_sensors.OpticalSensorBlockEntity;
 import com.deltasf.createpropulsion.thruster.ThrusterBlockEntity;
 import com.simibubi.create.compat.computercraft.AbstractComputerBehaviour;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
@@ -27,6 +29,10 @@ public class ComputerBehaviour extends AbstractComputerBehaviour {
     public static NonNullSupplier<IPeripheral> getPeripheralFor(SmartBlockEntity blockEntity) {
         if (blockEntity instanceof ThrusterBlockEntity thruster)
             return () -> new ThrusterPeripheral(thruster);
+        if (blockEntity instanceof OpticalSensorBlockEntity opticalSensor)
+            return () -> new OpticalSensorPeripheral(opticalSensor);
+        if (blockEntity instanceof LodestoneTrackerBlockEntity tracker)
+            return () -> new LodestoneTrackerPeripheral(tracker);
         throw new IllegalArgumentException(
                 "No peripheral available for " + ForgeRegistries.BLOCK_ENTITY_TYPES.getKey(blockEntity.getType()));
     }

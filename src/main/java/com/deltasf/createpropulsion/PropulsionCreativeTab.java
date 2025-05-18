@@ -19,7 +19,7 @@ import net.minecraft.world.item.CreativeModeTab.Output;
 public class PropulsionCreativeTab {
     private static final DeferredRegister<CreativeModeTab> REGISTER = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, CreatePropulsion.ID);
 
-        public static final RegistryObject<CreativeModeTab> BASE_TAB = REGISTER.register("propulsion_creative_tab", 
+        public static final RegistryObject<CreativeModeTab> BASE_TAB = REGISTER.register("base", 
         () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup.createpropulsion.base"))
             .withTabsBefore(CreativeModeTabs.SPAWN_EGGS)
