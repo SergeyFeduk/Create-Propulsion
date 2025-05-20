@@ -12,6 +12,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -31,6 +32,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+@SuppressWarnings("deprecation")
 public class LodestoneTrackerBlock extends Block implements EntityBlock {
     public static final IntegerProperty POWER_NORTH = IntegerProperty.create("north_power", 0, 15);
     public static final IntegerProperty POWER_EAST = IntegerProperty.create("east_power", 0, 15);
@@ -59,6 +61,19 @@ public class LodestoneTrackerBlock extends Block implements EntityBlock {
     @Override
     public BlockEntity newBlockEntity(@Nonnull BlockPos pos, @Nonnull BlockState state) {
         return new LodestoneTrackerBlockEntity(PropulsionBlockEntities.LODESTONE_TRACKER_BLOCK_ENTITY.get(), pos, state);
+    }
+
+    @Override
+    public void onRemove(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull BlockState newState, boolean isMoving) {
+        if (!state.is(newState.getBlock())) {
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof LodestoneTrackerBlockEntity trackerBlockEntity) {
+                ItemStack compass = trackerBlockEntity.getCompass();
+                Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), compass);
+            }
+            level.removeBlockEntity(pos);
+        }
+        super.onRemove(state, level, pos, newState, isMoving);
     }
 
     //Handling hand interactions

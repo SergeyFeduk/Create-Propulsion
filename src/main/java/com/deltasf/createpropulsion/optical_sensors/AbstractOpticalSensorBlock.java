@@ -137,8 +137,8 @@ public abstract class AbstractOpticalSensorBlock extends DirectionalBlock implem
     public void onRemove(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull BlockState newState, boolean isMoving) {
         if (!state.is(newState.getBlock())) {
             BlockEntity be = level.getBlockEntity(pos);
-            if (be instanceof AbstractOpticalSensorBlockEntity sensorBE) {
-                for (ItemStack lens : sensorBE.getLenses()) {
+            if (be instanceof AbstractOpticalSensorBlockEntity sensorBlockEntity) {
+                for (ItemStack lens : sensorBlockEntity.getLenses()) {
                     if (!lens.isEmpty()) {
                         Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), lens);
                     }
