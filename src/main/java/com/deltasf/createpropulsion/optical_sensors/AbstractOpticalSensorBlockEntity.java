@@ -13,6 +13,7 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.PropulsionItems;
 import com.deltasf.createpropulsion.optical_sensors.rendering.BeamRenderData;
+import com.deltasf.createpropulsion.utility.GoggleUtils;
 import com.mojang.datafixers.util.Pair;
 import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
@@ -20,7 +21,6 @@ import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour
 import com.simibubi.create.foundation.utility.Lang;
 
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
@@ -276,7 +276,7 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
 
     //Goggles info
 
-    private static final ChatFormatting LENS_TEXT_COLOR = ChatFormatting.GOLD;
+    //private static final ChatFormatting LENS_TEXT_COLOR = ;
     @Override
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         if (getCurrentLensCount() == 0) return false; // No lenses - no need for goggle info
@@ -293,27 +293,15 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
                 var lensItem = (OpticalLensItem)lensStack.getItem();
                 if (lensItem.hasCustomColor(lensStack)) {
                     Component coloredBox = Component.literal("█").withStyle(Style.EMPTY.withColor(lensItem.getColor(lensStack)));
-                    Lang.builder()
-                        .text("- ")
-                        .add(Lang.itemName(lensStack).style(LENS_TEXT_COLOR))
-                        .space().add(coloredBox)
-                        .forGoggles(tooltip);
+                    GoggleUtils.LensTooltip(lensStack, tooltip).space().add(coloredBox).forGoggles(tooltip);
                 } else {
-                    LensTooltip(lensStack, tooltip);
+                    GoggleUtils.LensTooltip(lensStack, tooltip).forGoggles(tooltip);;
                 }
             } else {
-                LensTooltip(lensStack, tooltip);
+                GoggleUtils.LensTooltip(lensStack, tooltip).forGoggles(tooltip);;
             }
         }
         return true;
-    }
-
-    private void LensTooltip(ItemStack lensStack, List<Component> tooltip) {
-        //- {Lensname}
-        Lang.builder()
-            .text("- ")
-            .add(Lang.itemName(lensStack).style(LENS_TEXT_COLOR))
-            .forGoggles(tooltip);
     }
 
     // Networking and nbt

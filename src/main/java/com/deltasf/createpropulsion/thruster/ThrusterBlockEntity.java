@@ -48,7 +48,6 @@ import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
-import net.minecraftforge.registries.tags.ITagManager;
 
 import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.PropulsionCompatibility;
@@ -75,7 +74,6 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
     //Thruster data
     private ThrusterData thrusterData;
     public SmartFluidTankBehaviour tank;
-    //private BlockState state;
     private int emptyBlocks;
     //Ticking
     private int currentTick = 0;
@@ -108,14 +106,6 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
             fluidsProperties.put(TFMGFluids.GASOLINE.get().getSource(), new FluidThrusterProperties(1.05f, 0.95f));
             fluidsProperties.put(TFMGFluids.DIESEL.get().getSource(), new FluidThrusterProperties(1.0f, 0.9f));     
         }
-        //TODO: Fuels from tags (replace with tag checking from 0.1.3)
-        ITagManager<Fluid> fluidTags = ForgeRegistries.FLUIDS.tags();
-        var tagContents = fluidTags.getTag(FORGE_FUEL_TAG);
-        for (Fluid fluid : tagContents) {
-            if (fluidsProperties.get(fluid) == null) {
-                fluidsProperties.put(fluid, FluidThrusterProperties.DEFAULT);
-            }
-        }
     };
 
     public static class FluidThrusterProperties {
@@ -140,8 +130,11 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
         return thrusterData;
     }
 
-    public FluidThrusterProperties getFuelProperties() {
-        return fluidsProperties.get(fluidStack().getRawFluid());
+    public FluidThrusterProperties getFuelProperties(Fluid fluid) {
+        var properties = fluidsProperties.get(fluid);
+        if (properties != null) return properties;
+        if (fluid.is(FORGE_FUEL_TAG)) return FluidThrusterProperties.DEFAULT;
+        return null;
     }
 
     public int getEmptyBlocks() {return emptyBlocks; }
@@ -173,7 +166,7 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
         int power = getOverriddenPowerOrState(currentBlockState);
 
         if (isFluidValid && power > 0) {
-            var properties = getFuelProperties();
+            var properties = getFuelProperties(fluidStack().getRawFluid());
             float powerPercentage = power / 15.0f;
             float obstructionEffect = calculateObstructionEffect();
             float thrustPercentage = Math.min(powerPercentage, obstructionEffect);
@@ -215,21 +208,7 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
         if (PropulsionConfig.THRUSTER_DAMAGE_ENTITIES.get() && isFluidValid && power > 0) {
             doEntityDamageCheck(currentTick); // Assuming this uses getBlockState() internally or is fine
         }
-        /*if (PropulsionConfig.THRUSTER_DAMAGE_ENTITIES.get() && isFluidValid && power > 0) doEntityDamageCheck(currentTick);
-        if (!(isThrustDirty || currentTick % tick_rate == 0)) {
-            return;
-        }*/
         //Recalculate obstruction
-        /*state = getBlockState();
-        if (currentTick % (tick_rate * 2) == 0) {
-            //Every second fluid tick update obstruction
-            int previousEmptyBlocks = emptyBlocks;
-            calculateObstruction(level, worldPosition, state.getValue(ThrusterBlock.FACING));
-            if (previousEmptyBlocks != emptyBlocks) {
-                setChanged();
-                level.sendBlockUpdated(worldPosition, state, state, Block.UPDATE_CLIENTS);
-            }
-        }*/
         if (currentTick % (PropulsionConfig.THRUSTER_TICKS_PER_UPDATE.get() * 2) == 0) { // Example: Check obstruction every 2 * N ticks
             int previousEmptyBlocks = emptyBlocks;
             calculateObstruction(level, worldPosition, currentBlockState.getValue(ThrusterBlock.FACING));
@@ -241,26 +220,8 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
         }
 
         if (isThrustDirty || currentTick % tick_rate == 0) {
-            updateThrust(currentBlockState); // Call the new centralized method
+            updateThrust(currentBlockState);
         }
-
-        //Calculate thrust
-        /*isThrustDirty = false;
-        float thrust = 0;
-        if (isFluidValid && power > 0){
-            var properties = getFuelProperties();
-            float powerPercentage = power / 15.0f;
-            //Redstone power clamped by obstruction value
-            float obstruction = calculateObstructionEffect();
-            float thrustPercentage = Math.min(powerPercentage, obstruction);
-            int consumption =  obstruction > 0 ? calculateFuelConsumption(powerPercentage, properties.consumptionMultiplier, tick_rate) : 0;
-            //Consume fluid
-            tank.getPrimaryHandler().drain(consumption, IFluidHandler.FluidAction.EXECUTE);
-            //Calculate thrust
-            float thrustMultiplier = (float)(double)PropulsionConfig.THRUSTER_THRUST_MULTIPLIER.get();
-            thrust = BASE_MAX_THRUST * thrustMultiplier * thrustPercentage * properties.thrustMultiplier;
-        }
-        thrusterData.setThrust(thrust);*/
     }
 
     private int calculateFuelConsumption(float powerPercentage, float fluidPropertiesConsumptionMultiplier, int tick_rate){
@@ -357,13 +318,6 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
 
     //Helpers
 
-    /*private int getPower() {
-        if (PropulsionCompatibility.CC_ACTIVE && overridePower) {
-            return overridenPower;
-        }
-        return state.getValue(ThrusterBlock.POWER);
-    }*/
-
     private int getOverriddenPowerOrState(BlockState currentBlockState) {
         if (PropulsionCompatibility.CC_ACTIVE && overridePower) {
             return overridenPower;
@@ -378,7 +332,7 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
 
     public boolean validFluid(){
         if (fluidStack().isEmpty()) return false;
-        return getFuelProperties() != null;
+        return getFuelProperties(fluidStack().getRawFluid()) != null;
     }
 
     public void calculateObstruction(Level level, BlockPos pos, Direction forwardDirection){

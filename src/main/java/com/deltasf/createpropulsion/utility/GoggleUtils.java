@@ -1,6 +1,12 @@
 package com.deltasf.createpropulsion.utility;
 
+import com.simibubi.create.foundation.utility.Lang;
+import com.simibubi.create.foundation.utility.LangBuilder;
+import java.util.List;
+
 import net.minecraft.ChatFormatting;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.chat.Component;
 
 public class GoggleUtils {
     //Just reversed version of create TooltipHelper.makeProgressBar
@@ -30,5 +36,12 @@ public class GoggleUtils {
             tooltipColor = ChatFormatting.GREEN;
         }
         return tooltipColor;
+    }
+
+    public static LangBuilder LensTooltip(ItemStack lensStack, List<Component> tooltip) {
+        //- {Lensname}
+        return Lang.builder()
+            .text("- ")
+            .add(Lang.itemName(lensStack).style(ChatFormatting.GOLD));
     }
 }

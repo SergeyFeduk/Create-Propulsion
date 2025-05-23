@@ -41,14 +41,14 @@ public class ThrusterPeripheral extends SyncedPeripheral<ThrusterBlockEntity> {
     @LuaFunction(mainThread = true)
     public float getFuelThrustMultiplier() {
         if (!blockEntity.validFluid()) return 0;
-        return blockEntity.getFuelProperties().thrustMultiplier;
+        return blockEntity.getFuelProperties(blockEntity.fluidStack().getRawFluid()).thrustMultiplier;
     }
 
     //Get consumption multiplier of current fuel
     @LuaFunction(mainThread = true)
     public float getFuelConsumptionMultiplier() {
         if (!blockEntity.validFluid()) return 0;
-        return blockEntity.getFuelProperties().consumptionMultiplier;
+        return blockEntity.getFuelProperties(blockEntity.fluidStack().getRawFluid()).consumptionMultiplier;
     }
 
     @Override
