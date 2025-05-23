@@ -11,9 +11,9 @@ import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = CreatePropulsion.ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ClientEvents {
+    
     @SubscribeEvent
     public static void registerItemColors(RegisterColorHandlersEvent.Item event) {
-
         event.register((stack, tintIndex) -> {
             if (tintIndex != 0) return -1;
             DyeableLeatherItem dyeableItem = (DyeableLeatherItem) stack.getItem();

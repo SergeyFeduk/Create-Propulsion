@@ -20,7 +20,6 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import com.simibubi.create.compat.computercraft.AbstractComputerBehaviour;
 import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
@@ -31,8 +30,6 @@ import com.simibubi.create.foundation.utility.Lang;
 import com.simibubi.create.foundation.utility.LangBuilder;
 
 import java.awt.Color;
-import java.util.Dictionary;
-import java.util.Hashtable;
 import java.util.List;
 
 import org.joml.Quaterniond;
@@ -46,12 +43,9 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
 
 import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.PropulsionCompatibility;
-import com.deltasf.createpropulsion.PropulsionFluids;
 import com.deltasf.createpropulsion.compat.computercraft.ComputerBehaviour;
 import com.deltasf.createpropulsion.debug.DebugRenderer;
 import com.simibubi.create.foundation.collision.Matrix3d;
@@ -60,8 +54,6 @@ import com.deltasf.createpropulsion.particles.ParticleTypes;
 import com.deltasf.createpropulsion.particles.PlumeParticleData;
 import com.deltasf.createpropulsion.utility.GoggleUtils;
 import com.deltasf.createpropulsion.utility.MathUtility;
-import com.jesz.createdieselgenerators.fluids.FluidRegistry;
-import com.drmangotea.tfmg.registry.TFMGFluids;
 
 //Abandon all hope, ye who enter here
 @SuppressWarnings({"deprecation", "unchecked"})
@@ -88,26 +80,6 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
     public boolean overridePower = false;
     public int overridenPower;
 
-    public static final TagKey<Fluid> FORGE_FUEL_TAG = TagKey.create(ForgeRegistries.FLUIDS.getRegistryKey(), new ResourceLocation("forge", "fuel")); 
-    private static Dictionary<Fluid, FluidThrusterProperties> fluidsProperties = new Hashtable<Fluid, FluidThrusterProperties>();
-    static {
-        //Not sure where to show these in game, perhaps in item tooltip if wearing goggles/design goggles
-        //Defined fuels
-        fluidsProperties.put(PropulsionFluids.TURPENTINE.get().getSource(), FluidThrusterProperties.DEFAULT);
-        if (PropulsionCompatibility.CDG_ACTIVE) {
-            fluidsProperties.put(FluidRegistry.PLANT_OIL.get().getSource(), new FluidThrusterProperties(0.8f, 1.1f));
-            fluidsProperties.put(FluidRegistry.BIODIESEL.get().getSource(), new FluidThrusterProperties(0.9f, 1f));
-            fluidsProperties.put(FluidRegistry.DIESEL.get().getSource(), new FluidThrusterProperties(1.0f, 0.9f));
-            fluidsProperties.put(FluidRegistry.GASOLINE.get().getSource(), new FluidThrusterProperties(1.05f, 0.95f));
-            fluidsProperties.put(FluidRegistry.ETHANOL.get().getSource(), new FluidThrusterProperties(0.85f, 1.2f));
-        } if (PropulsionCompatibility.TFMG_ACTIVE) {
-            fluidsProperties.put(TFMGFluids.NAPHTHA.get().getSource(), new FluidThrusterProperties(0.95f, 1.0f));
-            fluidsProperties.put(TFMGFluids.KEROSENE.get().getSource(), new FluidThrusterProperties(1.0f, 0.9f));
-            fluidsProperties.put(TFMGFluids.GASOLINE.get().getSource(), new FluidThrusterProperties(1.05f, 0.95f));
-            fluidsProperties.put(TFMGFluids.DIESEL.get().getSource(), new FluidThrusterProperties(1.0f, 0.9f));     
-        }
-    };
-
     public static class FluidThrusterProperties {
         public float thrustMultiplier;
         public float consumptionMultiplier;
@@ -131,9 +103,8 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
     }
 
     public FluidThrusterProperties getFuelProperties(Fluid fluid) {
-        var properties = fluidsProperties.get(fluid);
+        var properties = ThrusterFuelManager.getInstance().getProperties(fluid);
         if (properties != null) return properties;
-        if (fluid.is(FORGE_FUEL_TAG)) return FluidThrusterProperties.DEFAULT;
         return null;
     }
 

@@ -1,0 +1,6 @@
+{
+    "fluid": "tfmg:gasoline",
+    "thrust_multiplier": 1.05,
+    "consumption_multiplier": 0.95,
+    "required_mod": "tfmg"
+}
