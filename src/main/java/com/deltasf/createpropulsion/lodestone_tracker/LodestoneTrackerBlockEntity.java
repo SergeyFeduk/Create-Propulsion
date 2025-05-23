@@ -79,6 +79,7 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
         if (targetLodestone) {
             targetBlockPosition = CompassItem.getLodestonePosition(compass.getShareTag());
             if (targetBlockPosition == null) {
+                //TODO: Print to check if this is correct
                 //This is triggered with lodestone compass which has its lodestone block destroyed
                 //In this case we just rotate the angle
                 float angle = ((float)currentTick * 10.0f) % 360.0f;

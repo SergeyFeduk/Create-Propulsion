@@ -95,7 +95,7 @@ public class ThrusterBlock extends DirectionalBlock implements EntityBlock {
                 }
                 //Invoke initial redstone and obstruction check
                 doRedstoneCheck(level, state, pos); //This does not call obstruction due to skipping logic
-                calculateObstruction(thrusterBlockEntity, level, pos, state);
+                //calculateObstruction(thrusterBlockEntity, level, pos, state);
             }
         }
         super.onPlace(state, level, pos, oldState, isMoving);
@@ -133,6 +133,10 @@ public class ThrusterBlock extends DirectionalBlock implements EntityBlock {
         BlockEntity blockEntity = level.getBlockEntity(pos);
         if (blockEntity instanceof ThrusterBlockEntity thrusterBlockEntity) {
             calculateObstruction(thrusterBlockEntity, level, pos, state);
+            thrusterBlockEntity.updateThrust(newState);
+            //TODO: Emit particles immediately but NOTE, do not use ServerLevel for that
+            //thrusterBlockEntity.emitParticles(level, pos, state);
+            thrusterBlockEntity.setChanged();
         }
     }
 

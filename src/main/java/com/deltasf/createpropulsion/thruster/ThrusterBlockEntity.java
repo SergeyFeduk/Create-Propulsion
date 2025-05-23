@@ -75,7 +75,7 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
     //Thruster data
     private ThrusterData thrusterData;
     public SmartFluidTankBehaviour tank;
-    private BlockState state;
+    //private BlockState state;
     private int emptyBlocks;
     //Ticking
     private int currentTick = 0;
@@ -108,7 +108,7 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
             fluidsProperties.put(TFMGFluids.GASOLINE.get().getSource(), new FluidThrusterProperties(1.05f, 0.95f));
             fluidsProperties.put(TFMGFluids.DIESEL.get().getSource(), new FluidThrusterProperties(1.0f, 0.9f));     
         }
-        //Fuels from tags
+        //TODO: Fuels from tags (replace with tag checking from 0.1.3)
         ITagManager<Fluid> fluidTags = ForgeRegistries.FLUIDS.tags();
         var tagContents = fluidTags.getTag(FORGE_FUEL_TAG);
         for (Fluid fluid : tagContents) {
@@ -133,7 +133,6 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
     public ThrusterBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
         thrusterData = new ThrusterData();
-        this.state = state;
         particleType = (ParticleType<PlumeParticleData>)ParticleTypes.getPlumeType();
     }
 
@@ -158,7 +157,7 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
 
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-        if (side == state.getValue(ThrusterBlock.FACING) && cap == ForgeCapabilities.FLUID_HANDLER) {
+        if (side == getBlockState().getValue(ThrusterBlock.FACING) && cap == ForgeCapabilities.FLUID_HANDLER) {
             return tank.getCapability().cast();
         }
         if (PropulsionCompatibility.CC_ACTIVE && computerBehaviour.isPeripheralCap(cap)) {
@@ -168,26 +167,60 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
         return super.getCapability(cap, side);
     }
 
-    //This ticking runs only on server. It is specified in ThrusterBlock
+    public void updateThrust(BlockState currentBlockState) {
+        float thrust = 0;
+        boolean isFluidValid = validFluid();
+        int power = getOverriddenPowerOrState(currentBlockState);
+
+        if (isFluidValid && power > 0) {
+            var properties = getFuelProperties();
+            float powerPercentage = power / 15.0f;
+            float obstructionEffect = calculateObstructionEffect();
+            float thrustPercentage = Math.min(powerPercentage, obstructionEffect);
+
+            if (thrustPercentage > 0) {
+                int tick_rate = PropulsionConfig.THRUSTER_TICKS_PER_UPDATE.get(); // Or a fixed value if consumption is per-operation
+                int consumption = calculateFuelConsumption(powerPercentage, properties.consumptionMultiplier, tick_rate); // Adjust tick_rate if consumption is per-update-thrust call
+                
+                // Check if enough fuel for this operation
+                if (tank.getPrimaryHandler().getFluidAmount() >= consumption) {
+                    tank.getPrimaryHandler().drain(consumption, IFluidHandler.FluidAction.EXECUTE);
+                    float thrustMultiplier = (float)(double)PropulsionConfig.THRUSTER_THRUST_MULTIPLIER.get();
+                    thrust = BASE_MAX_THRUST * thrustMultiplier * thrustPercentage * properties.thrustMultiplier;
+                } else {
+                    // Not enough fuel for this operation, so thrust is 0 for this "attempt"
+                    thrust = 0;
+                }
+            }
+        }
+        thrusterData.setThrust(thrust);
+        isThrustDirty = false;
+    }
+
     @SuppressWarnings("null")
     @Override
     public void tick(){
         super.tick();
+        BlockState currentBlockState = getBlockState();
         if (level.isClientSide) {
-            emitParticles(level, worldPosition, state);
+            emitParticles(level, worldPosition, currentBlockState);
+            return;
         }
         currentTick++;
         
         int tick_rate = PropulsionConfig.THRUSTER_TICKS_PER_UPDATE.get();
         boolean isFluidValid = validFluid();
-        int power = getPower();
+        int power = getOverriddenPowerOrState(currentBlockState);
         //Damage entities
-        if (PropulsionConfig.THRUSTER_DAMAGE_ENTITIES.get() && isFluidValid && power > 0) doEntityDamageCheck(currentTick);
+        if (PropulsionConfig.THRUSTER_DAMAGE_ENTITIES.get() && isFluidValid && power > 0) {
+            doEntityDamageCheck(currentTick); // Assuming this uses getBlockState() internally or is fine
+        }
+        /*if (PropulsionConfig.THRUSTER_DAMAGE_ENTITIES.get() && isFluidValid && power > 0) doEntityDamageCheck(currentTick);
         if (!(isThrustDirty || currentTick % tick_rate == 0)) {
             return;
-        }
+        }*/
         //Recalculate obstruction
-        state = getBlockState();
+        /*state = getBlockState();
         if (currentTick % (tick_rate * 2) == 0) {
             //Every second fluid tick update obstruction
             int previousEmptyBlocks = emptyBlocks;
@@ -196,9 +229,23 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
                 setChanged();
                 level.sendBlockUpdated(worldPosition, state, state, Block.UPDATE_CLIENTS);
             }
+        }*/
+        if (currentTick % (PropulsionConfig.THRUSTER_TICKS_PER_UPDATE.get() * 2) == 0) { // Example: Check obstruction every 2 * N ticks
+            int previousEmptyBlocks = emptyBlocks;
+            calculateObstruction(level, worldPosition, currentBlockState.getValue(ThrusterBlock.FACING));
+            if (previousEmptyBlocks != emptyBlocks) {
+                isThrustDirty = true; // Obstruction changed, mark thrust as dirty for next recalc
+                setChanged(); // Vanilla method to mark BE for saving
+                level.sendBlockUpdated(worldPosition, currentBlockState, currentBlockState, Block.UPDATE_CLIENTS); // Sync BE data
+            }
         }
+
+        if (isThrustDirty || currentTick % tick_rate == 0) {
+            updateThrust(currentBlockState); // Call the new centralized method
+        }
+
         //Calculate thrust
-        isThrustDirty = false;
+        /*isThrustDirty = false;
         float thrust = 0;
         if (isFluidValid && power > 0){
             var properties = getFuelProperties();
@@ -213,7 +260,7 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
             float thrustMultiplier = (float)(double)PropulsionConfig.THRUSTER_THRUST_MULTIPLIER.get();
             thrust = BASE_MAX_THRUST * thrustMultiplier * thrustPercentage * properties.thrustMultiplier;
         }
-        thrusterData.setThrust(thrust);
+        thrusterData.setThrust(thrust);*/
     }
 
     private int calculateFuelConsumption(float powerPercentage, float fluidPropertiesConsumptionMultiplier, int tick_rate){
@@ -221,9 +268,9 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
         return (int)Math.ceil(base_consumption * powerPercentage * fluidPropertiesConsumptionMultiplier * tick_rate);
     }
 
-    private void emitParticles(Level level, BlockPos pos, BlockState state){
+    public void emitParticles(Level level, BlockPos pos, BlockState state){
         if (emptyBlocks == 0) return;
-        int power = getPower();
+        int power = getOverriddenPowerOrState(state);
         if (power == 0) return;
         if (!validFluid()) return;
         //Limit minumum velocity and particle count when power is lower than that
@@ -276,7 +323,7 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
             status = Lang.translate("gui.goggles.thruster.status.no_fuel", new Object[0]).style(ChatFormatting.RED);
         } else if (!validFluid()) {
             status = Lang.translate("gui.goggles.thruster.status.wrong_fuel", new Object[0]).style(ChatFormatting.RED);
-        } else if (getPower() == 0) {
+        } else if (getOverriddenPowerOrState(getBlockState()) == 0) {
             status = Lang.translate("gui.goggles.thruster.status.not_powered", new Object[0]).style(ChatFormatting.GOLD);
         } else if (emptyBlocks == 0) {
             status = Lang.translate("gui.goggles.thruster.obstructed", new Object[0]).style(ChatFormatting.RED);
@@ -310,12 +357,20 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
 
     //Helpers
 
-    private int getPower() {
+    /*private int getPower() {
         if (PropulsionCompatibility.CC_ACTIVE && overridePower) {
             return overridenPower;
         }
         return state.getValue(ThrusterBlock.POWER);
+    }*/
+
+    private int getOverriddenPowerOrState(BlockState currentBlockState) {
+        if (PropulsionCompatibility.CC_ACTIVE && overridePower) {
+            return overridenPower;
+        }
+        return currentBlockState.getValue(ThrusterBlock.POWER);
     }
+
 
     public FluidStack fluidStack(){
         return tank.getPrimaryHandler().getFluid();
@@ -329,12 +384,17 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
     public void calculateObstruction(Level level, BlockPos pos, Direction forwardDirection){
         //Starting from the block behind and iterate OBSTRUCTION_LENGTH blocks in that direction
         //Can't really use level.clip as we explicitly want to check for obstruction only in ship space
+        int oldEmptyBlocks = this.emptyBlocks;
         for (emptyBlocks = 0; emptyBlocks < OBSTRUCTION_LENGTH; emptyBlocks++){
             BlockPos checkPos = pos.relative(forwardDirection.getOpposite(), emptyBlocks + 1);
             BlockState state = level.getBlockState(checkPos);
             if (!(state.isAir() || !state.isSolid())) break;
         }
-        isThrustDirty = true;
+        if (oldEmptyBlocks != this.emptyBlocks) { // Only set dirty if it actually changed
+            isThrustDirty = true;
+        }
+
+        //isThrustDirty = true;
     }
 
     @Override
@@ -364,7 +424,7 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
     @SuppressWarnings("null")
     private void doEntityDamageCheck(int tick) {
         if (tick % TICKS_PER_ENTITY_CHECK != 0) return;
-        int power = getPower();
+        int power = getOverriddenPowerOrState(getBlockState());
         float visualPowerPercent = ((float)Math.max(power, LOWEST_POWER_THRSHOLD) - LOWEST_POWER_THRSHOLD) / 15.0f;
         float distanceByPower = org.joml.Math.lerp(0.55f,1.5f, visualPowerPercent);
 
