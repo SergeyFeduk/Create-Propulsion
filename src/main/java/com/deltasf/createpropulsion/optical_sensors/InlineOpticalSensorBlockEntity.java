@@ -6,7 +6,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.deltasf.createpropulsion.PropulsionConfig;
-import com.deltasf.createpropulsion.PropulsionItems;
+import com.deltasf.createpropulsion.registries.PropulsionItems;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 
 import net.minecraft.core.BlockPos;

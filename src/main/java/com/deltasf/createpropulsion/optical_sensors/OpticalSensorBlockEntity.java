@@ -7,10 +7,10 @@ import javax.annotation.Nullable;
 
 import com.deltasf.createpropulsion.PropulsionCompatibility;
 import com.deltasf.createpropulsion.PropulsionConfig;
-import com.deltasf.createpropulsion.PropulsionItems;
 import com.deltasf.createpropulsion.compat.computercraft.ComputerBehaviour;
 import com.deltasf.createpropulsion.optical_sensors.optical_sensor.OpticalSensorDistanceScrollBehaviour;
 import com.deltasf.createpropulsion.optical_sensors.optical_sensor.OpticalSensorFilterValueBox;
+import com.deltasf.createpropulsion.registries.PropulsionItems;
 import com.simibubi.create.compat.computercraft.AbstractComputerBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.filtering.FilteringBehaviour;

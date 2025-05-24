@@ -3,7 +3,7 @@ package com.deltasf.createpropulsion.optical_sensors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.deltasf.createpropulsion.PropulsionItems;
+import com.deltasf.createpropulsion.registries.PropulsionItems;
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntityTicker;
 import com.simibubi.create.foundation.utility.VoxelShaper;

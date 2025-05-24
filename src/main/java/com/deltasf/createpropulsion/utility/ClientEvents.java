@@ -1,7 +1,7 @@
 package com.deltasf.createpropulsion.utility;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
-import com.deltasf.createpropulsion.PropulsionItems;
+import com.deltasf.createpropulsion.registries.PropulsionItems;
 
 import net.minecraft.world.item.DyeableLeatherItem;
 import net.minecraftforge.api.distmarker.Dist;

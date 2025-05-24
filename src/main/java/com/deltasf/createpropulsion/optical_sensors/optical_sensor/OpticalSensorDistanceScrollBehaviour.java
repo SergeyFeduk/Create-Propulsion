@@ -1,8 +1,8 @@
 package com.deltasf.createpropulsion.optical_sensors.optical_sensor;
 
 import com.deltasf.createpropulsion.PropulsionConfig;
-import com.deltasf.createpropulsion.PropulsionItems;
 import com.deltasf.createpropulsion.optical_sensors.AbstractOpticalSensorBlockEntity;
+import com.deltasf.createpropulsion.registries.PropulsionItems;
 import com.google.common.collect.ImmutableList;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueSettingsBoard;

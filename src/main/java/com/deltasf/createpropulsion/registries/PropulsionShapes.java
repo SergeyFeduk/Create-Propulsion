@@ -1,4 +1,4 @@
-package com.deltasf.createpropulsion;
+package com.deltasf.createpropulsion.registries;
 
 import com.simibubi.create.foundation.utility.VoxelShaper;
 

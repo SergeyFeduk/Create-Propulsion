@@ -3,8 +3,8 @@ package com.deltasf.createpropulsion.lodestone_tracker;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.deltasf.createpropulsion.PropulsionBlockEntities;
-import com.deltasf.createpropulsion.PropulsionShapes;
+import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
+import com.deltasf.createpropulsion.registries.PropulsionShapes;
 import com.simibubi.create.AllSoundEvents;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntityTicker;
 

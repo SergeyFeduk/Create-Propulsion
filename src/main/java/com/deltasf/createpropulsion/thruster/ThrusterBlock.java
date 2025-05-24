@@ -27,8 +27,8 @@ import javax.annotation.Nullable;
 
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
-import com.deltasf.createpropulsion.PropulsionBlockEntities;
-import com.deltasf.createpropulsion.PropulsionShapes;
+import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
+import com.deltasf.createpropulsion.registries.PropulsionShapes;
 import com.deltasf.createpropulsion.ship.ForceInducedShip;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntityTicker;

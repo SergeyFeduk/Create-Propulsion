@@ -1,8 +1,8 @@
 package com.deltasf.createpropulsion.utility;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
-import com.deltasf.createpropulsion.PropulsionBlocks;
 import com.deltasf.createpropulsion.PropulsionConfig;
+import com.deltasf.createpropulsion.registries.PropulsionBlocks;
 import com.deltasf.createpropulsion.thruster.ThrusterBlockEntity;
 import com.simibubi.create.foundation.item.TooltipHelper;
 import com.simibubi.create.foundation.utility.Lang;

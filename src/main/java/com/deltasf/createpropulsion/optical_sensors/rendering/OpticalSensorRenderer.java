@@ -6,10 +6,10 @@ import org.joml.Vector3d;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-import com.deltasf.createpropulsion.PropulsionItems;
-import com.deltasf.createpropulsion.PropulsionBlockEntities;
 import com.deltasf.createpropulsion.optical_sensors.AbstractOpticalSensorBlock;
 import com.deltasf.createpropulsion.optical_sensors.AbstractOpticalSensorBlockEntity;
+import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
+import com.deltasf.createpropulsion.registries.PropulsionItems;
 import com.deltasf.createpropulsion.utility.TranslucentBeamRenderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;

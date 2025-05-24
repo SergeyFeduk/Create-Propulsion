@@ -1,5 +1,6 @@
-package com.deltasf.createpropulsion;
+package com.deltasf.createpropulsion.registries;
 
+import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerBlockEntity;
 import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerRenderer;
 import com.deltasf.createpropulsion.optical_sensors.InlineOpticalSensorBlockEntity;

@@ -2,6 +2,11 @@ package com.deltasf.createpropulsion;
 
 import com.deltasf.createpropulsion.compat.computercraft.CCProxy;
 import com.deltasf.createpropulsion.particles.ParticleTypes;
+import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
+import com.deltasf.createpropulsion.registries.PropulsionBlocks;
+import com.deltasf.createpropulsion.registries.PropulsionCreativeTab;
+import com.deltasf.createpropulsion.registries.PropulsionFluids;
+import com.deltasf.createpropulsion.registries.PropulsionItems;
 import com.simibubi.create.compat.Mods;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 

@@ -1,6 +1,8 @@
-package com.deltasf.createpropulsion;
+package com.deltasf.createpropulsion.registries;
 
 import javax.annotation.Nonnull;
+
+import com.deltasf.createpropulsion.CreatePropulsion;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;

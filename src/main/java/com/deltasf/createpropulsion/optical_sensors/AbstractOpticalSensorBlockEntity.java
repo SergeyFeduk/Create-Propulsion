@@ -11,8 +11,8 @@ import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import com.deltasf.createpropulsion.PropulsionConfig;
-import com.deltasf.createpropulsion.PropulsionItems;
 import com.deltasf.createpropulsion.optical_sensors.rendering.BeamRenderData;
+import com.deltasf.createpropulsion.registries.PropulsionItems;
 import com.deltasf.createpropulsion.utility.GoggleUtils;
 import com.mojang.datafixers.util.Pair;
 import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;

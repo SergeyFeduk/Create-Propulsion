@@ -2,8 +2,8 @@ package com.deltasf.createpropulsion.optical_sensors;
 
 import javax.annotation.Nonnull;
 
-import com.deltasf.createpropulsion.PropulsionBlockEntities;
-import com.deltasf.createpropulsion.PropulsionShapes;
+import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
+import com.deltasf.createpropulsion.registries.PropulsionShapes;
 import com.simibubi.create.foundation.utility.VoxelShaper;
 
 import net.minecraft.core.BlockPos;
