@@ -29,7 +29,7 @@ public class ThrusterFuelManager extends SimpleJsonResourceReloadListener {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     public static final String DIRECTORY = "thruster_fuels";
 
-    private Map<Fluid, ThrusterBlockEntity.FluidThrusterProperties> fuelPropertiesMap = new HashMap<>();
+    private Map<Fluid, FluidThrusterProperties> fuelPropertiesMap = new HashMap<>();
     public static final TagKey<Fluid> FORGE_FUEL_TAG = TagKey.create(ForgeRegistries.FLUIDS.getRegistryKey(), new ResourceLocation("forge", "fuel"));
 
     private static ThrusterFuelManager instance;
@@ -46,20 +46,20 @@ public class ThrusterFuelManager extends SimpleJsonResourceReloadListener {
 
     @Nullable
     @SuppressWarnings("deprecation")
-    public ThrusterBlockEntity.FluidThrusterProperties getProperties(Fluid fluid) {
+    public FluidThrusterProperties getProperties(Fluid fluid) {
         if (fluid == null || fluid == Fluids.EMPTY) return null;
-        ThrusterBlockEntity.FluidThrusterProperties props = fuelPropertiesMap.get(fluid);
+        FluidThrusterProperties props = fuelPropertiesMap.get(fluid);
         if (props != null) {
             return props;
         }
-        if (fluid.is(FORGE_FUEL_TAG)) return ThrusterBlockEntity.FluidThrusterProperties.DEFAULT;
+        if (fluid.is(FORGE_FUEL_TAG)) return FluidThrusterProperties.DEFAULT;
         return null;
     }
 
     @Override
     protected void apply(@Nonnull Map<ResourceLocation, JsonElement> pObject, @Nonnull ResourceManager resourceManager, @Nonnull ProfilerFiller profiler) {
         profiler.push(CreatePropulsion.ID + ":Loading_thruster_fuels");
-        Map<Fluid, ThrusterBlockEntity.FluidThrusterProperties> newMap = new HashMap<>();
+        Map<Fluid, FluidThrusterProperties> newMap = new HashMap<>();
 
         for (Map.Entry<ResourceLocation, JsonElement> entry : pObject.entrySet()) {
             ResourceLocation file = entry.getKey();
@@ -71,20 +71,23 @@ public class ThrusterFuelManager extends SimpleJsonResourceReloadListener {
                 .ifPresent(definition -> {
                     //There is a fuel that requires a mod but the mod is not present
                     if (definition.requiredMod().isPresent() && !ModList.get().isLoaded(definition.requiredMod().get())) {
+                        LOGGER.info("Not loaded {}: no mod", file.toString());
                         return;
                     }
                     Fluid fluid = definition.getFluid();
                     //Fluid is not in registry
                     if (fluid == Fluids.EMPTY) {
+                        LOGGER.info("Not Loaded {}: Empty fluid", file.toString());
                         return;
                     }
                     //Successfully load fuel
-                    ThrusterBlockEntity.FluidThrusterProperties properties = new ThrusterBlockEntity.FluidThrusterProperties(
+                    FluidThrusterProperties properties = new FluidThrusterProperties(
                         definition.thrustMultiplier(), 
                         definition.consumptionMultiplier());
                     newMap.put(fluid, properties);
-
+                    LOGGER.info("Loaded {}", file.toString());
                 });
+                
         }
 
         this.fuelPropertiesMap = newMap;

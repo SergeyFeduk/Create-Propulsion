@@ -80,18 +80,6 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
     public boolean overridePower = false;
     public int overridenPower;
 
-    public static class FluidThrusterProperties {
-        public float thrustMultiplier;
-        public float consumptionMultiplier;
-        
-        public static final FluidThrusterProperties DEFAULT = new FluidThrusterProperties(1,1 );
-
-        public FluidThrusterProperties(float thrustMultiplier, float consumptionMultiplier) {
-            this.thrustMultiplier = thrustMultiplier;
-            this.consumptionMultiplier = consumptionMultiplier;
-        }
-    }
-
     public ThrusterBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
         thrusterData = new ThrusterData();
@@ -147,13 +135,12 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
                 int consumption = calculateFuelConsumption(powerPercentage, properties.consumptionMultiplier, tick_rate); // Adjust tick_rate if consumption is per-update-thrust call
                 
                 // Check if enough fuel for this operation
-                if (tank.getPrimaryHandler().getFluidAmount() >= consumption) {
+                if (tank.getPrimaryHandler().getFluidAmount() <= 0) {
+                    thrust = 0;
+                } else {
                     tank.getPrimaryHandler().drain(consumption, IFluidHandler.FluidAction.EXECUTE);
                     float thrustMultiplier = (float)(double)PropulsionConfig.THRUSTER_THRUST_MULTIPLIER.get();
                     thrust = BASE_MAX_THRUST * thrustMultiplier * thrustPercentage * properties.thrustMultiplier;
-                } else {
-                    // Not enough fuel for this operation, so thrust is 0 for this "attempt"
-                    thrust = 0;
                 }
             }
         }
