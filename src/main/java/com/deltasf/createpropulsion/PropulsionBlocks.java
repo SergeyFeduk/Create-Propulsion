@@ -5,6 +5,7 @@ import com.deltasf.createpropulsion.optical_sensors.InlineOpticalSensorBlock;
 import com.deltasf.createpropulsion.optical_sensors.OpticalSensorBlock;
 import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerBlock;
 import com.deltasf.createpropulsion.thruster.ThrusterBlock;
+import com.deltasf.createpropulsion.tilt_sensor.TiltSensorBlock;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.BlockEntry;
 
@@ -29,7 +30,6 @@ public class PropulsionBlocks {
         .properties(p -> p.sound(SoundType.METAL))
         .properties(p -> p.strength(1.5F, 1.0F))
         .properties(p -> p.noOcclusion())
-        //.item(OpticalSensorItem::new).model((ctx, prov) -> prov.blockItem(ctx::getEntry)).build()
         .simpleItem()
         .register();
 
@@ -38,7 +38,6 @@ public class PropulsionBlocks {
         .properties(p -> p.sound(SoundType.METAL))
         .properties(p -> p.strength(2.5F, 2.0F))
         .properties(p -> p.noOcclusion())
-        //.item(OpticalSensorItem::new).model((ctx, prov) -> prov.blockItem(ctx::getEntry)).build()
         .simpleItem()
         .register();
 
@@ -51,6 +50,14 @@ public class PropulsionBlocks {
         .register();
 
     public static final BlockEntry<LodestoneTrackerBlock> LODESTONE_TRACKER_BLOCK = REGISTRATE.block("lodestone_tracker", LodestoneTrackerBlock::new)
+        .properties(p -> p.mapColor(MapColor.COLOR_YELLOW))
+        .properties(p -> p.sound(SoundType.METAL))
+        .properties(p -> p.strength(2.5F, 2.0F))
+        .properties(p -> p.noOcclusion())
+        .simpleItem()
+        .register();
+
+    public static final BlockEntry<TiltSensorBlock> TILT_SENSOR_BLOCK = REGISTRATE.block("tilt_sensor", TiltSensorBlock::new)
         .properties(p -> p.mapColor(MapColor.COLOR_YELLOW))
         .properties(p -> p.sound(SoundType.METAL))
         .properties(p -> p.strength(2.5F, 2.0F))

@@ -7,6 +7,7 @@ import com.deltasf.createpropulsion.optical_sensors.OpticalSensorBlockEntity;
 import com.deltasf.createpropulsion.optical_sensors.rendering.OpticalSensorRenderer;
 import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerBlockEntity;
 import com.deltasf.createpropulsion.thruster.ThrusterBlockEntity;
+import com.deltasf.createpropulsion.tilt_sensor.TiltSensorBlockEntity;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.BlockEntityEntry;
 
@@ -14,7 +15,8 @@ public class PropulsionBlockEntities {
     public static final CreateRegistrate REGISTRATE = CreatePropulsion.registrate();
     public static void register() {} //Loads this class
 
-    public static final BlockEntityEntry<ThrusterBlockEntity> THRUSTER_BLOCK_ENTITY = REGISTRATE.blockEntity("thruster_block_entity", ThrusterBlockEntity::new)
+    public static final BlockEntityEntry<ThrusterBlockEntity> THRUSTER_BLOCK_ENTITY = 
+        REGISTRATE.blockEntity("thruster_block_entity", ThrusterBlockEntity::new)
         .validBlocks(PropulsionBlocks.THRUSTER_BLOCK)
         .register();
 
@@ -39,5 +41,10 @@ public class PropulsionBlockEntities {
         REGISTRATE.blockEntity("lodestone_tracker_block_entity", LodestoneTrackerBlockEntity::new)
         .validBlock(PropulsionBlocks.LODESTONE_TRACKER_BLOCK)
         .renderer(() -> LodestoneTrackerRenderer::new)
+        .register();
+
+    public static final BlockEntityEntry<TiltSensorBlockEntity> TILT_SENSOR_BLOCK_ENTITY =
+        REGISTRATE.blockEntity("tilt_sensor_block_entity", TiltSensorBlockEntity::new)
+        .validBlock(PropulsionBlocks.TILT_SENSOR_BLOCK)
         .register();
 }
