@@ -91,11 +91,12 @@ repositories {
 dependencies {
     compileOnly fg.deobf("com.tterrag.registrate:Registrate:MC1.20-1.3.3")
     //Create
-    implementation (fg.deobf("curse.maven:create-328085:5838779"))
+    implementation (fg.deobf("curse.maven:create-328085:5838779") { transitive = false })
+    implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-${flywheel_minecraft_version}:${flywheel_version}")
     //CDG
-    implementation(fg.deobf("curse.maven:createdieselgenerators-869316:5401010"))
+    implementation fg.deobf("curse.maven:createdieselgenerators-869316:5401010")
     //TFMG
-    implementation(fg.deobf("curse.maven:createindustry-693815:5811638"))
+    implementation fg.deobf("curse.maven:createindustry-693815:5811638") 
     //CC
     implementation fg.deobf("cc.tweaked:cc-tweaked-${minecraft_version}-forge:${cc_version}")
     //JEI

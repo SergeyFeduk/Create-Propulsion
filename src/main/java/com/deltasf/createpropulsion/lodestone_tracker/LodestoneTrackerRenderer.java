@@ -1,32 +1,69 @@
 package com.deltasf.createpropulsion.lodestone_tracker;
 
+import com.deltasf.createpropulsion.registries.PropulsionPartialModels;
 import com.deltasf.createpropulsion.utility.Bakery;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import com.simibubi.create.foundation.blockEntity.renderer.SafeBlockEntityRenderer;
+import com.simibubi.create.foundation.render.CachedBufferer;
+import com.simibubi.create.foundation.render.SuperByteBuffer;
+import com.simibubi.create.foundation.utility.Color;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.Vec3;
 
 @SuppressWarnings("null") //Silence
 public class LodestoneTrackerRenderer extends SafeBlockEntityRenderer<LodestoneTrackerBlockEntity> {
     public LodestoneTrackerRenderer(BlockEntityRendererProvider.Context context) { super();}
+    private static IntegerProperty[] redstoneProperties = { 
+        LodestoneTrackerBlock.POWER_SOUTH, 
+        LodestoneTrackerBlock.POWER_EAST, 
+        LodestoneTrackerBlock.POWER_NORTH, 
+        LodestoneTrackerBlock.POWER_WEST 
+    };
 
     @Override
-    protected void renderSafe(LodestoneTrackerBlockEntity blockEntity, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int light, int overlay) {
+    protected void renderSafe(LodestoneTrackerBlockEntity blockEntity, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int light, int overlay) {        
+        //Render compass
         ItemStack compass = blockEntity.getCompass();
-        if (compass.isEmpty()) return;
-        //This is to update compass every frame instead of every tick. Better visual responsivness
-        float targetAngle = blockEntity.getAngleFromCompass(compass);
-        int modelIndex = getIndexFromAngle(targetAngle);
-        renderCompass(blockEntity.getLevel(), poseStack, bufferSource, light, overlay, compass, 0, new Vec3(0.5,0.85f,0.5), modelIndex);
+        if (!compass.isEmpty()) {
+            //This is to update compass every frame instead of every tick
+            float targetAngle = blockEntity.getAngleFromCompass(compass);
+            int modelIndex = getIndexFromAngle(targetAngle);
+            renderCompass(blockEntity.getLevel(), poseStack, bufferSource, light, overlay, compass, 0, new Vec3(0.5,0.85f,0.5), modelIndex);
+        }
+
+        //Render partials
+        BlockState blockState = blockEntity.getBlockState();
+        VertexConsumer vb = bufferSource.getBuffer(RenderType.solid()); 
+        SuperByteBuffer partialIndicatorModel = CachedBufferer.partial(PropulsionPartialModels.LODESTONE_TRACKER_INDICATOR, blockState);
+        for (int i = 0; i < 4; i++) {
+            poseStack.pushPose();
+
+            //Rotate around main model based on index
+            poseStack.translate(0.5, 0.5, 0.5);
+            poseStack.mulPose(Axis.YP.rotationDegrees(i * 90.0f));
+            poseStack.translate(-0.5, -0.5, -0.5); 
+
+            float redstonePower = blockState.getValue(redstoneProperties[i]) / 15.0f;
+
+            partialIndicatorModel.light(light)
+                                 .color(Color.mixColors(0x2C0300, 0xCD0000, redstonePower))
+                                 .overlay(overlay)
+                                 .renderInto(poseStack, vb);
+            poseStack.popPose();
+        }
     }
 
     private int getIndexFromAngle(float targetAngle) {

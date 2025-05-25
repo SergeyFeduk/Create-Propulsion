@@ -7,6 +7,7 @@ import com.deltasf.createpropulsion.registries.PropulsionBlocks;
 import com.deltasf.createpropulsion.registries.PropulsionCreativeTab;
 import com.deltasf.createpropulsion.registries.PropulsionFluids;
 import com.deltasf.createpropulsion.registries.PropulsionItems;
+import com.deltasf.createpropulsion.registries.PropulsionPartialModels;
 import com.simibubi.create.compat.Mods;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 
@@ -31,6 +32,7 @@ public class CreatePropulsion {
         PropulsionBlockEntities.register();
         PropulsionItems.register();
         PropulsionFluids.register();
+        PropulsionPartialModels.register();
         //Compat
         Mods.COMPUTERCRAFT.executeIfInstalled(() -> CCProxy::register);
         
