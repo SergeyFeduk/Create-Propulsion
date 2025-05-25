@@ -46,7 +46,7 @@ public class LodestoneTrackerRenderer extends SafeBlockEntityRenderer<LodestoneT
 
         //Render partials
         BlockState blockState = blockEntity.getBlockState();
-        VertexConsumer vb = bufferSource.getBuffer(RenderType.solid()); 
+        VertexConsumer vertexBuffer = bufferSource.getBuffer(RenderType.cutout()); 
         SuperByteBuffer partialIndicatorModel = CachedBufferer.partial(PropulsionPartialModels.LODESTONE_TRACKER_INDICATOR, blockState);
         for (int i = 0; i < 4; i++) {
             poseStack.pushPose();
@@ -60,8 +60,7 @@ public class LodestoneTrackerRenderer extends SafeBlockEntityRenderer<LodestoneT
 
             partialIndicatorModel.light(light)
                                  .color(Color.mixColors(0x2C0300, 0xCD0000, redstonePower))
-                                 .overlay(overlay)
-                                 .renderInto(poseStack, vb);
+                                 .renderInto(poseStack, vertexBuffer);
             poseStack.popPose();
         }
     }
