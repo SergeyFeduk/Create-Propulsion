@@ -12,6 +12,7 @@ public class PropulsionConfig {
     public static final ForgeConfigSpec.ConfigValue<Integer> THRUSTER_MAX_SPEED;
     public static final ForgeConfigSpec.ConfigValue<Integer> THRUSTER_TICKS_PER_UPDATE;
     public static final ForgeConfigSpec.ConfigValue<Boolean> THRUSTER_DAMAGE_ENTITIES;
+    public static final ForgeConfigSpec.ConfigValue<Double> THRUSTER_PARTICLE_OFFSET_INCOMING_VEL_MODIFIER; //This should be client
     //Optical sensors
     public static final ForgeConfigSpec.ConfigValue<Integer> OPTICAL_SENSOR_TICKS_PER_UPDATE;
     public static final ForgeConfigSpec.ConfigValue<Integer> INLINE_OPTICAL_SENSOR_MAX_DISTANCE;
@@ -29,6 +30,8 @@ public class PropulsionConfig {
                 .defineInRange("Thruster tick rate", 10, 1, 100);
             THRUSTER_DAMAGE_ENTITIES = BUILDER.comment("If true - thrusters will damage entities. May have negative effect on performance if a lot of thrusters are used.")
                 .define("Thrusters damage entities", true);
+            THRUSTER_PARTICLE_OFFSET_INCOMING_VEL_MODIFIER = BUILDER.comment("")
+                .define("Particle op", 0.1);
         BUILDER.pop();
 
         BUILDER.push("Optical sensors");

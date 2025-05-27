@@ -32,8 +32,8 @@ import com.simibubi.create.foundation.utility.LangBuilder;
 import java.awt.Color;
 import java.util.List;
 
+import org.joml.Matrix4dc;
 import org.joml.Quaterniond;
-import org.joml.Quaterniondc;
 import org.joml.Quaternionf;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
@@ -74,7 +74,8 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
     //Particles
     private ParticleType<PlumeParticleData> particleType;
     private static final float PARTICLE_VELOCITY = 4;
-    private static final float PARTICLE_SHIP_VELOCITY_MODIFIER = 0.15f;
+    private static final double NOZZLE_OFFSET_FROM_CENTER  = 0.9;
+    private static final double SHIP_VELOCITY_INHERITANCE = 0.5;
     //CC peripheral
     public AbstractComputerBehaviour computerBehaviour;
     public boolean overridePower = false;
@@ -188,6 +189,7 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
     }
 
     public void emitParticles(Level level, BlockPos pos, BlockState state){
+        
         if (emptyBlocks == 0) return;
         int power = getOverriddenPowerOrState(state);
         if (power == 0) return;
@@ -201,28 +203,52 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
         Direction direction = state.getValue(ThrusterBlock.FACING);
         Direction oppositeDirection = direction.getOpposite();
 
-        double particleX = pos.getX() + 0.5 + oppositeDirection.getStepX() * 0.85;
-        double particleY = pos.getY() + 0.5 + oppositeDirection.getStepY() * 0.85;
-        double particleZ = pos.getZ() + 0.5 + oppositeDirection.getStepZ() * 0.85;
-
-
-        Vector3d baseParticleVelocity = new Vector3d(oppositeDirection.getStepX(), oppositeDirection.getStepY(), oppositeDirection.getStepZ())
-            .mul(PARTICLE_VELOCITY * powerPercentage);
-        Vector3d rotatedShipVelocity = new Vector3d();
-        
-        ClientShip ship = VSGameUtilsKt.getShipObjectManagingPos((ClientLevel)level, pos);
+        double currentNozzleOffset = NOZZLE_OFFSET_FROM_CENTER;
+        Vector3d additionalVel = new Vector3d();
+        ClientShip ship = VSGameUtilsKt.getShipObjectManagingPos((ClientLevel) level, pos);
         if (ship != null) {
-            Quaterniondc shipRotation = ship.getRenderTransform().getShipToWorldRotation();
-            Quaterniond reversedShipRotation = new Quaterniond(shipRotation).invert();
-            Vector3dc shipVelocity = ship.getVelocity();
-            // Rotate ship velocity by reversed ship rotation
-            reversedShipRotation.transform(shipVelocity, rotatedShipVelocity);
-            rotatedShipVelocity.mul(PARTICLE_SHIP_VELOCITY_MODIFIER);
-            
+            Vector3dc shipWorldVelocityJOML = ship.getVelocity();
+            Matrix4dc transform = ship.getRenderTransform().getShipToWorld();
+            Matrix4dc invTransform = ship.getRenderTransform().getWorldToShip();
+
+            Vector3d shipVelocity = invTransform
+                // Rotate velocity with ship transform
+                .transformDirection(new Vector3d(shipWorldVelocityJOML));
+
+            /*String identifier = "thruster_" + this.hashCode() + "_len";
+            DebugRenderer.drawElongatedBox(identifier, pos.getCenter(), pos.getCenter().add(VectorConversionsMCKt.toMinecraft(samafj)), 
+                0.25f, Color.BLUE, false, 2);*/
+
+            Vector3d particleEjectionUnitVecJOML = transform
+                // Rotate velocity with ship transform
+                .transformDirection(VectorConversionsMCKt.toJOMLD(oppositeDirection.getNormal()));
+
+            double shipVelComponentAlongRotatedEjection = shipWorldVelocityJOML.dot(particleEjectionUnitVecJOML);
+            if (shipVelComponentAlongRotatedEjection > 0.0) {
+                Vector3d normalizedVelocity = new Vector3d();
+                shipWorldVelocityJOML.normalize(normalizedVelocity);
+                double shipVelComponentAlongRotatedEjectionNormalized = normalizedVelocity.dot(particleEjectionUnitVecJOML);
+                //Effect is used to smooth transition from no additional offset/vel to full in range [0, 1]
+                double effect = org.joml.Math.clamp(0.0, 1, shipVelComponentAlongRotatedEjectionNormalized);
+                double additionalOffset = (shipVelComponentAlongRotatedEjection) * PropulsionConfig.THRUSTER_PARTICLE_OFFSET_INCOMING_VEL_MODIFIER.get();
+                currentNozzleOffset += additionalOffset * effect;
+                additionalVel = new Vector3d(shipVelocity).mul(SHIP_VELOCITY_INHERITANCE * effect);
+            }
         }
-        baseParticleVelocity.add(rotatedShipVelocity);
-        level.addParticle(new PlumeParticleData(particleType), true, particleX, particleY, particleZ, 
-            baseParticleVelocity.x, baseParticleVelocity.y, baseParticleVelocity.z);
+
+        double particleX = pos.getX() + 0.5 + oppositeDirection.getStepX() * currentNozzleOffset;
+        double particleY = pos.getY() + 0.5 + oppositeDirection.getStepY() * currentNozzleOffset;
+        double particleZ = pos.getZ() + 0.5 + oppositeDirection.getStepZ() * currentNozzleOffset;
+
+        Vector3d particleVelocity = new Vector3d(oppositeDirection.getStepX(), oppositeDirection.getStepY(), oppositeDirection.getStepZ())
+            .mul(PARTICLE_VELOCITY * powerPercentage).add(additionalVel);
+        
+        level.addParticle(new PlumeParticleData(particleType), true, 
+            particleX, particleY, particleZ, 
+            particleVelocity.x, particleVelocity.y, particleVelocity.z);
+        level.addParticle(new PlumeParticleData(particleType), true, 
+            particleX, particleY, particleZ, 
+            particleVelocity.x, particleVelocity.y, particleVelocity.z);
     }
 
     private float calculateObstructionEffect(){

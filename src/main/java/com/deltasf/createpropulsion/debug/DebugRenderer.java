@@ -133,6 +133,17 @@ public class DebugRenderer {
         drawBox(identifier, center, size, new Quaternionf(), color, false, ticksToRender);
     }
 
+    //This is my new way of rendering debug arrows :P
+    public static void drawElongatedBox(String identifier, Vec3 posA, Vec3 posB, float thickness, Color color, boolean onlyInDebugMode, int ticksToRender) {
+        Vec3 center = posA.add(posB).scale(0.5);
+        Vec3 direction = posB.subtract(posA);
+        double length = direction.length();
+        Vec3 size = new Vec3(thickness, thickness, length);
+        Vector3f dir = new Vector3f((float) direction.x, (float) direction.y, (float) direction.z).normalize();
+        Quaternionf rotation = getRotationFromZ(dir);
+        drawBox(identifier, center, size, rotation, color, onlyInDebugMode, ticksToRender);
+    }
+
     public static void removeBox(String identifier) {
         if (identifier != null) {
             timedBoxes.remove(identifier);
@@ -236,5 +247,28 @@ public class DebugRenderer {
     private static void drawLine(VertexConsumer consumer, Matrix4f matrix, Vector3f pos1, Vector3f pos2, float r, float g, float b, float a) {
         consumer.vertex(matrix, pos1.x(), pos1.y(), pos1.z()).color(r, g, b, a).endVertex();
         consumer.vertex(matrix, pos2.x(), pos2.y(), pos2.z()).color(r, g, b, a).endVertex();
+    }
+
+    // Utility
+
+    private static Quaternionf getRotationFromZ(Vector3f direction) {
+        Vector3f zAxis = new Vector3f(0, 0, 1);
+        Vector3f axis = new Vector3f();
+        zAxis.cross(direction, axis);
+
+        float dot = zAxis.dot(direction);
+        float angle = (float) Math.acos(dot);
+
+        if (axis.lengthSquared() < 1e-6) {
+            // If direction is same or opposite of Z, avoid instability
+            if (dot > 0.9999f) {
+                return new Quaternionf();
+            } else {
+                return new Quaternionf().rotateXYZ((float) Math.PI, 0, 0);
+            }
+        }
+
+        axis.normalize();
+        return new Quaternionf().rotateAxis(angle, axis.x, axis.y, axis.z);
     }
 }
