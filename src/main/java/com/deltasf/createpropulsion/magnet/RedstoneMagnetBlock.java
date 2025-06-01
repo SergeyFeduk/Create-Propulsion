@@ -3,7 +3,6 @@ package com.deltasf.createpropulsion.magnet;
 import javax.annotation.Nonnull;
 
 import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
-import com.deltasf.createpropulsion.registries.PropulsionBlocks;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntityTicker;
 
 import net.minecraft.core.BlockPos;
@@ -58,10 +57,18 @@ public class RedstoneMagnetBlock extends DirectionalBlock implements EntityBlock
     
     @Override
     public void onPlace(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull BlockState oldState, boolean isMoving) {
-        if (!level.isClientSide) {
-            neighborChanged(state, level, pos, PropulsionBlocks.REDSTONE_MAGNET_BLOCK.get(), pos, false);
-        }
         super.onPlace(state, level, pos, oldState, isMoving);
+        if (!level.isClientSide) {
+            int power = level.getBestNeighborSignal(pos);
+            boolean powered = power > 0;
+            level.setBlock(pos, state.setValue(POWERED, powered), 3);
+            if (powered) {
+                BlockEntity blockEntity = level.getBlockEntity(pos);
+                if (blockEntity instanceof RedstoneMagnetBlockEntity be) {
+                    be.activate();
+                }
+            }
+        }
     }
 
     @Override

@@ -41,16 +41,14 @@ public class MagnetRegistry {
         Long2ObjectOpenHashMap<List<MagnetData>> spatial = dimensionMap.computeIfAbsent(level.dimension(), k -> new Long2ObjectOpenHashMap<>());
 
         Long oldChunkKey = lastChunkKey.get(data);
-        if (oldChunkKey == null || oldChunkKey != newChunkKey) {
-            //Remove from old
-            if (oldChunkKey != null) {
-                List<MagnetData> oldList = spatial.get(oldChunkKey);
-                if (oldList != null) oldList.remove(data);
-            }
-            //Add to new
-            spatial.computeIfAbsent(newChunkKey, k -> new ArrayList<>()).add(data);
-            lastChunkKey.put(data, newChunkKey);
+        // Always remove from old position if it exists
+        if (oldChunkKey != null) {
+            List<MagnetData> oldList = spatial.get(oldChunkKey);
+            if (oldList != null) oldList.remove(data);
         }
+        // Add to new position
+        spatial.computeIfAbsent(newChunkKey, k -> new ArrayList<>()).add(data);
+        lastChunkKey.put(data, newChunkKey);
     }
 
     public void removeMagnet(Level level, MagnetData data) {

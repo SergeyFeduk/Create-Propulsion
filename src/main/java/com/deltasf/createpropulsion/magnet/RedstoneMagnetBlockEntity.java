@@ -29,9 +29,10 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
             Ship ship = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
             shipId = ship.getId();
         }
-        data = new MagnetData(worldPosition, shipId);
-        data.updateWorldPosition(getLevel());
-        
+        if (data == null) {
+            data = new MagnetData(worldPosition, shipId);
+            data.updateWorldPosition(getLevel());
+        }
         MagnetRegistry.get().updateMagnet(getLevel(), data);
     }
 
@@ -39,6 +40,7 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
         MagnetRegistry.get().removeMagnet(getLevel(), data);
     }
 
+    @SuppressWarnings("null")
     @Override
     public void tick() {
         if (level.isClientSide) return;

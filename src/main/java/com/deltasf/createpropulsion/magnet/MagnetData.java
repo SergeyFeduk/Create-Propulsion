@@ -28,4 +28,17 @@ public class MagnetData {
             worldPosition = VectorConversionsMCKt.toJOML(VSGameUtilsKt.toWorldCoordinates(ship, pos.getCenter()));
         }
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MagnetData that = (MagnetData) o;
+        return pos.equals(that.pos);
+    }
+
+    @Override
+    public int hashCode() {
+        return pos.hashCode();
+    }
 }
