@@ -43,8 +43,10 @@ public class PropulsionCreativeTab {
                 output.accept(PropulsionBlocks.OPTICAL_SENSOR_BLOCK);
                 output.accept(PropulsionBlocks.THRUSTER_BLOCK);
                 //From 0.2
-                //output.accept(PropulsionBlocks.PHYSICS_ASSEMBLER_BLOCK);
                 output.accept(PropulsionBlocks.LODESTONE_TRACKER_BLOCK);
+                //output.accept(PropulsionBlocks.REDSTONE_MAGNET_BLOCK);
+                //output.accept(PropulsionBlocks.PHYSICS_ASSEMBLER_BLOCK);
+                //output.accept(PropulsionBlocks.TILT_SENSOR_BLOCK);
                 //From 0.2 (items)
                 output.accept(PropulsionFluids.TURPENTINE.getBucket().get());
                 output.accept(PropulsionItems.PINE_RESIN);

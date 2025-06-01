@@ -48,4 +48,9 @@ public class PropulsionBlockEntities {
         REGISTRATE.blockEntity("tilt_sensor_block_entity", TiltSensorBlockEntity::new)
         .validBlock(PropulsionBlocks.TILT_SENSOR_BLOCK)
         .register();
+
+    public static final BlockEntityEntry<TiltSensorBlockEntity> REDSTONE_MAGNET_BLOCK_ENTITY =
+        REGISTRATE.blockEntity("redstone_magnet_block_entity", TiltSensorBlockEntity::new)
+        .validBlock(PropulsionBlocks.REDSTONE_MAGNET_BLOCK)
+        .register();
 }

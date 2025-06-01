@@ -11,6 +11,9 @@
     "item.createpropulsion.optical_sensor": "Optical Sensor",
     "create.gui.optical_sensor.distance_behaviour": "Raycast Distance",
 
+    "block.createpropulsion.lodestone_tracker": "Lodestone Tracker",
+    "block.createpropulsion.redstone_magnet": "Redstone Magnet",
+
     "create.gui.goggles.thruster.status": "Thruster Status",
     "create.gui.goggles.thruster.status.no_fuel": "No Fuel",
     "create.gui.goggles.thruster.status.wrong_fuel": "Wrong Fuel",
@@ -36,7 +39,6 @@
     "fluid.createpropulsion.turpentine": "Turpentine",
     "item.createpropulsion.turpentine_bucket": "Turpentine Bucket",
 
-    "block.createpropulsion.lodestone_tracker": "Lodestone Tracker",
     "item.createpropulsion.optical_lens": "Optical Lens",
     "item.createpropulsion.fluid_lens": "Fluid Lens",
     "item.createpropulsion.focus_lens": "Focusing Lens",

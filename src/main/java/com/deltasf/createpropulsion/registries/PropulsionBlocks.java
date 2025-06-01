@@ -2,6 +2,7 @@ package com.deltasf.createpropulsion.registries;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerBlock;
+import com.deltasf.createpropulsion.magnet.RedstoneMagnetBlock;
 import com.deltasf.createpropulsion.optical_sensors.InlineOpticalSensorBlock;
 import com.deltasf.createpropulsion.optical_sensors.OpticalSensorBlock;
 import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerBlock;
@@ -60,6 +61,14 @@ public class PropulsionBlocks {
 
     public static final BlockEntry<TiltSensorBlock> TILT_SENSOR_BLOCK = REGISTRATE.block("tilt_sensor", TiltSensorBlock::new)
         .properties(p -> p.mapColor(MapColor.COLOR_YELLOW))
+        .properties(p -> p.sound(SoundType.METAL))
+        .properties(p -> p.strength(2.5F, 2.0F))
+        .properties(p -> p.noOcclusion())
+        .simpleItem()
+        .register();
+
+    public static final BlockEntry<RedstoneMagnetBlock> REDSTONE_MAGNET_BLOCK = REGISTRATE.block("redstone_magnet", RedstoneMagnetBlock::new)
+        .properties(p -> p.mapColor(MapColor.COLOR_RED))
         .properties(p -> p.sound(SoundType.METAL))
         .properties(p -> p.strength(2.5F, 2.0F))
         .properties(p -> p.noOcclusion())

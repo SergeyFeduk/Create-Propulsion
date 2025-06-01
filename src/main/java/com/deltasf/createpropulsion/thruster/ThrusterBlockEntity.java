@@ -100,7 +100,7 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
     public int getEmptyBlocks() {return emptyBlocks; }
 
     @Override
-    public void addBehaviours(List<BlockEntityBehaviour> behaviours){
+    public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
         tank = SmartFluidTankBehaviour.single(this, 200);
         behaviours.add(tank);
         if (PropulsionCompatibility.CC_ACTIVE) {
@@ -246,9 +246,9 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
         level.addParticle(new PlumeParticleData(particleType), true, 
             particleX, particleY, particleZ, 
             particleVelocity.x, particleVelocity.y, particleVelocity.z);
-        level.addParticle(new PlumeParticleData(particleType), true, 
+        /*level.addParticle(new PlumeParticleData(particleType), true, 
             particleX, particleY, particleZ, 
-            particleVelocity.x, particleVelocity.y, particleVelocity.z);
+            particleVelocity.x, particleVelocity.y, particleVelocity.z);*/
     }
 
     private float calculateObstructionEffect(){
@@ -331,8 +331,6 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
         if (oldEmptyBlocks != this.emptyBlocks) { // Only set dirty if it actually changed
             isThrustDirty = true;
         }
-
-        //isThrustDirty = true;
     }
 
     @Override
