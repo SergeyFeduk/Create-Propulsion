@@ -12,7 +12,7 @@ public class MagnetRegistryTickHandler {
         if (event.phase != TickEvent.Phase.END) return;
         var levels = event.getServer().getAllLevels();
         for(ServerLevel level : levels) {
-            MagnetRegistry.get().computeAndApplyForces(level);
+            MagnetRegistry.get().computePairs(level);
         }
     }
 }

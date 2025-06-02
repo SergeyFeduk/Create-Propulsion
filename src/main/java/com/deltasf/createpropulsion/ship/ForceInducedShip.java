@@ -20,7 +20,7 @@ public class ForceInducedShip implements ShipForcesInducer {
     public ForceInducedShip() {}
     
     @Override
-    public void applyForces(@NotNull PhysShip physicShip){
+    public void applyForces(@NotNull PhysShip physicShip) {
         PhysShipImpl ship = (PhysShipImpl)physicShip;
         appliersMapping.forEach((pos, applier) -> {
             applier.applyForces(pos, ship);

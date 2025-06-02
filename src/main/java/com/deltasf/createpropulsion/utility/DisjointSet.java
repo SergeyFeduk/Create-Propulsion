@@ -1,4 +1,4 @@
-package com.deltasf.createpropulsion.magnet;
+package com.deltasf.createpropulsion.utility;
 
 public class DisjointSet {
     private final int[] parent;

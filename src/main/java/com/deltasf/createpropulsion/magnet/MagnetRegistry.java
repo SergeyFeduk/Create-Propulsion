@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.joml.Vector3d;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
@@ -31,8 +32,12 @@ public class MagnetRegistry {
     private final double magnetRange = 32.0;
     private final double magnetRangeSquared = magnetRange * magnetRange;
 
+    //Broad check
     private final Map<ResourceKey<Level>, Long2ObjectOpenHashMap<List<MagnetData>>> dimensionMap = new HashMap<>();
     private final Map<MagnetData, Long> lastChunkKey = new IdentityHashMap<>();
+
+    //Pairing
+    private final ConcurrentHashMap<Long, List<MagnetPair>> shipToPairs = new ConcurrentHashMap<>();
     
     public void updateMagnet(Level level, MagnetData data) {
         data.updateWorldPosition(level);
@@ -45,6 +50,7 @@ public class MagnetRegistry {
         if (oldChunkKey != null) {
             List<MagnetData> oldList = spatial.get(oldChunkKey);
             if (oldList != null) oldList.remove(data);
+            lastChunkKey.remove(data);
         }
         // Add to new position
         spatial.computeIfAbsent(newChunkKey, k -> new ArrayList<>()).add(data);
@@ -58,6 +64,7 @@ public class MagnetRegistry {
         if (oldKey != null) {
             List<MagnetData> oldList = spatial.get(oldKey);
             if (oldList != null) oldList.remove(data);
+            lastChunkKey.remove(data);
         }
     }
 
@@ -85,13 +92,18 @@ public class MagnetRegistry {
         return neighbours;
     }
 
-    public void computeAndApplyForces(Level level) {
+    public void computePairs(Level level) {
         Long2ObjectOpenHashMap<List<MagnetData>> spatial = dimensionMap.get(level.dimension());
         if (spatial == null) return;
         //Gather active magnets
         List<MagnetData> active = new ArrayList<>();
         for(var list : spatial.values()) { active.addAll(list); }
         int n = active.size();
+        if (n <= 1) {
+            // Nothing to pair if there's 0 or 1 magnet
+            shipToPairs.clear();
+            return;
+        }
         //DisjointSet uf = new DisjointSet(n);
         List<int[]> edges = new ArrayList<>();
 
@@ -100,6 +112,7 @@ public class MagnetRegistry {
         for (int i = 0; i < n; i++) {
             indexMap.put(active.get(i), i);
         }
+        shipToPairs.clear();
         //Neighbour scan
         for(int i = 0; i < n; i++) {
             MagnetData A = active.get(i);
@@ -116,6 +129,16 @@ public class MagnetRegistry {
                 if (posA.distanceSquared(posB) <= magnetRangeSquared) {
                     //uf.union(i, j);
                     edges.add(new int[]{i, j});
+
+                    //Add to map
+                    if (A.shipId != -1) {
+                        MagnetPair pair = new MagnetPair(A.getBlockPos(), A.getBlockDipoleDir(), B.shipId, B.getBlockPos(), B.getBlockDipoleDir());
+                        shipToPairs.computeIfAbsent(A.shipId, k -> new ArrayList<>()).add(pair);
+                    }
+                    if (B.shipId != -1) {
+                        MagnetPair pair = new MagnetPair(B.getBlockPos(), B.getBlockDipoleDir(), A.shipId, A.getBlockPos(), A.getBlockDipoleDir());
+                        shipToPairs.computeIfAbsent(B.shipId, k -> new ArrayList<>()).add(pair);
+                    }
                 }
             }
         }
@@ -142,6 +165,11 @@ public class MagnetRegistry {
     }
 
     //Utility
+
+    public List<MagnetPair> getPairsForShip(long shipId) {
+        return shipToPairs.getOrDefault(shipId, Collections.emptyList());
+    }
+
     public long positionToPackedChunkPos(Vector3d position) {
         return packChunkPos(Mth.floor(position.x) >> 4, Mth.floor(position.z) >> 4);
     }

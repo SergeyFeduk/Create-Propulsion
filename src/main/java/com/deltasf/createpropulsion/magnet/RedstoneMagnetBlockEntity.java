@@ -2,8 +2,10 @@ package com.deltasf.createpropulsion.magnet;
 
 import java.util.List;
 
+import org.joml.Vector3i;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
@@ -30,7 +32,8 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
             shipId = ship.getId();
         }
         if (data == null) {
-            data = new MagnetData(worldPosition, shipId);
+            Vector3i dipoleDirection = VectorConversionsMCKt.toJOML(getBlockState().getValue(RedstoneMagnetBlock.FACING).getNormal());
+            data = new MagnetData(worldPosition, shipId, dipoleDirection);
             data.updateWorldPosition(getLevel());
         }
         MagnetRegistry.get().updateMagnet(getLevel(), data);
