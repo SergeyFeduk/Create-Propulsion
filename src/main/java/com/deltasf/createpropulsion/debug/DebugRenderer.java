@@ -35,9 +35,9 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(modid = CreatePropulsion.ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class DebugRenderer {
     private static class TimedBoxData {
-        final Vec3 position;
-        final Vec3 size;
-        final Quaternionf rotation;
+        Vec3 position;
+        Vec3 size;
+        Quaternionf rotation;
         final Color color;
         final boolean onlyInDebugMode;
         int remainingTicks;
@@ -45,22 +45,27 @@ public class DebugRenderer {
         TimedBoxData(Level level, Vec3 position, Vec3 size, Quaternionf rotation, Color color, boolean onlyInDebugMode, int initialTicks) {
             //Test if on ship and if so - modify position to be in world space and multiply rotation to account for ships rotation
             boolean inShipyard = VSGameUtilsKt.isBlockInShipyard(level, position);
+            boolean def = true;
             if (inShipyard) {
                 //Ship case
                 Ship ship = VSGameUtilsKt.getShipManagingPos(level, position.x, position.y, position.z);
-                Matrix4dc shipToWorldMatrix = ship.getShipToWorld();
-                Quaterniondc shipRotation = ship.getTransform().getShipToWorldRotation();
-                //Transform Position
-                Vector3d posInShip = VectorConversionsMCKt.toJOML(position);
-                Vector3d posInWorld = shipToWorldMatrix.transformPosition(posInShip, new Vector3d());
-                //Transform Rotation
-                Quaterniond rotInShip = new Quaterniond(rotation.x, rotation.y, rotation.z, rotation.w);
-                Quaterniond rotInWorld = shipRotation.mul(rotInShip, new Quaterniond());
-                //Set values
-                this.position = VectorConversionsMCKt.toMinecraft(posInWorld);
-                this.size = size;
-                this.rotation = new Quaternionf((float)rotInWorld.x, (float)rotInWorld.y, (float)rotInWorld.z, (float)rotInWorld.w);
-            } else {
+                if (ship != null) {
+                    def = false;
+                    Matrix4dc shipToWorldMatrix = ship.getShipToWorld();
+                    Quaterniondc shipRotation = ship.getTransform().getShipToWorldRotation();
+                    //Transform Position
+                    Vector3d posInShip = VectorConversionsMCKt.toJOML(position);
+                    Vector3d posInWorld = shipToWorldMatrix.transformPosition(posInShip, new Vector3d());
+                    //Transform Rotation
+                    Quaterniond rotInShip = new Quaterniond(rotation.x, rotation.y, rotation.z, rotation.w);
+                    Quaterniond rotInWorld = shipRotation.mul(rotInShip, new Quaterniond());
+                    //Set values
+                    this.position = VectorConversionsMCKt.toMinecraft(posInWorld);
+                    this.size = size;
+                    this.rotation = new Quaternionf((float)rotInWorld.x, (float)rotInWorld.y, (float)rotInWorld.z, (float)rotInWorld.w);
+                }
+            }
+            if (def) {
                 //World case
                 this.position = position;
                 this.size = size;

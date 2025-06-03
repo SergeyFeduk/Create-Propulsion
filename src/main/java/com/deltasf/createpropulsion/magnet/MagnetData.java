@@ -29,7 +29,7 @@ public class MagnetData {
             worldPosition = VectorConversionsMCKt.toJOML(pos.getCenter());
         } else {
             Ship ship = VSGameUtilsKt.getShipManagingPos(level, pos);
-            //TODO: ship might be null, handle that case
+            if (ship == null) return;
             worldPosition = VectorConversionsMCKt.toJOML(VSGameUtilsKt.toWorldCoordinates(ship, pos.getCenter()));
         }
     }

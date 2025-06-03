@@ -28,7 +28,9 @@ public class RedstoneMagnetBlock extends DirectionalBlock implements EntityBlock
 
     public RedstoneMagnetBlock(Properties properties){
         super(properties);
-        this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
+        this.registerDefaultState(this.stateDefinition.any()
+            .setValue(FACING, Direction.NORTH)
+            .setValue(POWERED, false));
     }
 
     @Override
@@ -61,7 +63,8 @@ public class RedstoneMagnetBlock extends DirectionalBlock implements EntityBlock
         if (!level.isClientSide) {
             int power = level.getBestNeighborSignal(pos);
             boolean powered = power > 0;
-            level.setBlock(pos, state.setValue(POWERED, powered), 3);
+            BlockState newState = state.setValue(POWERED, powered);
+            level.setBlock(pos, newState, 3);
             if (powered) {
                 BlockEntity blockEntity = level.getBlockEntity(pos);
                 if (blockEntity instanceof RedstoneMagnetBlockEntity be) {
@@ -91,7 +94,8 @@ public class RedstoneMagnetBlock extends DirectionalBlock implements EntityBlock
         boolean currentlyPowered = state.getValue(POWERED);
 
         if (powered != currentlyPowered) {
-            level.setBlock(pos, state.setValue(POWERED, powered), 3);
+            BlockState newState = state.setValue(POWERED, powered);
+            level.setBlock(pos, newState, 3);
             BlockEntity blockEntity = level.getBlockEntity(pos);
             if (blockEntity instanceof RedstoneMagnetBlockEntity be) {
                 if (powered) {
@@ -99,6 +103,7 @@ public class RedstoneMagnetBlock extends DirectionalBlock implements EntityBlock
                 } else {
                     be.deactivate();
                 }
+                be.setChanged();
             }
         }
     }

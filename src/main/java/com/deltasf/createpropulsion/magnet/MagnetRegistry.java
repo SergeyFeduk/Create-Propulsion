@@ -18,6 +18,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 @SuppressWarnings("deprecation")
 public class MagnetRegistry {
@@ -30,7 +31,8 @@ public class MagnetRegistry {
     private MagnetRegistry() {}
     //#endregion
     private final double magnetRange = 32.0;
-    private final double magnetRangeSquared = magnetRange * magnetRange;
+    public final double magnetRangeSquared = magnetRange * magnetRange;
+    public final boolean debug = false;
 
     //Broad check
     private final Map<ResourceKey<Level>, Long2ObjectOpenHashMap<List<MagnetData>>> dimensionMap = new HashMap<>();
@@ -55,6 +57,8 @@ public class MagnetRegistry {
         // Add to new position
         spatial.computeIfAbsent(newChunkKey, k -> new ArrayList<>()).add(data);
         lastChunkKey.put(data, newChunkKey);
+
+        //TODO: force immediate update
     }
 
     public void removeMagnet(Level level, MagnetData data) {
@@ -99,6 +103,17 @@ public class MagnetRegistry {
         List<MagnetData> active = new ArrayList<>();
         for(var list : spatial.values()) { active.addAll(list); }
         int n = active.size();
+        //Debug, draw active
+        if (debug) {
+            for (int i = 0; i < n; i++) {
+                var data = active.get(i);
+                String identifier = i + "_active";
+                DebugRenderer.drawBox(identifier, data.getBlockPos().getCenter(), new Vec3(1.5, 1.5, 1.5), Color.red, 2);
+                Vec3 snd = data.getBlockPos().getCenter().add(new Vec3(data.getBlockDipoleDir().x, data.getBlockDipoleDir().y, data.getBlockDipoleDir().z));
+                DebugRenderer.drawElongatedBox(identifier + "_dir", data.getBlockPos().getCenter(), snd, 0.1f, Color.blue, false, 2);
+            }
+        }
+        
         if (n <= 1) {
             // Nothing to pair if there's 0 or 1 magnet
             shipToPairs.clear();
@@ -130,32 +145,38 @@ public class MagnetRegistry {
                     //uf.union(i, j);
                     edges.add(new int[]{i, j});
 
-                    //Add to map
-                    if (A.shipId != -1) {
-                        MagnetPair pair = new MagnetPair(A.getBlockPos(), A.getBlockDipoleDir(), B.shipId, B.getBlockPos(), B.getBlockDipoleDir());
-                        shipToPairs.computeIfAbsent(A.shipId, k -> new ArrayList<>()).add(pair);
-                    }
-                    if (B.shipId != -1) {
-                        MagnetPair pair = new MagnetPair(B.getBlockPos(), B.getBlockDipoleDir(), A.shipId, A.getBlockPos(), A.getBlockDipoleDir());
-                        shipToPairs.computeIfAbsent(B.shipId, k -> new ArrayList<>()).add(pair);
-                    }
                 }
             }
         }
-        //Debug
-        int i = 0;
+        //Add pairs
         for(int[] edge : edges) {
-            i++;
-            String identifier = i + "_edge";
             MagnetData A = active.get(edge[0]);
             MagnetData B = active.get(edge[1]);
-            
-            DebugRenderer.drawElongatedBox(identifier, 
-                VectorConversionsMCKt.toMinecraft(A.getPosition()), 
-                VectorConversionsMCKt.toMinecraft(B.getPosition()), 
-                0.25f, Color.blue, false, 2);
-        } 
-        
+            if (A.shipId != -1) {
+                MagnetPair pair = new MagnetPair(A.getBlockPos(), A.getBlockDipoleDir(), B.shipId, B.getBlockPos(), B.getBlockDipoleDir());
+                shipToPairs.computeIfAbsent(A.shipId, k -> new ArrayList<>()).add(pair);
+            }
+            if (B.shipId != -1) {
+                MagnetPair pair = new MagnetPair(B.getBlockPos(), B.getBlockDipoleDir(), A.shipId, A.getBlockPos(), A.getBlockDipoleDir());
+                shipToPairs.computeIfAbsent(B.shipId, k -> new ArrayList<>()).add(pair);
+            }
+        }
+
+        //Debug, draw edges
+        if (debug) {
+            int i = 0;
+            for(int[] edge : edges) {
+                i++;
+                String identifier = i + "_edge";
+                MagnetData A = active.get(edge[0]);
+                MagnetData B = active.get(edge[1]);
+                
+                DebugRenderer.drawElongatedBox(identifier, 
+                    VectorConversionsMCKt.toMinecraft(A.getPosition()), 
+                    VectorConversionsMCKt.toMinecraft(B.getPosition()), 
+                    0.25f, Color.blue, false, 2);
+            }
+        }
     }
 
     private boolean shouldSkip(MagnetData A, MagnetData B) {
@@ -166,8 +187,19 @@ public class MagnetRegistry {
 
     //Utility
 
+    public void reset() {
+        dimensionMap.clear();
+        lastChunkKey.clear();
+        shipToPairs.clear();
+    }
+
     public List<MagnetPair> getPairsForShip(long shipId) {
-        return shipToPairs.getOrDefault(shipId, Collections.emptyList());
+        List<MagnetPair> internal = shipToPairs.get(shipId);
+        if (internal == null || internal.isEmpty()) {
+            return Collections.emptyList();
+        }
+        // Return a shallow copy so physics thread can iterate safely
+        return new ArrayList<>(internal);
     }
 
     public long positionToPackedChunkPos(Vector3d position) {

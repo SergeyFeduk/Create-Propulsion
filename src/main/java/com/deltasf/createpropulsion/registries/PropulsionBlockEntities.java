@@ -3,6 +3,7 @@ package com.deltasf.createpropulsion.registries;
 import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerBlockEntity;
 import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerRenderer;
+import com.deltasf.createpropulsion.magnet.RedstoneMagnetBlockEntity;
 import com.deltasf.createpropulsion.optical_sensors.InlineOpticalSensorBlockEntity;
 import com.deltasf.createpropulsion.optical_sensors.OpticalSensorBlockEntity;
 import com.deltasf.createpropulsion.optical_sensors.rendering.OpticalSensorRenderer;
@@ -49,8 +50,8 @@ public class PropulsionBlockEntities {
         .validBlock(PropulsionBlocks.TILT_SENSOR_BLOCK)
         .register();
 
-    public static final BlockEntityEntry<TiltSensorBlockEntity> REDSTONE_MAGNET_BLOCK_ENTITY =
-        REGISTRATE.blockEntity("redstone_magnet_block_entity", TiltSensorBlockEntity::new)
+    public static final BlockEntityEntry<RedstoneMagnetBlockEntity> REDSTONE_MAGNET_BLOCK_ENTITY =
+        REGISTRATE.blockEntity("redstone_magnet_block_entity", RedstoneMagnetBlockEntity::new)
         .validBlock(PropulsionBlocks.REDSTONE_MAGNET_BLOCK)
         .register();
 }
