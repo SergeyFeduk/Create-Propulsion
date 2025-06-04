@@ -1,12 +1,6 @@
 package com.deltasf.createpropulsion;
 
-import org.valkyrienskies.core.api.ships.ServerShip;
-import org.valkyrienskies.core.impl.hooks.VSEvents;
-import org.valkyrienskies.core.util.VSCoreUtilKt;
-import org.valkyrienskies.mod.common.VSGameUtilsKt;
-
 import com.deltasf.createpropulsion.compat.computercraft.CCProxy;
-import com.deltasf.createpropulsion.magnet.MagnetForceAttachment;
 import com.deltasf.createpropulsion.particles.ParticleTypes;
 import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
 import com.deltasf.createpropulsion.registries.PropulsionBlocks;

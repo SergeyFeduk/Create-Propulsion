@@ -119,7 +119,6 @@ public class MagnetRegistry {
             shipToPairs.clear();
             return;
         }
-        //DisjointSet uf = new DisjointSet(n);
         List<int[]> edges = new ArrayList<>();
 
         // Build a map from MagnetData to its index for fast lookup
@@ -142,9 +141,7 @@ public class MagnetRegistry {
                 if (shouldSkip(A, B)) continue;
                 Vector3d posB = B.getPosition();
                 if (posA.distanceSquared(posB) <= magnetRangeSquared) {
-                    //uf.union(i, j);
                     edges.add(new int[]{i, j});
-
                 }
             }
         }

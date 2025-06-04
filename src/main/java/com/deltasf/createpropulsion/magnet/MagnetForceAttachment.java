@@ -71,30 +71,26 @@ public class MagnetForceAttachment implements ShipForcesInducer {
 
     private final Vector3d _localPosA_absolute_shipspace = new Vector3d();
     private final Vector3d _worldPosA = new Vector3d();
-    private final Vector3d _m_A_hat = new Vector3d(); // Will be populated by the modified toWorldDirection logic
+    private final Vector3d _m_A_hat = new Vector3d();
 
-    private final Vector3d _worldPosB = new Vector3d(); // For magnet B's world position
-    private final Vector3d _m_B_hat = new Vector3d();   // For magnet B's world direction, populated by toWorldDirection logic
-    private final Vector3d _localPosB_shipspace = new Vector3d(); // If magnet B is on another ship
+    private final Vector3d _worldPosB = new Vector3d();
+    private final Vector3d _m_B_hat = new Vector3d();
+    private final Vector3d _localPosB_shipspace = new Vector3d();
 
-    // For calculateInteraction - Relative positions and distances
-    private final Vector3d _r_AB_vec = new Vector3d(); // Vector from A to B
-    private final Vector3d _r_BA_vec = new Vector3d(); // Vector from B to A (-r_AB_vec)
-    private final Vector3d _r_BA_hat = new Vector3d(); // Normalized r_BA_vec
+    private final Vector3d _r_AB_vec = new Vector3d();
+    private final Vector3d _r_BA_vec = new Vector3d();
+    private final Vector3d _r_BA_hat = new Vector3d();
 
-    // For calculateInteraction - Force components
     private final Vector3d _forceOnA = new Vector3d();
     private final Vector3d _forceTerm1 = new Vector3d();
     private final Vector3d _forceTerm2 = new Vector3d();
     private final Vector3d _forceTerm3 = new Vector3d();
 
-    // For calculateInteraction - Torque components
     private final Vector3d _torqueOnA_dipole = new Vector3d();
-    private final Vector3d _torqueCross_mA_mB = new Vector3d(); // m_A_hat x m_B_hat
-    private final Vector3d _torqueCross_mA_rBA = new Vector3d(); // m_A_hat x r_BA_hat
-    private final Vector3d _torqueTerm2_scaled = new Vector3d(); // Scaled version of _torqueCross_mA_rBA
+    private final Vector3d _torqueCross_mA_mB = new Vector3d();
+    private final Vector3d _torqueCross_mA_rBA = new Vector3d();
+    private final Vector3d _torqueTerm2_scaled = new Vector3d();
 
-    // For calculateInteraction - Application
     private final Vector3d _leverArmA_shipSpace = new Vector3d();
 
     //Variables
@@ -104,11 +100,10 @@ public class MagnetForceAttachment implements ShipForcesInducer {
 
     private final Vector3d _accumulatedForce = new Vector3d();
     private final Vector3d _accumulatedTorque = new Vector3d();
-    // We need a temporary vector for the torque from off-center force
     private final Vector3d _tempTorqueFromForce = new Vector3d();
 
 
-    @SuppressWarnings("null") // Keep if getShipById can return null and it's handled
+    @SuppressWarnings("null")
         private void calculateInteraction(MagnetPair pair, PhysShipImpl shipA, Vector3dc ACOM, ShipTransform transformA, 
         Vector3d totalForceAcc,
         Vector3d totalTorqueAcc) {
@@ -122,10 +117,6 @@ public class MagnetForceAttachment implements ShipForcesInducer {
         // World-space normalized direction of magnet A's moment
         toWorldDirection(transformA, pair.localDir, _m_A_hat);
 
-        // --- Magnet B Setup ---
-        // Variables worldPosB and m_B_hat will point to the pre-allocated _worldPosB and _m_B_hat
-        // Vector3dc worldPosB; // Not needed as we directly use _worldPosB
-        // Vector3dc m_B_hat;   // Not needed as we directly use _m_B_hat
         LoadedShip shipB_loaded = null;
 
         if (pair.otherShipId == -1) { // Magnet B is on the world grid
@@ -220,23 +211,14 @@ public class MagnetForceAttachment implements ShipForcesInducer {
         }
 
         // --- Apply Force and Torque ---
-        // _leverArmA_shipSpace = _localPosA_absolute_shipspace - ACOM
         _localPosA_absolute_shipspace.sub(ACOM, _leverArmA_shipSpace);
         Vector3d _worldLeverArmA = new Vector3d();
         transformA.getShipToWorld().transformDirection(_leverArmA_shipSpace, _worldLeverArmA);
         _worldLeverArmA.cross(_forceOnA, _tempTorqueFromForce);
 
-
-        //_leverArmA_shipSpace.cross(_forceOnA, _tempTorqueFromForce); 
-
-        //shipA.applyInvariantForceToPos(_forceOnA, _leverArmA_shipSpace);
         totalForceAcc.add(_forceOnA);
         totalTorqueAcc.add(_torqueOnA_dipole);
         totalTorqueAcc.add(_tempTorqueFromForce);
-
-        //shipA.applyInvariantForceToPos();
-        //shipA.applyInvariantTorque(_torqueOnA_dipole);
-
     }
 
     //Utility

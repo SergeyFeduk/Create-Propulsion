@@ -26,11 +26,11 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {}
 
-    public void activate() {
-        MagnetForceAttachment.get((ServerLevel) level, worldPosition); //Creates attachment if there is none
+    public void activate() { 
         boolean onShip = VSGameUtilsKt.isBlockInShipyard(level, worldPosition);
         long shipId = -1;
         if (onShip) {
+            MagnetForceAttachment.get((ServerLevel) level, worldPosition); //Creates attachment if there is none
             Ship ship = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
             shipId = ship.getId();
         }
