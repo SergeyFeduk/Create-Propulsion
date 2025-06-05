@@ -193,7 +193,7 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
         if (emptyBlocks == 0) return;
         int power = getOverriddenPowerOrState(state);
         if (power == 0) return;
-        if (!validFluid()) return;
+        if (!validFluid()) return; //TODO: Happens on client but should not as client does not have fuel manager instance
         //Limit minumum velocity and particle count when power is lower than that
         clientTick++;
         if (power < LOWEST_POWER_THRSHOLD && clientTick % 2 == 0) {clientTick = 0; return; }

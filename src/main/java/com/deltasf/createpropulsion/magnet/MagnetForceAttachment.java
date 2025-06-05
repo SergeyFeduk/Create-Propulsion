@@ -130,13 +130,13 @@ public class MagnetForceAttachment implements ShipForcesInducer {
                 System.err.println("Magnet otherDir (world) is zero for magnet at " + pair.otherPos.toString() +
                                 ". This will result in NaN forces/torques.");
             }
-            _m_B_hat.normalize(); // Becomes NaN if length was zero
+            _m_B_hat.normalize();
         } else { // Magnet B is on another ship
             shipB_loaded = getShipById(this.level, pair.otherShipId);
             if (shipB_loaded == null) return; // Other ship not found or not loaded
 
             ShipTransform transformB = shipB_loaded.getTransform();
-            _localPosB_shipspace.set( // Using pre-allocated _localPosB_shipspace
+            _localPosB_shipspace.set(
                 pair.otherPos.getX() + POINT_FIVE,
                 pair.otherPos.getY() + POINT_FIVE,
                 pair.otherPos.getZ() + POINT_FIVE
@@ -146,7 +146,6 @@ public class MagnetForceAttachment implements ShipForcesInducer {
         }
 
         // --- Relative Position and Distance ---
-        // Vector from magnet A to magnet B in world space: _r_AB_vec = _worldPosB - _worldPosA
         _worldPosB.sub(_worldPosA, _r_AB_vec);
         double rLengthSquared = _r_AB_vec.lengthSquared();
 
@@ -157,9 +156,7 @@ public class MagnetForceAttachment implements ShipForcesInducer {
 
         if (effectiveR <= 1e-8) return;
 
-        // Vector from magnet B to magnet A: _r_BA_vec = -_r_AB_vec
         _r_AB_vec.negate(_r_BA_vec);
-        // Normalized vector from B to A: _r_BA_hat = _r_BA_vec / effectiveR
         _r_BA_vec.normalize(effectiveR, _r_BA_hat);
 
         double r3 = effectiveR * effectiveRSquared;
@@ -179,31 +176,23 @@ public class MagnetForceAttachment implements ShipForcesInducer {
         double dot_mA_mB = _m_A_hat.dot(_m_B_hat);
 
         // --- Calculate Force on A due to B ---
-        // _forceTerm1 = _m_B_hat * dot_mA_rBA
         _m_B_hat.mul(dot_mA_rBA, _forceTerm1);
-        // _forceTerm2 = _m_A_hat * dot_mB_rBA
         _m_A_hat.mul(dot_mB_rBA, _forceTerm2);
-        // _forceTerm3 = _r_BA_hat * (dot_mA_mB - 5.0 * dot_mA_rBA * dot_mB_rBA)
         double termF3_scalar = dot_mA_mB - 5.0 * dot_mA_rBA * dot_mB_rBA;
         _r_BA_hat.mul(termF3_scalar, _forceTerm3);
 
-        // _forceOnA = (_forceTerm1 + _forceTerm2 + _forceTerm3) * forceCoeff
-        _forceTerm1.add(_forceTerm2, _forceOnA);   // _forceOnA = _forceTerm1 + _forceTerm2
-        _forceOnA.add(_forceTerm3);                // _forceOnA = _forceOnA + _forceTerm3
-        _forceOnA.mul(forceCoeff);                 // _forceOnA = _forceOnA * forceCoeff
+        _forceTerm1.add(_forceTerm2, _forceOnA);
+        _forceOnA.add(_forceTerm3);
+        _forceOnA.mul(forceCoeff);
 
         // --- Calculate Torque on A due to B ---
-        // _torqueCross_mA_mB = _m_A_hat x _m_B_hat
         _m_A_hat.cross(_m_B_hat, _torqueCross_mA_mB);
-        // _torqueCross_mA_rBA = _m_A_hat x _r_BA_hat
         _m_A_hat.cross(_r_BA_hat, _torqueCross_mA_rBA);
 
-        // _torqueTerm2_scaled = _torqueCross_mA_rBA * (-3.0 * dot_mB_rBA)
         _torqueCross_mA_rBA.mul(-3.0 * dot_mB_rBA, _torqueTerm2_scaled);
 
-        // _torqueOnA_dipole = (_torqueCross_mA_mB + _torqueTerm2_scaled) * torqueCoeff
-        _torqueCross_mA_mB.add(_torqueTerm2_scaled, _torqueOnA_dipole); // _torqueOnA_dipole = _torqueCross_mA_mB + _torqueTerm2_scaled
-        _torqueOnA_dipole.mul(torqueCoeff);                             // _torqueOnA_dipole = _torqueOnA_dipole * torqueCoeff
+        _torqueCross_mA_mB.add(_torqueTerm2_scaled, _torqueOnA_dipole);
+        _torqueOnA_dipole.mul(torqueCoeff);
         _torqueOnA_dipole.negate();
 
         if (!_forceOnA.isFinite() || !_torqueOnA_dipole.isFinite()) {
