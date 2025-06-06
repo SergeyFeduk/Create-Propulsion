@@ -214,6 +214,10 @@ public class MagnetForceAttachment implements ShipForcesInducer {
     
     private void toWorldDirection(ShipTransform transform, Vector3ic blockNormal, Vector3d destWorldDir) {
         transform.getShipToWorld().transformDirection(new Vector3d(blockNormal), destWorldDir);
+        if (destWorldDir.lengthSquared() < 1e-10) {
+            destWorldDir.zero();
+            return;
+        }
         destWorldDir.normalize();
     }    
     

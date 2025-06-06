@@ -7,10 +7,12 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.magnet.MagnetForceAttachment;
 import com.deltasf.createpropulsion.magnet.MagnetRegistry;
+import com.deltasf.createpropulsion.registries.PropulsionCommands;
 import com.deltasf.createpropulsion.thruster.ThrusterFuelManager;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.event.AddReloadListenerEvent;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -21,6 +23,11 @@ public class ForgeEvents {
     @SubscribeEvent
     public static void onAddReloadListeners(AddReloadListenerEvent event) {
         event.addListener(new ThrusterFuelManager());
+    }
+
+    @SubscribeEvent
+    public static void onCommandsRegister(RegisterCommandsEvent event) {
+        PropulsionCommands.register(event.getDispatcher());
     }
 
     @SubscribeEvent

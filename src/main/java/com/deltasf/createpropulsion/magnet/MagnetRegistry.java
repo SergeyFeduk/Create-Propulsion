@@ -8,6 +8,7 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.joml.Vector3d;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
@@ -32,7 +33,7 @@ public class MagnetRegistry {
     //#endregion
     private final double magnetRange = 32.0;
     public final double magnetRangeSquared = magnetRange * magnetRange;
-    public final boolean debug = false;
+    public boolean debug = false;
 
     //Broad check
     private final Map<ResourceKey<Level>, Long2ObjectOpenHashMap<List<MagnetData>>> dimensionMap = new HashMap<>();
@@ -45,9 +46,10 @@ public class MagnetRegistry {
         data.updateWorldPosition(level);
         long newChunkKey = positionToPackedChunkPos(data.getPosition());
 
-        Long2ObjectOpenHashMap<List<MagnetData>> spatial = dimensionMap.computeIfAbsent(level.dimension(), k -> new Long2ObjectOpenHashMap<>());
-
         Long oldChunkKey = lastChunkKey.get(data);
+        if (oldChunkKey != null && oldChunkKey.longValue() == newChunkKey) return; //Did not change the chunk, no need to update
+
+        Long2ObjectOpenHashMap<List<MagnetData>> spatial = dimensionMap.computeIfAbsent(level.dimension(), k -> new Long2ObjectOpenHashMap<>());
         // Always remove from old position if it exists
         if (oldChunkKey != null) {
             List<MagnetData> oldList = spatial.get(oldChunkKey);
@@ -62,6 +64,7 @@ public class MagnetRegistry {
     }
 
     public void removeMagnet(Level level, MagnetData data) {
+        if (data == null) return;
         Long2ObjectOpenHashMap<List<MagnetData>> spatial = dimensionMap.get(level.dimension());
         if (spatial == null) return;
         Long oldKey = lastChunkKey.get(data);
@@ -70,6 +73,10 @@ public class MagnetRegistry {
             if (oldList != null) oldList.remove(data);
             lastChunkKey.remove(data);
         }
+        //TODO: Replace with event-driven system to dirty all neighbours of removed magnet
+        shipToPairs.values().forEach(list -> list.removeIf(pair -> 
+            pair.otherShipId == data.shipId && pair.otherPos.equals(data.getBlockPos())
+        ));
     }
 
     //TODO: Instead of doing neighbour scan every tick - do it only when one of the magnets moved far enough (> 0.2 blocks) from previous registered position
@@ -109,8 +116,6 @@ public class MagnetRegistry {
                 var data = active.get(i);
                 String identifier = i + "_active";
                 DebugRenderer.drawBox(identifier, data.getBlockPos().getCenter(), new Vec3(1.5, 1.5, 1.5), Color.red, 2);
-                Vec3 snd = data.getBlockPos().getCenter().add(new Vec3(data.getBlockDipoleDir().x, data.getBlockDipoleDir().y, data.getBlockDipoleDir().z));
-                DebugRenderer.drawElongatedBox(identifier + "_dir", data.getBlockPos().getCenter(), snd, 0.1f, Color.blue, false, 2);
             }
         }
         
@@ -126,13 +131,11 @@ public class MagnetRegistry {
         for (int i = 0; i < n; i++) {
             indexMap.put(active.get(i), i);
         }
-        shipToPairs.clear();
+        
         //Neighbour scan
         for(int i = 0; i < n; i++) {
             MagnetData A = active.get(i);
             Vector3d posA = A.getPosition();
-            //if (A.shipId == -1) continue; //No need to scan the static magnets, dynamic will find them anyway 
-            //(technically there is a need due to j<= i check, but this is still possible if we restructure this)
             for(MagnetData B : retrieveNeighbours(level, A)) {
                 Integer jObj = indexMap.get(B);
                 if (jObj == null) continue; // B not in active list
@@ -146,18 +149,23 @@ public class MagnetRegistry {
             }
         }
         //Add pairs
+        ConcurrentHashMap<Long, List<MagnetPair>> newShipToPairs = new ConcurrentHashMap<>();
+
         for(int[] edge : edges) {
             MagnetData A = active.get(edge[0]);
             MagnetData B = active.get(edge[1]);
             if (A.shipId != -1) {
                 MagnetPair pair = new MagnetPair(A.getBlockPos(), A.getBlockDipoleDir(), B.shipId, B.getBlockPos(), B.getBlockDipoleDir());
-                shipToPairs.computeIfAbsent(A.shipId, k -> new ArrayList<>()).add(pair);
+                newShipToPairs.computeIfAbsent(A.shipId, k -> new CopyOnWriteArrayList<>()).add(pair);
             }
             if (B.shipId != -1) {
                 MagnetPair pair = new MagnetPair(B.getBlockPos(), B.getBlockDipoleDir(), A.shipId, A.getBlockPos(), A.getBlockDipoleDir());
-                shipToPairs.computeIfAbsent(B.shipId, k -> new ArrayList<>()).add(pair);
+                newShipToPairs.computeIfAbsent(B.shipId, k -> new CopyOnWriteArrayList<>()).add(pair);
             }
         }
+        //Update shipToPairs
+        shipToPairs.clear();
+        shipToPairs.putAll(newShipToPairs);
 
         //Debug, draw edges
         if (debug) {
@@ -195,8 +203,9 @@ public class MagnetRegistry {
         if (internal == null || internal.isEmpty()) {
             return Collections.emptyList();
         }
+        return internal;
         // Return a shallow copy so physics thread can iterate safely
-        return new ArrayList<>(internal);
+        //return new CopyOnWriteArrayList<>(internal);
     }
 
     public long positionToPackedChunkPos(Vector3d position) {

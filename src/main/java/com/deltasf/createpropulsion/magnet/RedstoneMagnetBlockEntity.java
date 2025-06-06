@@ -42,7 +42,10 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
     }
 
     public void deactivate() {
-        MagnetRegistry.get().removeMagnet(getLevel(), data);
+        if (this.data != null) {
+            MagnetRegistry.get().removeMagnet(getLevel(), data);
+            this.data = null;
+        }
     }
 
     @SuppressWarnings("null")
@@ -62,15 +65,8 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
         super.onLoad();
         if (level == null || level.isClientSide) return;
         
-        BlockState currentState = level.getBlockState(worldPosition);
-        boolean powered = currentState.getValue(RedstoneMagnetBlock.POWERED);
-
-        if (powered) {
-            level.setBlock(worldPosition,
-                            currentState.setValue(RedstoneMagnetBlock.POWERED, true),
-                            3
-            );
+        if (getBlockState().getValue(RedstoneMagnetBlock.POWERED)) {
             activate();
-        }
+        }    
     }
 }
