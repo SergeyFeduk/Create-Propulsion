@@ -1,6 +1,5 @@
 package com.deltasf.createpropulsion.magnet;
 
-import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -19,7 +18,6 @@ import com.deltasf.createpropulsion.debug.DebugRenderer;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -29,12 +27,14 @@ public class MagnetLevelRegistry {
 
     private final ConcurrentHashMap<UUID, MagnetData> magnets = new ConcurrentHashMap<>();
     private final Long2ObjectOpenHashMap<List<UUID>> spatial = new Long2ObjectOpenHashMap<>();
-    private final Map<UUID, Long> lastChunkKey = new IdentityHashMap<>();
+    private final Map<UUID, Long> lastChunkKey = new ConcurrentHashMap<>();
     private volatile Map<Long, List<MagnetPair>> shipToPairs = new ConcurrentHashMap<>();
+    
+    private Level level;
 
-    public MagnetLevelRegistry(ResourceKey<Level> dimension) {
-        //this.dimension = dimension;
-        System.out.println("Creating MagnetLevelRegistry for " + dimension.toString());
+    public MagnetLevelRegistry(Level level) {
+        this.level = level;
+        System.out.println("Creating MagnetLevelRegistry for " + level.dimension().toString());
     }
 
     public MagnetData getMagnet(UUID id) {
@@ -52,7 +52,7 @@ public class MagnetLevelRegistry {
         }
     }
 
-    public void updateMagnetPosition(Level level, MagnetData data) {
+    public void updateMagnetPosition(MagnetData data) {
         data.updateWorldPosition(level);
 
         long newChunkKey = positionToPackedChunkPos(data.getPosition());
@@ -73,7 +73,7 @@ public class MagnetLevelRegistry {
     //When this happens - do retrieveNeighbours for this magnet only
     //This will make sure that registry is updated only when needed and will increase performance
 
-    public void computePairs(Level level) {
+    public void computePairs() {
         //Collect garbage
         List<UUID> toRemove = new ArrayList<>();
         for (MagnetData data : magnets.values()) {
@@ -107,8 +107,11 @@ public class MagnetLevelRegistry {
         
         if (n <= 1) {
             // Nothing to pair if there's 0 or 1 magnet
-            shipToPairs.clear();
+            if (!shipToPairs.isEmpty()) {
+                this.shipToPairs = new ConcurrentHashMap<>();
+            }
             return;
+    
         }
         List<int[]> edges = new ArrayList<>();
 

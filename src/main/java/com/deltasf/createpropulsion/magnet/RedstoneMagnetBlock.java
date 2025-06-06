@@ -78,7 +78,7 @@ public class RedstoneMagnetBlock extends DirectionalBlock implements EntityBlock
 
     @Override
     public void onRemove(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull BlockState newState, boolean isMoving) {
-        //Final destruction
+        //Final destination
         if (!state.is(newState.getBlock()) && !level.isClientSide) {
             BlockEntity be = level.getBlockEntity(pos);
             if (be instanceof RedstoneMagnetBlockEntity rbe) {

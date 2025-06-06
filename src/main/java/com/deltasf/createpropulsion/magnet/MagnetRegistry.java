@@ -23,7 +23,7 @@ public class MagnetRegistry {
     private final Map<ResourceKey<Level>, MagnetLevelRegistry> registries = new ConcurrentHashMap<>();
 
     public MagnetLevelRegistry forLevel(Level level) {
-        return registries.computeIfAbsent(level.dimension(), MagnetLevelRegistry::new);
+        return registries.computeIfAbsent(level.dimension(), k -> new MagnetLevelRegistry(level));
     }
 
     public void reset() {

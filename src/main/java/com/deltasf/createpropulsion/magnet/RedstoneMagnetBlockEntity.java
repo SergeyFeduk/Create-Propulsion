@@ -45,17 +45,14 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
             Ship ship = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
             if (ship != null) {
                 currentShipId = ship.getId();
-                /*@SuppressWarnings("all")
-                var z = */MagnetForceAttachment.get(level, worldPosition);
-                //System.out.println("Creating an attachment");
-                //MagnetForceAttachment.getOrCreateAsAttachment(level, (ServerShip) ship);
+                MagnetForceAttachment.get(level, worldPosition);
             }
 
             Vector3i currentDipoleDir = VectorConversionsMCKt.toJOML(currentState.getValue(RedstoneMagnetBlock.FACING).getNormal());
             MagnetData magnetData = MagnetRegistry.get().forLevel(level).getOrCreateMagnet(this.magnetId, worldPosition, currentShipId, currentDipoleDir);
             magnetData.cancelRemoval();
             magnetData.update(worldPosition, currentShipId, currentDipoleDir);
-            MagnetRegistry.get().forLevel(level).updateMagnetPosition(level, magnetData);
+            MagnetRegistry.get().forLevel(level).updateMagnetPosition(magnetData);
 
         } else {
             MagnetRegistry.get().forLevel(level).scheduleRemoval(this.magnetId);
@@ -84,7 +81,7 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
 
         MagnetData data = MagnetRegistry.get().forLevel(level).getMagnet(this.magnetId);
         if (data != null && data.shipId != -1) {
-            MagnetRegistry.get().forLevel(level).updateMagnetPosition(level, data);
+            MagnetRegistry.get().forLevel(level).updateMagnetPosition(data);
         }
     }
 
