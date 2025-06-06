@@ -40,7 +40,10 @@ public class ThrusterFuelManager extends SimpleJsonResourceReloadListener {
     }
 
     public static ThrusterFuelManager getInstance() {
-        if (instance == null) throw new IllegalStateException("ThrusterFuelManager instance is not initialized. Calling it too early?");
+        if (instance == null) {
+            System.out.println("ThrusterFuelManager instance is not initialized. Calling it too early?");
+            new ThrusterFuelManager(); //Create instance cus client-side also needs it
+        }
         return instance;
     }
 
