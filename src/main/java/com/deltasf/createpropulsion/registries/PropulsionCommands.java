@@ -21,8 +21,8 @@ public class PropulsionCommands {
             .executes(PropulsionCommands::setDebugMode)));
 
         propulsionCommand
-            .then(Commands.literal("clearMagnetRegistry"))
-            .executes(PropulsionCommands::clearMagnetRegistry);
+            .then(Commands.literal("clearMagnetRegistry")
+            .executes(PropulsionCommands::clearMagnetRegistry));
 
         dispatcher.register(propulsionCommand);
     }

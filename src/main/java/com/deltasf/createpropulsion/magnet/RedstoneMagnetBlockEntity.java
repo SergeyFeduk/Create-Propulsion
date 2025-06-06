@@ -45,7 +45,7 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
             Ship ship = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
             if (ship != null) {
                 currentShipId = ship.getId();
-                MagnetForceAttachment.get(level, worldPosition);
+                MagnetForceAttachment.ensureAttachmentExists(level, worldPosition);
             }
 
             Vector3i currentDipoleDir = VectorConversionsMCKt.toJOML(currentState.getValue(RedstoneMagnetBlock.FACING).getNormal());

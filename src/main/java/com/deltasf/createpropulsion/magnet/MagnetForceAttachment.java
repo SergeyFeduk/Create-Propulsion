@@ -2,6 +2,8 @@ package com.deltasf.createpropulsion.magnet;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import org.jetbrains.annotations.NotNull;
 import org.joml.Math;
 import org.joml.Vector3d;
@@ -21,7 +23,8 @@ import net.minecraft.world.level.Level;
 
 @SuppressWarnings("deprecation")
 public class MagnetForceAttachment implements ShipForcesInducer {
-    public Level level;
+    public volatile Level level;
+    public MagnetForceAttachment() {}
 
     @Override
     public void applyForces(@NotNull PhysShip physicShip) {
@@ -250,4 +253,16 @@ public class MagnetForceAttachment implements ShipForcesInducer {
         }
         return ship;
     }
+
+    public static void ensureAttachmentExists(@Nonnull Level level, @Nonnull BlockPos pos) {
+        ServerShip ship = getShipAt((ServerLevel) level, pos);
+        if (ship != null) {
+            MagnetForceAttachment attachment = ship.getAttachment(MagnetForceAttachment.class);
+            if (attachment == null) {
+                attachment = new MagnetForceAttachment();
+                attachment.level = level;
+                ship.saveAttachment(MagnetForceAttachment.class, attachment);
+            }
+        }
+    } 
 }
