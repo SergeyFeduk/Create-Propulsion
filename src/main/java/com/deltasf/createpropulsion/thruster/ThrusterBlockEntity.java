@@ -1,5 +1,6 @@
 package com.deltasf.createpropulsion.thruster;
 
+import net.createmod.catnip.lang.LangBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
@@ -22,12 +23,10 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.registries.ForgeRegistries;
 
-import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
+import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour;
-import com.simibubi.create.foundation.utility.Lang;
-import com.simibubi.create.foundation.utility.LangBuilder;
 
 import java.awt.Color;
 import java.util.Dictionary;
@@ -53,6 +52,7 @@ import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.debug.DebugRenderer;
 import com.simibubi.create.foundation.collision.Matrix3d;
 import com.simibubi.create.foundation.collision.OrientedBB;
+import com.simibubi.create.foundation.utility.CreateLang;
 import com.deltasf.createpropulsion.particles.ParticleTypes;
 import com.deltasf.createpropulsion.particles.PlumeParticleData;
 import com.deltasf.createpropulsion.utility.MathUtility;
@@ -253,17 +253,17 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
         //Thruster status
         LangBuilder status;
         if (fluidStack().isEmpty()) {
-            status = Lang.translate("gui.goggles.thruster.status.no_fuel", new Object[0]).style(ChatFormatting.RED);
+            status = CreateLang.translate("gui.goggles.thruster.status.no_fuel", new Object[0]).style(ChatFormatting.RED);
         } else if (!validFluid()) {
-            status = Lang.translate("gui.goggles.thruster.status.wrong_fuel", new Object[0]).style(ChatFormatting.RED);
+            status = CreateLang.translate("gui.goggles.thruster.status.wrong_fuel", new Object[0]).style(ChatFormatting.RED);
         } else if (getBlockState().getValue(ThrusterBlock.POWER) == 0) {
-            status = Lang.translate("gui.goggles.thruster.status.not_powered", new Object[0]).style(ChatFormatting.GOLD);
+            status = CreateLang.translate("gui.goggles.thruster.status.not_powered", new Object[0]).style(ChatFormatting.GOLD);
         } else if (emptyBlocks == 0) {
-            status = Lang.translate("gui.goggles.thruster.obstructed", new Object[0]).style(ChatFormatting.RED);
+            status = CreateLang.translate("gui.goggles.thruster.obstructed", new Object[0]).style(ChatFormatting.RED);
         } else {
-            status = Lang.translate("gui.goggles.thruster.status.working", new Object[0]).style(ChatFormatting.GREEN);
+            status = CreateLang.translate("gui.goggles.thruster.status.working", new Object[0]).style(ChatFormatting.GREEN);
         }
-        Lang.translate("gui.goggles.thruster.status", new Object[0]).text(":").space().add(status).forGoggles(tooltip);
+        CreateLang.translate("gui.goggles.thruster.status", new Object[0]).text(":").space().add(status).forGoggles(tooltip);
 
         float efficiency = 100;
         ChatFormatting tooltipColor = ChatFormatting.GREEN;
@@ -281,14 +281,14 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
                 tooltipColor = ChatFormatting.GREEN;
             }
             //Add obstruction tooltip
-            Lang.builder().add(Lang.translate("gui.goggles.thruster.obstructed", new Object[0])).space()
-                .add(Lang.text(makeObstructionBar(emptyBlocks, OBSTRUCTION_LENGTH)))
+            CreateLang.builder().add(CreateLang.translate("gui.goggles.thruster.obstructed", new Object[0])).space()
+                .add(CreateLang.text(makeObstructionBar(emptyBlocks, OBSTRUCTION_LENGTH)))
                 .style(tooltipColor)
             .forGoggles(tooltip);
         }
         //Efficiency
-        Lang.builder().add(Lang.translate("gui.goggles.thruster.efficiency", new Object[0])).space()
-            .add(Lang.number(efficiency)).add(Lang.text("%"))
+        CreateLang.builder().add(CreateLang.translate("gui.goggles.thruster.efficiency", new Object[0])).space()
+            .add(CreateLang.number(efficiency)).add(CreateLang.text("%"))
             .style(tooltipColor)
             .forGoggles(tooltip);
         //Fluid tooltip

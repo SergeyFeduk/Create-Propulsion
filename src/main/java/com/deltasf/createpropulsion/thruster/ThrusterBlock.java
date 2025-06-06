@@ -1,5 +1,6 @@
 package com.deltasf.createpropulsion.thruster;
 
+import net.createmod.catnip.math.VoxelShaper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -34,7 +35,6 @@ import com.deltasf.createpropulsion.ship.ForceInducedShip;
 import com.deltasf.createpropulsion.utility.ShapeBuilder;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntityTicker;
-import com.simibubi.create.foundation.utility.VoxelShaper;
 
 @SuppressWarnings("deprecation")
 public class ThrusterBlock extends DirectionalBlock implements EntityBlock {
