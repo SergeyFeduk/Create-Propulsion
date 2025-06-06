@@ -26,15 +26,16 @@ public class MagnetForceAttachment implements ShipForcesInducer {
     @Override
     public void applyForces(@NotNull PhysShip physicShip) {
         PhysShipImpl ship = (PhysShipImpl) physicShip;
-        List<MagnetPair> pairs = MagnetRegistry.get().getPairsForShip(ship.getId());
-        if (pairs.isEmpty()) return;
+        List<MagnetPair> pairs = MagnetRegistry.get().forLevel(level).getPairsForShip(ship.getId());
+        if (pairs.isEmpty()) {
+            return;
+        }
 
         var transform = ship.getTransform();
         var shipCOM = transform.getPositionInShip();
 
         _accumulatedForce.zero();
         _accumulatedTorque.zero();
-
         for(MagnetPair pair : pairs) {
             calculateInteraction(pair, ship, shipCOM, transform, _accumulatedForce, _accumulatedTorque);
         }
@@ -149,7 +150,7 @@ public class MagnetForceAttachment implements ShipForcesInducer {
         _worldPosB.sub(_worldPosA, _r_AB_vec);
         double rLengthSquared = _r_AB_vec.lengthSquared();
 
-        if (rLengthSquared > MagnetRegistry.get().magnetRangeSquared) return;
+        if (rLengthSquared > MagnetRegistry.magnetRangeSquared) return;
 
         double effectiveRSquared = Math.max(rLengthSquared, MIN_INTERACTION_DISTANCE_SQ);
         double effectiveR = Math.sqrt(effectiveRSquared);

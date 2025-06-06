@@ -11,8 +11,9 @@ public class MagnetRegistryTickHandler {
     public static void onServerTick(TickEvent.ServerTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
         var levels = event.getServer().getAllLevels();
+        
         for(ServerLevel level : levels) {
-            MagnetRegistry.get().computePairs(level);
+            MagnetRegistry.get().forLevel(level).computePairs(level);
         }
     }
 }

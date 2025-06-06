@@ -199,8 +199,6 @@ public class PhysicsAssemblerBlockEntity extends BlockEntity {
             BlockEntity newBlockEntity = level.getBlockEntity(to);
             newBlockEntity.load(tdata);
         }
-
-        
     }
 
     private void removeBlock(Level level, BlockPos pos){

@@ -8,13 +8,18 @@ import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
+import java.util.UUID;
 
 public class MagnetData {
-    public MagnetData(BlockPos pos, long shipId, Vector3i blockDipoleDir) {
+    public MagnetData(UUID id, BlockPos pos, long shipId, Vector3i blockDipoleDir) {
+        this.id = id;
         this.pos = pos;
         this.shipId = shipId;
         this.blockDipoleDir = blockDipoleDir;
     }
+    public final UUID id;
+    private boolean pendingRemoval = false;
+
     private BlockPos pos;
     public long shipId = -1;
     private Vector3d worldPosition;
@@ -23,6 +28,12 @@ public class MagnetData {
     public BlockPos getBlockPos() { return pos; }
     public Vector3d getPosition() { return worldPosition; }
     public Vector3i getBlockDipoleDir() { return blockDipoleDir; }
+
+    public void update(BlockPos newPos, long newShipId, Vector3i newBlockDipoleDir) {
+        this.pos = newPos;
+        this.shipId = newShipId;
+        this.blockDipoleDir.set(newBlockDipoleDir);
+    }
 
     public void updateWorldPosition(Level level) {
         if (shipId == -1) {
@@ -34,16 +45,20 @@ public class MagnetData {
         }
     }
 
+    public void scheduleForRemoval() { this.pendingRemoval = true; }
+    public void cancelRemoval() { this.pendingRemoval = false; }
+    public boolean isPendingRemoval() { return this.pendingRemoval; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MagnetData that = (MagnetData) o;
-        return pos.equals(that.pos);
+        return id.equals(that.id);
     }
 
     @Override
     public int hashCode() {
-        return pos.hashCode();
+        return id.hashCode();
     }
 }

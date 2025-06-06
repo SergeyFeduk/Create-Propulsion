@@ -23,4 +23,9 @@ public class PropulsionCommands {
         MagnetRegistry.get().debug = value;
         return 1;
     }
+
+    /*private static int clearMagnetRegistry(CommandContext<CommandSourceStack> context) {
+        MagnetRegistry.get().reset();
+        return 1;
+    }*/
 }

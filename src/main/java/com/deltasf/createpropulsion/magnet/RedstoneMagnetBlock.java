@@ -60,26 +60,29 @@ public class RedstoneMagnetBlock extends DirectionalBlock implements EntityBlock
     @Override
     public void onPlace(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull BlockState oldState, boolean isMoving) {
         super.onPlace(state, level, pos, oldState, isMoving);
-        if (!level.isClientSide) {
-            int power = level.getBestNeighborSignal(pos);
-            boolean powered = power > 0;
-            BlockState newState = state.setValue(POWERED, powered);
-            level.setBlock(pos, newState, 3);
-            if (powered) {
-                BlockEntity blockEntity = level.getBlockEntity(pos);
-                if (blockEntity instanceof RedstoneMagnetBlockEntity be) {
-                    be.activate();
-                }
-            }
+
+        if (level.isClientSide) return;
+
+        BlockEntity be = level.getBlockEntity(pos);
+        if (be instanceof RedstoneMagnetBlockEntity rbe) {
+            rbe.scheduleUpdate();
         }
+    
+
+        if (!state.is(oldState.getBlock())) {
+            if (level.getBestNeighborSignal(pos) > 0) {
+                level.setBlock(pos, state.setValue(POWERED, true), 2);
+            }
+        }    
     }
 
     @Override
     public void onRemove(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull BlockState newState, boolean isMoving) {
-        if (!level.isClientSide) {
-            BlockEntity blockEntity = level.getBlockEntity(pos);
-            if (blockEntity instanceof RedstoneMagnetBlockEntity be) {
-                be.deactivate();
+        //Final destruction
+        if (!state.is(newState.getBlock()) && !level.isClientSide) {
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof RedstoneMagnetBlockEntity rbe) {
+                rbe.onBlockBroken();
             }
         }
         super.onRemove(state, level, pos, newState, isMoving);
@@ -89,22 +92,9 @@ public class RedstoneMagnetBlock extends DirectionalBlock implements EntityBlock
     public void neighborChanged(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull net.minecraft.world.level.block.Block block, @Nonnull BlockPos fromPos, boolean isMoving) {
         if (level.isClientSide) return;
 
-        int power = level.getBestNeighborSignal(pos);
-        boolean powered = power > 0;
-        boolean currentlyPowered = state.getValue(POWERED);
-
-        if (powered != currentlyPowered) {
-            BlockState newState = state.setValue(POWERED, powered);
-            level.setBlock(pos, newState, 3);
-            BlockEntity blockEntity = level.getBlockEntity(pos);
-            if (blockEntity instanceof RedstoneMagnetBlockEntity be) {
-                if (powered) {
-                    be.activate();
-                } else {
-                    be.deactivate();
-                }
-                be.setChanged();
-            }
+        boolean shouldBePowered = level.getBestNeighborSignal(pos) > 0;
+        if (state.getValue(POWERED) != shouldBePowered) {
+            level.setBlock(pos, state.setValue(POWERED, shouldBePowered), 2);
         }
     }
 

@@ -1,6 +1,7 @@
 package com.deltasf.createpropulsion.magnet;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.joml.Vector3i;
 import org.valkyrienskies.core.api.ships.Ship;
@@ -11,40 +12,63 @@ import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
     public RedstoneMagnetBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
-        data = null;
-        
     }
-    public MagnetData data;
+
+    private UUID magnetId;
+    private boolean needsUpdate = true; 
 
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {}
 
-    public void activate() { 
-        boolean onShip = VSGameUtilsKt.isBlockInShipyard(level, worldPosition);
-        long shipId = -1;
-        if (onShip) {
-            MagnetForceAttachment.get((ServerLevel) level, worldPosition); //Creates attachment if there is none
+    @SuppressWarnings("null")
+    public void updateMagnetState() {
+        if (level == null || level.isClientSide) return;
+
+        //Ensure valid UUID
+        if (this.magnetId == null) {
+            this.magnetId = UUID.randomUUID();
+            setChanged();
+        }
+
+        BlockState currentState = level.getBlockState(worldPosition);
+        boolean shouldBeActive = currentState.getValue(RedstoneMagnetBlock.POWERED);
+
+        if (shouldBeActive) {
+            long currentShipId = -1;
             Ship ship = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
-            shipId = ship.getId();
+            if (ship != null) {
+                currentShipId = ship.getId();
+                /*@SuppressWarnings("all")
+                var z = */MagnetForceAttachment.get(level, worldPosition);
+                //System.out.println("Creating an attachment");
+                //MagnetForceAttachment.getOrCreateAsAttachment(level, (ServerShip) ship);
+            }
+
+            Vector3i currentDipoleDir = VectorConversionsMCKt.toJOML(currentState.getValue(RedstoneMagnetBlock.FACING).getNormal());
+            MagnetData magnetData = MagnetRegistry.get().forLevel(level).getOrCreateMagnet(this.magnetId, worldPosition, currentShipId, currentDipoleDir);
+            magnetData.cancelRemoval();
+            magnetData.update(worldPosition, currentShipId, currentDipoleDir);
+            MagnetRegistry.get().forLevel(level).updateMagnetPosition(level, magnetData);
+
+        } else {
+            MagnetRegistry.get().forLevel(level).scheduleRemoval(this.magnetId);
         }
-        if (data == null) {
-            Vector3i dipoleDirection = VectorConversionsMCKt.toJOML(getBlockState().getValue(RedstoneMagnetBlock.FACING).getNormal());
-            data = new MagnetData(worldPosition, shipId, dipoleDirection);
-        }
-        MagnetRegistry.get().updateMagnet(getLevel(), data);
     }
 
-    public void deactivate() {
-        if (this.data != null) {
-            MagnetRegistry.get().removeMagnet(getLevel(), data);
-            this.data = null;
+    public void scheduleUpdate() {
+        this.needsUpdate = true;
+    }
+
+    public void onBlockBroken() {
+        if (this.magnetId != null) {
+            MagnetRegistry.get().forLevel(level).scheduleRemoval(this.magnetId);
         }
     }
 
@@ -52,21 +76,39 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
     @Override
     public void tick() {
         if (level.isClientSide) return;
-        if (data == null || data.shipId == -1) return;
-        if (getBlockState().getValue(RedstoneMagnetBlock.POWERED)) {
-            MagnetRegistry.get().updateMagnet(getLevel(), data);
+        
+        if (needsUpdate) {
+            updateMagnetState();
+            needsUpdate = false;
+        }
+
+        MagnetData data = MagnetRegistry.get().forLevel(level).getMagnet(this.magnetId);
+        if (data != null && data.shipId != -1) {
+            MagnetRegistry.get().forLevel(level).updateMagnetPosition(level, data);
         }
     }
 
-    //Sync after load
-    @SuppressWarnings("null")
     @Override
-    public void onLoad() {
-        super.onLoad();
-        if (level == null || level.isClientSide) return;
-        
-        if (getBlockState().getValue(RedstoneMagnetBlock.POWERED)) {
-            activate();
-        }    
+    public void onLoad() { 
+        scheduleUpdate();
+    }
+
+    //NBT
+
+    @Override
+    protected void read(CompoundTag tag, boolean isClient) {
+        super.read(tag, isClient);
+        if (tag.hasUUID("MagnetId")) {
+            this.magnetId = tag.getUUID("MagnetId");
+        }
+    }
+
+    @Override
+    protected void write(CompoundTag tag, boolean isClient) {
+        super.write(tag, isClient);
+        if (this.magnetId == null) {
+            this.magnetId = UUID.randomUUID();
+        }
+        tag.putUUID("MagnetId", this.magnetId);
     }
 }
