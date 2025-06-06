@@ -1,8 +1,11 @@
 package com.deltasf.createpropulsion.optical_sensors.optical_sensor;
 
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform;
-import com.simibubi.create.foundation.utility.VecHelper;
+
+import net.createmod.catnip.math.VecHelper;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
@@ -46,8 +49,8 @@ public class OpticalSensorFilterValueBox extends ValueBoxTransform.Sided {
     }
 
     @Override
-    public Vec3 getLocalOffset(BlockState state) {
-        Vec3 location = super.getLocalOffset(state);
+    public Vec3 getLocalOffset(LevelAccessor level, BlockPos pos, BlockState state) {
+        Vec3 location = super.getLocalOffset(level, pos, state);
         Direction facing = state.getValue(FACING);
         double offsetAmount = FACING_OFFSET_VOXELS / 16.0;
         Vec3 facingOffset = Vec3.atLowerCornerOf(facing.getNormal()).scale(offsetAmount);

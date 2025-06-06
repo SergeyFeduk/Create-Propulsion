@@ -1,5 +1,6 @@
 package com.deltasf.createpropulsion.utility;
 
+import net.createmod.catnip.math.VoxelShaper;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.world.level.block.Block;
@@ -9,7 +10,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.function.BiFunction;
 
-import com.simibubi.create.foundation.utility.VoxelShaper;
 import static net.minecraft.core.Direction.UP;
 
 //This was taken from create mod

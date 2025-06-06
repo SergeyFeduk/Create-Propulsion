@@ -6,12 +6,15 @@ import com.deltasf.createpropulsion.optical_sensors.OpticalSensorBlock;
 import com.deltasf.createpropulsion.optical_sensors.OpticalSensorBlockEntity;
 import com.deltasf.createpropulsion.optical_sensors.rendering.OpticalSensorRenderer;
 import com.deltasf.createpropulsion.particles.ParticleTypes;
+import com.deltasf.createpropulsion.ponder.SFPonderPlugin;
 import com.deltasf.createpropulsion.thruster.ThrusterBlock;
 import com.deltasf.createpropulsion.thruster.ThrusterBlockEntity;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.simibubi.create.foundation.item.TooltipHelper;
-import com.simibubi.create.foundation.utility.Lang;
+import com.simibubi.create.foundation.utility.CreateLang;
 
+import net.createmod.catnip.lang.FontHelper.Palette;
+import net.createmod.ponder.foundation.PonderIndex;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
@@ -32,6 +35,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -43,7 +47,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
-import com.simibubi.create.foundation.item.TooltipHelper.Palette;
 import com.tterrag.registrate.util.entry.BlockEntityEntry;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import net.minecraft.network.chat.Component;
@@ -106,7 +109,7 @@ public class CreatePropulsion {
     public CreatePropulsion() {
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
         ParticleTypes.register(modBus);
-        
+        modBus.addListener(this::onClientSetup);
         //Config
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, Config.SPEC, ID + "-server.toml");
 
@@ -114,6 +117,10 @@ public class CreatePropulsion {
 
         REGISTRATE.registerEventListeners(modBus);
     }
+
+    private void onClientSetup(FMLClientSetupEvent event) {
+		PonderIndex.addPlugin(new SFPonderPlugin());
+	}
 
     @EventBusSubscriber(modid = ID, bus = Bus.MOD, value = Dist.CLIENT)
     public static class ClientModEvents {
@@ -167,7 +174,7 @@ public class CreatePropulsion {
             List<Component> tooltipList = new ArrayList<>();
             if(I18n.exists(path + ".tooltip.summary")) {
                 if (Screen.hasShiftDown()) {
-                    tooltipList.add(Lang.translateDirect("tooltip.holdForDescription", Component.translatable("create.tooltip.keyShift").withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.DARK_GRAY));
+                    tooltipList.add(CreateLang.translateDirect("tooltip.holdForDescription", Component.translatable("create.tooltip.keyShift").withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.DARK_GRAY));
                     tooltipList.add(Component.empty());
                     
                     //Yeah this is VERY UGLY, I know but I don't want to add interface and implement custom handling for it
@@ -204,7 +211,7 @@ public class CreatePropulsion {
                     }
 
                 } else {
-                    tooltipList.add(Lang.translateDirect("tooltip.holdForDescription", Component.translatable("create.tooltip.keyShift").withStyle(ChatFormatting.GRAY)).withStyle(ChatFormatting.DARK_GRAY));
+                    tooltipList.add(CreateLang.translateDirect("tooltip.holdForDescription", Component.translatable("create.tooltip.keyShift").withStyle(ChatFormatting.GRAY)).withStyle(ChatFormatting.DARK_GRAY));
                 }
             }
             tooltip.addAll(1, tooltipList);
