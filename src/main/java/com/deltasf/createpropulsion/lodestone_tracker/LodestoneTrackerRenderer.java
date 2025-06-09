@@ -20,18 +20,11 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.Vec3;
 
 @SuppressWarnings("null") //Silence
 public class LodestoneTrackerRenderer extends SafeBlockEntityRenderer<LodestoneTrackerBlockEntity> {
     public LodestoneTrackerRenderer(BlockEntityRendererProvider.Context context) { super();}
-    private static IntegerProperty[] redstoneProperties = { 
-        LodestoneTrackerBlock.POWER_SOUTH, 
-        LodestoneTrackerBlock.POWER_EAST, 
-        LodestoneTrackerBlock.POWER_NORTH, 
-        LodestoneTrackerBlock.POWER_WEST 
-    };
 
     @Override
     protected void renderSafe(LodestoneTrackerBlockEntity blockEntity, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int light, int overlay) {        
@@ -48,6 +41,15 @@ public class LodestoneTrackerRenderer extends SafeBlockEntityRenderer<LodestoneT
         BlockState blockState = blockEntity.getBlockState();
         VertexConsumer vertexBuffer = bufferSource.getBuffer(RenderType.cutout()); 
         SuperByteBuffer partialIndicatorModel = CachedBufferer.partial(PropulsionPartialModels.LODESTONE_TRACKER_INDICATOR, blockState);
+
+        int[] powers = {
+            blockEntity.powerSouth(),
+            blockEntity.powerEast(),
+            blockEntity.powerNorth(),
+            blockEntity.powerWest()
+        };
+
+
         for (int i = 0; i < 4; i++) {
             poseStack.pushPose();
 
@@ -56,7 +58,7 @@ public class LodestoneTrackerRenderer extends SafeBlockEntityRenderer<LodestoneT
             poseStack.mulPose(Axis.YP.rotationDegrees(i * 90.0f));
             poseStack.translate(-0.5, -0.5, -0.5); 
 
-            float redstonePower = blockState.getValue(redstoneProperties[i]) / 15.0f;
+            float redstonePower = powers[i] / 15.0f;
 
             partialIndicatorModel.light(light)
                                  .color(Color.mixColors(0x2C0300, 0xCD0000, redstonePower))

@@ -25,7 +25,7 @@ import net.minecraft.world.level.Level;
 public class MagnetForceAttachment implements ShipForcesInducer {
     public volatile Level level;
     public MagnetForceAttachment() {}
-
+    
     @Override
     public void applyForces(@NotNull PhysShip physicShip) {
         PhysShipImpl ship = (PhysShipImpl) physicShip;
@@ -55,18 +55,18 @@ public class MagnetForceAttachment implements ShipForcesInducer {
     //Physics fun
 
     private double force_distance_factor(double distance) {
-        return 1 / (distance * distance * distance);
+        return 1 / (distance * distance * distance * distance);
         //return smoothDippedBetaDecay(distance, 3, 4.4, 2.6, 0.1, -0.2) / 4;
     }
 
     private double torque_distance_factor(double distance) {
-        return 1 / (distance * distance);
+        return 1 / (distance * distance * distance * distance);
         //return smoothDippedBetaDecay(distance, 2, 4.4, 2.6, 0.1, -0.2) / 4;
     } 
 
     private double smoothDippedBetaDecay(double distance, double exponent, double strength, double width, double center, double offset) {
         double q = distance + offset;
-        double base = 1 / java.lang.Math.pow(q, exponent);
+        double base = 1 / java.lang.Math.pow(q, exponent); //JOML has no pow !?
         double bump = strength * (1 - 1 / (1 + Math.exp(-width * (q - center)))); // Sigmoid
         return base * (1 - bump);
     }
@@ -95,7 +95,9 @@ public class MagnetForceAttachment implements ShipForcesInducer {
     private final Vector3d _torqueCross_mA_rBA = new Vector3d();
     private final Vector3d _torqueTerm2_scaled = new Vector3d();
 
+    private final Vector3d _worldLeverArmA = new Vector3d();
     private final Vector3d _leverArmA_shipSpace = new Vector3d();
+    private final Vector3d _normalToWorld = new Vector3d();
 
     //Variables
     private final double MIN_INTERACTION_DISTANCE_SQ = (0.5 * 1);
@@ -118,7 +120,7 @@ public class MagnetForceAttachment implements ShipForcesInducer {
         );
         // World-space position of magnet A
         transformA.getShipToWorld().transformPosition(_localPosA_absolute_shipspace, _worldPosA);
-        // World-space normalized direction of magnet A's moment
+        // World-space normalized direction of magnet A moment
         toWorldDirection(transformA, pair.localDir, _m_A_hat);
 
         LoadedShip shipB_loaded = null;
@@ -149,7 +151,7 @@ public class MagnetForceAttachment implements ShipForcesInducer {
             toWorldDirection(transformB, pair.otherDir, _m_B_hat);
         }
 
-        // --- Relative Position and Distance ---
+        //Distance coefficients
         _worldPosB.sub(_worldPosA, _r_AB_vec);
         double rLengthSquared = _r_AB_vec.lengthSquared();
 
@@ -163,23 +165,15 @@ public class MagnetForceAttachment implements ShipForcesInducer {
         _r_AB_vec.negate(_r_BA_vec);
         _r_BA_vec.normalize(effectiveR, _r_BA_hat);
 
-        double r3 = effectiveR * effectiveRSquared;
-        double r4 = effectiveRSquared * effectiveRSquared;
+        double forceCoeff = (3.0 * MAGNET_INTERACTION_CONSTANT) * force_distance_factor(effectiveR);
+        double torqueCoeff = MAGNET_INTERACTION_CONSTANT * torque_distance_factor(effectiveR);
 
-        if (Double.isInfinite(r3) || Double.isInfinite(r4) || Double.isNaN(r3) || Double.isNaN(r4) ||
-            Math.abs(r3) < 1e-10 || Math.abs(r4) < 1e-10) {
-            return;
-        }
-
-        double forceCoeff = (3.0 * MAGNET_INTERACTION_CONSTANT) / r4;
-        double torqueCoeff = MAGNET_INTERACTION_CONSTANT / r4;// r3;
-
-        // --- Dot Products ---
+        //Dots
         double dot_mA_rBA = _m_A_hat.dot(_r_BA_hat);
         double dot_mB_rBA = _m_B_hat.dot(_r_BA_hat);
         double dot_mA_mB = _m_A_hat.dot(_m_B_hat);
 
-        // --- Calculate Force on A due to B ---
+        //Calculater force
         _m_B_hat.mul(dot_mA_rBA, _forceTerm1);
         _m_A_hat.mul(dot_mB_rBA, _forceTerm2);
         double termF3_scalar = dot_mA_mB - 5.0 * dot_mA_rBA * dot_mB_rBA;
@@ -189,7 +183,7 @@ public class MagnetForceAttachment implements ShipForcesInducer {
         _forceOnA.add(_forceTerm3);
         _forceOnA.mul(forceCoeff);
 
-        // --- Calculate Torque on A due to B ---
+        //Calculate torque
         _m_A_hat.cross(_m_B_hat, _torqueCross_mA_mB);
         _m_A_hat.cross(_r_BA_hat, _torqueCross_mA_rBA);
 
@@ -203,9 +197,9 @@ public class MagnetForceAttachment implements ShipForcesInducer {
             return;
         }
 
-        // --- Apply Force and Torque ---
+        //Accumulate force and torque (dipole + force lever)
         _localPosA_absolute_shipspace.sub(ACOM, _leverArmA_shipSpace);
-        Vector3d _worldLeverArmA = new Vector3d();
+        
         transformA.getShipToWorld().transformDirection(_leverArmA_shipSpace, _worldLeverArmA);
         _worldLeverArmA.cross(_forceOnA, _tempTorqueFromForce);
 
@@ -217,7 +211,8 @@ public class MagnetForceAttachment implements ShipForcesInducer {
     //Utility
     
     private void toWorldDirection(ShipTransform transform, Vector3ic blockNormal, Vector3d destWorldDir) {
-        transform.getShipToWorld().transformDirection(new Vector3d(blockNormal), destWorldDir);
+        _normalToWorld.set(blockNormal);
+        transform.getShipToWorld().transformDirection(_normalToWorld, destWorldDir);
         if (destWorldDir.lengthSquared() < 1e-10) {
             destWorldDir.zero();
             return;
@@ -228,6 +223,12 @@ public class MagnetForceAttachment implements ShipForcesInducer {
     public static LoadedShip getShipById(Level level, long shipId) {
         return VSGameUtilsKt.getShipWorldNullable(level).getLoadedShips().getById(shipId);
     }
+
+    // As you can see the calculations are done only for magnet A. This sucks as magnet B would have to do 90% of the same calculations when calculating pair (B; A) 
+    // It is possible to reduce the amount of calculations by a factor of 2 by introducing centralized cache for the whole physics thread
+    // By caching result(A, B) after its calculation we can skip almost all math for (B, A) and just reuse inverted result(A, B), as F(A, B) = -F(B, A)
+    // This would require having a centralized cache and a way to subsribe to the start of physics tick, which I did not figure out yet
+    // Or, instead of physics tick start - check if all pairs were cached - and clean up after (tho this is less desirable)
 
     //CODE DUPLICATION!!!!!!!!!
 

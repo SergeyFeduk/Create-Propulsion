@@ -42,6 +42,16 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
     private static final float ANGLE_TOLERANCE = 360.0f / 32.0f / 2.0f; 
     private final LodestoneTrackerItemHandler itemHandler = new LodestoneTrackerItemHandler(this);
     private final LazyOptional<IItemHandler> itemHandlerCap = LazyOptional.of(() -> itemHandler);
+    //Replacing 16^4 blockstates with this
+    private int POWER_NORTH = 0;
+    private int POWER_EAST = 0;
+    private int POWER_SOUTH = 0;
+    private int POWER_WEST = 0;
+    public int powerNorth() { return POWER_NORTH; }
+    public int powerEast() { return POWER_EAST; }
+    public int powerSouth() { return POWER_SOUTH; }
+    public int powerWest() { return POWER_WEST; }
+
     //What am I doing with my life
     private ItemStack compass = ItemStack.EMPTY;
     private int currentTick = 0;
@@ -122,14 +132,25 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
         } else {
             calculateRedstoneOutput(angle);
         }
-        
+        int oldNorth = this.POWER_NORTH;
+        int oldEast = this.POWER_EAST;
+        int oldSouth = this.POWER_SOUTH;
+        int oldWest = this.POWER_WEST;
 
-        BlockState updatedState = getBlockState()
-            .setValue(LodestoneTrackerBlock.POWER_NORTH, redstoneOutputs.x)
-            .setValue(LodestoneTrackerBlock.POWER_EAST, redstoneOutputs.y)
-            .setValue(LodestoneTrackerBlock.POWER_SOUTH, redstoneOutputs.z)
-            .setValue(LodestoneTrackerBlock.POWER_WEST, redstoneOutputs.w);
-            level.setBlock(worldPosition, updatedState, Block.UPDATE_CLIENTS | Block.UPDATE_NEIGHBORS);
+        
+        this.POWER_NORTH = redstoneOutputs.x;
+        this.POWER_EAST = redstoneOutputs.y;
+        this.POWER_SOUTH = redstoneOutputs.z;
+        this.POWER_WEST = redstoneOutputs.w;
+
+        boolean changed = (oldNorth != this.POWER_NORTH || oldEast != this.POWER_EAST ||
+                       oldSouth != this.POWER_SOUTH || oldWest != this.POWER_WEST);
+
+        if (changed) {
+            setChanged();
+            level.updateNeighborsAt(worldPosition, getBlockState().getBlock());
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        }
     }
 
     private boolean isAngleWithinTolerance(float value, float target, float tolerance) {
@@ -297,6 +318,11 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
         super.write(tag, clientPacket);
         tag.put("CompassItem", compass.save(new CompoundTag()));
         tag.putInt("currentTick", currentTick);
+
+        tag.putInt("powerNorth", this.POWER_NORTH);
+        tag.putInt("powerEast", this.POWER_EAST);
+        tag.putInt("powerSouth", this.POWER_SOUTH);
+        tag.putInt("powerWest", this.POWER_WEST);
     }
 
     @Override
@@ -304,6 +330,11 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
         super.read(tag, clientPacket);
         compass = ItemStack.of(tag.getCompound("CompassItem"));
         currentTick = tag.getInt("currentTick");
+
+        this.POWER_NORTH = tag.getInt("powerNorth");
+        this.POWER_EAST = tag.getInt("powerEast");
+        this.POWER_SOUTH = tag.getInt("powerSouth");
+        this.POWER_WEST = tag.getInt("powerWest");
     }
 
     //Sync

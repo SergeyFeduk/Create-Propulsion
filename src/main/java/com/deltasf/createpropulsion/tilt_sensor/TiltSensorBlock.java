@@ -18,6 +18,6 @@ public class TiltSensorBlock extends Block implements EntityBlock {
 
     @Override
     public BlockEntity newBlockEntity(@Nonnull BlockPos pos, @Nonnull BlockState state) {
-        return new TiltSensorBlockEntity(PropulsionBlockEntities.LODESTONE_TRACKER_BLOCK_ENTITY.get(), pos, state);
+        return new TiltSensorBlockEntity(PropulsionBlockEntities.TILT_SENSOR_BLOCK_ENTITY.get(), pos, state);
     }
 }
