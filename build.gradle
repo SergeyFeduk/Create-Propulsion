@@ -4,6 +4,7 @@ plugins {
     id 'maven-publish'
     id 'net.minecraftforge.gradle' version '[6.0,6.2)'
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
+    id 'org.spongepowered.mixin' version '0.7+'
 }
 
 version = mod_version
@@ -19,6 +20,13 @@ println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty '
 minecraft {
     mappings channel: mapping_channel, version: mapping_version
     copyIdeResources = true
+
+    mixin {
+        // This is needed for MixinSquared as well.
+        add sourceSets.main, "${mod_id}.refmap.json"
+        config "${mod_id}.mixins.json"
+    }
+
     runs {
         configureEach {
             workingDirectory project.file('run')
@@ -52,7 +60,7 @@ minecraft {
     }
 }
 
-sourceSets.main.resources { srcDir 'src/generated/resources' }
+sourceSets.main.resources { srcDirs = ['src/main/resources', 'src/generated/resources'] }
 
 repositories {
 
@@ -86,6 +94,10 @@ repositories {
             includeModule("org.squiddev", "Cobalt")
         }
     }
+
+    //Mixin^2
+    maven { url = "https://maven.bawnorton.com/releases" }
+    maven { url = "https://maven.enjarai.dev/mirrors" }
 }
 
 dependencies {
@@ -107,6 +119,15 @@ dependencies {
     implementation("org.valkyrienskies.core:api-game:${vs_core_version}")
     implementation("org.valkyrienskies.core:util:${vs_core_version}")
     implementation(fg.deobf("org.valkyrienskies:valkyrienskies-120-forge:${vs2_version}"))
+    //Mixin^2
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+    compileOnly(annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-common:0.3.2-beta.4"))
+    implementation(jarJar("com.github.bawnorton.mixinsquared:mixinsquared-forge:0.3.2-beta.4")) {
+        jarJar.ranged(it, "[0.3.2-beta.4,)")
+    }
+    // Mixin Extras
+    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1"))
+    implementation("io.github.llamalad7:mixinextras-forge:0.4.1")
     //Forge
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 }
@@ -126,7 +147,7 @@ tasks.named('processResources', ProcessResources).configure {
     }
 }
 
-tasks.named('jar', Jar).configure {
+/*tasks.named('jar', Jar).configure {
     manifest {
         attributes([
                 'Specification-Title'     : mod_id,
@@ -140,7 +161,7 @@ tasks.named('jar', Jar).configure {
     }
 
     finalizedBy 'reobfJar'
-}
+}*/
 
 publishing {
     publications {
@@ -157,4 +178,39 @@ publishing {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+}
+
+/*tasks.named('jarJar', Jar) {
+    archiveClassifier.set('')
+}
+
+tasks.named('jar') {
+    enabled = false
+}
+*/
+
+tasks.named('jarJar', Jar).configure {
+    // 1. Remove the '-all' from the filename
+    archiveClassifier.set('')
+
+    // 2. Copy the manifest from the old 'jar' task so our JAR has the correct metadata
+    manifest {
+        attributes([
+                'Specification-Title'     : mod_id,
+                'Specification-Vendor'    : mod_authors,
+                'Specification-Version'   : '1',
+                'Implementation-Title'    : project.name,
+                'Implementation-Version'  : project.jar.archiveVersion,
+                'Implementation-Vendor'   : mod_authors,
+                'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+    
+    // 3. This is the most important fix: Tell reobfJar to run AFTER this task.
+    finalizedBy 'reobfJar'
+}
+
+// 4. Now we can safely disable the original 'jar' task, as it's no longer needed.
+tasks.named('jar') {
+    enabled = false
 }

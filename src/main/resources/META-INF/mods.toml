@@ -10,6 +10,9 @@ logoFile="icon.png"
 authors="Sergey Feduk"
 modClass="com.deltasf.createpropulsion.CreatePropulsion"
 
+[[mixins]]
+    config = "createpropulsion.mixins.json"
+
 description='''A mod that adds optical sensors and thruster to the Create mod. All stuff works with Valkyrien Skies 2!'''
 [[dependencies.${mod_id}]]
     modId="forge"
