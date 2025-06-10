@@ -15,10 +15,10 @@ import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 
 public class PhysicsAssemblerBlock extends DirectionalBlock implements EntityBlock {
-    public static final IntegerProperty POWER = IntegerProperty.create("redstone_power", 0, 15);
+    public static final BooleanProperty POWERED = BooleanProperty.create("redstone_power");
     public PhysicsAssemblerBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
@@ -40,7 +40,7 @@ public class PhysicsAssemblerBlock extends DirectionalBlock implements EntityBlo
 
     @Override
     protected void createBlockStateDefinition(@Nonnull StateDefinition.Builder<net.minecraft.world.level.block.Block, BlockState> builder) {
-        builder.add(FACING, POWER);
+        builder.add(FACING, POWERED);
     }
 
     @Override
@@ -57,13 +57,13 @@ public class PhysicsAssemblerBlock extends DirectionalBlock implements EntityBlo
 
     private void doRedstoneCheck(Level level, BlockState state, BlockPos pos){
         //Get redstone powers
-        int oldRedstonePower = state.getValue(POWER);
-        int newRedstonePower = level.getBestNeighborSignal(pos);
-        if (oldRedstonePower == newRedstonePower) return; 
+        boolean oldPowered = state.getValue(POWERED);
+        boolean newPowered = level.getBestNeighborSignal(pos) > 0;
+        if (oldPowered == newPowered) return; 
         //Update state
-        BlockState newState = state.setValue(POWER, newRedstonePower);
+        BlockState newState = state.setValue(POWERED, newPowered);
         level.setBlock(pos, newState, Block.UPDATE_ALL);
-        if (oldRedstonePower != 0 || newRedstonePower == 0) return; //We were turned off And new signal is not 0
+        if (!newPowered) return; //Falling edge
         
         //Invoke shipify
         BlockEntity blockEntity = level.getBlockEntity(pos);
