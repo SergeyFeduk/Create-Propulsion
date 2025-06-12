@@ -34,10 +34,10 @@ public class PropulsionBlockEntities {
         .renderer(() -> OpticalSensorRenderer::new)
         .register();
 
-    public static final BlockEntityEntry<PhysicsAssemblerBlockEntity> PHYSICAL_ASSEMBLER_BLOCK_ENTITY =
+    /*public static final BlockEntityEntry<PhysicsAssemblerBlockEntity> PHYSICAL_ASSEMBLER_BLOCK_ENTITY =
         REGISTRATE.blockEntity("physics_assembler_block_entity", PhysicsAssemblerBlockEntity::new)
         .validBlock(PropulsionBlocks.PHYSICS_ASSEMBLER_BLOCK)
-        .register();
+        .register();*/
     
     public static final BlockEntityEntry<LodestoneTrackerBlockEntity> LODESTONE_TRACKER_BLOCK_ENTITY = 
         REGISTRATE.blockEntity("lodestone_tracker_block_entity", LodestoneTrackerBlockEntity::new)
@@ -45,10 +45,10 @@ public class PropulsionBlockEntities {
         .renderer(() -> LodestoneTrackerRenderer::new)
         .register();
 
-    public static final BlockEntityEntry<TiltSensorBlockEntity> TILT_SENSOR_BLOCK_ENTITY =
+    /*public static final BlockEntityEntry<TiltSensorBlockEntity> TILT_SENSOR_BLOCK_ENTITY =
         REGISTRATE.blockEntity("tilt_sensor_block_entity", TiltSensorBlockEntity::new)
         .validBlock(PropulsionBlocks.TILT_SENSOR_BLOCK)
-        .register();
+        .register();*/
 
     public static final BlockEntityEntry<RedstoneMagnetBlockEntity> REDSTONE_MAGNET_BLOCK_ENTITY =
         REGISTRATE.blockEntity("redstone_magnet_block_entity", RedstoneMagnetBlockEntity::new)

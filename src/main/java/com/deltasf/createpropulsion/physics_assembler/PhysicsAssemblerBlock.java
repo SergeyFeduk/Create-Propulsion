@@ -45,7 +45,8 @@ public class PhysicsAssemblerBlock extends DirectionalBlock implements EntityBlo
 
     @Override
     public BlockEntity newBlockEntity(@Nonnull BlockPos pos, @Nonnull BlockState state) {
-        return new PhysicsAssemblerBlockEntity(PropulsionBlockEntities.PHYSICAL_ASSEMBLER_BLOCK_ENTITY.get(), pos, state);
+        //return new PhysicsAssemblerBlockEntity(PropulsionBlockEntities.PHYSICAL_ASSEMBLER_BLOCK_ENTITY.get(), pos, state);
+        return null;
     }
 
     //Handle redstone signal
