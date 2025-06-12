@@ -70,6 +70,7 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
     //Ticking
     private int currentTick = 0;
     private int clientTick = 0;
+    private float particleSpawnAccumulator = 0.0f;
     private boolean isThrustDirty = false;
     //Particles
     private ParticleType<PlumeParticleData> particleType;
@@ -188,21 +189,31 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
         return (int)Math.ceil(base_consumption * powerPercentage * fluidPropertiesConsumptionMultiplier * tick_rate);
     }
 
-    public void emitParticles(Level level, BlockPos pos, BlockState state){
-        
+    public void emitParticles(Level level, BlockPos pos, BlockState state) {
         if (emptyBlocks == 0) return;
         int power = getOverriddenPowerOrState(state);
         if (power == 0) return;
         if (!validFluid()) return;
-        //Limit minumum velocity and particle count when power is lower than that
+    
+        double particleCountMultiplier = org.joml.Math.clamp(0.0, 2.0, PropulsionConfig.THRUSTER_PARTICLE_COUNT_MULTIPLIER.get());
+        if (particleCountMultiplier <= 0) return;
+    
         clientTick++;
-        if (power < LOWEST_POWER_THRSHOLD && clientTick % 2 == 0) {clientTick = 0; return; }
-
+        if (power < LOWEST_POWER_THRSHOLD && clientTick % 2 == 0) {
+            clientTick = 0;
+            return;
+        }
+    
+        this.particleSpawnAccumulator += particleCountMultiplier;
+    
+        int particlesToSpawn = (int) this.particleSpawnAccumulator;
+        if (particlesToSpawn == 0) return;
+    
+        this.particleSpawnAccumulator -= particlesToSpawn;
         float powerPercentage = Math.max(power, LOWEST_POWER_THRSHOLD) / 15.0f;
-
         Direction direction = state.getValue(ThrusterBlock.FACING);
         Direction oppositeDirection = direction.getOpposite();
-
+    
         double currentNozzleOffset = NOZZLE_OFFSET_FROM_CENTER;
         Vector3d additionalVel = new Vector3d();
         ClientShip ship = VSGameUtilsKt.getShipObjectManagingPos((ClientLevel) level, pos);
@@ -210,19 +221,19 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
             Vector3dc shipWorldVelocityJOML = ship.getVelocity();
             Matrix4dc transform = ship.getRenderTransform().getShipToWorld();
             Matrix4dc invTransform = ship.getRenderTransform().getWorldToShip();
-
+    
             Vector3d shipVelocity = invTransform
                 // Rotate velocity with ship transform
                 .transformDirection(new Vector3d(shipWorldVelocityJOML));
-
+    
             /*String identifier = "thruster_" + this.hashCode() + "_len";
-            DebugRenderer.drawElongatedBox(identifier, pos.getCenter(), pos.getCenter().add(VectorConversionsMCKt.toMinecraft(samafj)), 
+            DebugRenderer.drawElongatedBox(identifier, pos.getCenter(), pos.getCenter().add(VectorConversionsMCKt.toMinecraft(samafj)),
                 0.25f, Color.BLUE, false, 2);*/
-
+    
             Vector3d particleEjectionUnitVecJOML = transform
                 // Rotate velocity with ship transform
                 .transformDirection(VectorConversionsMCKt.toJOMLD(oppositeDirection.getNormal()));
-
+    
             double shipVelComponentAlongRotatedEjection = shipWorldVelocityJOML.dot(particleEjectionUnitVecJOML);
             if (shipVelComponentAlongRotatedEjection > 0.0) {
                 Vector3d normalizedVelocity = new Vector3d();
@@ -235,20 +246,20 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
                 additionalVel = new Vector3d(shipVelocity).mul(SHIP_VELOCITY_INHERITANCE * effect);
             }
         }
-
+    
         double particleX = pos.getX() + 0.5 + oppositeDirection.getStepX() * currentNozzleOffset;
         double particleY = pos.getY() + 0.5 + oppositeDirection.getStepY() * currentNozzleOffset;
         double particleZ = pos.getZ() + 0.5 + oppositeDirection.getStepZ() * currentNozzleOffset;
-
+    
         Vector3d particleVelocity = new Vector3d(oppositeDirection.getStepX(), oppositeDirection.getStepY(), oppositeDirection.getStepZ())
             .mul(PARTICLE_VELOCITY * powerPercentage).add(additionalVel);
-        
-        level.addParticle(new PlumeParticleData(particleType), true, 
-            particleX, particleY, particleZ, 
-            particleVelocity.x, particleVelocity.y, particleVelocity.z);
-        /*level.addParticle(new PlumeParticleData(particleType), true, 
-            particleX, particleY, particleZ, 
-            particleVelocity.x, particleVelocity.y, particleVelocity.z);*/
+    
+        // Spawn the calculated number of particles.
+        for (int i = 0; i < particlesToSpawn; i++) {
+            level.addParticle(new PlumeParticleData(particleType), true,
+                particleX, particleY, particleZ,
+                particleVelocity.x, particleVelocity.y, particleVelocity.z);
+        }
     }
 
     private float calculateObstructionEffect(){

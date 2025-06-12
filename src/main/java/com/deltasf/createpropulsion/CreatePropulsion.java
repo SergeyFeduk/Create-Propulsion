@@ -32,11 +32,13 @@ public class CreatePropulsion {
         PropulsionItems.register();
         PropulsionFluids.register();
         PropulsionPartialModels.register();
+        PropulsionCreativeTab.register(modBus);
         //Compat
         Mods.COMPUTERCRAFT.executeIfInstalled(() -> CCProxy::register);
-        
-        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, PropulsionConfig.SPEC, ID + "-server.toml");
-        PropulsionCreativeTab.register(modBus);
+        //Config
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, PropulsionConfig.SERVER_SPEC, ID + "-server.toml");
+        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, PropulsionConfig.CLIENT_SPEC, ID + "-client.toml");
+        //Registrate
         REGISTRATE.registerEventListeners(modBus);
     }
 }

@@ -17,6 +17,8 @@ import org.valkyrienskies.core.api.ships.properties.ShipTransform;
 import org.valkyrienskies.core.impl.game.ships.PhysShipImpl;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
+import com.deltasf.createpropulsion.PropulsionConfig;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -118,7 +120,7 @@ public class MagnetForceAttachment implements ShipForcesInducer {
         double powerB = pair.otherPower;
         if (powerA <= 0 || powerB <= 0) return; //Interaction power product is zero
         double normalizedPowerProduct = (powerA / 15.0) * (powerB / 15.0);
-        double effectiveInteractionConstant = MAGNET_INTERACTION_CONSTANT * normalizedPowerProduct;
+        double effectiveInteractionConstant = MAGNET_INTERACTION_CONSTANT * normalizedPowerProduct * PropulsionConfig.REDSTONE_MAGNET_POWER_MULTIPLIER.get();
         
         _localPosA_absolute_shipspace.set(
             pair.localPos.getX() + POINT_FIVE,
