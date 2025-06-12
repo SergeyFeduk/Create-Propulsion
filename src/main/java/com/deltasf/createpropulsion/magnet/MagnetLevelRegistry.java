@@ -41,8 +41,8 @@ public class MagnetLevelRegistry {
         return magnets.get(id);
     }
 
-    public MagnetData getOrCreateMagnet(UUID id, BlockPos pos, long shipId, Vector3i dir) {
-        return magnets.computeIfAbsent(id, k -> new MagnetData(id, pos, shipId, dir));
+    public MagnetData getOrCreateMagnet(UUID id, BlockPos pos, long shipId, Vector3i dir, int power) {
+        return magnets.computeIfAbsent(id, k -> new MagnetData(id, pos, shipId, dir, power));
     }
 
     public void scheduleRemoval(UUID id) {
@@ -145,11 +145,13 @@ public class MagnetLevelRegistry {
             MagnetData A = active.get(edge[0]);
             MagnetData B = active.get(edge[1]);
             if (A.shipId != -1) {
-                MagnetPair pair = new MagnetPair(A.getBlockPos(), A.getBlockDipoleDir(), B.shipId, B.getBlockPos(), B.getBlockDipoleDir());
+                MagnetPair pair = new MagnetPair(A.getBlockPos(), A.getBlockDipoleDir(), A.getPower(),
+                                                 B.shipId, B.getBlockPos(), B.getBlockDipoleDir(), B.getPower());
                 newShipToPairs.computeIfAbsent(A.shipId, k -> new CopyOnWriteArrayList<>()).add(pair);
             }
             if (B.shipId != -1) {
-                MagnetPair pair = new MagnetPair(B.getBlockPos(), B.getBlockDipoleDir(), A.shipId, A.getBlockPos(), A.getBlockDipoleDir());
+                MagnetPair pair = new MagnetPair(B.getBlockPos(), B.getBlockDipoleDir(), B.getPower(), 
+                                                 A.shipId, A.getBlockPos(), A.getBlockDipoleDir(), A.getPower());
                 newShipToPairs.computeIfAbsent(B.shipId, k -> new CopyOnWriteArrayList<>()).add(pair);
             }
         }
@@ -178,7 +180,7 @@ public class MagnetLevelRegistry {
         int cx = Mth.floor(position.x) >> 4;
         int cz = Mth.floor(position.z) >> 4;
 
-        List<UUID> neighbours = new ArrayList<>();
+        List<UUID> neighbours = new ArrayList<>(64);
         for(int dx = -2; dx <= 2; dx++) {
             for(int dz = -2; dz <= 2; dz++) {
                 long key = packChunkPos(cx + dx, cz + dz);

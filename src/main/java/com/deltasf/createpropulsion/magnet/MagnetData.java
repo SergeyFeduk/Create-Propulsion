@@ -11,11 +11,12 @@ import net.minecraft.world.level.Level;
 import java.util.UUID;
 
 public class MagnetData {
-    public MagnetData(UUID id, BlockPos pos, long shipId, Vector3i blockDipoleDir) {
+    public MagnetData(UUID id, BlockPos pos, long shipId, Vector3i blockDipoleDir, int power) {
         this.id = id;
         this.pos = pos;
         this.shipId = shipId;
         this.blockDipoleDir = blockDipoleDir;
+        this.power = power;
     }
     public final UUID id;
     private boolean pendingRemoval = false;
@@ -24,15 +25,18 @@ public class MagnetData {
     public long shipId = -1;
     private Vector3d worldPosition;
     private final Vector3i blockDipoleDir; 
+    private int power;
 
     public BlockPos getBlockPos() { return pos; }
     public Vector3d getPosition() { return worldPosition; }
     public Vector3i getBlockDipoleDir() { return blockDipoleDir; }
+    public int getPower() { return power; } 
 
-    public void update(BlockPos newPos, long newShipId, Vector3i newBlockDipoleDir) {
+    public void update(BlockPos newPos, long newShipId, Vector3i newBlockDipoleDir, int newPower) {
         this.pos = newPos;
         this.shipId = newShipId;
         this.blockDipoleDir.set(newBlockDipoleDir);
+        this.power = newPower;
     }
 
     public void updateWorldPosition(Level level) {

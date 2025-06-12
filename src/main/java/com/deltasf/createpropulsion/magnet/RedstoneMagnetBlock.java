@@ -60,20 +60,10 @@ public class RedstoneMagnetBlock extends DirectionalBlock implements EntityBlock
     @Override
     public void onPlace(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull BlockState oldState, boolean isMoving) {
         super.onPlace(state, level, pos, oldState, isMoving);
-
         if (level.isClientSide) return;
+        if (state.is(oldState.getBlock())) return;
 
-        BlockEntity be = level.getBlockEntity(pos);
-        if (be instanceof RedstoneMagnetBlockEntity rbe) {
-            rbe.scheduleUpdate();
-        }
-    
-
-        if (!state.is(oldState.getBlock())) {
-            if (level.getBestNeighborSignal(pos) > 0) {
-                level.setBlock(pos, state.setValue(POWERED, true), 2);
-            }
-        }    
+        updatePower(state, level, pos);
     }
 
     @Override
@@ -91,8 +81,17 @@ public class RedstoneMagnetBlock extends DirectionalBlock implements EntityBlock
     @Override
     public void neighborChanged(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull net.minecraft.world.level.block.Block block, @Nonnull BlockPos fromPos, boolean isMoving) {
         if (level.isClientSide) return;
+        updatePower(state, level, pos);
+    }
 
-        boolean shouldBePowered = level.getBestNeighborSignal(pos) > 0;
+    private void updatePower(BlockState state, Level level, BlockPos pos) {
+        int signalStrength = level.getBestNeighborSignal(pos);
+        boolean shouldBePowered = signalStrength > 0;
+        BlockEntity be = level.getBlockEntity(pos);
+        if (be instanceof RedstoneMagnetBlockEntity rbe) {
+            rbe.setPower(signalStrength);
+        }
+
         if (state.getValue(POWERED) != shouldBePowered) {
             level.setBlock(pos, state.setValue(POWERED, shouldBePowered), 2);
         }

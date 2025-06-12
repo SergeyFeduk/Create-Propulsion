@@ -43,6 +43,10 @@ public class PropulsionConfig {
                 .defineInRange("Optical sensor max raycast distance", 32, 8, 64);
         BUILDER.pop();
 
+        BUILDER.push("Magnet");
+            
+        BUILDER.pop();
+
         SPEC = BUILDER.build();
     }
 }

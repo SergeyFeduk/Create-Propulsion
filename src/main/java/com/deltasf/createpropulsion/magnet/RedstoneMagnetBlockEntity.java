@@ -22,10 +22,18 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
     }
 
     private UUID magnetId;
-    private boolean needsUpdate = true; 
+    private boolean needsUpdate = true;
+    private int power = 0;
 
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {}
+
+    public void setPower(int power) {
+        if (this.power == power) return;
+        this.power = power;
+        this.scheduleUpdate();
+        setChanged();
+    }
 
     @SuppressWarnings("null")
     public void updateMagnetState() {
@@ -38,9 +46,9 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
         }
 
         BlockState currentState = level.getBlockState(worldPosition);
-        boolean shouldBeActive = currentState.getValue(RedstoneMagnetBlock.POWERED);
+        //boolean shouldBeActive = currentState.getValue(RedstoneMagnetBlock.POWERED);
 
-        if (shouldBeActive) {
+        if (this.power > 0) {
             long currentShipId = -1;
             Ship ship = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
             if (ship != null) {
@@ -49,9 +57,9 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
             }
 
             Vector3i currentDipoleDir = VectorConversionsMCKt.toJOML(currentState.getValue(RedstoneMagnetBlock.FACING).getNormal());
-            MagnetData magnetData = MagnetRegistry.get().forLevel(level).getOrCreateMagnet(this.magnetId, worldPosition, currentShipId, currentDipoleDir);
+            MagnetData magnetData = MagnetRegistry.get().forLevel(level).getOrCreateMagnet(this.magnetId, worldPosition, currentShipId, currentDipoleDir, this.power);
             magnetData.cancelRemoval();
-            magnetData.update(worldPosition, currentShipId, currentDipoleDir);
+            magnetData.update(worldPosition, currentShipId, currentDipoleDir, this.power);
             MagnetRegistry.get().forLevel(level).updateMagnetPosition(magnetData);
 
         } else {
@@ -98,6 +106,7 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
         if (tag.hasUUID("MagnetId")) {
             this.magnetId = tag.getUUID("MagnetId");
         }
+        this.power = tag.getInt("Power");
     }
 
     @Override
@@ -107,5 +116,6 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
             this.magnetId = UUID.randomUUID();
         }
         tag.putUUID("MagnetId", this.magnetId);
+        tag.putInt("Power", this.power);
     }
 }

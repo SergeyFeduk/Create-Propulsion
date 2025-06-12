@@ -113,7 +113,14 @@ public class MagnetForceAttachment implements ShipForcesInducer {
         private void calculateInteraction(MagnetPair pair, PhysShipImpl shipA, Vector3dc ACOM, ShipTransform transformA, 
         Vector3d totalForceAcc,
         Vector3d totalTorqueAcc) {
-            _localPosA_absolute_shipspace.set(
+        //Calculate interaction power
+        double powerA = pair.localPower;
+        double powerB = pair.otherPower;
+        if (powerA <= 0 || powerB <= 0) return; //Interaction power product is zero
+        double normalizedPowerProduct = (powerA / 15.0) * (powerB / 15.0);
+        double effectiveInteractionConstant = MAGNET_INTERACTION_CONSTANT * normalizedPowerProduct;
+        
+        _localPosA_absolute_shipspace.set(
             pair.localPos.getX() + POINT_FIVE,
             pair.localPos.getY() + POINT_FIVE,
             pair.localPos.getZ() + POINT_FIVE
@@ -165,8 +172,8 @@ public class MagnetForceAttachment implements ShipForcesInducer {
         _r_AB_vec.negate(_r_BA_vec);
         _r_BA_vec.normalize(effectiveR, _r_BA_hat);
 
-        double forceCoeff = (3.0 * MAGNET_INTERACTION_CONSTANT) * force_distance_factor(effectiveR);
-        double torqueCoeff = MAGNET_INTERACTION_CONSTANT * torque_distance_factor(effectiveR);
+        double forceCoeff = 3.0 * effectiveInteractionConstant * force_distance_factor(effectiveR);
+        double torqueCoeff = effectiveInteractionConstant * torque_distance_factor(effectiveR);
 
         //Dots
         double dot_mA_rBA = _m_A_hat.dot(_r_BA_hat);
