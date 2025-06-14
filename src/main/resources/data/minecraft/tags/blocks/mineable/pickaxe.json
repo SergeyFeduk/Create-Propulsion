@@ -4,6 +4,7 @@
         "createpropulsion:thruster",
         "createpropulsion:inline_optical_sensor",
         "createpropulsion:optical_sensor",
-        "createpropulsion:lodestone_tracker"
+        "createpropulsion:lodestone_tracker",
+        "createpropulsion:redstone_magnet"
     ]
 }

@@ -22,6 +22,7 @@ public class PropulsionConfig {
     public static final ForgeConfigSpec.ConfigValue<Integer> OPTICAL_SENSOR_MAX_DISTANCE;
     //Magnet
     public static final ForgeConfigSpec.ConfigValue<Double> REDSTONE_MAGNET_POWER_MULTIPLIER;
+    public static final ForgeConfigSpec.ConfigValue<Double> REDSTONE_MAGNET_FORCE_INDUCED_TORQUE_MULTIPLIER;
 
     static {
         //#region Server
@@ -48,10 +49,12 @@ public class PropulsionConfig {
         SERVER_BUILDER.pop();
 
         SERVER_BUILDER.push("Redstone magnet");
-
-        SERVER_BUILDER.pop();
             REDSTONE_MAGNET_POWER_MULTIPLIER = SERVER_BUILDER.comment("Magnet power is multiplied by that.")
                 .define("Power multiplier", 1.0);
+            REDSTONE_MAGNET_FORCE_INDUCED_TORQUE_MULTIPLIER = SERVER_BUILDER.comment("Torque induced by offset of the force-applying magnet from COM. Value of 1.0 is realistic but does not allow for statically stable contraptions. Modify this value only if you know what you are doing!")
+                .define("Force-induced torque multiplier", 1.0);
+        SERVER_BUILDER.pop();
+
         SERVER_SPEC = SERVER_BUILDER.build();
         //#endregion
     

@@ -18,5 +18,10 @@
         "block": "createpropulsion:lodestone_tracker",
         "mass": 900.0,
         "friction": 0.6
+    },
+    {
+        "block": "createpropulsion:redstone_magnet",
+        "mass": 1000.0,
+        "friction": 0.4
     }
 ]

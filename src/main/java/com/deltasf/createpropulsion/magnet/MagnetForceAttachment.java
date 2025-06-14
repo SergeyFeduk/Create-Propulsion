@@ -214,7 +214,7 @@ public class MagnetForceAttachment implements ShipForcesInducer {
 
         totalForceAcc.add(_forceOnA);
         totalTorqueAcc.add(_torqueOnA_dipole);
-        totalTorqueAcc.add(_tempTorqueFromForce);
+        totalTorqueAcc.add(_tempTorqueFromForce.mul(PropulsionConfig.REDSTONE_MAGNET_FORCE_INDUCED_TORQUE_MULTIPLIER.get()));
     }
 
     //Utility
