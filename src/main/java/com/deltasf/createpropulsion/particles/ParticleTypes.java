@@ -9,6 +9,7 @@ import com.simibubi.create.foundation.utility.Lang;
 
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
@@ -26,6 +27,7 @@ public enum ParticleTypes {
     //Plume is a special case as we handle shimmer compat
     PLUME_DEFAULT(PlumeParticleData::new),
     PLUME_SHIMMER(PlumeParticleData::new);
+
     private static volatile ParticleType<?> cachedPlumeType = null;
     private static final Object cacheLock = new Object();
 

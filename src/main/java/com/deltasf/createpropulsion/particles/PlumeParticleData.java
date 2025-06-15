@@ -69,8 +69,6 @@ public class PlumeParticleData implements ParticleOptions, ICustomParticleDataWi
     @Override
 	@OnlyIn(Dist.CLIENT)
 	public SpriteParticleRegistration<PlumeParticleData> getMetaFactory() {
-        return plumeSpriteSet -> {
-            return new PlumeParticle.Factory(plumeSpriteSet, plumeSpriteSet);
-        };
+        return PlumeParticle.Factory::new;
 	}
 }

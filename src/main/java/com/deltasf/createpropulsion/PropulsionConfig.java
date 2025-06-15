@@ -61,7 +61,7 @@ public class PropulsionConfig {
         //#region Client
         CLIENT_BUILDER.push("Thruster");
             THRUSTER_PARTICLE_OFFSET_INCOMING_VEL_MODIFIER = CLIENT_BUILDER.comment("Particle additional velocity modifier when ship is moving in the same direction as exhaust.")
-                    .define("Particle velocity offset", 0.1);
+                    .define("Particle velocity offset", 0.15);
             THRUSTER_PARTICLE_COUNT_MULTIPLIER = CLIENT_BUILDER.comment("The higher this number is - the more particles are spawned.")
                     .define("Particle count multiplier", 1.0);
                     CLIENT_BUILDER.pop();
