@@ -1,4 +1,4 @@
-package com.deltasf.createpropulsion;
+package com.deltasf.createpropulsion.compat;
 
 import net.minecraftforge.fml.ModList;
 

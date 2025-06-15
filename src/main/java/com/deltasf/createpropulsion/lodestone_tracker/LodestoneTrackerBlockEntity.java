@@ -12,7 +12,7 @@ import org.joml.Vector4i;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
-import com.deltasf.createpropulsion.PropulsionCompatibility;
+import com.deltasf.createpropulsion.compat.PropulsionCompatibility;
 import com.deltasf.createpropulsion.compat.computercraft.ComputerBehaviour;
 import com.deltasf.createpropulsion.utility.MathUtility;
 import com.simibubi.create.compat.computercraft.AbstractComputerBehaviour;

@@ -45,7 +45,7 @@ import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 import net.minecraft.network.chat.Component;
 
 import com.deltasf.createpropulsion.PropulsionConfig;
-import com.deltasf.createpropulsion.PropulsionCompatibility;
+import com.deltasf.createpropulsion.compat.PropulsionCompatibility;
 import com.deltasf.createpropulsion.compat.computercraft.ComputerBehaviour;
 import com.deltasf.createpropulsion.debug.DebugRenderer;
 import com.simibubi.create.foundation.collision.Matrix3d;

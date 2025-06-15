@@ -3,7 +3,7 @@ package com.deltasf.createpropulsion.particles;
 import java.util.function.Supplier;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
-import com.deltasf.createpropulsion.PropulsionCompatibility;
+import com.deltasf.createpropulsion.compat.PropulsionCompatibility;
 import com.simibubi.create.foundation.particle.ICustomParticleData;
 import com.simibubi.create.foundation.utility.Lang;
 

@@ -66,12 +66,12 @@ public class MagnetForceAttachment implements ShipForcesInducer {
         //return smoothDippedBetaDecay(distance, 2, 4.4, 2.6, 0.1, -0.2) / 4;
     } 
 
-    private double smoothDippedBetaDecay(double distance, double exponent, double strength, double width, double center, double offset) {
+    /*private double smoothDippedBetaDecay(double distance, double exponent, double strength, double width, double center, double offset) {
         double q = distance + offset;
         double base = 1 / java.lang.Math.pow(q, exponent); //JOML has no pow !?
         double bump = strength * (1 - 1 / (1 + Math.exp(-width * (q - center)))); // Sigmoid
         return base * (1 - bump);
-    }
+    }*/
 
     //Physics not fun
 

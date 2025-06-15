@@ -195,6 +195,7 @@ public class PlumeParticle extends SimpleAnimatedParticle {
         setSpriteFromAge(this.sprites);
         float percent = (float)this.age / (float)this.lifetime;
         this.quadSize = this.baseSize + (float)Math.pow(percent, 0.8f) * 2.0f;
+        //setAlpha(1);
         setAlpha(1 - percent);
     }
 
