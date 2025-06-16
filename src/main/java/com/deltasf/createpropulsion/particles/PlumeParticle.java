@@ -35,7 +35,7 @@ public class PlumeParticle extends SimpleAnimatedParticle {
 
     //State
     private final SpriteSet spriteSet;
-    private static final int PLUME_SPRITE_COUNT = 5;
+    private static final int PLUME_SPRITE_COUNT = 6;
     private static final int SMOKE_SPRITE_COUNT = 7; //Yes, should be 10 but this looks better imo
     private static final int BASE_SMOKE_TRANSITION_AGE = 20;
 
