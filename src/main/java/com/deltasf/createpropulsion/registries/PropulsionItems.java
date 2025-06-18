@@ -3,6 +3,7 @@ package com.deltasf.createpropulsion.registries;
 import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.optical_sensors.OpticalLensItem;
 import com.deltasf.createpropulsion.utility.BurnableItem;
+//import com.deltasf.createpropulsion.design_goggles.DesignGogglesItem;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.ItemEntry;
 
@@ -22,6 +23,8 @@ public class PropulsionItems {
     public static final ItemEntry<Item> FOCUS_LENS = REGISTRATE.item("focus_lens", Item::new).register();
     public static final ItemEntry<Item> INVISIBILITY_LENS = REGISTRATE.item("invisibility_lens", Item::new).register();
     public static final ItemEntry<Item> UNFINISHED_LENS = REGISTRATE.item("unfinished_lens", Item::new).register();
+
+    //public static final ItemEntry<DesignGogglesItem> DESIGN_GOGGLES = REGISTRATE.item("design_goggles", DesignGogglesItem::new).register();
 
     public static final TagKey<Item> OPTICAL_LENS_TAG = makeTag("optical_lens");
 

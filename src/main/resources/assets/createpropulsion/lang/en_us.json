@@ -36,7 +36,7 @@
     "createpropulsion.thruster.tooltip.behaviour1": "Pushes vehicles. Thrust depends on _redstone signal_ strength.",
 
     "createpropulsion.lodestone_tracker.tooltip.summary": "Maps _compass_ direction to redstone signal.",
-    "createpropulsion.lodestone_tracker.tooltip.condition1": "When a _compass_ is inserted",
+    "createpropulsion.lodestone_tracker.tooltip.condition1": "When a compass is inserted",
     "createpropulsion.lodestone_tracker.tooltip.behaviour1": "Emits _redstone signal_ in the direction opposite to where the _compass_ points.",
 
     "createpropulsion.redstone_magnet.tooltip.summary": "_Attracts or repels_ other magnets based on polarity.",

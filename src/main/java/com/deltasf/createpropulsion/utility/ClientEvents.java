@@ -1,17 +1,20 @@
 package com.deltasf.createpropulsion.utility;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
+//import com.deltasf.createpropulsion.design_goggles.DesignGogglesOverlayRenderer;
 import com.deltasf.createpropulsion.registries.PropulsionItems;
 
 import net.minecraft.world.item.DyeableLeatherItem;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterColorHandlersEvent;
+import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
+import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = CreatePropulsion.ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ClientEvents {
-    
+
     @SubscribeEvent
     public static void registerItemColors(RegisterColorHandlersEvent.Item event) {
         event.register((stack, tintIndex) -> {
@@ -34,7 +37,6 @@ public class ClientEvents {
                 g = Math.max(0, Math.min(255, g));
                 b = Math.max(0, Math.min(255, b));
 
-
                 int newColor = (r << 16) | (g << 8) | b;
                 return newColor;
             } else {
@@ -43,4 +45,9 @@ public class ClientEvents {
 
         }, PropulsionItems.OPTICAL_LENS.get());
     }
+
+    /*@SubscribeEvent
+    public static void registerGuiOverlays(RegisterGuiOverlaysEvent event) {
+        event.registerAbove(VanillaGuiOverlay.HOTBAR.id(), "goggle_info", DesignGogglesOverlayRenderer.OVERLAY);
+    }*/
 }

@@ -277,7 +277,7 @@ public class PlumeParticle extends SimpleAnimatedParticle {
 
     @Nonnull
     public ParticleRenderType getRenderType(){
-        return ParticleRenderType.PARTICLE_SHEET_OPAQUE;
+        return ParticleRenderType.PARTICLE_SHEET_LIT;
     }
 
     //Factory
