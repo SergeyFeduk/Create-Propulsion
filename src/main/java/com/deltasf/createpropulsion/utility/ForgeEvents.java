@@ -28,7 +28,7 @@ public class ForgeEvents {
     
     @SubscribeEvent
     public static void onAddReloadListeners(AddReloadListenerEvent event) {
-        event.addListener(new ThrusterFuelManager());
+        event.addListener(ThrusterFuelManager.INSTANCE);
     }
 
     @SubscribeEvent

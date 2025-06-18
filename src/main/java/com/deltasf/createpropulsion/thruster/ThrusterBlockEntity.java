@@ -93,7 +93,7 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
     }
 
     public FluidThrusterProperties getFuelProperties(Fluid fluid) {
-        var properties = ThrusterFuelManager.getInstance().getProperties(fluid);
+        var properties = ThrusterFuelManager.INSTANCE.getProperties(fluid);
         if (properties != null) return properties;
         return null;
     }

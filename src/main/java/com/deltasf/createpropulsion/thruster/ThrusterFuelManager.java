@@ -32,19 +32,10 @@ public class ThrusterFuelManager extends SimpleJsonResourceReloadListener {
     private Map<Fluid, FluidThrusterProperties> fuelPropertiesMap = new HashMap<>();
     public static final TagKey<Fluid> FORGE_FUEL_TAG = TagKey.create(ForgeRegistries.FLUIDS.getRegistryKey(), new ResourceLocation("forge", "fuel"));
 
-    private static ThrusterFuelManager instance;
+    public static final ThrusterFuelManager INSTANCE = new ThrusterFuelManager();
 
-    public ThrusterFuelManager() {
+    private ThrusterFuelManager() {
         super(GSON, DIRECTORY);
-        instance = this;
-    }
-
-    public static ThrusterFuelManager getInstance() {
-        if (instance == null) {
-            System.out.println("ThrusterFuelManager instance is not initialized. Calling it too early?");
-            new ThrusterFuelManager(); //Create instance cus client-side also needs it
-        }
-        return instance;
     }
 
     @Nullable
