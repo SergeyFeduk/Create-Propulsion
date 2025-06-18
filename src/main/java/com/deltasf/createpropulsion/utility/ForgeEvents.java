@@ -10,14 +10,18 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.magnet.MagnetForceAttachment;
 import com.deltasf.createpropulsion.magnet.MagnetRegistry;
+import com.deltasf.createpropulsion.network.PropulsionPackets;
+import com.deltasf.createpropulsion.network.SyncThrusterFuelsPacket;
 import com.deltasf.createpropulsion.registries.PropulsionCommands;
 import com.deltasf.createpropulsion.thruster.ThrusterFuelManager;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -28,7 +32,14 @@ public class ForgeEvents {
     
     @SubscribeEvent
     public static void onAddReloadListeners(AddReloadListenerEvent event) {
-        event.addListener(ThrusterFuelManager.INSTANCE);
+        event.addListener(new ThrusterFuelManager());
+    }
+
+    @SubscribeEvent
+    public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
+        if(event.getEntity() instanceof ServerPlayer player)  {
+            PropulsionPackets.sendToPlayer(SyncThrusterFuelsPacket.create(ThrusterFuelManager.getFuelPropertiesMap()), player);
+        }
     }
 
     @SubscribeEvent

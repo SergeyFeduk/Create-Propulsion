@@ -1,7 +1,7 @@
 package com.deltasf.createpropulsion;
 
 import com.deltasf.createpropulsion.compat.computercraft.CCProxy;
-//import com.deltasf.createpropulsion.network.PacketHandler;
+import com.deltasf.createpropulsion.network.PropulsionPackets;
 import com.deltasf.createpropulsion.particles.ParticleTypes;
 import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
 import com.deltasf.createpropulsion.registries.PropulsionBlocks;
@@ -34,7 +34,7 @@ public class CreatePropulsion {
         PropulsionFluids.register();
         PropulsionPartialModels.register();
         PropulsionCreativeTab.register(modBus);
-        //PacketHandler.register();
+        PropulsionPackets.register();
         //Compat
         Mods.COMPUTERCRAFT.executeIfInstalled(() -> CCProxy::register);
         //Config

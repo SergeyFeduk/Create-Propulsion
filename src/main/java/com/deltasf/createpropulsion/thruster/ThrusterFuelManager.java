@@ -8,6 +8,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
+import com.deltasf.createpropulsion.network.PropulsionPackets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -15,6 +16,7 @@ import com.mojang.logging.LogUtils;
 import com.mojang.serialization.JsonOps;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.tags.TagKey;
@@ -23,24 +25,27 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.server.ServerLifecycleHooks;
+
+import com.deltasf.createpropulsion.network.SyncThrusterFuelsPacket;
 
 public class ThrusterFuelManager extends SimpleJsonResourceReloadListener {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     public static final String DIRECTORY = "thruster_fuels";
 
-    private Map<Fluid, FluidThrusterProperties> fuelPropertiesMap = new HashMap<>();
+    private static Map<Fluid, FluidThrusterProperties> fuelPropertiesMap = new HashMap<>();
     public static final TagKey<Fluid> FORGE_FUEL_TAG = TagKey.create(ForgeRegistries.FLUIDS.getRegistryKey(), new ResourceLocation("forge", "fuel"));
 
-    public static final ThrusterFuelManager INSTANCE = new ThrusterFuelManager();
+    public static Map<Fluid, FluidThrusterProperties> getFuelPropertiesMap() { return fuelPropertiesMap; }
 
-    private ThrusterFuelManager() {
+    public ThrusterFuelManager() {
         super(GSON, DIRECTORY);
     }
 
     @Nullable
     @SuppressWarnings("deprecation")
-    public FluidThrusterProperties getProperties(Fluid fluid) {
+    public static FluidThrusterProperties getProperties(Fluid fluid) {
         if (fluid == null || fluid == Fluids.EMPTY) return null;
         FluidThrusterProperties props = fuelPropertiesMap.get(fluid);
         if (props != null) {
@@ -52,7 +57,29 @@ public class ThrusterFuelManager extends SimpleJsonResourceReloadListener {
 
     @Override
     protected void apply(@Nonnull Map<ResourceLocation, JsonElement> pObject, @Nonnull ResourceManager resourceManager, @Nonnull ProfilerFiller profiler) {
+        //Parse datapacks
         profiler.push(CreatePropulsion.ID + ":Loading_thruster_fuels");
+        fuelPropertiesMap = parseFuelProperties(pObject);
+        profiler.pop();
+        //Update clients (happens only on /reload as on server start server instance is still null)
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        if (server != null && server.isRunning()) {
+            PropulsionPackets.sendToAll(SyncThrusterFuelsPacket.create(fuelPropertiesMap));
+        }
+    }
+
+    public static void updateClient(Map<ResourceLocation, FluidThrusterProperties> fuelMap) {
+        Map<Fluid, FluidThrusterProperties> newClientMap = new HashMap<>();
+        fuelMap.forEach((rl, props) -> {
+            Fluid fluid = ForgeRegistries.FLUIDS.getValue(rl);
+            if (fluid != null) {
+                newClientMap.put(fluid, props);
+            }
+        });
+        fuelPropertiesMap = newClientMap;
+    }
+
+    private Map<Fluid, FluidThrusterProperties> parseFuelProperties(@Nonnull Map<ResourceLocation, JsonElement> pObject) {
         Map<Fluid, FluidThrusterProperties> newMap = new HashMap<>();
 
         for (Map.Entry<ResourceLocation, JsonElement> entry : pObject.entrySet()) {
@@ -83,8 +110,7 @@ public class ThrusterFuelManager extends SimpleJsonResourceReloadListener {
                 });
                 
         }
-
-        this.fuelPropertiesMap = newMap;
-        profiler.pop();
+        
+        return newMap;
     }
 }
