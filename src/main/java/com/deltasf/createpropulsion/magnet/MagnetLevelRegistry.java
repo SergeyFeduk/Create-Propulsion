@@ -29,6 +29,7 @@ public class MagnetLevelRegistry {
     private final Long2ObjectOpenHashMap<List<UUID>> spatial = new Long2ObjectOpenHashMap<>();
     private final Map<UUID, Long> lastChunkKey = new ConcurrentHashMap<>();
     private volatile Map<Long, List<MagnetPair>> shipToPairs = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Long, List<UUID>> shipMagnets = new ConcurrentHashMap<>();
     
     private Level level;
 
@@ -42,7 +43,12 @@ public class MagnetLevelRegistry {
     }
 
     public MagnetData getOrCreateMagnet(UUID id, BlockPos pos, long shipId, Vector3i dir, int power) {
-        return magnets.computeIfAbsent(id, k -> new MagnetData(id, pos, shipId, dir, power));
+        MagnetData data = magnets.computeIfAbsent(id, k -> {
+            MagnetData newData = new MagnetData(id, pos, shipId, dir, power);
+            shipMagnets.computeIfAbsent(shipId, sId -> new CopyOnWriteArrayList<>()).add(id);
+            return newData;
+        });
+        return data;
     }
 
     public void scheduleRemoval(UUID id) {
@@ -89,6 +95,16 @@ public class MagnetLevelRegistry {
                 if (chunkKey != null) {
                     List<UUID> list = spatial.get(chunkKey);
                     if (list != null) list.remove(id);
+                }
+                //Remove from shipMagnets map
+                if (removedData.shipId != -1) {
+                    List<UUID> shipList = shipMagnets.get(removedData.shipId);
+                    if (shipList != null) {
+                        shipList.remove(id);
+                        if (shipList.isEmpty()) {
+                            shipMagnets.remove(removedData.shipId);
+                        }
+                    }
                 }
             }
         }
@@ -199,6 +215,16 @@ public class MagnetLevelRegistry {
             return Collections.emptyList();
         }
         return internal;
+    }
+
+    public void removeAllMagnetsForShip(long shipId) {
+        List<UUID> magnetsToRemove = shipMagnets.get(shipId);
+        if (magnetsToRemove != null && !magnetsToRemove.isEmpty()) {
+            for (UUID magnetId : new ArrayList<>(magnetsToRemove)) {
+                scheduleRemoval(magnetId);
+            }
+            shipMagnets.remove(shipId);
+        }
     }
 
     private boolean shouldSkip(MagnetData A, MagnetData B) {

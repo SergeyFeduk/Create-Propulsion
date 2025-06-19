@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.joml.Vector3i;
+import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
@@ -13,6 +14,7 @@ import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -89,7 +91,12 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
 
         MagnetData data = MagnetRegistry.get().forLevel(level).getMagnet(this.magnetId);
         if (data != null && data.shipId != -1) {
-            MagnetRegistry.get().forLevel(level).updateMagnetPosition(data);
+            var serverShip = VSGameUtilsKt.getShipManagingPos((ServerLevel)level, worldPosition);
+            if (serverShip == null) {
+                MagnetRegistry.get().forLevel(level).removeAllMagnetsForShip(data.shipId); //Technically we could just remove only this magnet but who cares
+            } else {
+                MagnetRegistry.get().forLevel(level).updateMagnetPosition(data);
+            }
         }
     }
 
