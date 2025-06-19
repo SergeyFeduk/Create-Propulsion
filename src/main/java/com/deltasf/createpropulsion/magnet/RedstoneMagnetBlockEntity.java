@@ -59,13 +59,13 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
             }
 
             Vector3i currentDipoleDir = VectorConversionsMCKt.toJOML(currentState.getValue(RedstoneMagnetBlock.FACING).getNormal());
-            MagnetData magnetData = MagnetRegistry.get().forLevel(level).getOrCreateMagnet(this.magnetId, worldPosition, currentShipId, currentDipoleDir, this.power);
+            MagnetData magnetData = MagnetRegistry.forLevel(level).getOrCreateMagnet(this.magnetId, worldPosition, currentShipId, currentDipoleDir, this.power);
             magnetData.cancelRemoval();
             magnetData.update(worldPosition, currentShipId, currentDipoleDir, this.power);
-            MagnetRegistry.get().forLevel(level).updateMagnetPosition(magnetData);
+            MagnetRegistry.forLevel(level).updateMagnetPosition(magnetData);
 
         } else {
-            MagnetRegistry.get().forLevel(level).scheduleRemoval(this.magnetId);
+            MagnetRegistry.forLevel(level).scheduleRemoval(this.magnetId);
         }
     }
 
@@ -75,7 +75,7 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
 
     public void onBlockBroken() {
         if (this.magnetId != null) {
-            MagnetRegistry.get().forLevel(level).scheduleRemoval(this.magnetId);
+            MagnetRegistry.forLevel(level).scheduleRemoval(this.magnetId);
         }
     }
 
@@ -89,13 +89,13 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
             needsUpdate = false;
         }
 
-        MagnetData data = MagnetRegistry.get().forLevel(level).getMagnet(this.magnetId);
+        MagnetData data = MagnetRegistry.forLevel(level).getMagnet(this.magnetId);
         if (data != null && data.shipId != -1) {
             var serverShip = VSGameUtilsKt.getShipManagingPos((ServerLevel)level, worldPosition);
             if (serverShip == null) {
-                MagnetRegistry.get().forLevel(level).removeAllMagnetsForShip(data.shipId); //Technically we could just remove only this magnet but who cares
+                MagnetRegistry.forLevel(level).removeAllMagnetsForShip(data.shipId); //Technically we could just remove only this magnet but who cares
             } else {
-                MagnetRegistry.get().forLevel(level).updateMagnetPosition(data);
+                MagnetRegistry.forLevel(level).updateMagnetPosition(data);
             }
         }
     }

@@ -31,7 +31,7 @@ public class MagnetForceAttachment implements ShipForcesInducer {
     @Override
     public void applyForces(@NotNull PhysShip physicShip) {
         PhysShipImpl ship = (PhysShipImpl) physicShip;
-        List<MagnetPair> pairs = MagnetRegistry.get().forLevel(level).getPairsForShip(ship.getId());
+        List<MagnetPair> pairs = MagnetRegistry.forLevel(level).getPairsForShip(ship.getId());
         if (pairs.isEmpty()) {
             return;
         }
