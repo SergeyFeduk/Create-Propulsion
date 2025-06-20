@@ -9,14 +9,20 @@ import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
+import com.deltasf.createpropulsion.compat.PropulsionCompatibility;
+import com.deltasf.createpropulsion.compat.computercraft.ComputerBehaviour;
+import com.simibubi.create.compat.computercraft.AbstractComputerBehaviour;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.LazyOptional;
 
 public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
     public RedstoneMagnetBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
@@ -27,13 +33,17 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
     private boolean needsUpdate = true;
     private int power = 0;
 
-    @Override
-    public void addBehaviours(List<BlockEntityBehaviour> behaviours) {}
+    //CC peripheral
+    public AbstractComputerBehaviour computerBehaviour;
+    public boolean overridePower = false;
+    public int overridenPower;
 
     public void setPower(int power) {
         if (this.power == power) return;
         this.power = power;
-        this.scheduleUpdate();
+        if (!overridePower) {
+            this.scheduleUpdate();
+        }
         setChanged();
     }
 
@@ -48,9 +58,9 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
         }
 
         BlockState currentState = level.getBlockState(worldPosition);
-        //boolean shouldBeActive = currentState.getValue(RedstoneMagnetBlock.POWERED);
+        int effectivePower = getEffectivePower();
 
-        if (this.power > 0) {
+        if (effectivePower > 0) {
             long currentShipId = -1;
             Ship ship = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
             if (ship != null) {
@@ -59,9 +69,9 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
             }
 
             Vector3i currentDipoleDir = VectorConversionsMCKt.toJOML(currentState.getValue(RedstoneMagnetBlock.FACING).getNormal());
-            MagnetData magnetData = MagnetRegistry.forLevel(level).getOrCreateMagnet(this.magnetId, worldPosition, currentShipId, currentDipoleDir, this.power);
+            MagnetData magnetData = MagnetRegistry.forLevel(level).getOrCreateMagnet(this.magnetId, worldPosition, currentShipId, currentDipoleDir, effectivePower);
             magnetData.cancelRemoval();
-            magnetData.update(worldPosition, currentShipId, currentDipoleDir, this.power);
+            magnetData.update(worldPosition, currentShipId, currentDipoleDir, effectivePower);
             MagnetRegistry.forLevel(level).updateMagnetPosition(magnetData);
 
         } else {
@@ -105,6 +115,40 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
         scheduleUpdate();
     }
 
+    public int getEffectivePower() {
+        if (PropulsionCompatibility.CC_ACTIVE && overridePower) {
+            return overridenPower;
+        }
+        return this.power;
+    }
+
+    @SuppressWarnings("null")
+    public void updateBlockstateFromPower() {
+        if (level == null || level.isClientSide) return;
+        
+        BlockState currentState = getBlockState();
+        boolean shouldBePowered = getEffectivePower() > 0;
+        
+        if (currentState.getValue(RedstoneMagnetBlock.POWERED) != shouldBePowered) {
+            level.setBlock(getBlockPos(), currentState.setValue(RedstoneMagnetBlock.POWERED, shouldBePowered), 2);
+        }
+    }
+
+    @Override
+    public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
+        if (PropulsionCompatibility.CC_ACTIVE) {
+            behaviours.add(computerBehaviour = new ComputerBehaviour(this));
+        }
+    }
+
+    @Override
+    public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
+        if (PropulsionCompatibility.CC_ACTIVE && computerBehaviour.isPeripheralCap(cap)) {
+            return computerBehaviour.getPeripheralCapability();
+        }
+        return super.getCapability(cap, side);
+    }
+
     //NBT
 
     @Override
@@ -114,6 +158,10 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
             this.magnetId = tag.getUUID("MagnetId");
         }
         this.power = tag.getInt("Power");
+        if (PropulsionCompatibility.CC_ACTIVE) {
+            this.overridePower = tag.getBoolean("overridePower");
+            this.overridenPower = tag.getInt("overridenPower");
+        }    
     }
 
     @Override
@@ -124,5 +172,9 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
         }
         tag.putUUID("MagnetId", this.magnetId);
         tag.putInt("Power", this.power);
+        if (PropulsionCompatibility.CC_ACTIVE) {
+            tag.putBoolean("overridePower", this.overridePower);
+            tag.putInt("overridenPower", this.overridenPower);
+        }    
     }
 }

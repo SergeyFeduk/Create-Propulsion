@@ -90,6 +90,7 @@ public class RedstoneMagnetBlock extends DirectionalBlock implements EntityBlock
         BlockEntity be = level.getBlockEntity(pos);
         if (be instanceof RedstoneMagnetBlockEntity rbe) {
             rbe.setPower(signalStrength);
+            rbe.updateBlockstateFromPower();
         }
 
         if (state.getValue(POWERED) != shouldBePowered) {
