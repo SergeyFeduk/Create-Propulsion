@@ -34,7 +34,7 @@ public class LodestoneTrackerRenderer extends SafeBlockEntityRenderer<LodestoneT
             //This is to update compass every frame instead of every tick
             float targetAngle = blockEntity.getAngleFromCompass(compass);
             int modelIndex = getIndexFromAngle(targetAngle);
-            renderCompass(blockEntity.getLevel(), poseStack, bufferSource, light, overlay, compass, 0, new Vec3(0.5,0.85f,0.5), modelIndex);
+            renderCompass(blockEntity.getLevel(), poseStack, bufferSource, light, overlay, compass, new Vec3(0.5,0.85f,0.5), modelIndex);
         }
 
         //Render partials
@@ -81,7 +81,7 @@ public class LodestoneTrackerRenderer extends SafeBlockEntityRenderer<LodestoneT
 
 
     private static void renderCompass(Level level, PoseStack ms, MultiBufferSource buffer, int light, int overlay, 
-        ItemStack item, int angle, Vec3 position, int modelIndex) {
+        ItemStack item, Vec3 position, int modelIndex) {
         ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
         //Acquire target compass model
         modelIndex = Math.min(Math.max(0, modelIndex), 31);

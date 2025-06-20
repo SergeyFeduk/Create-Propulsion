@@ -64,7 +64,7 @@ public class PropulsionConfig {
                     .define("Particle velocity offset", 0.15);
             THRUSTER_PARTICLE_COUNT_MULTIPLIER = CLIENT_BUILDER.comment("The higher this number is - the more particles are spawned.")
                     .define("Particle count multiplier", 1.0);
-                    CLIENT_BUILDER.pop();
+        CLIENT_BUILDER.pop();
         CLIENT_SPEC = CLIENT_BUILDER.build();
         //#endregion
     }

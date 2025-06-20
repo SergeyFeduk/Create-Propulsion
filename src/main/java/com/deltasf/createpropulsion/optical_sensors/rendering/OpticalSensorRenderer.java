@@ -254,20 +254,21 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<AbstractOptic
         for (ItemStack stack : lenses) {
             if (stack.is(opticalLensItem)) {
                 Item item = stack.getItem();
-                DyeableLeatherItem dyeableItem = (DyeableLeatherItem) item;
-                if (dyeableItem.hasCustomColor(stack)) {
-                    int color = dyeableItem.getColor(stack);
-
-                    // Extract RGB values from hex
-                    int r = (color >> 16) & 0xFF;
-                    int g = (color >> 8) & 0xFF;
-                    int b = color & 0xFF;
-
-                    // Accumulate RGB values
-                    totalRed += r;
-                    totalGreen += g;
-                    totalBlue += b;
-                    dyedLensCount++;
+                if (item instanceof DyeableLeatherItem dyeableItem) {
+                    if (dyeableItem.hasCustomColor(stack)) {
+                        int color = dyeableItem.getColor(stack);
+    
+                        // Extract RGB values from hex
+                        int r = (color >> 16) & 0xFF;
+                        int g = (color >> 8) & 0xFF;
+                        int b = color & 0xFF;
+    
+                        // Accumulate RGB values
+                        totalRed += r;
+                        totalGreen += g;
+                        totalBlue += b;
+                        dyedLensCount++;
+                    }
                 }
             }
         }

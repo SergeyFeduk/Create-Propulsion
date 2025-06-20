@@ -26,7 +26,7 @@ public class ThrusterPeripheral extends SyncedPeripheral<ThrusterBlockEntity> {
     @LuaFunction(mainThread = true)
     public void setPower(int power) {
         int clampedPower = Math.max(Math.min(power, 15), 0);
-        blockEntity.overridePower = clampedPower == 0 ? false : true;
+        blockEntity.overridePower = clampedPower != 0;
         blockEntity.overridenPower = clampedPower;
     }
 

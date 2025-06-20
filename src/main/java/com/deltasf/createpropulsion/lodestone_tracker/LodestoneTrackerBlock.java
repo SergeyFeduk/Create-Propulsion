@@ -43,11 +43,6 @@ public class LodestoneTrackerBlock extends Block implements EntityBlock {
         this.registerDefaultState(this.stateDefinition.any());
     }
 
-    /*@Override
-    protected void createBlockStateDefinition(@Nonnull StateDefinition.Builder<net.minecraft.world.level.block.Block, BlockState> builder) {
-        builder.add(POWER_NORTH, POWER_EAST, POWER_SOUTH, POWER_WEST);
-    }*/
-
     @Override
     public BlockEntity newBlockEntity(@Nonnull BlockPos pos, @Nonnull BlockState state) {
         return new LodestoneTrackerBlockEntity(PropulsionBlockEntities.LODESTONE_TRACKER_BLOCK_ENTITY.get(), pos, state);
