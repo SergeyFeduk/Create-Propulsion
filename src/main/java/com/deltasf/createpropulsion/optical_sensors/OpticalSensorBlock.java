@@ -4,6 +4,7 @@ import javax.annotation.Nonnull;
 
 import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
 import com.deltasf.createpropulsion.registries.PropulsionShapes;
+import com.deltasf.createpropulsion.registries.PropulsionShapes.ShapeBuilder;
 import com.simibubi.create.foundation.utility.VoxelShaper;
 
 import net.minecraft.core.BlockPos;
@@ -12,15 +13,23 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class OpticalSensorBlock extends AbstractOpticalSensorBlock {
     public OpticalSensorBlock(Properties properties){
         super(properties);
     }
+
+    private static final VoxelShaper INTERACTION_SHAPE = ShapeBuilder.shape().add(Block.box(4, 4, 0, 12, 12, 4))
+            .forDirectional(Direction.NORTH);
+
 
     @Override
     public BlockEntity newBlockEntity(@Nonnull BlockPos pos, @Nonnull BlockState state) {
@@ -57,6 +66,14 @@ public class OpticalSensorBlock extends AbstractOpticalSensorBlock {
 
     @Override
     protected VoxelShaper getShapeMap() { return PropulsionShapes.OPTICAL_SENSOR; }
+
+    @Override
+    protected boolean isInteractionFace(BlockState state, BlockHitResult hit) {
+        VoxelShape frontPartShape = INTERACTION_SHAPE.get(state.getValue(FACING));
+        Vec3 localHit = hit.getLocation().subtract(Vec3.atLowerCornerOf(hit.getBlockPos()));
+        double epsilon = 1e-4;
+        return frontPartShape.toAabbs().stream().anyMatch(aabb -> aabb.inflate(epsilon).contains(localHit)) || hit.getDirection() == state.getValue(FACING);
+    }
 
     //Redstone
 

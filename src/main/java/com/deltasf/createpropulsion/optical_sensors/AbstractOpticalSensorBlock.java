@@ -85,11 +85,13 @@ public abstract class AbstractOpticalSensorBlock extends DirectionalBlock implem
         }
     }
 
+    protected abstract boolean isInteractionFace(BlockState state, BlockHitResult hit);
+
     @Override
     public InteractionResult use(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull Player player, @Nonnull InteractionHand hand, @Nonnull BlockHitResult hit) {
         //TODO: Add sounds
         //Lenses actions are applicable to the front face only
-        if (hit.getDirection() != state.getValue(FACING)) {
+        if (!isInteractionFace(state, hit)) {
             return super.use(state, level, pos, player, hand, hit);
         }
         //Safety check + get sensorBE

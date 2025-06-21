@@ -33,6 +33,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.phys.BlockHitResult;
 
 @SuppressWarnings("deprecation")
 public class InlineOpticalSensorBlock extends AbstractOpticalSensorBlock {
@@ -74,6 +75,11 @@ public class InlineOpticalSensorBlock extends AbstractOpticalSensorBlock {
     @Override
     protected VoxelShaper getShapeMap() {
         return PropulsionShapes.INLINE_OPTICAL_SENSOR;
+    }
+
+    @Override
+    protected boolean isInteractionFace(BlockState state, BlockHitResult hit) {
+        return hit.getDirection() != state.getValue(FACING).getOpposite();
     }
 
     //Redstone

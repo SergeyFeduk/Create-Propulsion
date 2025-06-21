@@ -2,7 +2,6 @@ package com.deltasf.createpropulsion.mixin;
 
 import org.joml.Vector3d;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.mod.common.VSClientGameUtils;
@@ -15,7 +14,6 @@ import net.minecraft.client.renderer.item.CompassItemPropertyFunction;
 import net.minecraft.world.phys.Vec3;
 
 @MixinIf("is_vsaddition_not_loaded") //If loaded - similar mixin is applied by vs additions
-@Pseudo
 @Mixin(CompassItemPropertyFunction.class)
 public abstract class CompassItemPropertyFunctionMixin {
 

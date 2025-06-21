@@ -1,7 +1,6 @@
 package com.deltasf.createpropulsion.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
@@ -18,7 +17,6 @@ import net.minecraft.world.item.CompassItem;
 import net.minecraft.world.level.Level;
 
 @MixinIf("is_vsaddition_not_loaded") //If loaded - similar mixin is applied by vs additions
-@Pseudo
 @Mixin(CompassItem.class)
 public abstract class CompassItemMixin {
 
