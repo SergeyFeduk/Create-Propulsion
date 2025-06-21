@@ -14,6 +14,8 @@ import org.valkyrienskies.core.api.ships.ShipForcesInducer;
 import org.valkyrienskies.core.impl.game.ships.PhysShipImpl;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
+import com.deltasf.createpropulsion.utility.AttachmentUtils;
+
 @SuppressWarnings("deprecation")
 public class ForceInducedShip implements ShipForcesInducer {
     public Map<BlockPos, IForceApplier> appliersMapping = new ConcurrentHashMap<>();
@@ -35,31 +37,20 @@ public class ForceInducedShip implements ShipForcesInducer {
         appliersMapping.remove(pos);
         //Remove attachment by using passing null as attachment instance in order to clean up after ourselves
         if (appliersMapping.isEmpty()) {
-            getShipAt(level, pos).saveAttachment(ForceInducedShip.class, null);
+            ServerShip ship = AttachmentUtils.getShipAt(level, pos);
+            if (ship != null) {
+                // Remove attachment by passing null as the instance
+                ship.saveAttachment(ForceInducedShip.class, null);
+            }
         }
     }
 
     //Getters
-    public static ForceInducedShip getOrCreateAsAttachment(ServerShip ship){
-        ForceInducedShip attachment = ship.getAttachment(ForceInducedShip.class);
-        if (attachment == null) {
-            attachment = new ForceInducedShip();
-            ship.saveAttachment(ForceInducedShip.class, attachment);
-        }
-        return attachment;
+    public static ForceInducedShip getOrCreateAsAttachment(ServerShip ship) {
+        return AttachmentUtils.getOrCreate(ship, ForceInducedShip.class, ForceInducedShip::new);
     }
 
     public static ForceInducedShip get(Level level, BlockPos pos) {
-        ServerShip ship = getShipAt((ServerLevel)level, pos);
-        return ship != null ? getOrCreateAsAttachment(ship) : null;
-    }
-
-    private static ServerShip getShipAt(ServerLevel serverLevel, BlockPos pos){
-        //For some reason (which I don't remember anymore) it has to be just like that
-        ServerShip ship = VSGameUtilsKt.getShipObjectManagingPos(serverLevel, pos);
-        if (ship == null){
-            ship = VSGameUtilsKt.getShipManagingPos(serverLevel, pos);
-        }
-        return ship;
+        return AttachmentUtils.get(level, pos, ForceInducedShip.class, ForceInducedShip::new);
     }
 }

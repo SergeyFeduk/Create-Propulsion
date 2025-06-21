@@ -18,6 +18,7 @@ import org.valkyrienskies.core.impl.game.ships.PhysShipImpl;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import com.deltasf.createpropulsion.PropulsionConfig;
+import com.deltasf.createpropulsion.utility.AttachmentUtils;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -239,40 +240,24 @@ public class MagnetForceAttachment implements ShipForcesInducer {
     // This would require having a centralized cache and a way to subsribe to the start of physics tick, which I did not figure out yet
     // Or, instead of physics tick start - check if all pairs were cached - and clean up after (tho this is less desirable)
 
-    //CODE DUPLICATION!!!!!!!!!
 
     public static MagnetForceAttachment getOrCreateAsAttachment(Level level, ServerShip ship){
-        MagnetForceAttachment attachment = ship.getAttachment(MagnetForceAttachment.class);
-        if (attachment == null) {
-            attachment = new MagnetForceAttachment();
+        return AttachmentUtils.getOrCreate(ship, MagnetForceAttachment.class, () -> {
+            MagnetForceAttachment attachment = new MagnetForceAttachment();
             attachment.level = level;
-            ship.saveAttachment(MagnetForceAttachment.class, attachment);
-        }
-        return attachment;
+            return attachment;
+        });
     }
 
     public static MagnetForceAttachment get(Level level, BlockPos pos) {
-        ServerShip ship = getShipAt((ServerLevel)level, pos);
-        return ship != null ? getOrCreateAsAttachment(level, ship) : null;
-    }
-
-    private static ServerShip getShipAt(ServerLevel serverLevel, BlockPos pos){
-        ServerShip ship = VSGameUtilsKt.getShipObjectManagingPos(serverLevel, pos);
-        if (ship == null){
-            ship = VSGameUtilsKt.getShipManagingPos(serverLevel, pos);
-        }
-        return ship;
+        return AttachmentUtils.get(level, pos, MagnetForceAttachment.class, () -> {
+            MagnetForceAttachment attachment = new MagnetForceAttachment();
+            attachment.level = level;
+            return attachment;
+        });
     }
 
     public static void ensureAttachmentExists(@Nonnull Level level, @Nonnull BlockPos pos) {
-        ServerShip ship = getShipAt((ServerLevel) level, pos);
-        if (ship != null) {
-            MagnetForceAttachment attachment = ship.getAttachment(MagnetForceAttachment.class);
-            if (attachment == null) {
-                attachment = new MagnetForceAttachment();
-                attachment.level = level;
-                ship.saveAttachment(MagnetForceAttachment.class, attachment);
-            }
-        }
+        get(level, pos);
     } 
 }

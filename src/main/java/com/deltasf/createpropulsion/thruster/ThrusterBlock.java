@@ -94,8 +94,7 @@ public class ThrusterBlock extends DirectionalBlock implements EntityBlock {
                     ship.addApplier(pos, applier);
                 }
                 //Invoke initial redstone and obstruction check
-                doRedstoneCheck(level, state, pos); //This does not call obstruction due to skipping logic
-                //calculateObstruction(thrusterBlockEntity, level, pos, state);
+                doRedstoneCheck(level, state, pos);
             }
         }
         super.onPlace(state, level, pos, oldState, isMoving);
@@ -103,16 +102,13 @@ public class ThrusterBlock extends DirectionalBlock implements EntityBlock {
 
     @Override
     public void onRemove(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull BlockState newState, boolean isMoving) {
-        if (!level.isClientSide()) {
-            ForceInducedShip ship = ForceInducedShip.get(level, pos);
-            if (ship != null) {
-                ship.removeApplier((ServerLevel)level, pos);
-            }
-        }
-        BlockEntity entity = level.getBlockEntity(pos);
-        if (entity != null)
-            ((SmartBlockEntity)entity).destroy(); //Probably required
         super.onRemove(state, level, pos, newState, isMoving);
+        
+        if (level.isClientSide()) return;
+        ForceInducedShip ship = ForceInducedShip.get(level, pos);
+        if (ship != null) {
+            ship.removeApplier((ServerLevel)level, pos);
+        }
     }
     //Handle redstone level
     @Override
