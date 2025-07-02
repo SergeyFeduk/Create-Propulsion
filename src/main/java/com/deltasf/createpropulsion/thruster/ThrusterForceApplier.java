@@ -9,11 +9,10 @@ import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 import net.minecraft.core.BlockPos;
 
-import com.deltasf.createpropulsion.ship.IForceApplier;
 import com.deltasf.createpropulsion.PropulsionConfig;
 
 //Thruster math is no longer taken from any other mod and obfuscated to look like i did this myself
-public class ThrusterForceApplier implements IForceApplier {
+public class ThrusterForceApplier {
     private ThrusterData data;
 
     public ThrusterForceApplier(ThrusterData data){
@@ -32,12 +31,11 @@ public class ThrusterForceApplier implements IForceApplier {
     private static final Vector3d scaledForce_temp2 = new Vector3d();
     private static final Vector3d scaledForce_temp3 = new Vector3d();
 
-    @Override
     public void applyForces(BlockPos pos, PhysShipImpl ship) {
         float thrust = data.getThrust();
         if (thrust == 0) return;
 
-        final int maxSpeed = PropulsionConfig.THRUSTER_MAX_SPEED.get(); //Should be fine to take data fron config in physics thread, right?
+        final int maxSpeed = PropulsionConfig.THRUSTER_MAX_SPEED.get();
         //Direction from ship space to world space
         final ShipTransform transform = ship.getTransform();
         final Vector3dc shipCenterOfMass = transform.getPositionInShip(); 

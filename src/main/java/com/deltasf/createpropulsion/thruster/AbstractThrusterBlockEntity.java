@@ -1,109 +1,90 @@
 package com.deltasf.createpropulsion.thruster;
 
+import com.deltasf.createpropulsion.PropulsionConfig;
+import com.deltasf.createpropulsion.compat.PropulsionCompatibility;
+import com.deltasf.createpropulsion.compat.computercraft.ComputerBehaviour;
+import com.deltasf.createpropulsion.debug.DebugRenderer;
+import com.deltasf.createpropulsion.particles.ParticleTypes;
+import com.deltasf.createpropulsion.particles.PlumeParticleData;
+import com.deltasf.createpropulsion.utility.GoggleUtils;
+import com.deltasf.createpropulsion.utility.MathUtility;
+import com.simibubi.create.compat.computercraft.AbstractComputerBehaviour;
+import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
+import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
+import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.simibubi.create.foundation.collision.Matrix3d;
+import com.simibubi.create.foundation.collision.OrientedBB;
+import com.simibubi.create.foundation.utility.Lang;
+import com.simibubi.create.foundation.utility.LangBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-
-import com.simibubi.create.compat.computercraft.AbstractComputerBehaviour;
-import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
-import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
-import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import com.simibubi.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour;
-import com.simibubi.create.foundation.utility.Lang;
-import com.simibubi.create.foundation.utility.LangBuilder;
-
-import java.awt.Color;
-import java.util.List;
-
-import org.joml.Matrix4dc;
-import org.joml.Quaterniond;
-import org.joml.Quaternionf;
-import org.joml.Vector3d;
-import org.joml.Vector3dc;
+import org.joml.*;
+import org.joml.Math;
 import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
-import net.minecraft.network.chat.Component;
+import java.awt.*;
+import java.util.List;
 
-import com.deltasf.createpropulsion.PropulsionConfig;
-import com.deltasf.createpropulsion.compat.PropulsionCompatibility;
-import com.deltasf.createpropulsion.compat.computercraft.ComputerBehaviour;
-import com.deltasf.createpropulsion.debug.DebugRenderer;
-import com.simibubi.create.foundation.collision.Matrix3d;
-import com.simibubi.create.foundation.collision.OrientedBB;
-import com.deltasf.createpropulsion.particles.ParticleTypes;
-import com.deltasf.createpropulsion.particles.PlumeParticleData;
-import com.deltasf.createpropulsion.utility.GoggleUtils;
-import com.deltasf.createpropulsion.utility.MathUtility;
-
-//Abandon all hope, ye who enter here
 @SuppressWarnings({"deprecation", "unchecked"})
-public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggleInformation {
-    private static final int OBSTRUCTION_LENGTH = 10; //Prob should be a config
-    public static final int BASE_MAX_THRUST = 400000;
-    public static final float BASE_FUEL_CONSUMPTION = 2;
-    public static final int TICKS_PER_ENTITY_CHECK = 5;
-    public static final int LOWEST_POWER_THRSHOLD = 5;
-    //Thruster data
-    private ThrusterData thrusterData;
-    public SmartFluidTankBehaviour tank;
-    private int emptyBlocks;
-    //Ticking
+public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggleInformation {
+    // Constants
+    protected static final int OBSTRUCTION_LENGTH = 10;
+    protected static final int TICKS_PER_ENTITY_CHECK = 5;
+    protected static final int LOWEST_POWER_THRSHOLD = 5;
+    private static final float PARTICLE_VELOCITY = 4;
+    private static final double NOZZLE_OFFSET_FROM_CENTER = 0.9;
+    private static final double SHIP_VELOCITY_INHERITANCE = 0.5;
+
+    // Common State
+    protected ThrusterData thrusterData;
+    protected int emptyBlocks;
+    protected boolean isThrustDirty = false;
+
+    // Ticking
     private int currentTick = 0;
     private int clientTick = 0;
     private float particleSpawnAccumulator = 0.0f;
-    private boolean isThrustDirty = false;
-    //Particles
-    private ParticleType<PlumeParticleData> particleType;
-    private static final float PARTICLE_VELOCITY = 4;
-    private static final double NOZZLE_OFFSET_FROM_CENTER  = 0.9;
-    private static final double SHIP_VELOCITY_INHERITANCE = 0.5;
-    //CC peripheral
+
+    // Particles
+    protected ParticleType<PlumeParticleData> particleType;
+
+    // CC Peripheral
     public AbstractComputerBehaviour computerBehaviour;
     public boolean overridePower = false;
     public int overridenPower;
 
-    public ThrusterBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
+    public AbstractThrusterBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
         thrusterData = new ThrusterData();
-        particleType = (ParticleType<PlumeParticleData>)ParticleTypes.getPlumeType();
+        particleType = (ParticleType<PlumeParticleData>) ParticleTypes.getPlumeType();
     }
 
-    public ThrusterData getThrusterData() {
-        return thrusterData;
-    }
+    public abstract void updateThrust(BlockState currentBlockState);
 
-    public FluidThrusterProperties getFuelProperties(Fluid fluid) {
-        var properties = ThrusterFuelManager.getProperties(fluid);
-        if (properties != null) return properties;
-        return null;
-    }
+    protected abstract boolean isWorking();
 
-    public int getEmptyBlocks() {return emptyBlocks; }
+    protected abstract LangBuilder getGoggleStatus();
 
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
-        tank = SmartFluidTankBehaviour.single(this, 200);
-        behaviours.add(tank);
         if (PropulsionCompatibility.CC_ACTIVE) {
             behaviours.add(computerBehaviour = new ComputerBehaviour(this));
         }
@@ -111,67 +92,35 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
 
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-        if (side == getBlockState().getValue(ThrusterBlock.FACING) && cap == ForgeCapabilities.FLUID_HANDLER) {
-            return tank.getCapability().cast();
-        }
         if (PropulsionCompatibility.CC_ACTIVE && computerBehaviour.isPeripheralCap(cap)) {
             return computerBehaviour.getPeripheralCapability();
         }
-        
         return super.getCapability(cap, side);
-    }
-
-    public void updateThrust(BlockState currentBlockState) {
-        float thrust = 0;
-        boolean isFluidValid = validFluid();
-        int power = getOverriddenPowerOrState(currentBlockState);
-
-        if (isFluidValid && power > 0) {
-            var properties = getFuelProperties(fluidStack().getRawFluid());
-            float powerPercentage = power / 15.0f;
-            float obstructionEffect = calculateObstructionEffect();
-            float thrustPercentage = Math.min(powerPercentage, obstructionEffect);
-
-            if (thrustPercentage > 0) {
-                int tick_rate = PropulsionConfig.THRUSTER_TICKS_PER_UPDATE.get(); 
-                int consumption = calculateFuelConsumption(powerPercentage, properties.consumptionMultiplier, tick_rate);
-                
-                // Check if enough fuel for this operation
-                if (tank.getPrimaryHandler().getFluidAmount() <= 0) {
-                    thrust = 0;
-                } else {
-                    tank.getPrimaryHandler().drain(consumption, IFluidHandler.FluidAction.EXECUTE);
-                    float thrustMultiplier = (float)(double)PropulsionConfig.THRUSTER_THRUST_MULTIPLIER.get();
-                    thrust = BASE_MAX_THRUST * thrustMultiplier * thrustPercentage * properties.thrustMultiplier;
-                }
-            }
-        }
-        thrusterData.setThrust(thrust);
-        isThrustDirty = false;
     }
 
     @SuppressWarnings("null")
     @Override
-    public void tick(){
+    public void tick() {
         super.tick();
         BlockState currentBlockState = getBlockState();
         if (level.isClientSide) {
-            emitParticles(level, worldPosition, currentBlockState);
+            if (shouldEmitParticles()) {
+                emitParticles(level, worldPosition, currentBlockState);
+            }
             return;
         }
         currentTick++;
-        
+
         int tick_rate = PropulsionConfig.THRUSTER_TICKS_PER_UPDATE.get();
-        boolean isFluidValid = validFluid();
-        int power = getOverriddenPowerOrState(currentBlockState);
-        //Damage entities
-        if (PropulsionConfig.THRUSTER_DAMAGE_ENTITIES.get() && isFluidValid && power > 0) {
+
+        if (shouldDamageEntities()) {
             doEntityDamageCheck(currentTick);
         }
-        //Recalculate obstruction
-        if (currentTick % (PropulsionConfig.THRUSTER_TICKS_PER_UPDATE.get() * 2) == 0) {
+
+        // Periodically recalculate obstruction
+        if (currentTick % (tick_rate * 2) == 0) {
             int previousEmptyBlocks = emptyBlocks;
-            calculateObstruction(level, worldPosition, currentBlockState.getValue(ThrusterBlock.FACING));
+            calculateObstruction(level, worldPosition, currentBlockState.getValue(AbstractThrusterBlock.FACING));
             if (previousEmptyBlocks != emptyBlocks) {
                 isThrustDirty = true;
                 setChanged();
@@ -179,21 +128,72 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
             }
         }
 
+        // Update thrust periodically or when marked dirty
         if (isThrustDirty || currentTick % tick_rate == 0) {
             updateThrust(currentBlockState);
         }
     }
 
-    private int calculateFuelConsumption(float powerPercentage, float fluidPropertiesConsumptionMultiplier, int tick_rate){
-        float base_consumption = BASE_FUEL_CONSUMPTION * (float)(double)PropulsionConfig.THRUSTER_CONSUMPTION_MULTIPLIER.get();
-        return (int)Math.ceil(base_consumption * powerPercentage * fluidPropertiesConsumptionMultiplier * tick_rate);
+    protected boolean shouldEmitParticles() {
+        return isPowered() && isWorking();
+    }
+
+    protected boolean shouldDamageEntities() {
+        return PropulsionConfig.THRUSTER_DAMAGE_ENTITIES.get() && isPowered() && isWorking();
+    }
+
+    protected void addSpecificGoggleInfo(List<Component> tooltip, boolean isPlayerSneaking) {}
+
+    public ThrusterData getThrusterData() {
+        return thrusterData;
+    }
+
+    public int getEmptyBlocks() {
+        return emptyBlocks;
+    }
+
+    protected boolean isPowered() {
+        return getOverriddenPowerOrState(getBlockState()) > 0;
+    }
+
+    protected float calculateObstructionEffect() {
+        return (float) emptyBlocks / (float) OBSTRUCTION_LENGTH;
+    }
+    
+    protected int getOverriddenPowerOrState(BlockState currentBlockState) {
+        if (PropulsionCompatibility.CC_ACTIVE && overridePower) {
+            return overridenPower;
+        }
+        return currentBlockState.getValue(AbstractThrusterBlock.POWER);
+    }
+
+    @Override
+    protected void write(CompoundTag compound, boolean clientPacket) {
+        super.write(compound, clientPacket);
+        compound.putInt("emptyBlocks", emptyBlocks);
+        compound.putInt("currentTick", currentTick);
+        compound.putBoolean("isThrustDirty", isThrustDirty);
+        if (PropulsionCompatibility.CC_ACTIVE) {
+            compound.putInt("overridenPower", overridenPower);
+            compound.putBoolean("overridePower", overridePower);
+        }
+    }
+
+    @Override
+    protected void read(CompoundTag compound, boolean clientPacket) {
+        super.read(compound, clientPacket);
+        emptyBlocks = compound.getInt("emptyBlocks");
+        currentTick = compound.getInt("currentTick");
+        isThrustDirty = compound.getBoolean("isThrustDirty");
+        if (PropulsionCompatibility.CC_ACTIVE) {
+            overridenPower = compound.getInt("overridenPower");
+            overridePower = compound.getBoolean("overridePower");
+        }
     }
 
     public void emitParticles(Level level, BlockPos pos, BlockState state) {
         if (emptyBlocks == 0) return;
         int power = getOverriddenPowerOrState(state);
-        if (power == 0) return;
-        if (!validFluid()) return;
     
         double particleCountMultiplier = org.joml.Math.clamp(0.0, 2.0, PropulsionConfig.THRUSTER_PARTICLE_COUNT_MULTIPLIER.get());
         if (particleCountMultiplier <= 0) return;
@@ -211,7 +211,7 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
     
         this.particleSpawnAccumulator -= particlesToSpawn;
         float powerPercentage = Math.max(power, LOWEST_POWER_THRSHOLD) / 15.0f;
-        Direction direction = state.getValue(ThrusterBlock.FACING);
+        Direction direction = state.getValue(AbstractThrusterBlock.FACING);
         Direction oppositeDirection = direction.getOpposite();
     
         double currentNozzleOffset = NOZZLE_OFFSET_FROM_CENTER;
@@ -225,10 +225,6 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
             Vector3d shipVelocity = invTransform
                 // Rotate velocity with ship transform
                 .transformDirection(new Vector3d(shipWorldVelocityJOML));
-    
-            /*String identifier = "thruster_" + this.hashCode() + "_len";
-            DebugRenderer.drawElongatedBox(identifier, pos.getCenter(), pos.getCenter().add(VectorConversionsMCKt.toMinecraft(samafj)),
-                0.25f, Color.BLUE, false, 2);*/
     
             Vector3d particleEjectionUnitVecJOML = transform
                 // Rotate velocity with ship transform
@@ -262,74 +258,6 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
         }
     }
 
-    private float calculateObstructionEffect(){
-        return (float)emptyBlocks / (float)OBSTRUCTION_LENGTH;
-    }
-
-    @Override
-    public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking){
-        //Calculate obstruction if player looks at thruster with goggles. Always
-        boolean wasThrustDirty = isThrustDirty;
-        calculateObstruction(getLevel(), worldPosition, getBlockState().getValue(ThrusterBlock.FACING));
-        isThrustDirty = wasThrustDirty;
-
-        //Thruster status
-        LangBuilder status;
-        if (fluidStack().isEmpty()) {
-            status = Lang.translate("gui.goggles.thruster.status.no_fuel", new Object[0]).style(ChatFormatting.RED);
-        } else if (!validFluid()) {
-            status = Lang.translate("gui.goggles.thruster.status.wrong_fuel", new Object[0]).style(ChatFormatting.RED);
-        } else if (getOverriddenPowerOrState(getBlockState()) == 0) {
-            status = Lang.translate("gui.goggles.thruster.status.not_powered", new Object[0]).style(ChatFormatting.GOLD);
-        } else if (emptyBlocks == 0) {
-            status = Lang.translate("gui.goggles.thruster.obstructed", new Object[0]).style(ChatFormatting.RED);
-        } else {
-            status = Lang.translate("gui.goggles.thruster.status.working", new Object[0]).style(ChatFormatting.GREEN);
-        }
-        Lang.translate("gui.goggles.thruster.status", new Object[0]).text(":").space().add(status).forGoggles(tooltip);
-
-        float efficiency = 100;
-        ChatFormatting tooltipColor = ChatFormatting.GREEN;
-        //Obstruction, if present
-        if (emptyBlocks < OBSTRUCTION_LENGTH) {
-            //Calculate efficiency
-            efficiency = calculateObstructionEffect() * 100;
-            tooltipColor = GoggleUtils.efficiencyColor(efficiency);
-            //Add obstruction tooltip
-            Lang.builder().add(Lang.translate("gui.goggles.thruster.obstructed", new Object[0])).space()
-                .add(Lang.text(GoggleUtils.makeObstructionBar(emptyBlocks, OBSTRUCTION_LENGTH)))
-                .style(tooltipColor)
-            .forGoggles(tooltip);
-        }
-        //Efficiency
-        Lang.builder().add(Lang.translate("gui.goggles.thruster.efficiency", new Object[0])).space()
-            .add(Lang.number(efficiency)).add(Lang.text("%"))
-            .style(tooltipColor)
-            .forGoggles(tooltip);
-        //Fluid tooltip
-        containedFluidTooltip(tooltip, isPlayerSneaking, tank.getCapability().cast());
-        return true;
-    }
-
-    //Helpers
-
-    private int getOverriddenPowerOrState(BlockState currentBlockState) {
-        if (PropulsionCompatibility.CC_ACTIVE && overridePower) {
-            return overridenPower;
-        }
-        return currentBlockState.getValue(ThrusterBlock.POWER);
-    }
-
-
-    public FluidStack fluidStack(){
-        return tank.getPrimaryHandler().getFluid();
-    }
-
-    public boolean validFluid(){
-        if (fluidStack().isEmpty()) return false;
-        return getFuelProperties(fluidStack().getRawFluid()) != null;
-    }
-
     public void calculateObstruction(Level level, BlockPos pos, Direction forwardDirection){
         //Starting from the block behind and iterate OBSTRUCTION_LENGTH blocks in that direction
         //Can't really use level.clip as we explicitly want to check for obstruction only in ship space
@@ -345,27 +273,25 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
     }
 
     @Override
-    protected void write(CompoundTag compound, boolean clientPacket){
-        super.write(compound, clientPacket);
-        compound.putInt("emptyBlocks", emptyBlocks);
-        compound.putInt("currentTick", currentTick);
-        compound.putBoolean("isThrustDirty", isThrustDirty);
-        if (PropulsionCompatibility.CC_ACTIVE) {
-            compound.putInt("overridenPower", overridenPower);
-            compound.putBoolean("overridePower", overridePower);
-        }
-    }
+    public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
+        boolean wasThrustDirty = isThrustDirty;
+        calculateObstruction(getLevel(), worldPosition, getBlockState().getValue(AbstractThrusterBlock.FACING));
+        isThrustDirty = wasThrustDirty;
 
-    @Override
-    protected void read(CompoundTag compound, boolean clientPacket){
-        super.read(compound, clientPacket);
-        emptyBlocks = compound.getInt("emptyBlocks");
-        currentTick = compound.getInt("currentTick");
-        isThrustDirty = compound.getBoolean("isThrustDirty");
-        if (PropulsionCompatibility.CC_ACTIVE) {
-            overridenPower = compound.getInt("overridenPower");
-            overridePower = compound.getBoolean("overridePower");
+        Lang.translate("gui.goggles.thruster.status", new Object[0]).text(":").space().add(getGoggleStatus()).forGoggles(tooltip);
+
+        float efficiency = 100;
+        ChatFormatting tooltipColor = ChatFormatting.GREEN;
+        if (emptyBlocks < OBSTRUCTION_LENGTH) {
+            efficiency = calculateObstructionEffect() * 100;
+            tooltipColor = GoggleUtils.efficiencyColor(efficiency);
+            Lang.builder().add(Lang.translate("gui.goggles.thruster.obstructed", new Object[0])).space().add(Lang.text(GoggleUtils.makeObstructionBar(emptyBlocks, OBSTRUCTION_LENGTH))).style(tooltipColor).forGoggles(tooltip);
         }
+
+        Lang.builder().add(Lang.translate("gui.goggles.thruster.efficiency", new Object[0])).space().add(Lang.number(efficiency)).add(Lang.text("%")).style(tooltipColor).forGoggles(tooltip);
+
+        addSpecificGoggleInfo(tooltip, isPlayerSneaking);
+        return true;
     }
 
     @SuppressWarnings("null")
@@ -375,7 +301,7 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
         float visualPowerPercent = ((float)Math.max(power, LOWEST_POWER_THRSHOLD) - LOWEST_POWER_THRSHOLD) / 15.0f;
         float distanceByPower = org.joml.Math.lerp(0.55f,1.5f, visualPowerPercent);
 
-        Direction plumeDirection = getBlockState().getValue(ThrusterBlock.FACING).getOpposite();
+        Direction plumeDirection = getBlockState().getValue(AbstractThrusterBlock.FACING).getOpposite();
 
         // Calculate OBB World Position and Orientation
         ObbCalculationResult obbResult = calculateObb(plumeDirection, distanceByPower);
@@ -471,21 +397,11 @@ public class ThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggle
         }
     }
 
-    private static class ObbCalculationResult {
-        public final double plumeLength;
-        public final Vec3 thrusterNozzleWorldPosMC;
-        public final OrientedBB plumeOBB;
-        public final Vector3d obbCenterWorldJOML;
-        public final Vector3d plumeHalfExtentsJOML;
-        public final Quaterniond obbRotationWorldJOML;
-
-        public ObbCalculationResult(double plumeLength, Vec3 thrusterNozzleWorldPosMC, OrientedBB plumeOBB, Vector3d obbCenterWorldJOML, Vector3d plumeHalfExtentsJOML, Quaterniond obbRotationWorldJOML) {
-            this.plumeLength = plumeLength;
-            this.thrusterNozzleWorldPosMC = thrusterNozzleWorldPosMC;
-            this.plumeOBB = plumeOBB;
-            this.obbCenterWorldJOML = obbCenterWorldJOML;
-            this.plumeHalfExtentsJOML = plumeHalfExtentsJOML;
-            this.obbRotationWorldJOML = obbRotationWorldJOML;
-        }
-    }
+    private static record ObbCalculationResult(
+        double plumeLength,
+        Vec3 thrusterNozzleWorldPosMC,
+        OrientedBB plumeOBB,
+        Vector3d obbCenterWorldJOML,
+        Vector3d plumeHalfExtentsJOML,
+        Quaterniond obbRotationWorldJOML) {}
 }

@@ -1,9 +1,9 @@
 package com.deltasf.createpropulsion.compat.computercraft;
 
-import com.deltasf.createpropulsion.thruster.ThrusterBlockEntity;
-
 import dan200.computercraft.api.lua.LuaFunction;
 import dan200.computercraft.api.peripheral.IPeripheral;
+
+import com.deltasf.createpropulsion.thruster.thruster.ThrusterBlockEntity;
 import com.simibubi.create.compat.computercraft.implementation.peripherals.SyncedPeripheral;
 
 public class ThrusterPeripheral extends SyncedPeripheral<ThrusterBlockEntity> {

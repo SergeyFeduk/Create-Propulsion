@@ -1,4 +1,4 @@
-package com.deltasf.createpropulsion.ship;
+package com.deltasf.createpropulsion.thruster;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,9 +17,9 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import com.deltasf.createpropulsion.utility.AttachmentUtils;
 
 @SuppressWarnings("deprecation")
-public class ForceInducedShip implements ShipForcesInducer {
-    public Map<BlockPos, IForceApplier> appliersMapping = new ConcurrentHashMap<>();
-    public ForceInducedShip() {}
+public class ThrusterForceAttachment implements ShipForcesInducer {
+    public Map<BlockPos, ThrusterForceApplier> appliersMapping = new ConcurrentHashMap<>();
+    public ThrusterForceAttachment() {}
     
     @Override
     public void applyForces(@NotNull PhysShip physicShip) {
@@ -29,7 +29,7 @@ public class ForceInducedShip implements ShipForcesInducer {
         });
     }
 
-    public void addApplier(BlockPos pos, IForceApplier applier){
+    public void addApplier(BlockPos pos, ThrusterForceApplier applier){
         appliersMapping.put(pos, applier);
     }
 
@@ -40,17 +40,17 @@ public class ForceInducedShip implements ShipForcesInducer {
             ServerShip ship = AttachmentUtils.getShipAt(level, pos);
             if (ship != null) {
                 // Remove attachment by passing null as the instance
-                ship.saveAttachment(ForceInducedShip.class, null);
+                ship.saveAttachment(ThrusterForceAttachment.class, null);
             }
         }
     }
 
     //Getters
-    public static ForceInducedShip getOrCreateAsAttachment(ServerShip ship) {
-        return AttachmentUtils.getOrCreate(ship, ForceInducedShip.class, ForceInducedShip::new);
+    public static ThrusterForceAttachment getOrCreateAsAttachment(ServerShip ship) {
+        return AttachmentUtils.getOrCreate(ship, ThrusterForceAttachment.class, ThrusterForceAttachment::new);
     }
 
-    public static ForceInducedShip get(Level level, BlockPos pos) {
-        return AttachmentUtils.get(level, pos, ForceInducedShip.class, ForceInducedShip::new);
+    public static ThrusterForceAttachment get(Level level, BlockPos pos) {
+        return AttachmentUtils.get(level, pos, ThrusterForceAttachment.class, ThrusterForceAttachment::new);
     }
 }

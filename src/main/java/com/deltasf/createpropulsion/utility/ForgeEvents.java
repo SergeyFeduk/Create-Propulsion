@@ -13,15 +13,25 @@ import com.deltasf.createpropulsion.magnet.MagnetRegistry;
 import com.deltasf.createpropulsion.network.PropulsionPackets;
 import com.deltasf.createpropulsion.network.SyncThrusterFuelsPacket;
 import com.deltasf.createpropulsion.registries.PropulsionCommands;
+import com.deltasf.createpropulsion.registries.PropulsionFluids;
 import com.deltasf.createpropulsion.thruster.ThrusterFuelManager;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.event.level.BlockEvent.FluidPlaceBlockEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -35,6 +45,7 @@ public class ForgeEvents {
         event.addListener(new ThrusterFuelManager());
     }
 
+    //Sync thruster fuels for goggles & particles on client side
     @SubscribeEvent
     public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if(event.getEntity() instanceof ServerPlayer player)  {
@@ -52,9 +63,9 @@ public class ForgeEvents {
         MagnetRegistry.get().reset();
     }
 
+    //Restore MagnetForceAttachment levels
     @SubscribeEvent
 	public static void onServerStart(ServerStartedEvent event) {
-        //Restore MagnetForceAttachment levels
         Map<ResourceLocation, ServerLevel> levelLookup = new HashMap<>();
         for (ServerLevel level : event.getServer().getAllLevels()) {
             levelLookup.put(level.dimension().location(), level);
@@ -79,6 +90,47 @@ public class ForgeEvents {
                         attachment.level = level;
                     }
                 }
+            }
+        }
+    }
+
+    //Turpentine-lava interaction
+    @SubscribeEvent
+    public static void onNeighborBlockUpdate(BlockEvent.NeighborNotifyEvent event) {
+        LevelAccessor level = event.getLevel();
+        BlockPos pos = event.getPos();
+        BlockState state = level.getBlockState(pos);
+
+        // We only care about fluid interactions. If the block isn't a fluid, ignore.
+        if (state.getFluidState().isEmpty()) {
+            return;
+        }
+
+        // Check if the block that was just updated is EITHER your fluid OR lava
+        boolean isTurpentine = state.getFluidState().is(PropulsionFluids.TURPENTINE.get());
+        boolean isLava = state.getFluidState().is(Fluids.LAVA) || state.getFluidState().is(Fluids.FLOWING_LAVA);
+
+        if (!isTurpentine && !isLava) {
+            return;
+        }
+
+        // Now, check all adjacent blocks for the other fluid
+        for (Direction dir : Direction.values()) {
+            BlockPos neighborPos = pos.relative(dir);
+            FluidState neighborFluid = level.getFluidState(neighborPos);
+
+            // Case 1: The updated block is Turpentine, and its neighbor is Lava
+            if (isTurpentine && (neighborFluid.is(Fluids.LAVA) || neighborFluid.is(Fluids.FLOWING_LAVA))) {
+                // Turn the Turpentine block into stone
+                level.setBlock(pos, Blocks.STONE.defaultBlockState(), 3);
+                return; // Interaction happened, we're done.
+            }
+
+            // Case 2: The updated block is Lava, and its neighbor is Turpentine
+            if (isLava && neighborFluid.is(PropulsionFluids.TURPENTINE.get())) {
+                // Turn the Turpentine block into stone
+                level.setBlock(neighborPos, Blocks.STONE.defaultBlockState(), 3);
+                return; // Interaction happened, we're done.
             }
         }
     }

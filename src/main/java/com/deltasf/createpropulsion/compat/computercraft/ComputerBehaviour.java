@@ -3,7 +3,7 @@ package com.deltasf.createpropulsion.compat.computercraft;
 import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerBlockEntity;
 import com.deltasf.createpropulsion.magnet.RedstoneMagnetBlockEntity;
 import com.deltasf.createpropulsion.optical_sensors.OpticalSensorBlockEntity;
-import com.deltasf.createpropulsion.thruster.ThrusterBlockEntity;
+import com.deltasf.createpropulsion.thruster.thruster.ThrusterBlockEntity;
 import com.simibubi.create.compat.computercraft.AbstractComputerBehaviour;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 
