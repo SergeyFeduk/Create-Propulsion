@@ -13,6 +13,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -20,6 +21,8 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.ForgeMod;
 
 public class AssemblyGaugeItem extends Item {
 
@@ -116,4 +119,43 @@ public class AssemblyGaugeItem extends Item {
     public static BlockPos getTargetedPosition(BlockPos pos, net.minecraft.core.Direction face) {
         return pos.relative(face);
     }
+
+    @SuppressWarnings("null")
+    public static boolean handleLeftClick(Player player) {
+        ItemStack stack = player.getMainHandItem();
+        if (!(stack.getItem() instanceof AssemblyGaugeItem)) {
+            return false;
+        }
+    
+        BlockPos posA = getPosA(stack);
+        BlockPos posB = getPosB(stack);
+        boolean shouldReset = false;
+    
+        if (posA != null && posB == null) {
+            shouldReset = true;
+        }
+        else if (posA != null && posB != null) {
+            AABB selectionBox = new AABB(posA).minmax(new AABB(posB));
+            Vec3 eyePos = player.getEyePosition();
+            Attribute reachAttr = ForgeMod.BLOCK_REACH.get();
+            if (reachAttr == null) {
+                return false;
+            }
+            double reach = player.getAttribute(reachAttr).getValue();
+            Vec3 lookVec = player.getViewVector(1.0F);
+            Vec3 endPos = eyePos.add(lookVec.scale(reach));
+    
+            if (selectionBox.inflate(0.05).clip(eyePos, endPos).isPresent()) {
+                shouldReset = true;
+            }
+        }
+    
+        if (shouldReset) {
+            PropulsionPackets.sendToServer(new ResetGaugePacket());
+            return true;
+        }
+    
+        return false;
+    }
+    
 }

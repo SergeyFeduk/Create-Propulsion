@@ -104,12 +104,10 @@ public class ForgeEvents {
         BlockPos pos = event.getPos();
         BlockState state = level.getBlockState(pos);
 
-        // We only care about fluid interactions. If the block isn't a fluid, ignore.
         if (state.getFluidState().isEmpty()) {
             return;
         }
 
-        // Check if the block that was just updated is EITHER your fluid OR lava
         boolean isTurpentine = state.getFluidState().is(PropulsionFluids.TURPENTINE.get());
         boolean isLava = state.getFluidState().is(Fluids.LAVA) || state.getFluidState().is(Fluids.FLOWING_LAVA);
 
@@ -117,23 +115,18 @@ public class ForgeEvents {
             return;
         }
 
-        // Now, check all adjacent blocks for the other fluid
         for (Direction dir : Direction.values()) {
             BlockPos neighborPos = pos.relative(dir);
             FluidState neighborFluid = level.getFluidState(neighborPos);
 
-            // Case 1: The updated block is Turpentine, and its neighbor is Lava
             if (isTurpentine && (neighborFluid.is(Fluids.LAVA) || neighborFluid.is(Fluids.FLOWING_LAVA))) {
-                // Turn the Turpentine block into stone
                 level.setBlock(pos, Blocks.STONE.defaultBlockState(), 3);
-                return; // Interaction happened, we're done.
+                return;
             }
 
-            // Case 2: The updated block is Lava, and its neighbor is Turpentine
             if (isLava && neighborFluid.is(PropulsionFluids.TURPENTINE.get())) {
-                // Turn the Turpentine block into stone
                 level.setBlock(neighborPos, Blocks.STONE.defaultBlockState(), 3);
-                return; // Interaction happened, we're done.
+                return;
             }
         }
     }

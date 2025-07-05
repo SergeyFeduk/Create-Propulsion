@@ -10,8 +10,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
+import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -23,37 +25,14 @@ public class ForgeClientEvents {
         if (!event.isAttack()) {
             return;
         }
-    
+
         Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
         if (player == null) return;
-    
-        ItemStack stack = player.getMainHandItem();
-        if (!(stack.getItem() instanceof AssemblyGaugeItem)) {
-            return;
-        }
-    
-        BlockPos posA = AssemblyGaugeItem.getPosA(stack);
-        BlockPos posB = AssemblyGaugeItem.getPosB(stack);
-        HitResult hitResult = mc.hitResult;
-    
-        boolean reset = false;
-    
-        if (posA != null && posB == null) {
-            reset = true;
-        }
-        else if (hitResult != null && hitResult.getType() == HitResult.Type.MISS) {
-            reset = true;
-        }
-        else if (posA != null && posB != null && hitResult != null) {
-            AABB selectionBox = new AABB(posA).minmax(new AABB(posB));
-            if (selectionBox.inflate(0.05).contains(hitResult.getLocation())) {
-                reset = true;
-            }
-        }
-    
-        if (reset) {
-            PropulsionPackets.sendToServer(new ResetGaugePacket());
+
+        boolean wasHandled = AssemblyGaugeItem.handleLeftClick(player);
+
+        if (wasHandled) {
             event.setCanceled(true);
         }
     }

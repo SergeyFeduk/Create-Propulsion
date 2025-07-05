@@ -27,19 +27,18 @@ import net.minecraftforge.common.ForgeMod;
 
 public class AssemblyGaugeOverlayRenderer {
     public static final IGuiOverlay OVERLAY = AssemblyGaugeOverlayRenderer::renderOverlay;
-
-    private static AABB lastSelectionAABB;
-    private static BlockPos lastPosA;
-
+    
     private static final int PASSIVE_COLOR = 0xaf68c5;
-    private static final int HIGHLIGHT_COLOR = 0xc782de;
+    private static final int HIGHLIGHT_COLOR = 0xda97f0;
     private static final int CANCEL_COLOR = 0xFF5555;
-
-    private static double flashStartGameTime = 0.0;
+    
     private static final double FLASH_ANIMATION_DURATION_S = 0.3;
     private static final double FLASH_HOLD_DURATION_S = 2.0;
     private static final double FLASH_TOTAL_DURATION_S = FLASH_ANIMATION_DURATION_S + FLASH_HOLD_DURATION_S;
-
+    
+    private static AABB lastSelectionAABB;
+    private static BlockPos lastPosA;
+    private static double flashStartGameTime = 0.0;
     private static boolean flashQueued = false;
 
     public static void triggerFlash(AABB selection) {
