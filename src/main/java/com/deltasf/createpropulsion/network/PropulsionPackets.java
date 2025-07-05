@@ -1,6 +1,8 @@
 package com.deltasf.createpropulsion.network;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
+import com.deltasf.createpropulsion.physics_assembler.AssemblyGaugeUsedPacket;
+import com.deltasf.createpropulsion.physics_assembler.ResetGaugePacket;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -28,6 +30,18 @@ public class PropulsionPackets {
             .decoder(SyncThrusterFuelsPacket::decode)
             .consumerMainThread(SyncThrusterFuelsPacket::handle)
             .add();
+        
+        INSTANCE.messageBuilder(AssemblyGaugeUsedPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+            .encoder(AssemblyGaugeUsedPacket::write)
+            .decoder(AssemblyGaugeUsedPacket::new)
+            .consumerMainThread(AssemblyGaugeUsedPacket::handle)
+            .add();
+
+        INSTANCE.messageBuilder(ResetGaugePacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+            .encoder(ResetGaugePacket::toBytes)
+            .decoder(ResetGaugePacket::new)
+            .consumerMainThread(ResetGaugePacket::handle)
+            .add();
     }
 
     public static <MSG> void sendToPlayer(MSG message, ServerPlayer player) {
@@ -36,5 +50,9 @@ public class PropulsionPackets {
 
     public static <MSG> void sendToAll(MSG message) {
         INSTANCE.send(PacketDistributor.ALL.noArg(), message);
+    }
+
+    public static <MSG> void sendToServer(MSG message) {
+        INSTANCE.sendToServer(message);
     }
 }

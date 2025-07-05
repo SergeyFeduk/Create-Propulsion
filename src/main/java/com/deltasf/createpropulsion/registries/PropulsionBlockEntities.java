@@ -34,10 +34,10 @@ public class PropulsionBlockEntities {
         .renderer(() -> OpticalSensorRenderer::new)
         .register();
 
-    /*public static final BlockEntityEntry<PhysicsAssemblerBlockEntity> PHYSICAL_ASSEMBLER_BLOCK_ENTITY =
+    public static final BlockEntityEntry<PhysicsAssemblerBlockEntity> PHYSICAL_ASSEMBLER_BLOCK_ENTITY =
         REGISTRATE.blockEntity("physics_assembler_block_entity", PhysicsAssemblerBlockEntity::new)
         .validBlock(PropulsionBlocks.PHYSICS_ASSEMBLER_BLOCK)
-        .register();*/
+        .register();
     
     public static final BlockEntityEntry<LodestoneTrackerBlockEntity> LODESTONE_TRACKER_BLOCK_ENTITY = 
         REGISTRATE.blockEntity("lodestone_tracker_block_entity", LodestoneTrackerBlockEntity::new)

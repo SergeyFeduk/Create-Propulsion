@@ -1,11 +1,22 @@
 package com.deltasf.createpropulsion.utility;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
+import com.deltasf.createpropulsion.network.PropulsionPackets;
+import com.deltasf.createpropulsion.physics_assembler.AssemblyGaugeItem;
+import com.deltasf.createpropulsion.physics_assembler.AssemblyGaugeOverlayRenderer;
+import com.deltasf.createpropulsion.physics_assembler.ResetGaugePacket;
 //import com.deltasf.createpropulsion.design_goggles.DesignGogglesOverlayRenderer;
 import com.deltasf.createpropulsion.registries.PropulsionItems;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeableLeatherItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RegisterColorHandlersEvent;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
@@ -46,8 +57,9 @@ public class ClientEvents {
         }, PropulsionItems.OPTICAL_LENS.get());
     }
 
-    /*@SubscribeEvent
+    @SubscribeEvent
     public static void registerGuiOverlays(RegisterGuiOverlaysEvent event) {
-        event.registerAbove(VanillaGuiOverlay.HOTBAR.id(), "goggle_info", DesignGogglesOverlayRenderer.OVERLAY);
-    }*/
+        event.registerAbove(VanillaGuiOverlay.HOTBAR.id(), "assembly_gauge", AssemblyGaugeOverlayRenderer.OVERLAY);
+        //event.registerAbove(VanillaGuiOverlay.HOTBAR.id(), "goggle_info", DesignGogglesOverlayRenderer.OVERLAY);
+    }
 }

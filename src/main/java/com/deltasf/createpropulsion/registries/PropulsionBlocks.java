@@ -43,13 +43,13 @@ public class PropulsionBlocks {
         .simpleItem()
         .register();
 
-    /*public static final BlockEntry<PhysicsAssemblerBlock> PHYSICS_ASSEMBLER_BLOCK = REGISTRATE.block("physics_assembler", PhysicsAssemblerBlock::new)
+    public static final BlockEntry<PhysicsAssemblerBlock> PHYSICS_ASSEMBLER_BLOCK = REGISTRATE.block("physics_assembler", PhysicsAssemblerBlock::new)
         .properties(p -> p.mapColor(MapColor.COLOR_YELLOW))
         .properties(p -> p.sound(SoundType.METAL))
         .properties(p -> p.strength(2.5F, 2.0F))
         .properties(p -> p.noOcclusion())
         .simpleItem()
-        .register();*/
+        .register();
 
     public static final BlockEntry<LodestoneTrackerBlock> LODESTONE_TRACKER_BLOCK = REGISTRATE.block("lodestone_tracker", LodestoneTrackerBlock::new)
         .properties(p -> p.mapColor(MapColor.COLOR_YELLOW))
