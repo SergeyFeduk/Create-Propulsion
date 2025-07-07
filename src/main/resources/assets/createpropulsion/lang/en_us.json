@@ -13,6 +13,7 @@
 
     "block.createpropulsion.lodestone_tracker": "Lodestone Tracker",
     "block.createpropulsion.redstone_magnet": "Redstone Magnet",
+    "block.createpropulsion.physics_assembler": "Physics Assembler",
 
     "create.gui.goggles.thruster.status": "Thruster Status",
     "create.gui.goggles.thruster.status.no_fuel": "No Fuel",
@@ -51,5 +52,7 @@
     "item.createpropulsion.fluid_lens": "Fluid Lens",
     "item.createpropulsion.focus_lens": "Focusing Lens",
     "item.createpropulsion.invisibility_lens": "Invisibility Lens",
-    "item.createpropulsion.unfinished_lens": "Unfinished Lens"
+    "item.createpropulsion.unfinished_lens": "Unfinished Lens",
+
+    "item.createpropulsion.assembly_gauge": "Assembly Gauge"
 }

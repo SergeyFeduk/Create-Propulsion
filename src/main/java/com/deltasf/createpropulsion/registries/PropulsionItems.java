@@ -26,7 +26,9 @@ public class PropulsionItems {
     public static final ItemEntry<Item> UNFINISHED_LENS = REGISTRATE.item("unfinished_lens", Item::new).register();
 
     //public static final ItemEntry<DesignGogglesItem> DESIGN_GOGGLES = REGISTRATE.item("design_goggles", DesignGogglesItem::new).register();
-    public static final ItemEntry<AssemblyGaugeItem> ASSEMBLY_GAUGE = REGISTRATE.item("assembly_gauge", AssemblyGaugeItem::new).register();
+    public static final ItemEntry<AssemblyGaugeItem> ASSEMBLY_GAUGE = REGISTRATE.item("assembly_gauge", AssemblyGaugeItem::new)
+        .properties(p -> p.stacksTo(1))
+        .register();
 
     public static final TagKey<Item> OPTICAL_LENS_TAG = makeTag("optical_lens");
 
