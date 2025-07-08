@@ -63,7 +63,6 @@ public class PhysicsAssemblerBlockEntity extends BlockEntity {
     }
 
     private void calculateBoundsForDirection(BlockPos origin, Direction facing) {
-        // Using offsets relative to the *assembler block's* position (origin)
         int minXOff = (facing.getAxis() == Direction.Axis.X) ? (facing.getAxisDirection() == Direction.AxisDirection.POSITIVE ? 1 : -3) : -1;
         int minYOff = (facing.getAxis() == Direction.Axis.Y) ? (facing.getAxisDirection() == Direction.AxisDirection.POSITIVE ? 1 : -3) : -1;
         int minZOff = (facing.getAxis() == Direction.Axis.Z) ? (facing.getAxisDirection() == Direction.AxisDirection.POSITIVE ? 1 : -3) : -1;

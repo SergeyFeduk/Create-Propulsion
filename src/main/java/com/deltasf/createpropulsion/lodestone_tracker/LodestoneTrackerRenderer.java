@@ -22,7 +22,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
-@SuppressWarnings("null") //Silence
 public class LodestoneTrackerRenderer extends SafeBlockEntityRenderer<LodestoneTrackerBlockEntity> {
     public LodestoneTrackerRenderer(BlockEntityRendererProvider.Context context) { super();}
 

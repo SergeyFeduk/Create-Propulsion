@@ -112,8 +112,7 @@ public class MagnetForceAttachment implements ShipForcesInducer {
     private final Vector3d _tempTorqueFromForce = new Vector3d();
 
 
-    @SuppressWarnings("null")
-        private void calculateInteraction(MagnetPair pair, PhysShipImpl shipA, Vector3dc ACOM, ShipTransform transformA, 
+    private void calculateInteraction(MagnetPair pair, PhysShipImpl shipA, Vector3dc ACOM, ShipTransform transformA, 
         Vector3d totalForceAcc,
         Vector3d totalTorqueAcc) {
         //Calculate interaction power

@@ -45,8 +45,7 @@ public class PhysicsAssemblerBlock extends DirectionalBlock implements EntityBlo
 
     @Override
     public BlockEntity newBlockEntity(@Nonnull BlockPos pos, @Nonnull BlockState state) {
-        //return new PhysicsAssemblerBlockEntity(PropulsionBlockEntities.PHYSICAL_ASSEMBLER_BLOCK_ENTITY.get(), pos, state);
-        return null;
+        return new PhysicsAssemblerBlockEntity(PropulsionBlockEntities.PHYSICAL_ASSEMBLER_BLOCK_ENTITY.get(), pos, state);
     }
 
     //Handle redstone signal
@@ -64,7 +63,7 @@ public class PhysicsAssemblerBlock extends DirectionalBlock implements EntityBlo
         //Update state
         BlockState newState = state.setValue(POWERED, newPowered);
         level.setBlock(pos, newState, Block.UPDATE_ALL);
-        if (!newPowered) return; //Falling edge
+        if (!newPowered) return;
         
         //Invoke shipify
         BlockEntity blockEntity = level.getBlockEntity(pos);

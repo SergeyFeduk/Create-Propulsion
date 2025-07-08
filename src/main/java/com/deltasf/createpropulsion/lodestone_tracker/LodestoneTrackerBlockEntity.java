@@ -40,6 +40,7 @@ import net.minecraftforge.items.IItemHandler;
 public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
     //Total of 360 degrees occupied by 32 states, halved to account for angles being centered while segments are not
     private static final float ANGLE_TOLERANCE = 360.0f / 32.0f / 2.0f; 
+    //TODO: Use item handler instead of compass field
     private final LodestoneTrackerItemHandler itemHandler = new LodestoneTrackerItemHandler(this);
     private final LazyOptional<IItemHandler> itemHandlerCap = LazyOptional.of(() -> itemHandler);
     //Replacing 16^4 blockstates with this
@@ -89,7 +90,6 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
         if (targetLodestone) {
             targetBlockPosition = CompassItem.getLodestonePosition(compass.getShareTag());
             if (targetBlockPosition == null) {
-                //TODO: Print to check if this is correct
                 //This is triggered with lodestone compass which has its lodestone block destroyed
                 //In this case we just rotate the angle
                 float angle = ((float)currentTick * 10.0f) % 360.0f;

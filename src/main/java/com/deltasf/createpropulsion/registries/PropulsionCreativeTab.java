@@ -48,13 +48,13 @@ public class PropulsionCreativeTab {
                 output.accept(PropulsionBlocks.PHYSICS_ASSEMBLER_BLOCK);
                 //output.accept(PropulsionBlocks.TILT_SENSOR_BLOCK);
                 //From 0.2 (items)
+                output.accept(PropulsionItems.ASSEMBLY_GAUGE);
                 output.accept(PropulsionFluids.TURPENTINE.getBucket().get());
                 output.accept(PropulsionItems.PINE_RESIN);
                 output.accept(PropulsionItems.OPTICAL_LENS);
                 output.accept(PropulsionItems.FLUID_LENS);
                 output.accept(PropulsionItems.FOCUS_LENS);
                 output.accept(PropulsionItems.INVISIBILITY_LENS);
-                output.accept(PropulsionItems.ASSEMBLY_GAUGE);
             }
         }
 }
