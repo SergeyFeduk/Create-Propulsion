@@ -1,13 +1,16 @@
 package com.deltasf.createpropulsion.physics_assembler;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
+import com.deltasf.createpropulsion.registries.PropulsionShapes;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DirectionalBlock;
@@ -16,36 +19,29 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class PhysicsAssemblerBlock extends DirectionalBlock implements EntityBlock {
-    public static final BooleanProperty POWERED = BooleanProperty.create("redstone_power");
+public class PhysicsAssemblerBlock extends Block implements EntityBlock {
+    public static final BooleanProperty POWERED = BooleanProperty.create("powered");
     public PhysicsAssemblerBlock(Properties properties) {
         super(properties);
-        this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
-    }
-
-    @Override
-    public BlockState getStateForPlacement(@Nonnull BlockPlaceContext context) {
-        Direction baseDirection = context.getNearestLookingDirection();
-        Direction placeDirection;
-        Player player = context.getPlayer();
-        if (player != null) {
-            placeDirection = !player.isShiftKeyDown() ? baseDirection.getOpposite() : baseDirection;
-        } else {
-            placeDirection = baseDirection;
-        }
-        
-        return this.defaultBlockState().setValue(FACING, placeDirection);
+        this.registerDefaultState(this.stateDefinition.any().setValue(POWERED, false));
     }
 
     @Override
     protected void createBlockStateDefinition(@Nonnull StateDefinition.Builder<net.minecraft.world.level.block.Block, BlockState> builder) {
-        builder.add(FACING, POWERED);
+        builder.add(POWERED);
     }
 
     @Override
     public BlockEntity newBlockEntity(@Nonnull BlockPos pos, @Nonnull BlockState state) {
         return new PhysicsAssemblerBlockEntity(PropulsionBlockEntities.PHYSICAL_ASSEMBLER_BLOCK_ENTITY.get(), pos, state);
+    }
+
+    @Override
+    public VoxelShape getShape(@Nullable BlockState pState, @Nullable BlockGetter pLevel, @Nullable BlockPos pPos, @Nullable CollisionContext pContext) {
+        return PropulsionShapes.PHYSICS_ASSEMBLER.get(Direction.NORTH);
     }
 
     //Handle redstone signal

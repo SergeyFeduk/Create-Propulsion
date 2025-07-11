@@ -48,7 +48,7 @@ public class PhysicsAssemblerBlockEntity extends BlockEntity {
     public PhysicsAssemblerBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
         //Set poses here
-        calculateBounds(pos, state);
+        //calculateBounds(pos, state);
     }
 
     private BlockPos posA;
@@ -57,12 +57,12 @@ public class PhysicsAssemblerBlockEntity extends BlockEntity {
     private List<Vector2i> chunkPoses = new ArrayList<Vector2i>();
     private List<Vector2i> destchunkPoses = new ArrayList<Vector2i>();
 
-    private void calculateBounds(BlockPos origin, BlockState state) {
+    /*private void calculateBounds(BlockPos origin, BlockState state) {
         Direction facing = state.getValue(DirectionalBlock.FACING);
         calculateBoundsForDirection(origin, facing);
-    }
+    }*/
 
-    private void calculateBoundsForDirection(BlockPos origin, Direction facing) {
+    /*private void calculateBoundsForDirection(BlockPos origin, Direction facing) {
         int minXOff = (facing.getAxis() == Direction.Axis.X) ? (facing.getAxisDirection() == Direction.AxisDirection.POSITIVE ? 1 : -3) : -1;
         int minYOff = (facing.getAxis() == Direction.Axis.Y) ? (facing.getAxisDirection() == Direction.AxisDirection.POSITIVE ? 1 : -3) : -1;
         int minZOff = (facing.getAxis() == Direction.Axis.Z) ? (facing.getAxisDirection() == Direction.AxisDirection.POSITIVE ? 1 : -3) : -1;
@@ -74,7 +74,7 @@ public class PhysicsAssemblerBlockEntity extends BlockEntity {
         // The calculated bounds are relative to the assembler's worldPosition
         this.posA = origin.offset(minXOff, minYOff, minZOff);
         this.posB = origin.offset(maxXOff, maxYOff, maxZOff);
-    }
+    }*/
 
     //Super secret logic that converts objects spatially restricted to world grid into independent ship entities
     //I spent like two evenings on this
@@ -85,7 +85,7 @@ public class PhysicsAssemblerBlockEntity extends BlockEntity {
         ServerLevel level = (ServerLevel) world;
 
         if (posA == null || posB == null) {
-            calculateBounds(this.worldPosition, this.getBlockState());
+            //calculateBounds(this.worldPosition, this.getBlockState());
             if (posA == null || posB == null) return;
         }
 
@@ -298,15 +298,15 @@ public class PhysicsAssemblerBlockEntity extends BlockEntity {
     @Override
     public void saveAdditional(@Nonnull CompoundTag tag) {
         super.saveAdditional(tag);
-        tag.put("posA", NbtUtils.writeBlockPos(posA));
-        tag.put("posB", NbtUtils.writeBlockPos(posB));
+        //tag.put("posA", NbtUtils.writeBlockPos(posA));
+        //tag.put("posB", NbtUtils.writeBlockPos(posB));
     }
 
     @Override
     public void load(@Nonnull CompoundTag tag) {
         super.load(tag);
-        posA = NbtUtils.readBlockPos(tag.getCompound("posA"));
-        posB = NbtUtils.readBlockPos(tag.getCompound("posB"));
+        //posA = NbtUtils.readBlockPos(tag.getCompound("posA"));
+        //posB = NbtUtils.readBlockPos(tag.getCompound("posB"));
     }
 
     @Override

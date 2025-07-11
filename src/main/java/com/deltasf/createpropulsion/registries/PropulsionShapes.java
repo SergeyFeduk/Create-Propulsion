@@ -35,8 +35,12 @@ public class PropulsionShapes {
             .add(Block.box(1, 0, 1, 15, 2, 15))
             .add(Block.box(2, 2, 2, 14, 9, 14))
             .add(Block.box(0, 9, 0, 16, 14, 16))
+            .forDirectional(Direction.NORTH),
+
+        PHYSICS_ASSEMBLER = ShapeBuilder.shape()
+            .add(Block.box(0, 0, 0, 16, 14, 16))
+            .add(Block.box(1, 14, 1, 15, 16, 15))
             .forDirectional(Direction.NORTH);
-    
     
     public static class ShapeBuilder {
         private VoxelShape shape;
