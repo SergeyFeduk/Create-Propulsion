@@ -27,11 +27,7 @@ import net.minecraftforge.common.ForgeMod;
 
 public class AssemblyGaugeOverlayRenderer {
     public static final IGuiOverlay OVERLAY = AssemblyGaugeOverlayRenderer::renderOverlay;
-    
-    private static final int PASSIVE_COLOR = 0xaf68c5;
-    private static final int HIGHLIGHT_COLOR = 0xda97f0;
-    private static final int CANCEL_COLOR = 0xFF5555;
-    
+
     private static final double FLASH_ANIMATION_DURATION_S = 0.3;
     private static final double FLASH_HOLD_DURATION_S = 2.0;
     private static final double FLASH_TOTAL_DURATION_S = FLASH_ANIMATION_DURATION_S + FLASH_HOLD_DURATION_S;
@@ -100,9 +96,9 @@ public class AssemblyGaugeOverlayRenderer {
                 lastPosA = posA;
             } else {
                 if (player.isShiftKeyDown()) {
-                    statusText = Component.literal("Click again to cancel").withStyle(s -> s.withColor(CANCEL_COLOR));
+                    statusText = Component.literal("Click again to cancel").withStyle(s -> s.withColor(AssemblyUtility.CANCEL_COLOR));
                 } else {
-                    statusText = Component.literal("Click again to confirm").withStyle(s -> s.withColor(HIGHLIGHT_COLOR));
+                    statusText = Component.literal("Click again to confirm").withStyle(s -> s.withColor(AssemblyUtility.HIGHLIGHT_COLOR));
                 }
             }
         }
@@ -126,17 +122,14 @@ public class AssemblyGaugeOverlayRenderer {
             if (elapsedTime < FLASH_ANIMATION_DURATION_S) {
                 float progress = (float) (elapsedTime / FLASH_ANIMATION_DURATION_S);
                 flashLineWidth = Mth.lerp(progress, 1/16f, 1/64f);
-                color = lerpColor(progress, HIGHLIGHT_COLOR, PASSIVE_COLOR);
+                color = AssemblyUtility.lerpColor(progress, AssemblyUtility.HIGHLIGHT_COLOR, AssemblyUtility.PASSIVE_COLOR);
             } else {
                 flashLineWidth = 1/64f;
-                color = PASSIVE_COLOR;
+                color = AssemblyUtility.PASSIVE_COLOR;
             }
 
-            CreateClient.OUTLINER.showAABB("gauge_flash", lastSelectionAABB)
-                .colored(color)
-                .lineWidth(flashLineWidth)
-                .withFaceTexture(AllSpecialTextures.SELECTION)
-                .disableLineNormals();
+            AssemblyUtility.renderOutline("gauge_flash", lastSelectionAABB, color, flashLineWidth, true);
+
         } else if (posB != null) {
             Vec3 eyePos = player.getEyePosition(partialTicks);
 
@@ -150,27 +143,11 @@ public class AssemblyGaugeOverlayRenderer {
 
             float lineWidth = isHovering ? 1/16f : 1/64f;
 
-            var outline = CreateClient.OUTLINER.showAABB("gauge_selection", currentSelectionBox)
-                .colored(PASSIVE_COLOR)
-                .lineWidth(lineWidth)
-                .disableLineNormals();
-
-            outline.withFaceTexture(isHovering ? AllSpecialTextures.SELECTION : null);
+            AssemblyUtility.renderOutline("gauge_selection", currentSelectionBox, AssemblyUtility.PASSIVE_COLOR, lineWidth, isHovering);
 
         } else {
-            int color = isTooLarge || (player.isShiftKeyDown()) ? CANCEL_COLOR : PASSIVE_COLOR;
-            CreateClient.OUTLINER.showAABB("gauge_selection", currentSelectionBox)
-                .colored(color)
-                .lineWidth(1/16f)
-                .withFaceTexture(AllSpecialTextures.SELECTION)
-                .disableLineNormals();
+            int color = isTooLarge || (player.isShiftKeyDown()) ? AssemblyUtility.CANCEL_COLOR : AssemblyUtility.PASSIVE_COLOR;
+            AssemblyUtility.renderOutline("gauge_selection", currentSelectionBox, color, 1/16f, true);
         }
-    }
-
-    private static int lerpColor(float progress, int color1, int color2) {
-        int r1 = (color1 >> 16) & 0xFF, g1 = (color1 >> 8) & 0xFF, b1 = color1 & 0xFF;
-        int r2 = (color2 >> 16) & 0xFF, g2 = (color2 >> 8) & 0xFF, b2 = color2 & 0xFF;
-        int r = (int) Mth.lerp(progress, r1, r2), g = (int) Mth.lerp(progress, g1, g2), b = (int) Mth.lerp(progress, b1, b2);
-        return (r << 16) | (g << 8) | b;
     }
 }

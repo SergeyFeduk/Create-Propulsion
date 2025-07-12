@@ -8,6 +8,7 @@ import com.deltasf.createpropulsion.optical_sensors.InlineOpticalSensorBlockEnti
 import com.deltasf.createpropulsion.optical_sensors.OpticalSensorBlockEntity;
 import com.deltasf.createpropulsion.optical_sensors.rendering.OpticalSensorRenderer;
 import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerBlockEntity;
+import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerRenderer;
 import com.deltasf.createpropulsion.thruster.thruster.ThrusterBlockEntity;
 import com.deltasf.createpropulsion.tilt_sensor.TiltSensorBlockEntity;
 import com.simibubi.create.foundation.data.CreateRegistrate;
@@ -37,6 +38,7 @@ public class PropulsionBlockEntities {
     public static final BlockEntityEntry<PhysicsAssemblerBlockEntity> PHYSICAL_ASSEMBLER_BLOCK_ENTITY =
         REGISTRATE.blockEntity("physics_assembler_block_entity", PhysicsAssemblerBlockEntity::new)
         .validBlock(PropulsionBlocks.PHYSICS_ASSEMBLER_BLOCK)
+        .renderer(() -> PhysicsAssemblerRenderer::new)
         .register();
     
     public static final BlockEntityEntry<LodestoneTrackerBlockEntity> LODESTONE_TRACKER_BLOCK_ENTITY = 

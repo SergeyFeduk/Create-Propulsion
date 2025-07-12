@@ -23,5 +23,10 @@
         "block": "createpropulsion:redstone_magnet",
         "mass": 1000.0,
         "friction": 0.4
+    },
+    {
+        "block": "createpropulsion:physics_assembler",
+        "mass": 1600.0,
+        "friction": 0.4
     }
 ]

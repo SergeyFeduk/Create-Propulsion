@@ -23,10 +23,14 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -36,6 +40,11 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.ticks.ScheduledTick;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.networking.PacketRestartChunkUpdates;
@@ -45,36 +54,17 @@ import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 @SuppressWarnings("null")
 public class PhysicsAssemblerBlockEntity extends BlockEntity {
     private final BlockState AIR = Blocks.AIR.defaultBlockState();
+    private static final int MAX_MINK_DISTANCE = 3;
+
     public PhysicsAssemblerBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
-        //Set poses here
-        //calculateBounds(pos, state);
     }
-
-    private BlockPos posA;
-    private BlockPos posB;
 
     private List<Vector2i> chunkPoses = new ArrayList<Vector2i>();
     private List<Vector2i> destchunkPoses = new ArrayList<Vector2i>();
 
-    /*private void calculateBounds(BlockPos origin, BlockState state) {
-        Direction facing = state.getValue(DirectionalBlock.FACING);
-        calculateBoundsForDirection(origin, facing);
-    }*/
-
-    /*private void calculateBoundsForDirection(BlockPos origin, Direction facing) {
-        int minXOff = (facing.getAxis() == Direction.Axis.X) ? (facing.getAxisDirection() == Direction.AxisDirection.POSITIVE ? 1 : -3) : -1;
-        int minYOff = (facing.getAxis() == Direction.Axis.Y) ? (facing.getAxisDirection() == Direction.AxisDirection.POSITIVE ? 1 : -3) : -1;
-        int minZOff = (facing.getAxis() == Direction.Axis.Z) ? (facing.getAxisDirection() == Direction.AxisDirection.POSITIVE ? 1 : -3) : -1;
-
-        int maxXOff = (facing.getAxis() == Direction.Axis.X) ? (facing.getAxisDirection() == Direction.AxisDirection.POSITIVE ? 3 : -1) : 1;
-        int maxYOff = (facing.getAxis() == Direction.Axis.Y) ? (facing.getAxisDirection() == Direction.AxisDirection.POSITIVE ? 3 : 1) : 1;
-        int maxZOff = (facing.getAxis() == Direction.Axis.Z) ? (facing.getAxisDirection() == Direction.AxisDirection.POSITIVE ? 3 : -1) : 1;
-
-        // The calculated bounds are relative to the assembler's worldPosition
-        this.posA = origin.offset(minXOff, minYOff, minZOff);
-        this.posB = origin.offset(maxXOff, maxYOff, maxZOff);
-    }*/
+    private final ItemStackHandler itemHandler = createItemHandler();
+    private final LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.of(() -> itemHandler);
 
     //Super secret logic that converts objects spatially restricted to world grid into independent ship entities
     //I spent like two evenings on this
@@ -84,10 +74,17 @@ public class PhysicsAssemblerBlockEntity extends BlockEntity {
         if (!(world instanceof ServerLevel)) return;
         ServerLevel level = (ServerLevel) world;
 
+        //Obtain pos from stack
+        ItemStack gaugeStack = itemHandler.getStackInSlot(0);
+        if (!(gaugeStack.getItem() instanceof AssemblyGaugeItem)) return;
+
+        BlockPos posA = AssemblyGaugeItem.getPosA(gaugeStack);
+        BlockPos posB = AssemblyGaugeItem.getPosB(gaugeStack);
+
         if (posA == null || posB == null) {
-            //calculateBounds(this.worldPosition, this.getBlockState());
-            if (posA == null || posB == null) return;
+            return;
         }
+
 
         //Get region
         SelectedRegion region = getGeometricCenterOfBlocksInRegion(level, posA, posB);
@@ -231,7 +228,6 @@ public class PhysicsAssemblerBlockEntity extends BlockEntity {
 
         //And lighting too
         level.getChunkSource().getLightEngine().checkBlock(to);
-
     }
 
     private SelectedRegion getGeometricCenterOfBlocksInRegion(Level level, BlockPos posA, BlockPos posB) {
@@ -293,20 +289,117 @@ public class PhysicsAssemblerBlockEntity extends BlockEntity {
         }
     }
 
-    //Serialization, temp as will be replaced with some item storing corner positions
+    //Gauge
+
+    public boolean canInsertGauge(ItemStack gauge) {
+        BlockPos posA = AssemblyGaugeItem.getPosA(gauge);
+        BlockPos posB = AssemblyGaugeItem.getPosB(gauge);
+        if (posA == null || posB == null) {
+            return false;
+        }
+
+        int manhattanDistance = getManhattanDistanceToRegion(this.worldPosition, posA, posB);
+        return manhattanDistance <= MAX_MINK_DISTANCE;
+    }
+
+    public boolean hasGauge() {
+        return !itemHandler.getStackInSlot(0).isEmpty();
+    }
+
+    public void insertGauge(Player player, InteractionHand hand) {
+        if (level == null || level.isClientSide()) {
+            return;
+        }
+
+        ItemStack gaugeInHand = player.getItemInHand(hand);
+        
+        if (!(gaugeInHand.getItem() instanceof AssemblyGaugeItem) || !itemHandler.getStackInSlot(0).isEmpty()) {
+            return;
+        }
+        
+        ItemStack gaugeToInsert = gaugeInHand.copy();
+        gaugeToInsert.setCount(1);
+        itemHandler.setStackInSlot(0, gaugeToInsert);
+
+        gaugeInHand.shrink(1);
+        level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_ALL);
+    }
+
+    public ItemStack removeGauge() {
+        if (level == null || level.isClientSide()) {
+            return ItemStack.EMPTY;
+        }
+
+        ItemStack extracted = itemHandler.getStackInSlot(0).copy();
+        itemHandler.setStackInSlot(0, ItemStack.EMPTY);
+
+        level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_ALL);
+        return extracted;
+    }
+
+    private int getManhattanDistanceToRegion(BlockPos point, BlockPos corner1, BlockPos corner2) {
+        int minX = Math.min(corner1.getX(), corner2.getX());
+        int maxX = Math.max(corner1.getX(), corner2.getX());
+        int minY = Math.min(corner1.getY(), corner2.getY());
+        int maxY = Math.max(corner1.getY(), corner2.getY());
+        int minZ = Math.min(corner1.getZ(), corner2.getZ());
+        int maxZ = Math.max(corner1.getZ(), corner2.getZ());
+
+        int distX = Math.max(0, minX - point.getX()) + Math.max(0, point.getX() - maxX);
+        int distY = Math.max(0, minY - point.getY()) + Math.max(0, point.getY() - maxY);
+        int distZ = Math.max(0, minZ - point.getZ()) + Math.max(0, point.getZ() - maxZ);
+
+        return distX + distY + distZ;
+    }
+
+    public ItemStack getGaugeStack() {
+        return this.itemHandler.getStackInSlot(0);
+    }
+
+    public float getGaugeRotation() {
+        ItemStack gauge = getGaugeStack();
+        if (gauge.isEmpty()) {
+            return 0;
+        }
+
+        BlockPos posA = AssemblyGaugeItem.getPosA(gauge);
+        BlockPos posB = AssemblyGaugeItem.getPosB(gauge);
+
+        if (posA == null || posB == null) {
+            return 0;
+        }
+
+        int minX = Math.min(posA.getX(), posB.getX());
+        int maxX = Math.max(posA.getX(), posB.getX());
+        int minZ = Math.min(posA.getZ(), posB.getZ());
+        int maxZ = Math.max(posA.getZ(), posB.getZ());
+
+        BlockPos point = this.worldPosition;
+        int distX = Math.max(0, minX - point.getX()) + Math.max(0, point.getX() - maxX);
+        int distZ = Math.max(0, minZ - point.getZ()) + Math.max(0, point.getZ() - maxZ);
+        
+        if (distZ >= distX) {
+            return 0.0f;
+        }
+
+        return 90.0f;
+    }
+
+    //Serialization
 
     @Override
     public void saveAdditional(@Nonnull CompoundTag tag) {
         super.saveAdditional(tag);
-        //tag.put("posA", NbtUtils.writeBlockPos(posA));
-        //tag.put("posB", NbtUtils.writeBlockPos(posB));
+        tag.put("inventory", itemHandler.serializeNBT());
     }
 
     @Override
     public void load(@Nonnull CompoundTag tag) {
         super.load(tag);
-        //posA = NbtUtils.readBlockPos(tag.getCompound("posA"));
-        //posB = NbtUtils.readBlockPos(tag.getCompound("posB"));
+        if (tag.contains("inventory", Tag.TAG_COMPOUND)) {
+            itemHandler.deserializeNBT(tag.getCompound("inventory"));
+        }
+
     }
 
     @Override
@@ -326,4 +419,35 @@ public class PhysicsAssemblerBlockEntity extends BlockEntity {
     public Packet<ClientGamePacketListener> getUpdatePacket() {
         return ClientboundBlockEntityDataPacket.create(this);
     }
+
+    //Capabilities
+
+    @Nonnull
+    @Override
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
+        if (cap == ForgeCapabilities.ITEM_HANDLER) {
+            return lazyItemHandler.cast();
+        }
+        return super.getCapability(cap, side);
+    }
+
+    @Override
+    public void invalidateCaps() {
+        super.invalidateCaps();
+        lazyItemHandler.invalidate();
+    }
+
+    private ItemStackHandler createItemHandler() {
+    return new ItemStackHandler(1) {
+        @Override
+        protected void onContentsChanged(int slot) {
+            setChanged();
+        }
+
+        @Override
+        public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
+            return stack.getItem() instanceof AssemblyGaugeItem && super.isItemValid(slot, stack);
+        }
+    };
+}
 }
