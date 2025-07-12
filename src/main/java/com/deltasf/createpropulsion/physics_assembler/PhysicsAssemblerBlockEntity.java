@@ -12,6 +12,7 @@ import org.joml.Quaterniond;
 import org.joml.Quaterniondc;
 import org.joml.Vector2i;
 import org.joml.Vector3d;
+import org.joml.Vector3dc;
 import org.joml.Vector3i;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.properties.ChunkClaim;
@@ -145,18 +146,24 @@ public class PhysicsAssemblerBlockEntity extends BlockEntity {
         }
 
         //Teleport ship to actual location
-        Vector3d finalShipPosInWorld;
-        Vector3d finalShipPosInShipyard;
-        Quaterniondc finalShipRotation = new Quaterniond(); // Identity rotation initially
+        Vector3dc comInShip = ship.getInertiaData().getCenterOfMassInShip();
+        Vector3d finalShipPosInShipyard = new Vector3d(comInShip).add(0.5,0.5,0.5);
+
+        Vector3d newShipInternalCenterPosVec = VectorConversionsMCKt.toJOMLD(newShipInternalCenterPos);
+        Vector3d creationAnchorPosVec = VectorConversionsMCKt.toJOMLD(creationAnchorPos);
+
+        Vector3d shipComInWorld = new Vector3d(comInShip)
+            .sub(newShipInternalCenterPosVec)
+            .add(creationAnchorPosVec);
+
+        Vector3d finalShipPosInWorld = shipComInWorld.add(0.5,0.5,0.5);
+        Quaterniondc finalShipRotation = new Quaterniond();
         Vector3d finalShipScale = new Vector3d(1, 1, 1);
+
         if (parentShip != null) {
-            finalShipPosInShipyard = gc;
-            finalShipPosInWorld = parentShip.getShipToWorld().transformPosition(gc.add(0.5, 0.5, 0.5));
+            finalShipPosInWorld = parentShip.getShipToWorld().transformPosition(shipComInWorld, new Vector3d());
             finalShipRotation = parentShip.getTransform().getShipToWorldRotation();
-            finalShipScale = parentShip.getTransform().getShipToWorldScaling().mul(1, new Vector3d());
-        } else {
-            finalShipPosInShipyard = gc;
-            finalShipPosInWorld = gc.add(0.5, 0.5, 0.5);
+            finalShipScale.mul(parentShip.getTransform().getShipToWorldScaling());
         }
 
         ShipTransformImpl newShipTransform = new ShipTransformImpl(
@@ -299,6 +306,7 @@ public class PhysicsAssemblerBlockEntity extends BlockEntity {
         }
 
         int manhattanDistance = getManhattanDistanceToRegion(this.worldPosition, posA, posB);
+        //TODO: physics assembler cannot be inside of the region
         return manhattanDistance <= MAX_MINK_DISTANCE;
     }
 
