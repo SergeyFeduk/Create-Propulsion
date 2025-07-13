@@ -482,17 +482,10 @@ public class PhysicsAssemblerBlockEntity extends BlockEntity {
 
     public record GaugeValidationResult(boolean isValid, Optional<Component> reason) {}
 
-    private class SelectedRegion {
-        public Vector3d geometricCenter;
-        public boolean hasBlocks; 
-        public List<BlockPos> blockPositions;
-        public Set<ChunkPos> chunkPosSet;
-
-        public SelectedRegion(Vector3d geometricalCenter, boolean hasBlocks, List<BlockPos> blocks, Set<ChunkPos> chunkPosSet) {
-            this.geometricCenter = geometricalCenter;
-            this.hasBlocks = hasBlocks;
-            this.blockPositions = blocks;
-            this.chunkPosSet = chunkPosSet;
-        }
-    }
+    private record SelectedRegion (
+        Vector3d geometricCenter,
+        boolean hasBlocks,
+        List<BlockPos> blockPositions,
+        Set<ChunkPos> chunkPosSet
+    ) {}
 }

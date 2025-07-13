@@ -79,18 +79,22 @@ public class AssemblyGaugeOverlayRenderer {
 
         boolean selectingSecond = posA != null && posB == null;
         Component statusText = null;
+
         boolean isTooLarge = false;
+        AABB selectionBox = null; 
         if (selectingSecond && lookingAtPos != null) {
-            if (Math.abs(posA.getX() - lookingAtPos.getX()) > AssemblyUtility.MAX_ASSEMBLY_SIZE
-                || Math.abs(posA.getY() - lookingAtPos.getY()) > AssemblyUtility.MAX_ASSEMBLY_SIZE
-                || Math.abs(posA.getZ() - lookingAtPos.getZ()) > AssemblyUtility.MAX_ASSEMBLY_SIZE) {
-                isTooLarge = true;
-            }
+            selectionBox = new AABB(posA, lookingAtPos);
+            isTooLarge = AssemblyUtility.isAABBLarger(selectionBox, AssemblyUtility.MAX_ASSEMBLY_SIZE);
         }
+
         if (posA == null) lastPosA = null;
         if (selectingSecond) {
             if (isTooLarge) {
-                statusText = Component.literal("Selection is too big").withStyle(s -> s.withColor(AssemblyUtility.CANCEL_COLOR));
+                if (selectionBox != null && AssemblyUtility.isAABBLarger(selectionBox, AssemblyUtility.MAX_RENDERED_OUTLINE_SIZE)) {
+                    statusText = Component.literal("Selection must start and end on the same structure").withStyle(s -> s.withColor(AssemblyUtility.CANCEL_COLOR));
+                } else {
+                    statusText = Component.literal("Selection is too big").withStyle(s -> s.withColor(AssemblyUtility.CANCEL_COLOR));
+                }
             } else if (lastPosA == null) {
                 lastPosA = posA;
             } else {
@@ -130,16 +134,7 @@ public class AssemblyGaugeOverlayRenderer {
             AssemblyUtility.renderOutline("gauge_flash", lastSelectionAABB, color, flashLineWidth, true);
 
         } else if (posB != null) {
-            Vec3 eyePos = player.getEyePosition(partialTicks);
-
-            boolean isHovering = currentSelectionBox.contains(eyePos);
-            if (!isHovering) {
-                double reach = player.getAttribute(ForgeMod.BLOCK_REACH.get()).getValue() + 1;
-                Vec3 lookVec = player.getViewVector(partialTicks);
-                Vec3 endPos = eyePos.add(lookVec.scale(reach));
-                isHovering = currentSelectionBox.clip(eyePos, endPos).isPresent();
-            }
-
+            boolean isHovering = AssemblyUtility.isPlayerLookingAtAABB(player, currentSelectionBox, partialTicks, 1.0, 0.0);
             float lineWidth = isHovering ? 1/16f : 1/64f;
 
             AssemblyUtility.renderOutline("gauge_selection", currentSelectionBox, AssemblyUtility.PASSIVE_COLOR, lineWidth, isHovering);
