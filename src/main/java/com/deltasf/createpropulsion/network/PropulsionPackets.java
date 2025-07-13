@@ -1,8 +1,9 @@
 package com.deltasf.createpropulsion.network;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
-import com.deltasf.createpropulsion.physics_assembler.AssemblyGaugeUsedPacket;
-import com.deltasf.createpropulsion.physics_assembler.ResetGaugePacket;
+import com.deltasf.createpropulsion.physics_assembler.packets.GaugeInsertionErrorPacket;
+import com.deltasf.createpropulsion.physics_assembler.packets.GaugeUsedPacket;
+import com.deltasf.createpropulsion.physics_assembler.packets.ResetGaugePacket;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -31,16 +32,22 @@ public class PropulsionPackets {
             .consumerMainThread(SyncThrusterFuelsPacket::handle)
             .add();
         
-        INSTANCE.messageBuilder(AssemblyGaugeUsedPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
-            .encoder(AssemblyGaugeUsedPacket::write)
-            .decoder(AssemblyGaugeUsedPacket::new)
-            .consumerMainThread(AssemblyGaugeUsedPacket::handle)
+        INSTANCE.messageBuilder(GaugeUsedPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+            .encoder(GaugeUsedPacket::encode)
+            .decoder(GaugeUsedPacket::new)
+            .consumerMainThread(GaugeUsedPacket::handle)
             .add();
 
         INSTANCE.messageBuilder(ResetGaugePacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-            .encoder(ResetGaugePacket::toBytes)
+            .encoder(ResetGaugePacket::encode)
             .decoder(ResetGaugePacket::new)
             .consumerMainThread(ResetGaugePacket::handle)
+            .add();
+        
+        INSTANCE.messageBuilder(GaugeInsertionErrorPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+            .encoder(GaugeInsertionErrorPacket::encode)
+            .decoder(GaugeInsertionErrorPacket::new)
+            .consumerMainThread(GaugeInsertionErrorPacket::handle)
             .add();
     }
 

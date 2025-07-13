@@ -3,12 +3,15 @@ package com.deltasf.createpropulsion.physics_assembler;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.deltasf.createpropulsion.network.PropulsionPackets;
+import com.deltasf.createpropulsion.physics_assembler.packets.GaugeInsertionErrorPacket;
 import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
 import com.deltasf.createpropulsion.registries.PropulsionShapes;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Containers;
@@ -71,8 +74,13 @@ public class PhysicsAssemblerBlock extends Block implements EntityBlock {
             if (level.isClientSide()) {
                 return InteractionResult.SUCCESS;
             }
-            if (assembler.canInsertGauge(heldItem)) {
+            PhysicsAssemblerBlockEntity.GaugeValidationResult result = assembler.canInsertGauge(heldItem);
+            if (result.isValid()) {
                 assembler.insertGauge(player, hand);
+            } else {
+                result.reason().ifPresent(reason -> {
+                    PropulsionPackets.sendToPlayer(new GaugeInsertionErrorPacket(reason), (ServerPlayer)player);
+                });
             }
             return InteractionResult.SUCCESS;
 
@@ -85,7 +93,6 @@ public class PhysicsAssemblerBlock extends Block implements EntityBlock {
             level.playSound(null, pos, SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, 0.2f, 1.0f);
             return InteractionResult.SUCCESS;
         }
-
         return InteractionResult.PASS;
     }
 

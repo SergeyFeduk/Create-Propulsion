@@ -6,6 +6,8 @@ import javax.annotation.Nullable;
 import org.valkyrienskies.core.impl.shadow.nb;
 
 import com.deltasf.createpropulsion.network.PropulsionPackets;
+import com.deltasf.createpropulsion.physics_assembler.packets.GaugeUsedPacket;
+import com.deltasf.createpropulsion.physics_assembler.packets.ResetGaugePacket;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -28,7 +30,6 @@ public class AssemblyGaugeItem extends Item {
 
     private static final String NBT_KEY_POS1 = "posA";
     private static final String NBT_KEY_POS2 = "posB";
-    public static final int MAX_SIZE = 32;
 
     public AssemblyGaugeItem(Properties pProperties) {
         super(pProperties);
@@ -73,15 +74,15 @@ public class AssemblyGaugeItem extends Item {
             nbt.put(NBT_KEY_POS1, NbtUtils.writeBlockPos(targetedPos));
         } else {
             BlockPos posA = NbtUtils.readBlockPos(nbt.getCompound(NBT_KEY_POS1));
-            if (Math.abs(posA.getX() - targetedPos.getX()) > MAX_SIZE
-                || Math.abs(posA.getY() - targetedPos.getY()) > MAX_SIZE
-                || Math.abs(posA.getZ() - targetedPos.getZ()) > MAX_SIZE) {
+            if (Math.abs(posA.getX() - targetedPos.getX()) > AssemblyUtility.MAX_ASSEMBLY_SIZE
+                || Math.abs(posA.getY() - targetedPos.getY()) > AssemblyUtility.MAX_ASSEMBLY_SIZE
+                || Math.abs(posA.getZ() - targetedPos.getZ()) > AssemblyUtility.MAX_ASSEMBLY_SIZE) {
                 return InteractionResult.FAIL;
             }
 
             nbt.put(NBT_KEY_POS2, NbtUtils.writeBlockPos(targetedPos));
             AABB selection = new AABB(posA).minmax(new AABB(targetedPos));
-            PropulsionPackets.sendToAll(new AssemblyGaugeUsedPacket(selection));
+            PropulsionPackets.sendToAll(new GaugeUsedPacket(selection));
         }
 
         return InteractionResult.CONSUME;

@@ -81,18 +81,17 @@ public class AssemblyGaugeOverlayRenderer {
         Component statusText = null;
         boolean isTooLarge = false;
         if (selectingSecond && lookingAtPos != null) {
-            if (Math.abs(posA.getX() - lookingAtPos.getX()) > AssemblyGaugeItem.MAX_SIZE
-                || Math.abs(posA.getY() - lookingAtPos.getY()) > AssemblyGaugeItem.MAX_SIZE
-                || Math.abs(posA.getZ() - lookingAtPos.getZ()) > AssemblyGaugeItem.MAX_SIZE) {
+            if (Math.abs(posA.getX() - lookingAtPos.getX()) > AssemblyUtility.MAX_ASSEMBLY_SIZE
+                || Math.abs(posA.getY() - lookingAtPos.getY()) > AssemblyUtility.MAX_ASSEMBLY_SIZE
+                || Math.abs(posA.getZ() - lookingAtPos.getZ()) > AssemblyUtility.MAX_ASSEMBLY_SIZE) {
                 isTooLarge = true;
             }
         }
         if (posA == null) lastPosA = null;
         if (selectingSecond) {
             if (isTooLarge) {
-                statusText = Component.literal("Selection is too big").withStyle(ChatFormatting.RED);
+                statusText = Component.literal("Selection is too big").withStyle(s -> s.withColor(AssemblyUtility.CANCEL_COLOR));
             } else if (lastPosA == null) {
-                statusText = Component.literal("First position selected").withStyle(ChatFormatting.WHITE);
                 lastPosA = posA;
             } else {
                 if (player.isShiftKeyDown()) {

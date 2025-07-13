@@ -3,7 +3,8 @@ package com.deltasf.createpropulsion.utility;
 import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.network.PropulsionPackets;
 import com.deltasf.createpropulsion.physics_assembler.AssemblyGaugeItem;
-import com.deltasf.createpropulsion.physics_assembler.ResetGaugePacket;
+import com.deltasf.createpropulsion.physics_assembler.packets.ResetGaugePacket;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;

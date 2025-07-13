@@ -4,7 +4,7 @@ import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.network.PropulsionPackets;
 import com.deltasf.createpropulsion.physics_assembler.AssemblyGaugeItem;
 import com.deltasf.createpropulsion.physics_assembler.AssemblyGaugeOverlayRenderer;
-import com.deltasf.createpropulsion.physics_assembler.ResetGaugePacket;
+import com.deltasf.createpropulsion.physics_assembler.packets.ResetGaugePacket;
 //import com.deltasf.createpropulsion.design_goggles.DesignGogglesOverlayRenderer;
 import com.deltasf.createpropulsion.registries.PropulsionItems;
 

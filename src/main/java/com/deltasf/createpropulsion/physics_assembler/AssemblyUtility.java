@@ -11,6 +11,9 @@ public class AssemblyUtility {
     public static final int HIGHLIGHT_COLOR = 0xda97f0;
     public static final int CANCEL_COLOR = 0xFF5555;
 
+    public static final int MAX_ASSEMBLY_SIZE = 32;
+    public static final int MAX_RENDERED_OULTINE_SIZE = 128;
+
     public static void renderOutline(String key, AABB boundingBox, int color, float lineWidth, boolean showFace) {
         var outline = CreateClient.OUTLINER.showAABB(key, boundingBox)
             .colored(color)

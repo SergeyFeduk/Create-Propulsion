@@ -1,4 +1,4 @@
-package com.deltasf.createpropulsion.physics_assembler;
+package com.deltasf.createpropulsion.physics_assembler.packets;
 
 import com.deltasf.createpropulsion.physics_assembler.AssemblyGaugeOverlayRenderer;
 import net.minecraft.network.FriendlyByteBuf;
@@ -9,20 +9,19 @@ import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public class AssemblyGaugeUsedPacket {
-
+public class GaugeUsedPacket {
     private final AABB selection;
 
-    public AssemblyGaugeUsedPacket(AABB selection) {
+    public GaugeUsedPacket(AABB selection) {
         this.selection = selection;
     }
 
-    public AssemblyGaugeUsedPacket(FriendlyByteBuf buf) {
+    public GaugeUsedPacket(FriendlyByteBuf buf) {
         this.selection = new AABB(buf.readDouble(), buf.readDouble(), buf.readDouble(),
                                   buf.readDouble(), buf.readDouble(), buf.readDouble());
     }
 
-    public void write(FriendlyByteBuf buf) {
+    public void encode(FriendlyByteBuf buf) {
         buf.writeDouble(selection.minX);
         buf.writeDouble(selection.minY);
         buf.writeDouble(selection.minZ);

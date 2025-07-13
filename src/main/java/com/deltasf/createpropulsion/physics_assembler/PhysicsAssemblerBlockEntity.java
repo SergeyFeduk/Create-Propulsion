@@ -3,6 +3,7 @@ package com.deltasf.createpropulsion.physics_assembler;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -20,11 +21,13 @@ import org.valkyrienskies.core.impl.game.ships.ShipDataCommon;
 import org.valkyrienskies.core.impl.game.ships.ShipTransformImpl;
 import org.valkyrienskies.core.impl.networking.simple.SimplePackets;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -195,13 +198,21 @@ public class PhysicsAssemblerBlockEntity extends BlockEntity {
         if (level.getBlockTicks().hasScheduledTick(from, state.getBlock())) {
             level.getBlockTicks().schedule(new ScheduledTick<Block>(state.getBlock(), to, 0, 0));
         }
-        //Transfer block entity and its data. This is even more concerning as neurocorellate of consciousness is probably located somewhere in blockEntity
+        //Transfer block entity and its data. This is even more concerning as neurocorrelate of consciousness is probably located somewhere in blockEntity
+        //Also, why the fuck do I write this?
+
+        //This approach should be better
         if (state.hasBlockEntity() && blockEntity != null) {
+            CompoundTag tdata = blockEntity.saveWithFullMetadata();
+            level.setBlockEntity(BlockEntity.loadStatic(to, state, tdata));
+        }
+        //But RelocationUtil.kt does something like that. Not sure why
+        /*if (state.hasBlockEntity() && blockEntity != null) {
             CompoundTag tdata = blockEntity.saveWithFullMetadata();
             level.setBlockEntity(blockEntity);
             BlockEntity newBlockEntity = level.getBlockEntity(to);
             newBlockEntity.load(tdata);
-        }
+        }*/
     }
 
     private void removeBlock(Level level, BlockPos pos){
@@ -282,32 +293,42 @@ public class PhysicsAssemblerBlockEntity extends BlockEntity {
         return new SelectedRegion(new Vector3d(actualCenterX, actualCenterY, actualCenterZ), blocksFound, blocksList, chunkPosSet);
     }
 
-    private class SelectedRegion {
-        public Vector3d geometricCenter;
-        public boolean hasBlocks; 
-        public List<BlockPos> blockPositions;
-        public Set<ChunkPos> chunkPosSet;
-
-        public SelectedRegion(Vector3d geometricalCenter, boolean hasBlocks, List<BlockPos> blocks, Set<ChunkPos> chunkPosSet) {
-            this.geometricCenter = geometricalCenter;
-            this.hasBlocks = hasBlocks;
-            this.blockPositions = blocks;
-            this.chunkPosSet = chunkPosSet;
-        }
-    }
-
     //Gauge
 
-    public boolean canInsertGauge(ItemStack gauge) {
+    public GaugeValidationResult canInsertGauge(ItemStack gauge) {
         BlockPos posA = AssemblyGaugeItem.getPosA(gauge);
         BlockPos posB = AssemblyGaugeItem.getPosB(gauge);
+
+        // Check gauge positions
         if (posA == null || posB == null) {
-            return false;
+            Component reason = Component.literal("Gauge is not fully configured").withStyle(s -> s.withColor(AssemblyUtility.CANCEL_COLOR));
+            return new GaugeValidationResult(false, Optional.of(reason));
         }
 
+        // Check if the assembler is inside the region
+        BlockPos selfPos = this.worldPosition;
+        int minX = Math.min(posA.getX(), posB.getX());
+        int maxX = Math.max(posA.getX(), posB.getX());
+        int minY = Math.min(posA.getY(), posB.getY());
+        int maxY = Math.max(posA.getY(), posB.getY());
+        int minZ = Math.min(posA.getZ(), posB.getZ());
+        int maxZ = Math.max(posA.getZ(), posB.getZ());
+
+        if (selfPos.getX() >= minX && selfPos.getX() <= maxX &&
+            selfPos.getY() >= minY && selfPos.getY() <= maxY &&
+            selfPos.getZ() >= minZ && selfPos.getZ() <= maxZ) {
+            Component reason = Component.literal("Assembler cannot be inside the selection").withStyle(s -> s.withColor(AssemblyUtility.CANCEL_COLOR));
+            return new GaugeValidationResult(false, Optional.of(reason));
+        }
+
+        // Check distance between assembler and region
         int manhattanDistance = getManhattanDistanceToRegion(this.worldPosition, posA, posB);
-        //TODO: physics assembler cannot be inside of the region
-        return manhattanDistance <= MAX_MINK_DISTANCE;
+        if (manhattanDistance > MAX_MINK_DISTANCE) {
+            Component reason = Component.literal("Selection is too far away").withStyle(s -> s.withColor(AssemblyUtility.CANCEL_COLOR));
+            return new GaugeValidationResult(false, Optional.of(reason));
+        }
+
+        return new GaugeValidationResult(true, Optional.empty());
     }
 
     public boolean hasGauge() {
@@ -446,16 +467,32 @@ public class PhysicsAssemblerBlockEntity extends BlockEntity {
     }
 
     private ItemStackHandler createItemHandler() {
-    return new ItemStackHandler(1) {
-        @Override
-        protected void onContentsChanged(int slot) {
-            setChanged();
-        }
+        return new ItemStackHandler(1) {
+            @Override
+            protected void onContentsChanged(int slot) {
+                setChanged();
+            }
 
-        @Override
-        public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
-            return stack.getItem() instanceof AssemblyGaugeItem && super.isItemValid(slot, stack);
+            @Override
+            public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
+                return stack.getItem() instanceof AssemblyGaugeItem && super.isItemValid(slot, stack);
+            }
+        };
+    }
+
+    public record GaugeValidationResult(boolean isValid, Optional<Component> reason) {}
+
+    private class SelectedRegion {
+        public Vector3d geometricCenter;
+        public boolean hasBlocks; 
+        public List<BlockPos> blockPositions;
+        public Set<ChunkPos> chunkPosSet;
+
+        public SelectedRegion(Vector3d geometricalCenter, boolean hasBlocks, List<BlockPos> blocks, Set<ChunkPos> chunkPosSet) {
+            this.geometricCenter = geometricalCenter;
+            this.hasBlocks = hasBlocks;
+            this.blockPositions = blocks;
+            this.chunkPosSet = chunkPosSet;
         }
-    };
-}
+    }
 }

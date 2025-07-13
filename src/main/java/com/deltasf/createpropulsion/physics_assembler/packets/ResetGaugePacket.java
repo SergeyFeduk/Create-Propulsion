@@ -1,4 +1,4 @@
-package com.deltasf.createpropulsion.physics_assembler;
+package com.deltasf.createpropulsion.physics_assembler.packets;
 
 import com.deltasf.createpropulsion.physics_assembler.AssemblyGaugeItem;
 import net.minecraft.network.FriendlyByteBuf;
@@ -15,7 +15,7 @@ public class ResetGaugePacket {
 
     public ResetGaugePacket(FriendlyByteBuf buf) {}
 
-    public void toBytes(FriendlyByteBuf buf) {}
+    public void encode(FriendlyByteBuf buf) {}
 
     public boolean handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context context = supplier.get();
