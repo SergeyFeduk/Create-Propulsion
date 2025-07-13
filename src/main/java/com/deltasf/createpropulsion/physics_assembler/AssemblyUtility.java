@@ -8,9 +8,11 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import com.simibubi.create.AllSpecialTextures;
 import com.simibubi.create.CreateClient;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -45,6 +47,19 @@ public class AssemblyUtility {
         int r2 = (color2 >> 16) & 0xFF, g2 = (color2 >> 8) & 0xFF, b2 = color2 & 0xFF;
         int r = (int) Mth.lerp(progress, r1, r2), g = (int) Mth.lerp(progress, g1, g2), b = (int) Mth.lerp(progress, b1, b2);
         return (r << 16) | (g << 8) | b;
+    }
+
+    public static boolean isAssemblyGauge(ItemStack stack) {
+        return !stack.isEmpty() && stack.getItem() instanceof AssemblyGaugeItem;
+    }
+
+    public static BlockPos getTargetedPosition(BlockPos pos, net.minecraft.core.Direction face) {
+        return pos.relative(face);
+    }
+
+
+    public static AABB fromBlockVolumes(BlockPos posA, BlockPos posB) {
+        return new AABB(posA).minmax(new AABB(posB));
     }
 
     @SuppressWarnings("null")

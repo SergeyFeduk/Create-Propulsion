@@ -15,9 +15,14 @@ import org.joml.Vector2i;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.joml.Vector3i;
+import org.valkyrienskies.core.api.ships.PhysShip;
 import org.valkyrienskies.core.api.ships.ServerShip;
+import org.valkyrienskies.core.api.ships.ServerShipTransformProvider;
 import org.valkyrienskies.core.api.ships.properties.ChunkClaim;
+import org.valkyrienskies.core.impl.game.ships.PhysShipImpl;
+import org.valkyrienskies.core.impl.game.ships.ShipData;
 import org.valkyrienskies.core.impl.game.ships.ShipDataCommon;
+import org.valkyrienskies.core.impl.game.ships.ShipPhysicsData;
 import org.valkyrienskies.core.impl.game.ships.ShipTransformImpl;
 import org.valkyrienskies.core.impl.networking.simple.SimplePackets;
 
@@ -88,7 +93,6 @@ public class PhysicsAssemblerBlockEntity extends BlockEntity {
         if (posA == null || posB == null) {
             return;
         }
-
 
         //Get region
         SelectedRegion region = getGeometricCenterOfBlocksInRegion(level, posA, posB);
@@ -176,8 +180,10 @@ public class PhysicsAssemblerBlockEntity extends BlockEntity {
             finalShipScale
         );
 
-        if (ship instanceof ShipDataCommon) {
-            ((ShipDataCommon) ship).setTransform(newShipTransform);
+        if (ship instanceof ShipDataCommon shipData) {
+            shipData.setTransform(newShipTransform);
+            //TODO: Inherit linear velocity and angular momentum
+            //if (parentShip != null && parentShip instanceof ShipDataCommon parentShipData) {}
         }
 
         //Sync FROM chunks to resume updated when TO chunks start to tick

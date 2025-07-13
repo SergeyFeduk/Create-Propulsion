@@ -50,7 +50,7 @@ public class AssemblyGaugeOverlayRenderer {
 
         Player player = mc.player;
         ItemStack stack = player.getMainHandItem();
-        if (!(stack.getItem() instanceof AssemblyGaugeItem)) {
+        if (!AssemblyUtility.isAssemblyGauge(stack)) {
             flashStartGameTime = 0.0;
             return;
         }
@@ -74,7 +74,7 @@ public class AssemblyGaugeOverlayRenderer {
         BlockPos lookingAtPos = null;
         if (result != null && result.getType() == HitResult.Type.BLOCK) {
             BlockHitResult blockHitResult = (BlockHitResult) result;
-            lookingAtPos = AssemblyGaugeItem.getTargetedPosition(blockHitResult.getBlockPos(), blockHitResult.getDirection());
+            lookingAtPos = AssemblyUtility.getTargetedPosition(blockHitResult.getBlockPos(), blockHitResult.getDirection());
         }
 
         boolean selectingSecond = posA != null && posB == null;
@@ -110,9 +110,9 @@ public class AssemblyGaugeOverlayRenderer {
         }
         AABB currentSelectionBox = null;
         if (posA != null && posB != null) {
-            currentSelectionBox = new AABB(posA).minmax(new AABB(posB));
+            currentSelectionBox = AssemblyUtility.fromBlockVolumes(posA, posB);
         } else if (selectingSecond && lookingAtPos != null) {
-            currentSelectionBox = new AABB(posA).minmax(new AABB(lookingAtPos));
+            currentSelectionBox = AssemblyUtility.fromBlockVolumes(posA, lookingAtPos);
         }
 
         if (currentSelectionBox == null) return;

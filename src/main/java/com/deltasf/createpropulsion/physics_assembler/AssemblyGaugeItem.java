@@ -43,7 +43,7 @@ public class AssemblyGaugeItem extends Item {
     @Override
     public InteractionResult useOn(@Nonnull UseOnContext context) {
         Level level = context.getLevel();
-        BlockPos targetedPos = getTargetedPosition(context.getClickedPos(), context.getClickedFace());
+        BlockPos targetedPos = AssemblyUtility.getTargetedPosition(context.getClickedPos(), context.getClickedFace());
         ItemStack stack = context.getItemInHand();
         Player player = context.getPlayer();
 
@@ -81,7 +81,7 @@ public class AssemblyGaugeItem extends Item {
             }
 
             nbt.put(NBT_KEY_POS2, NbtUtils.writeBlockPos(targetedPos));
-            AABB selection = new AABB(posA).minmax(new AABB(targetedPos));
+            AABB selection = AssemblyUtility.fromBlockVolumes(posA, targetedPos);
             PropulsionPackets.sendToAll(new GaugeUsedPacket(selection));
         }
 
@@ -117,13 +117,9 @@ public class AssemblyGaugeItem extends Item {
         nbt.remove(NBT_KEY_POS2);
     }
 
-    public static BlockPos getTargetedPosition(BlockPos pos, net.minecraft.core.Direction face) {
-        return pos.relative(face);
-    }
-
     public static boolean handleLeftClick(Player player) {
         ItemStack stack = player.getMainHandItem();
-        if (!(stack.getItem() instanceof AssemblyGaugeItem)) {
+        if (!AssemblyUtility.isAssemblyGauge(stack)) {
             return false;
         }
     
@@ -135,7 +131,7 @@ public class AssemblyGaugeItem extends Item {
             shouldReset = true;
         }
         else if (posA != null && posB != null) {
-            AABB selectionBox = new AABB(posA).minmax(new AABB(posB));
+            AABB selectionBox = AssemblyUtility.fromBlockVolumes(posA, posB);
             if (AssemblyUtility.isPlayerLookingAtAABB(player, selectionBox, 1.0f, 0.0, 0.05)) {
                 shouldReset = true;
             }
