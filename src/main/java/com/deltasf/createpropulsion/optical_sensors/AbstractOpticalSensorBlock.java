@@ -20,6 +20,8 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DirectionalBlock;
 import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -172,4 +174,13 @@ public abstract class AbstractOpticalSensorBlock extends DirectionalBlock implem
     @Override
 	public abstract boolean canConnectRedstone(BlockState state, BlockGetter world, BlockPos pos, Direction side);
 
+    @Override
+    public BlockState rotate(@Nonnull BlockState state, @Nonnull Rotation rot) {
+        return state.setValue(FACING, rot.rotate(state.getValue(FACING)));
+    }
+
+    @Override
+    public BlockState mirror(@Nonnull BlockState state, @Nonnull Mirror mirrorIn) {
+        return state.rotate(mirrorIn.getRotation(state.getValue(FACING)));
+    }
 }

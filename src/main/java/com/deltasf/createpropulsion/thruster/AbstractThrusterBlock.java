@@ -17,6 +17,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DirectionalBlock;
 import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -127,5 +129,15 @@ public abstract class AbstractThrusterBlock extends DirectionalBlock implements 
             thrusterBlockEntity.updateThrust(newState);
             thrusterBlockEntity.setChanged();
         }
+    }
+
+    @Override
+    public BlockState rotate(@Nonnull BlockState state, @Nonnull Rotation rot) {
+        return state.setValue(FACING, rot.rotate(state.getValue(FACING)));
+    }
+
+    @Override
+    public BlockState mirror(@Nonnull BlockState state, @Nonnull Mirror mirrorIn) {
+        return state.rotate(mirrorIn.getRotation(state.getValue(FACING)));
     }
 }
