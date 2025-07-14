@@ -1,4 +1,5 @@
 {
+	"format_version": "1.21.6",
 	"credit": "Made with Blockbench",
 	"texture_size": [64, 64],
 	"textures": {
@@ -38,11 +39,11 @@
 			"rotation": {"angle": 0, "axis": "x", "origin": [9, 9, 1]},
 			"faces": {
 				"north": {"uv": [0, 0, 3, 3], "texture": "#0"},
-				"east": {"uv": [1.5, 12.5, 2, 15], "texture": "#0"},
-				"south": {"uv": [2, 12.5, 4.5, 15], "texture": "#0"},
-				"west": {"uv": [4.5, 12.5, 5, 15], "texture": "#0"},
-				"up": {"uv": [4.5, 15.5, 2, 15], "texture": "#0"},
-				"down": {"uv": [4.5, 12, 2, 12.5], "texture": "#0"}
+				"east": {"uv": [1.5, 12.5, 2, 15.5], "texture": "#0"},
+				"south": {"uv": [2, 12.5, 5, 15.5], "texture": "#0"},
+				"west": {"uv": [5, 12.5, 5.5, 15.5], "texture": "#0"},
+				"up": {"uv": [5, 16, 2, 15.5], "texture": "#0"},
+				"down": {"uv": [5, 12, 2, 12.5], "texture": "#0"}
 			}
 		},
 		{
@@ -88,7 +89,7 @@
 			"scale": [0.4, 0.4, 0.4]
 		},
 		"firstperson_lefthand": {
-			"rotation": [0, 225, 0],
+			"rotation": [0, -135, 0],
 			"scale": [0.4, 0.4, 0.4]
 		},
 		"ground": {
@@ -96,21 +97,11 @@
 			"scale": [0.25, 0.25, 0.25]
 		},
 		"gui": {
-			"rotation": [30, 225, 0],
+			"rotation": [30, -135, 0],
 			"scale": [0.625, 0.625, 0.625]
 		},
 		"fixed": {
 			"scale": [0.5, 0.5, 0.5]
 		}
-	},
-	"groups": [
-		0,
-		1,
-		{
-			"name": "VoxelShapes",
-			"origin": [8, 8, 8],
-			"color": 0,
-			"children": [2, 3, 4]
-		}
-	]
+	}
 }
