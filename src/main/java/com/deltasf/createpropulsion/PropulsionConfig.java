@@ -41,7 +41,7 @@ public class PropulsionConfig {
 
         SERVER_BUILDER.push("Optical sensors");
             OPTICAL_SENSOR_TICKS_PER_UPDATE = SERVER_BUILDER.comment("How many ticks between casting a ray. Lower values are more precise, but can have negative effect on performance.")
-                .defineInRange("Optical sensor tick rate", 5, 1, 100);
+                .defineInRange("Optical sensor tick rate", 2, 1, 100);
             INLINE_OPTICAL_SENSOR_MAX_DISTANCE = SERVER_BUILDER.comment("Length of the raycast ray.")
                 .defineInRange("Inline optical sensor max raycast distance", 16, 4, 32);
             OPTICAL_SENSOR_MAX_DISTANCE = SERVER_BUILDER.comment("Length of the raycast ray. Very high values may degrade performance. Change with caution!")
