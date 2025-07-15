@@ -25,6 +25,14 @@ import net.minecraft.world.phys.Vec3;
 @SuppressWarnings("deprecation")
 public class MagnetLevelRegistry {
 
+    /// Hello there. You are probably interested in how I impl'd magnets. So let me assist you with an explanation:
+    /// Magnets register themselves into the registry (this file) when they are activated. Registry handles pairing
+    /// in O(n * k), where k is the average amount of neighbours per magnet. Neighbours are all other active magnets
+    /// in 5x5 chunk region. All magnets on different grids are paired together and result is stored in shipToPairs map
+    /// This map is later used inside MagnetForceAttachment to calculate and aggregate forces and torques affecting each magnet on a given ship.
+    /// 
+    /// Btw, this implementation is not final, read TODOs. 
+
     private final ConcurrentHashMap<UUID, MagnetData> magnets = new ConcurrentHashMap<>();
     private final Long2ObjectOpenHashMap<List<UUID>> spatial = new Long2ObjectOpenHashMap<>();
     private final Map<UUID, Long> lastChunkKey = new ConcurrentHashMap<>();
