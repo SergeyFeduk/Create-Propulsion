@@ -60,10 +60,11 @@ import org.valkyrienskies.mod.common.networking.PacketRestartChunkUpdates;
 import org.valkyrienskies.mod.common.networking.PacketStopChunkUpdates;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
+import com.deltasf.createpropulsion.PropulsionConfig;
+
 @SuppressWarnings("null")
 public class PhysicsAssemblerBlockEntity extends BlockEntity {
     private final BlockState AIR = Blocks.AIR.defaultBlockState();
-    private static final int MAX_MINK_DISTANCE = 3;
 
     public PhysicsAssemblerBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
@@ -329,7 +330,7 @@ public class PhysicsAssemblerBlockEntity extends BlockEntity {
 
         // Check distance between assembler and region
         int manhattanDistance = getManhattanDistanceToRegion(this.worldPosition, posA, posB);
-        if (manhattanDistance > MAX_MINK_DISTANCE) {
+        if (manhattanDistance > PropulsionConfig.PHYSICS_ASSEMBLER_MAX_MINK_DISTANCE.get()) {
             Component reason = Component.literal("Selection is too far away").withStyle(s -> s.withColor(AssemblyUtility.CANCEL_COLOR));
             return new GaugeValidationResult(false, Optional.of(reason));
         }

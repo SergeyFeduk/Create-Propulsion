@@ -23,6 +23,8 @@ public class PropulsionConfig {
     //Magnet
     public static final ForgeConfigSpec.ConfigValue<Double> REDSTONE_MAGNET_POWER_MULTIPLIER;
     public static final ForgeConfigSpec.ConfigValue<Double> REDSTONE_MAGNET_FORCE_INDUCED_TORQUE_MULTIPLIER;
+    //Physics assembler
+    public static final ForgeConfigSpec.ConfigValue<Integer> PHYSICS_ASSEMBLER_MAX_MINK_DISTANCE;
 
     static {
         //#region Server
@@ -53,6 +55,11 @@ public class PropulsionConfig {
                 .define("Power multiplier", 1.0);
             REDSTONE_MAGNET_FORCE_INDUCED_TORQUE_MULTIPLIER = SERVER_BUILDER.comment("Torque induced by offset of the force-applying magnet from COM. Value of 1.0 is realistic but does not allow for statically stable contraptions. Modify this value only if you know what you are doing!")
                 .define("Force-induced torque multiplier", 1.0);
+        SERVER_BUILDER.pop();
+
+        SERVER_BUILDER.push("Physics assembler");
+            PHYSICS_ASSEMBLER_MAX_MINK_DISTANCE = SERVER_BUILDER.comment("Maximum distance between region selected with assembly gauge and physics assembler block.")
+                .define("Max distance to region", 3);
         SERVER_BUILDER.pop();
 
         SERVER_SPEC = SERVER_BUILDER.build();
