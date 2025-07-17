@@ -45,8 +45,8 @@
     "createpropulsion.redstone_magnet.tooltip.behaviour1": "Affects nearby _powered magnets_.",
 
     "createpropulsion.physics_assembler.tooltip.summary": "_Assembles_ blocks into physical entities.",
-    "createpropulsion.physics_assembler.tooltip.condition1": "When contains assembly gauge and powered",
-    "createpropulsion.physics_assembler.tooltip.behaviour1": "_Assembles_ all blocks in _region_ defined by _assembly gauge_ into a physical entity.",
+    "createpropulsion.physics_assembler.tooltip.condition1": "When powered and contains an assembly gauge",
+    "createpropulsion.physics_assembler.tooltip.behaviour1": "_Assembles_ blocks in _region_ defined by _assembly gauge_ into a physical entity.",
 
     "item.createpropulsion.pine_resin": "Pine Resin",
     "fluid.createpropulsion.turpentine": "Turpentine",
@@ -60,8 +60,8 @@
 
     "item.createpropulsion.assembly_gauge": "Assembly Gauge",
 
-    "createpropulsion.optical_lens.tooltip.summary": "_Optical lens_ that can be colored to tint an _optical sensor_'s beam.",
-    "createpropulsion.fluid_lens.tooltip.summary": "Enables an _optical sensor_ to detect fluids.",
-    "createpropulsion.focus_lens.tooltip.summary": "Doubles an _optical sensor_'s maximum range.",
-    "createpropulsion.invisibility_lens.tooltip.summary": "Makes an _optical sensor_'s beam invisible."
+    "createpropulsion.optical_lens.tooltip.summary": "Optical lens that can be _colored_ to tint an _optical sensor_'s beam.",
+    "createpropulsion.fluid_lens.tooltip.summary": "Enables an _optical sensor_ to detect _fluids_.",
+    "createpropulsion.focus_lens.tooltip.summary": "_Doubles_ an _optical sensor_'s maximum _range_.",
+    "createpropulsion.invisibility_lens.tooltip.summary": "Makes an _optical sensor_'s beam _invisible_."
 }

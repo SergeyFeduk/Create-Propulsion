@@ -82,7 +82,7 @@ public class AssemblyUtility {
         AABB inflatedBox = box.inflate(inflation);
 
         if (ship == null) {
-            return inflatedBox.clip(eyePos, endPos).isPresent();
+            return inflatedBox.contains(eyePos) || inflatedBox.clip(eyePos, endPos).isPresent();
         } else {
             Matrix4dc worldToShip = ship.getTransform().getWorldToShip();
             Vector3d worldEyePos = new Vector3d(eyePos.x, eyePos.y, eyePos.z);
@@ -93,7 +93,7 @@ public class AssemblyUtility {
 
             Vec3 shipRayStart = new Vec3(shipEyePos.x, shipEyePos.y, shipEyePos.z);
             Vec3 shipRayEnd = new Vec3(shipEndPos.x, shipEndPos.y, shipEndPos.z);
-            return inflatedBox.clip(shipRayStart, shipRayEnd).isPresent();
+            return inflatedBox.contains(shipRayStart) || inflatedBox.clip(shipRayStart, shipRayEnd).isPresent();
         }
     }
 
