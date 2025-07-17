@@ -40,9 +40,13 @@
     "createpropulsion.lodestone_tracker.tooltip.condition1": "When a compass is inserted",
     "createpropulsion.lodestone_tracker.tooltip.behaviour1": "Emits _redstone signal_ in the direction opposite to where the _compass_ points.",
 
-    "createpropulsion.redstone_magnet.tooltip.summary": "_Attracts or repels_ other magnets based on polarity.",
+    "createpropulsion.redstone_magnet.tooltip.summary": "_Attracts_ or _repels_ nearby powered magnets based on polarity.",
     "createpropulsion.redstone_magnet.tooltip.condition1": "When powered",
     "createpropulsion.redstone_magnet.tooltip.behaviour1": "Affects nearby _powered magnets_.",
+
+    "createpropulsion.physics_assembler.tooltip.summary": "_Assembles_ blocks into physical entities.",
+    "createpropulsion.physics_assembler.tooltip.condition1": "When contains assembly gauge and powered",
+    "createpropulsion.physics_assembler.tooltip.behaviour1": "_Assembles_ all blocks in _region_ defined by _assembly gauge_ into a physical entity.",
 
     "item.createpropulsion.pine_resin": "Pine Resin",
     "fluid.createpropulsion.turpentine": "Turpentine",
@@ -54,5 +58,10 @@
     "item.createpropulsion.invisibility_lens": "Invisibility Lens",
     "item.createpropulsion.unfinished_lens": "Unfinished Lens",
 
-    "item.createpropulsion.assembly_gauge": "Assembly Gauge"
+    "item.createpropulsion.assembly_gauge": "Assembly Gauge",
+
+    "createpropulsion.optical_lens.tooltip.summary": "_Optical lens_ that can be colored to tint an _optical sensor_'s beam.",
+    "createpropulsion.fluid_lens.tooltip.summary": "Enables an _optical sensor_ to detect fluids.",
+    "createpropulsion.focus_lens.tooltip.summary": "Doubles an _optical sensor_'s maximum range.",
+    "createpropulsion.invisibility_lens.tooltip.summary": "Makes an _optical sensor_'s beam invisible."
 }
