@@ -13,5 +13,20 @@
         "block": "createpropulsion:optical_sensor",
         "mass": 1200.0,
         "friction": 0.6
+    },
+    {
+        "block": "createpropulsion:lodestone_tracker",
+        "mass": 900.0,
+        "friction": 0.6
+    },
+    {
+        "block": "createpropulsion:redstone_magnet",
+        "mass": 1000.0,
+        "friction": 0.4
+    },
+    {
+        "block": "createpropulsion:physics_assembler",
+        "mass": 1600.0,
+        "friction": 0.4
     }
 ]

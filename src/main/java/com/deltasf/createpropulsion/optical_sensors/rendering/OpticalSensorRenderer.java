@@ -6,33 +6,33 @@ import org.joml.Vector3d;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-import com.deltasf.createpropulsion.Config;
-import com.deltasf.createpropulsion.CreatePropulsion;
-import com.deltasf.createpropulsion.optical_sensors.InlineOpticalSensorBlock;
-import com.deltasf.createpropulsion.optical_sensors.InlineOpticalSensorBlockEntity;
+import com.deltasf.createpropulsion.optical_sensors.AbstractOpticalSensorBlock;
+import com.deltasf.createpropulsion.optical_sensors.AbstractOpticalSensorBlockEntity;
+import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
+import com.deltasf.createpropulsion.registries.PropulsionItems;
 import com.deltasf.createpropulsion.utility.TranslucentBeamRenderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.simibubi.create.foundation.blockEntity.renderer.SafeBlockEntityRenderer;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.item.DyeableLeatherItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
-import com.simibubi.create.AllItems;
 import com.simibubi.create.foundation.blockEntity.behaviour.filtering.FilteringRenderer;
 
-public class OpticalSensorRenderer extends SafeBlockEntityRenderer<InlineOpticalSensorBlockEntity>{
+public class OpticalSensorRenderer extends SafeBlockEntityRenderer<AbstractOpticalSensorBlockEntity>{
     
     public OpticalSensorRenderer(BlockEntityRendererProvider.Context context) { super();}
 
@@ -58,6 +58,10 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<InlineOptical
         RAY_POWERED_COLOR.x(), RAY_POWERED_COLOR.y(), RAY_POWERED_COLOR.z(), RAY_POWERED_COLOR.w() * END_ALPHA
     );
 
+    private static final Vector3f MODIFIED_TEMP_COLOR = new Vector3f();
+    private static final Vector4f MODIFIED_START_COLOR = new Vector4f();
+    private static final Vector4f MODIFIED_END_COLOR = new Vector4f();
+
     // Positions
     private final Vector3f localStartPos = new Vector3f();
     private final Vector3f directionVec = new Vector3f();
@@ -80,19 +84,13 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<InlineOptical
     //#endregion
 
     @Override
-    protected void renderSafe(InlineOpticalSensorBlockEntity blockEntity, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int light, int overlay) {
+    protected void renderSafe(AbstractOpticalSensorBlockEntity blockEntity, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int light, int overlay) {
         //Filtering if we are OPTICAL_SENSOR_BLOCK_ENTITY
-        if (blockEntity.getType() == CreatePropulsion.OPTICAL_SENSOR_BLOCK_ENTITY.get()) {
+        if (blockEntity.getType() == PropulsionBlockEntities.OPTICAL_SENSOR_BLOCK_ENTITY.get()) {
             FilteringRenderer.renderOnBlockEntity(blockEntity, partialTicks, poseStack, bufferSource, light, overlay);
         }
-        //Skip rendering if no goggles and configured for that
-        if (Config.OPTICAL_SENSOR_VISIBLE_ONLY_WITH_GOGGLES.get()) {
-            LocalPlayer player = Minecraft.getInstance().player;
-            if (player != null) {
-                ItemStack headItemStack = player.getItemBySlot(EquipmentSlot.HEAD);
-                if (headItemStack.getItem() != AllItems.GOGGLES.get()) return; //No goggles -> no rendering for ya
-            }
-        }
+        //Skip rendering if there are invisibility lens inserted
+        if (blockEntity.hasLens(PropulsionItems.INVISIBILITY_LENS.get())) return; //Invisibiliy lens -> no beam rendering for ya
 
         BeamRenderData beamData = blockEntity.getClientBeamRenderData();
             
@@ -101,7 +99,7 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<InlineOptical
         if (distance <= 1e-6f) return; // Same position case
         BlockState state = blockEntity.getBlockState();
         Direction facing = state.getValue(BlockStateProperties.FACING);
-        boolean powered = state.getValue(InlineOpticalSensorBlock.POWERED);
+        boolean powered = state.getValue(AbstractOpticalSensorBlock.POWERED);
 
         //Get start and end pos
         this.directionVec.set(facing.getStepX(), facing.getStepY(), facing.getStepZ());
@@ -146,8 +144,20 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<InlineOptical
         beamData.normalTop.set(this.upVector).negate();
         beamData.normalLeft.set(this.sideVector);
 
-        beamData.startColor.set(powered ? START_POWERED_COLOR : START_COLOR);
-        beamData.endColor.set(powered ? END_POWERED_COLOR : END_COLOR);
+        //Apply custom color if not powered and has optical lenses inserted
+        if (!powered && blockEntity.hasLens(PropulsionItems.OPTICAL_LENS.get())) {
+            //Get all lenses of type PropulsionItems.OPTICAL_LENS as item stacks and mix their colors in rgb space
+            if (calculateFinalColor(blockEntity.getLenses())) {
+                MODIFIED_START_COLOR.set(MODIFIED_TEMP_COLOR, START_ALPHA);
+                MODIFIED_END_COLOR.set(MODIFIED_TEMP_COLOR, END_ALPHA);
+                setBeamColors(beamData, MODIFIED_START_COLOR, MODIFIED_END_COLOR);
+            } else { // No colored lens, default behaviour
+                setBeamColors(beamData, powered);
+            }
+        } else {
+            setBeamColors(beamData, powered);
+        }
+
         beamData.poseSnapshot = poseStack.last();
 
         //Rendering setup
@@ -161,7 +171,7 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<InlineOptical
     }
 
     @Override
-    public boolean shouldRender(@Nonnull InlineOpticalSensorBlockEntity blockEntity, @Nonnull Vec3 cameraPos) {
+    public boolean shouldRender(@Nonnull AbstractOpticalSensorBlockEntity blockEntity, @Nonnull Vec3 cameraPos) {
         //Distance pre-check
         if (!super.shouldRender(blockEntity, cameraPos)) { 
             return false; 
@@ -178,7 +188,27 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<InlineOptical
         return frustum == null || frustum.isVisible(beamAABB);
     }
 
-    private AABB calculateBeamAABB(InlineOpticalSensorBlockEntity blockEntity) {
+    @Override
+    public boolean shouldRenderOffScreen(@Nonnull AbstractOpticalSensorBlockEntity pBlockEntity) {
+        return true;
+    }
+
+    @Override
+    public int getViewDistance() {
+        return 256;
+    }
+
+    private void setBeamColors(BeamRenderData beamData, Vector4f startColor, Vector4f endColor) {
+        beamData.startColor.set(startColor);
+        beamData.endColor.set(endColor);
+    }
+
+    private void setBeamColors(BeamRenderData beamData, boolean powered) {
+        beamData.startColor.set(powered ? START_POWERED_COLOR : START_COLOR);
+        beamData.endColor.set(powered ? END_POWERED_COLOR : END_COLOR);
+    }
+
+    private AABB calculateBeamAABB(AbstractOpticalSensorBlockEntity blockEntity) {
         float distance = blockEntity.getRaycastDistance();
         if (distance <= 1e-6f) return null;
         BlockPos blockPos = blockEntity.getBlockPos();
@@ -213,13 +243,44 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<InlineOptical
         return new AABB(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
-    @Override
-    public boolean shouldRenderOffScreen(@Nonnull InlineOpticalSensorBlockEntity pBlockEntity) {
-        return true;
-    }
+    private boolean calculateFinalColor(NonNullList<ItemStack> lenses) {
+        float totalRed = 0;
+        float totalGreen = 0;
+        float totalBlue = 0;
+        int dyedLensCount = 0;
 
-    @Override
-    public int getViewDistance() {
-        return 256;
+        Item opticalLensItem = PropulsionItems.OPTICAL_LENS.get();
+
+        for (ItemStack stack : lenses) {
+            if (stack.is(opticalLensItem)) {
+                Item item = stack.getItem();
+                if (item instanceof DyeableLeatherItem dyeableItem) {
+                    if (dyeableItem.hasCustomColor(stack)) {
+                        int color = dyeableItem.getColor(stack);
+    
+                        // Extract RGB values from hex
+                        int r = (color >> 16) & 0xFF;
+                        int g = (color >> 8) & 0xFF;
+                        int b = color & 0xFF;
+    
+                        // Accumulate RGB values
+                        totalRed += r;
+                        totalGreen += g;
+                        totalBlue += b;
+                        dyedLensCount++;
+                    }
+                }
+            }
+        }
+
+        if (dyedLensCount == 0) {
+            return false;
+        } else {
+            float avgRed = totalRed / dyedLensCount;
+            float avgGreen = totalGreen / dyedLensCount;
+            float avgBlue = totalBlue / dyedLensCount;
+            MODIFIED_TEMP_COLOR.set(avgRed / 255.0f, avgGreen / 255.0f, avgBlue / 255.0f);
+            return true;
+        }
     }
 }

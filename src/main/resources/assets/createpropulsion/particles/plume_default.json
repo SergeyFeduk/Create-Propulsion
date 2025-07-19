@@ -4,6 +4,17 @@
         "createpropulsion:plume_default/plume2",
         "createpropulsion:plume_default/plume3",
         "createpropulsion:plume_default/plume4",
-        "createpropulsion:plume_default/plume5"
+        "createpropulsion:plume_default/plume5",
+        "createpropulsion:plume_default/plume6",
+        "createpropulsion:smoke/big_smoke_2",
+        "createpropulsion:smoke/big_smoke_3",
+        "createpropulsion:smoke/big_smoke_4",
+        "createpropulsion:smoke/big_smoke_5",
+        "createpropulsion:smoke/big_smoke_6",
+        "createpropulsion:smoke/big_smoke_7",
+        "createpropulsion:smoke/big_smoke_8",
+        "createpropulsion:smoke/big_smoke_9",
+        "createpropulsion:smoke/big_smoke_10",
+        "createpropulsion:smoke/big_smoke_11"
     ]
 }

@@ -1,0 +1,9 @@
+{
+    "replace": false,
+    "values": [
+      "createpropulsion:optical_lens",
+      "createpropulsion:fluid_lens",
+      "createpropulsion:focus_lens",
+      "createpropulsion:invisibility_lens"
+    ]
+}

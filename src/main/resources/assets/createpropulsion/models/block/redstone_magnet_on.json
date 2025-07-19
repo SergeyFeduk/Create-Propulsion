@@ -1,0 +1,7 @@
+{
+	"parent": "createpropulsion:block/redstone_magnet_base",
+    "textures": {
+      "1": "createpropulsion:block/magnet_on",
+	  "particle": "createpropulsion:block/magnet_off"
+    }
+}

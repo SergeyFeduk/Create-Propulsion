@@ -11,6 +11,10 @@
     "item.createpropulsion.optical_sensor": "Optical Sensor",
     "create.gui.optical_sensor.distance_behaviour": "Raycast Distance",
 
+    "block.createpropulsion.lodestone_tracker": "Lodestone Tracker",
+    "block.createpropulsion.redstone_magnet": "Redstone Magnet",
+    "block.createpropulsion.physics_assembler": "Physics Assembler",
+
     "create.gui.goggles.thruster.status": "Thruster Status",
     "create.gui.goggles.thruster.status.no_fuel": "No Fuel",
     "create.gui.goggles.thruster.status.wrong_fuel": "Wrong Fuel",
@@ -18,6 +22,7 @@
     "create.gui.goggles.thruster.status.working": "On",
     "create.gui.goggles.thruster.obstructed": "Obstructed",
     "create.gui.goggles.thruster.efficiency": "Efficiency",
+    "create.gui.goggles.optical_sensor.lenses": "Lenses",
 
     "createpropulsion.inline_optical_sensor.tooltip.summary": "Casts a _ray_ up to _{} blocks long_, detecting blocks.",
     "createpropulsion.inline_optical_sensor.tooltip.condition1": "When block is detected",
@@ -29,5 +34,34 @@
 
     "createpropulsion.thruster.tooltip.summary": "Provides thrust up to _{} kN_ to push vehicles.",
     "createpropulsion.thruster.tooltip.condition1": "When fueled and powered",
-    "createpropulsion.thruster.tooltip.behaviour1": "Pushes vehicles. Thrust depends on _redstone signal_ strength."
+    "createpropulsion.thruster.tooltip.behaviour1": "Pushes vehicles. Thrust depends on _redstone signal_ strength.",
+
+    "createpropulsion.lodestone_tracker.tooltip.summary": "Maps _compass_ direction to _redstone signal_.",
+    "createpropulsion.lodestone_tracker.tooltip.condition1": "When a compass is inserted",
+    "createpropulsion.lodestone_tracker.tooltip.behaviour1": "Emits _redstone signal_ in the direction opposite to where the _compass_ points.",
+
+    "createpropulsion.redstone_magnet.tooltip.summary": "_Attracts_ or _repels_ nearby powered magnets based on polarity.",
+    "createpropulsion.redstone_magnet.tooltip.condition1": "When powered",
+    "createpropulsion.redstone_magnet.tooltip.behaviour1": "Affects nearby _powered magnets_.",
+
+    "createpropulsion.physics_assembler.tooltip.summary": "_Assembles_ blocks into physical entities.",
+    "createpropulsion.physics_assembler.tooltip.condition1": "When powered and contains an assembly gauge",
+    "createpropulsion.physics_assembler.tooltip.behaviour1": "_Assembles_ blocks in _region_ defined by _assembly gauge_ into a physical entity.",
+
+    "item.createpropulsion.pine_resin": "Pine Resin",
+    "fluid.createpropulsion.turpentine": "Turpentine",
+    "item.createpropulsion.turpentine_bucket": "Turpentine Bucket",
+
+    "item.createpropulsion.optical_lens": "Optical Lens",
+    "item.createpropulsion.fluid_lens": "Fluid Lens",
+    "item.createpropulsion.focus_lens": "Focusing Lens",
+    "item.createpropulsion.invisibility_lens": "Invisibility Lens",
+    "item.createpropulsion.unfinished_lens": "Unfinished Lens",
+
+    "item.createpropulsion.assembly_gauge": "Assembly Gauge",
+
+    "createpropulsion.optical_lens.tooltip.summary": "Optical lens that can be _colored_ to tint an _optical sensor_'s beam.",
+    "createpropulsion.fluid_lens.tooltip.summary": "Enables an _optical sensor_ to detect _fluids_.",
+    "createpropulsion.focus_lens.tooltip.summary": "_Doubles_ an _optical sensor_'s maximum _range_.",
+    "createpropulsion.invisibility_lens.tooltip.summary": "Makes an _optical sensor_'s beam _invisible_."
 }

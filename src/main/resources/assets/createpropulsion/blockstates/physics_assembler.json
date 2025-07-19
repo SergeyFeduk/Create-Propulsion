@@ -1,0 +1,7 @@
+{
+    "variants": {
+        "powered=false": { "model": "createpropulsion:block/physics_assembler_off" },
+        "powered=true": { "model": "createpropulsion:block/physics_assembler_on" }
+    }
+}
+  

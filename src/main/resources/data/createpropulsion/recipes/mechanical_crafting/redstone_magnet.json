@@ -1,0 +1,29 @@
+{
+    "type":"create:mechanical_crafting",
+    "acceptMirrored":false,
+    "key":{
+        "A":{
+            "item":"create:andesite_alloy"
+        },
+        "C":{
+            "item":"create:copper_sheet"
+        },
+        "I":{
+            "item":"minecraft:iron_ingot"
+        },
+        "R":{
+            "item":"minecraft:redstone"
+        }
+    },
+    "pattern":[
+        " AAA ",
+        " CCC ",
+        " RIR ",
+        " CCC ",
+        " AAA "
+    ],
+    "result":{
+        "count":1,
+        "item":"createpropulsion:redstone_magnet"
+    }
+}
