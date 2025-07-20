@@ -91,17 +91,17 @@ public class AssemblyGaugeOverlayRenderer {
         if (selectingSecond) {
             if (isTooLarge) {
                 if (selectionBox != null && AssemblyUtility.isAABBLarger(selectionBox, AssemblyUtility.MAX_RENDERED_OUTLINE_SIZE)) {
-                    statusText = Component.literal("Selection must start and end on the same structure").withStyle(s -> s.withColor(AssemblyUtility.CANCEL_COLOR));
+                    statusText = Component.translatable("createpropulsion.gauge.selection.same_structure").withStyle(s -> s.withColor(AssemblyUtility.CANCEL_COLOR));
                 } else {
-                    statusText = Component.literal("Selection is too big").withStyle(s -> s.withColor(AssemblyUtility.CANCEL_COLOR));
+                    statusText = Component.translatable("createpropulsion.gauge.selection.too_big").withStyle(s -> s.withColor(AssemblyUtility.CANCEL_COLOR));
                 }
             } else if (lastPosA == null) {
                 lastPosA = posA;
             } else {
                 if (player.isShiftKeyDown()) {
-                    statusText = Component.literal("Click again to cancel").withStyle(s -> s.withColor(AssemblyUtility.CANCEL_COLOR));
+                    statusText = Component.translatable("createpropulsion.gauge.selection.cancel").withStyle(s -> s.withColor(AssemblyUtility.CANCEL_COLOR));
                 } else {
-                    statusText = Component.literal("Click again to confirm").withStyle(s -> s.withColor(AssemblyUtility.HIGHLIGHT_COLOR));
+                    statusText = Component.translatable("createpropulsion.gauge.selection.confirm").withStyle(s -> s.withColor(AssemblyUtility.HIGHLIGHT_COLOR));
                 }
             }
         }

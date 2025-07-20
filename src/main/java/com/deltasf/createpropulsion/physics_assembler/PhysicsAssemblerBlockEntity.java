@@ -324,14 +324,14 @@ public class PhysicsAssemblerBlockEntity extends BlockEntity {
         if (selfPos.getX() >= minX && selfPos.getX() <= maxX &&
             selfPos.getY() >= minY && selfPos.getY() <= maxY &&
             selfPos.getZ() >= minZ && selfPos.getZ() <= maxZ) {
-            Component reason = Component.literal("Assembler cannot be inside the selection").withStyle(s -> s.withColor(AssemblyUtility.CANCEL_COLOR));
+            Component reason = Component.translatable("createpropulsion.assembler.selection.cannot_be_inside").withStyle(s -> s.withColor(AssemblyUtility.CANCEL_COLOR));
             return new GaugeValidationResult(false, Optional.of(reason));
         }
 
         // Check distance between assembler and region
         int manhattanDistance = getManhattanDistanceToRegion(this.worldPosition, posA, posB);
         if (manhattanDistance > PropulsionConfig.PHYSICS_ASSEMBLER_MAX_MINK_DISTANCE.get()) {
-            Component reason = Component.literal("Selection is too far away").withStyle(s -> s.withColor(AssemblyUtility.CANCEL_COLOR));
+             Component reason = Component.translatable("createpropulsion.assembler.selection.too_far").withStyle(s -> s.withColor(AssemblyUtility.CANCEL_COLOR));
             return new GaugeValidationResult(false, Optional.of(reason));
         }
 
