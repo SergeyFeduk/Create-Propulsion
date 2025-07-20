@@ -52,11 +52,11 @@
     "fluid.createpropulsion.turpentine": "Скипидар",
     "item.createpropulsion.turpentine_bucket": "Ведро скипидара",
 
-    "item.createpropulsion.optical_lens": "Оптическая лизна",
+    "item.createpropulsion.optical_lens": "Оптическая линза",
     "item.createpropulsion.fluid_lens": "Жидкостная линза",
-    "item.createpropulsion.focus_lens": "Фокусирующая лизна",
+    "item.createpropulsion.focus_lens": "Фокусирующая линза",
     "item.createpropulsion.invisibility_lens": "Линза невидимости",
-    "item.createpropulsion.unfinished_lens": "Незаконченная лизна",
+    "item.createpropulsion.unfinished_lens": "Незаконченная линза",
 
     "item.createpropulsion.assembly_gauge": "Калибратор сборщика",
     "createpropulsion.gauge.selection.same_structure": "Выделенная область должна начинаться и заканчиваться на одной структуре",
