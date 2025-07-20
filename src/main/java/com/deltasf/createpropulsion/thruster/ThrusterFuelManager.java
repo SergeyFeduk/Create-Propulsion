@@ -92,13 +92,11 @@ public class ThrusterFuelManager extends SimpleJsonResourceReloadListener {
                 .ifPresent(definition -> {
                     //There is a fuel that requires a mod but the mod is not present
                     if (definition.requiredMod().isPresent() && !ModList.get().isLoaded(definition.requiredMod().get())) {
-                        LOGGER.info("Not loaded {}: no mod", file.toString());
                         return;
                     }
                     Fluid fluid = definition.getFluid();
                     //Fluid is not in registry
                     if (fluid == Fluids.EMPTY) {
-                        LOGGER.info("Not Loaded {}: Empty fluid", file.toString());
                         return;
                     }
                     //Successfully load fuel
@@ -106,9 +104,7 @@ public class ThrusterFuelManager extends SimpleJsonResourceReloadListener {
                         definition.thrustMultiplier(), 
                         definition.consumptionMultiplier());
                     newMap.put(fluid, properties);
-                    LOGGER.info("Loaded {}", file.toString());
                 });
-                
         }
         
         return newMap;

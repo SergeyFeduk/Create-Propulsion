@@ -138,7 +138,6 @@ public class AssemblyGaugeOverlayRenderer {
             float lineWidth = isHovering ? 1/16f : 1/64f;
 
             AssemblyUtility.renderOutline("gauge_selection", currentSelectionBox, AssemblyUtility.PASSIVE_COLOR, lineWidth, isHovering);
-
         } else {
             int color = isTooLarge || (player.isShiftKeyDown()) ? AssemblyUtility.CANCEL_COLOR : AssemblyUtility.PASSIVE_COLOR;
             AssemblyUtility.renderOutline("gauge_selection", currentSelectionBox, color, 1/16f, true);

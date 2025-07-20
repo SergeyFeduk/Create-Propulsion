@@ -129,8 +129,17 @@ public abstract class AbstractOpticalSensorBlock extends DirectionalBlock implem
         return super.use(state, level, pos, player, hand, hit);
     }
 
-    // Abstract methods
+    @Override
+    public BlockState rotate(@Nonnull BlockState state, @Nonnull Rotation rot) {
+        return state.setValue(FACING, rot.rotate(state.getValue(FACING)));
+    }
 
+    @Override
+    public BlockState mirror(@Nonnull BlockState state, @Nonnull Mirror mirrorIn) {
+        return state.rotate(mirrorIn.getRotation(state.getValue(FACING)));
+    }
+
+    // Abstract methods
     @Override
     public abstract BlockEntity newBlockEntity(@Nonnull BlockPos pos, @Nonnull BlockState state);
 
@@ -173,14 +182,4 @@ public abstract class AbstractOpticalSensorBlock extends DirectionalBlock implem
 
     @Override
 	public abstract boolean canConnectRedstone(BlockState state, BlockGetter world, BlockPos pos, Direction side);
-
-    @Override
-    public BlockState rotate(@Nonnull BlockState state, @Nonnull Rotation rot) {
-        return state.setValue(FACING, rot.rotate(state.getValue(FACING)));
-    }
-
-    @Override
-    public BlockState mirror(@Nonnull BlockState state, @Nonnull Mirror mirrorIn) {
-        return state.rotate(mirrorIn.getRotation(state.getValue(FACING)));
-    }
 }

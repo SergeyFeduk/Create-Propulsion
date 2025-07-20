@@ -21,5 +21,4 @@ public class FluidThrusterProperties {
     public static FluidThrusterProperties decode(FriendlyByteBuf buf) {
         return new FluidThrusterProperties(buf.readFloat(), buf.readFloat());
     }    
-    
 }
