@@ -36,7 +36,7 @@
     "createpropulsion.thruster.tooltip.condition1": "Когда заправлен и подан редстоун-сигнал",
     "createpropulsion.thruster.tooltip.behaviour1": "Толкает корабль. Тяга зависит от мощности _редстоун-сигнала_ и используемого топлива.",
 
-    "createpropulsion.lodestone_tracker.tooltip.summary": "Превращает направление стрелки установленного _компаса_ в _редстоун-сигнал_.",
+    "createpropulsion.lodestone_tracker.tooltip.summary": "Преобразует направление стрелки _компаса_ в _редстоун-сигнал_.",
     "createpropulsion.lodestone_tracker.tooltip.condition1": "Когда установлен компас",
     "createpropulsion.lodestone_tracker.tooltip.behaviour1": "Подаёт _редстоун-сигнал_ в направлении обратном стрелке _компаса_.",
 
@@ -66,7 +66,7 @@
     "createpropulsion.assembler.selection.cannot_be_inside": "Сборщик не может находиться внутри выделенной области",
     "createpropulsion.assembler.selection.too_far": "Выделенная область слишком далеко",
 
-    "createpropulsion.optical_lens.tooltip.summary": "Оптическая линза которая может быть _покрашена_ для изменения цвета луча _оптического сенсора_.",
+    "createpropulsion.optical_lens.tooltip.summary": "Оптическая линза, которую можно _покрасить_, чтобы изменить цвет луча _оптического сенсора_.",
     "createpropulsion.fluid_lens.tooltip.summary": "Позволяет _оптическому сенсору_ обнаруживать _жидкости_.",
     "createpropulsion.focus_lens.tooltip.summary": "_Удваивает_ предельную дальность _оптического сенсора_.",
     "createpropulsion.invisibility_lens.tooltip.summary": "Делает луч _оптического сенсора невидимым_."
