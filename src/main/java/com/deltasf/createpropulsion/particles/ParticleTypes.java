@@ -3,7 +3,6 @@ package com.deltasf.createpropulsion.particles;
 import java.util.function.Supplier;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
-import com.deltasf.createpropulsion.compat.PropulsionCompatibility;
 import com.simibubi.create.foundation.particle.ICustomParticleData;
 import com.simibubi.create.foundation.utility.Lang;
 
@@ -24,12 +23,7 @@ import net.minecraftforge.registries.RegistryObject;
 //Create actually handles registration so elegantly, this is the only reason I just copied it from their repo
 @EventBusSubscriber(modid = CreatePropulsion.ID, bus = Bus.MOD, value = Dist.CLIENT)
 public enum ParticleTypes {
-    //Plume is a special case as we handle shimmer compat
-    PLUME_DEFAULT(PlumeParticleData::new),
-    PLUME_SHIMMER(PlumeParticleData::new);
-
-    private static volatile ParticleType<?> cachedPlumeType = null;
-    private static final Object cacheLock = new Object();
+    PLUME_DEFAULT(PlumeParticleData::new);
 
     private final ParticleEntry<?> entry;
 
@@ -44,18 +38,7 @@ public enum ParticleTypes {
     }
 
     public static ParticleType<?> getPlumeType() {
-        ParticleType<?> result = cachedPlumeType;
-        //Thread-safe caching or whatever
-        if (result == null) {
-            synchronized (cacheLock) {
-                result = cachedPlumeType;
-                if (result == null) {
-                    result = PropulsionCompatibility.SHIMMER_ACTIVE ? PLUME_SHIMMER.get() : PLUME_DEFAULT.get();
-                    cachedPlumeType = result;
-                }
-            }
-        }
-        return result;
+        return PLUME_DEFAULT.get();
     }
 
     public static void register(IEventBus modEventBus){
