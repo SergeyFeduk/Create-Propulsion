@@ -101,6 +101,15 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
     @SuppressWarnings("null")
     @Override
     public void tick() {
+        if (this.isRemoved()) {
+            return;
+        }
+        //This part should ACTUALLY fix the issue with particle emission 
+        if (level.getBlockState(worldPosition).getBlock() != this.getBlockState().getBlock()) {
+            this.setRemoved();
+            return;
+        }
+
         super.tick();
         BlockState currentBlockState = getBlockState();
         if (level.isClientSide) {
