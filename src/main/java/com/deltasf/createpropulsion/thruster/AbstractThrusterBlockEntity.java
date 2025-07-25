@@ -43,6 +43,8 @@ import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 import java.awt.*;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 @SuppressWarnings({"deprecation", "unchecked"})
 public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggleInformation {
     // Constants
@@ -92,11 +94,15 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
 
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
+        if (side == getFluidCapSide()) return super.getCapability(cap, side);
         if (PropulsionCompatibility.CC_ACTIVE && computerBehaviour.isPeripheralCap(cap)) {
             return computerBehaviour.getPeripheralCapability();
         }
         return super.getCapability(cap, side);
     }
+
+    @Nullable
+    protected abstract Direction getFluidCapSide();
 
     @SuppressWarnings("null")
     @Override
