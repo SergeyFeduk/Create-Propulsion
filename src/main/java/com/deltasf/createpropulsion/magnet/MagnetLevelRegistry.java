@@ -14,6 +14,7 @@ import org.joml.Vector3d;
 import org.joml.Vector3i;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
+import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.debug.DebugRenderer;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
@@ -121,7 +122,7 @@ public class MagnetLevelRegistry {
         List<MagnetData> active = new ArrayList<>(magnets.values());
         int n = active.size();
         //Debug, draw active
-        if (MagnetRegistry.get().debug) {
+        if (CreatePropulsion.debug) {
             for (int i = 0; i < n; i++) {
                 var data = active.get(i);
                 String identifier = i + "_active";
@@ -183,7 +184,7 @@ public class MagnetLevelRegistry {
         this.shipToPairs = newShipToPairs;
 
         //Debug, draw edges
-        if (MagnetRegistry.get().debug) {
+        if (CreatePropulsion.debug) {
             int i = 0;
             for(int[] edge : edges) {
                 i++;

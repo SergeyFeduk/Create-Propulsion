@@ -18,7 +18,6 @@ public class MagnetRegistry {
     
     public static final double magnetRange = 32.0;
     public static final double magnetRangeSquared = magnetRange * magnetRange;
-    public boolean debug = false;
 
     private final Map<ResourceKey<Level>, MagnetLevelRegistry> registries = new ConcurrentHashMap<>();
 

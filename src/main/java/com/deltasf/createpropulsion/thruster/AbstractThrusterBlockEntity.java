@@ -1,5 +1,6 @@
 package com.deltasf.createpropulsion.thruster;
 
+import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.compat.PropulsionCompatibility;
 import com.deltasf.createpropulsion.compat.computercraft.ComputerBehaviour;
@@ -326,7 +327,7 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
         AABB plumeAABB = calculateAabb(plumeDirection, distanceByPower);
 
         // Debug OBB
-        debugObb(obbResult, false);
+        debugObb(obbResult, CreatePropulsion.debug);
 
         // Query damage candidates
         List<Entity> damageCandidates = level.getEntities(null, plumeAABB);
@@ -386,14 +387,13 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
     }
 
     private void debugObb(ObbCalculationResult obbResult, boolean debug) {
-        if (debug) {
-            String identifier = "thruster_" + this.hashCode() + "_obb";
-            Quaternionf debugRotation = new Quaternionf((float)obbResult.obbRotationWorldJOML.x, (float)obbResult.obbRotationWorldJOML.y, (float)obbResult.obbRotationWorldJOML.z, (float)obbResult.obbRotationWorldJOML.w);
-            Vec3 debugSize = new Vec3(obbResult.plumeHalfExtentsJOML.x * 2, obbResult.plumeHalfExtentsJOML.y * 2, obbResult.plumeHalfExtentsJOML.z * 2);
-            Vec3 debugCenter = VectorConversionsMCKt.toMinecraft(obbResult.obbCenterWorldJOML);
+        if (!debug) return;
+        String identifier = "thruster_" + this.hashCode() + "_obb";
+        Quaternionf debugRotation = new Quaternionf((float)obbResult.obbRotationWorldJOML.x, (float)obbResult.obbRotationWorldJOML.y, (float)obbResult.obbRotationWorldJOML.z, (float)obbResult.obbRotationWorldJOML.w);
+        Vec3 debugSize = new Vec3(obbResult.plumeHalfExtentsJOML.x * 2, obbResult.plumeHalfExtentsJOML.y * 2, obbResult.plumeHalfExtentsJOML.z * 2);
+        Vec3 debugCenter = VectorConversionsMCKt.toMinecraft(obbResult.obbCenterWorldJOML);
 
-            DebugRenderer.drawBox(identifier, debugCenter, debugSize, debugRotation, Color.ORANGE, false, TICKS_PER_ENTITY_CHECK + 1);
-        }
+        DebugRenderer.drawBox(identifier, debugCenter, debugSize, debugRotation, Color.ORANGE, false, TICKS_PER_ENTITY_CHECK + 1);
     }
 
     private void applyDamageToEntities(Level level, List<Entity> damageCandidates, ObbCalculationResult obbResult, float visualPowerPercent) {

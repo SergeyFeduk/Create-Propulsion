@@ -1,5 +1,6 @@
 package com.deltasf.createpropulsion.registries;
 
+import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.magnet.MagnetRegistry;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
@@ -29,7 +30,7 @@ public class PropulsionCommands {
 
     private static int setDebugMode(CommandContext<CommandSourceStack> context) {
         boolean value = BoolArgumentType.getBool(context, "value");
-        MagnetRegistry.get().debug = value;
+        CreatePropulsion.debug = value;
         return 1;
     }
 

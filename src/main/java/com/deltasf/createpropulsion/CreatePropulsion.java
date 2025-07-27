@@ -23,6 +23,7 @@ public class CreatePropulsion {
     public static final String ID = "createpropulsion";
     public static final CreateRegistrate REGISTRATE = CreateRegistrate.create(ID);
     public static CreateRegistrate registrate() { return REGISTRATE; }
+    public static boolean debug = false;
 
     public CreatePropulsion() {
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
