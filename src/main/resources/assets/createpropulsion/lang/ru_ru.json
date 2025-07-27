@@ -38,7 +38,7 @@
 
     "createpropulsion.lodestone_tracker.tooltip.summary": "Преобразует направление стрелки _компаса_ в _редстоун-сигнал_.",
     "createpropulsion.lodestone_tracker.tooltip.condition1": "Когда установлен компас",
-    "createpropulsion.lodestone_tracker.tooltip.behaviour1": "Подаёт _редстоун-сигнал_ в направлении обратном стрелке _компаса_.",
+    "createpropulsion.lodestone_tracker.tooltip.behaviour1": "Подаёт _редстоун-сигнал_ в направлении стрелки _компаса_.",
 
     "createpropulsion.redstone_magnet.tooltip.summary": "_Притягивает_ или _отталкивает_ находящиеся рядом магниты в соответствии с их полярностью.",
     "createpropulsion.redstone_magnet.tooltip.condition1": "Когда подан редстоун-сигнал",
