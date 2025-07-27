@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
 import com.deltasf.createpropulsion.registries.PropulsionShapes;
 import com.simibubi.create.AllSoundEvents;
+import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntityTicker;
 
 import net.minecraft.core.BlockPos;
@@ -18,6 +19,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -31,7 +33,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 @SuppressWarnings("deprecation")
-public class LodestoneTrackerBlock extends Block implements EntityBlock {
+public class LodestoneTrackerBlock extends Block implements EntityBlock, IWrenchable {
 
     @Override
     public VoxelShape getShape(@Nullable BlockState pState, @Nullable BlockGetter pLevel, @Nullable BlockPos pPos, @Nullable CollisionContext pContext) {
@@ -68,23 +70,23 @@ public class LodestoneTrackerBlock extends Block implements EntityBlock {
         if (ray.getDirection() != Direction.UP) return InteractionResult.PASS;
         if (level.isClientSide) return InteractionResult.SUCCESS;
         BlockEntity be = level.getBlockEntity(pos);
-        if (!(be instanceof LodestoneTrackerBlockEntity trackerBE)) return InteractionResult.PASS;
+        if (!(be instanceof LodestoneTrackerBlockEntity trackerBlockEntity)) return InteractionResult.PASS;
 
         ItemStack heldStack = player.getItemInHand(hand);
-        boolean trackerHasCompass = trackerBE.hasCompass();
+        boolean trackerHasCompass = trackerBlockEntity.hasCompass();
         boolean playerHoldingCompass = heldStack.getItem() == Items.COMPASS;
 
         if (playerHoldingCompass && !trackerHasCompass) {
             // Player has compass, tracker is empty -> Place compass
             ItemStack compassToPlace = heldStack.split(1);
-            trackerBE.setCompass(compassToPlace);
+            trackerBlockEntity.setCompass(compassToPlace);
             AllSoundEvents.DEPOT_SLIDE.playOnServer(level, pos);
             dirtyBlockEntity(level, pos);
             return InteractionResult.CONSUME;
 
         } else if (heldStack.isEmpty() && trackerHasCompass) {
             // Player has empty hand, tracker has compass -> Take compass
-            ItemStack takenCompass = trackerBE.removeCompass();
+            ItemStack takenCompass = trackerBlockEntity.removeCompass();
             player.getInventory().placeItemBackInInventory(takenCompass);
             level.playSound(null, pos, SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, 0.2f, 1.0f);
             dirtyBlockEntity(level, pos);
@@ -104,6 +106,24 @@ public class LodestoneTrackerBlock extends Block implements EntityBlock {
         return new SmartBlockEntityTicker<>();
     }
 
+    //Wrench behaviour
+
+    @Override
+    public InteractionResult onWrenched(BlockState state, UseOnContext context) {
+        Level level = context.getLevel();
+        BlockEntity be = level.getBlockEntity(context.getClickedPos());
+        if (be instanceof LodestoneTrackerBlockEntity trackerBlockEntity) {
+            trackerBlockEntity.toggleInverted();
+            if (trackerBlockEntity.IsInverted()) {
+                level.playSound(null, context.getClickedPos(), SoundEvents.STONE_BUTTON_CLICK_OFF, SoundSource.BLOCKS, 0.7f, 0.8f);
+            } else {
+                playRotateSound(level, context.getClickedPos());
+            }
+        }
+        
+        return InteractionResult.SUCCESS;
+    }
+
     //Redstone
     @Override
 	public boolean canConnectRedstone(BlockState state, BlockGetter world, BlockPos pos, Direction side) {
@@ -112,23 +132,20 @@ public class LodestoneTrackerBlock extends Block implements EntityBlock {
 
     @Override
     public int getSignal(@Nonnull BlockState blockState, @Nonnull BlockGetter blockAccess, @Nonnull BlockPos pos, @Nonnull Direction side){
-        boolean invertedDirection = true;
-
         BlockEntity be = blockAccess.getBlockEntity(pos);
-        if (!(be instanceof LodestoneTrackerBlockEntity trackerBE)) {
-            return 0;
-        }
-        
-        if (invertedDirection) {
-            if (side == Direction.NORTH) return trackerBE.powerNorth();
-            if (side == Direction.EAST) return trackerBE.powerEast();
-            if (side == Direction.SOUTH) return trackerBE.powerSouth();
-            if (side == Direction.WEST) return trackerBE.powerWest();
-        } else {
-            if (side == Direction.NORTH) return trackerBE.powerSouth();
-            if (side == Direction.EAST) return trackerBE.powerWest();
-            if (side == Direction.SOUTH) return trackerBE.powerNorth();
-            if (side == Direction.WEST) return trackerBE.powerEast();
+        if (be instanceof LodestoneTrackerBlockEntity trackerBlockEntity) {
+            boolean invertedDirection = trackerBlockEntity.IsInverted();
+            if (invertedDirection) {
+                if (side == Direction.NORTH) return trackerBlockEntity.powerNorth();
+                if (side == Direction.EAST) return trackerBlockEntity.powerEast();
+                if (side == Direction.SOUTH) return trackerBlockEntity.powerSouth();
+                if (side == Direction.WEST) return trackerBlockEntity.powerWest();
+            } else {
+                if (side == Direction.NORTH) return trackerBlockEntity.powerSouth();
+                if (side == Direction.EAST) return trackerBlockEntity.powerWest();
+                if (side == Direction.SOUTH) return trackerBlockEntity.powerNorth();
+                if (side == Direction.WEST) return trackerBlockEntity.powerEast();
+            }
         }
         return 0;
     }
