@@ -59,6 +59,12 @@
     "item.createpropulsion.unfinished_lens": "透镜（半成品）",
 
     "item.createpropulsion.assembly_gauge": "组装测量仪",
+    "createpropulsion.gauge.selection.same_structure": "选区的起点与终点必须在同一结构上",
+    "createpropulsion.gauge.selection.too_big": "选区过大",
+    "createpropulsion.gauge.selection.cancel": "再次点击以取消",
+    "createpropulsion.gauge.selection.confirm": "再次点击以确认",
+    "createpropulsion.assembler.selection.cannot_be_inside": "物理结构组装器不可处于选区内",
+    "createpropulsion.assembler.selection.too_far": "选区距离过远",
 
     "createpropulsion.optical_lens.tooltip.summary": "可被_染色_的光学镜片，用于为_光学传感器_的光束着色。",
     "createpropulsion.fluid_lens.tooltip.summary": "使_光学传感器_能够检测_流体_。",
