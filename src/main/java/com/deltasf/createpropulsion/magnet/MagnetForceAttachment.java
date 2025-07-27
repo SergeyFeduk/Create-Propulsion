@@ -105,7 +105,7 @@ public class MagnetForceAttachment implements ShipForcesInducer {
     private final Vector3d normalToWorld = new Vector3d();
 
     //Variables
-    private final double MIN_INTERACTION_DISTANCE_SQ = (0.5 * 1);
+    private final double MIN_INTERACTION_DISTANCE_SQ = 0.5;
     private final double MAGNET_INTERACTION_CONSTANT = 10000;
     private static final double POINT_FIVE = 0.5;
 
