@@ -1,33 +1,73 @@
 {
-  "itemGroup.createpropulsion.base": "机械动力：推进工程",
+    "itemGroup.createpropulsion.base": "机械动力：推进工程",
 
-  "block.createpropulsion.thruster": "推进器",
-  "item.createpropulsion.thruster": "推进器",
+    "block.createpropulsion.thruster": "推进器",
+    "item.createpropulsion.thruster": "推进器",
 
-  "block.createpropulsion.inline_optical_sensor": "内嵌式光学传感器",
-  "item.createpropulsion.inline_optical_sensor": "内嵌式光学传感器",
+    "block.createpropulsion.inline_optical_sensor": "集成式光学传感器",
+    "item.createpropulsion.inline_optical_sensor": "集成式光学传感器",
 
-  "block.createpropulsion.optical_sensor": "光学传感器",
-  "item.createpropulsion.optical_sensor": "光学传感器",
-  "create.gui.optical_sensor.distance_behaviour": "光线投射距离",
+    "block.createpropulsion.optical_sensor": "光学传感器",
+    "item.createpropulsion.optical_sensor": "光学传感器",
+    "create.gui.optical_sensor.distance_behaviour": "光线投射距离",
 
-  "create.gui.goggles.thruster.status": "推进器状态",
-  "create.gui.goggles.thruster.status.no_fuel": "燃料耗尽",
-  "create.gui.goggles.thruster.status.wrong_fuel": "燃料错误",
-  "create.gui.goggles.thruster.status.not_powered": "未被红石充能",
-  "create.gui.goggles.thruster.status.working": "启用",
-  "create.gui.goggles.thruster.obstructed": "被遮挡",
-  "create.gui.goggles.thruster.efficiency": "效率",
+    "block.createpropulsion.lodestone_tracker": "磁石追踪器",
+    "block.createpropulsion.redstone_magnet": "红石磁铁",
+    "block.createpropulsion.physics_assembler": "物理结构组装器",
 
-  "createpropulsion.inline_optical_sensor.tooltip.summary": "投射出最长_{} 方块长度_的_光线_以检测方块。",
-  "createpropulsion.inline_optical_sensor.tooltip.condition1": "当检测到方块时",
-  "createpropulsion.inline_optical_sensor.tooltip.behaviour1": "发出_红石信号_。方块距离越近，信号越强。",
+    "create.gui.goggles.thruster.status": "推进器状态",
+    "create.gui.goggles.thruster.status.no_fuel": "燃料耗尽",
+    "create.gui.goggles.thruster.status.wrong_fuel": "燃料错误",
+    "create.gui.goggles.thruster.status.not_powered": "未被红石充能",
+    "create.gui.goggles.thruster.status.working": "启用",
+    "create.gui.goggles.thruster.obstructed": "被遮挡",
+    "create.gui.goggles.thruster.efficiency": "效率",
+    "create.gui.goggles.optical_sensor.lenses": "透镜",
 
-  "createpropulsion.optical_sensor.tooltip.summary": "可配置的_光学传感器_。可以设置_距离_并以方块类型进行_筛选_。",
-  "createpropulsion.optical_sensor.tooltip.condition1": "当检测到方块时",
-  "createpropulsion.optical_sensor.tooltip.behaviour1": "当检测到符合条件的方块时，发出_红石信号_。方块距离越近，信号越强。",
+    "createpropulsion.inline_optical_sensor.tooltip.summary": "投射出最长_{} 格_的_光束_以检测方块。",
+    "createpropulsion.inline_optical_sensor.tooltip.condition1": "当检测到方块时",
+    "createpropulsion.inline_optical_sensor.tooltip.behaviour1": "发出_红石信号_。距离方块越近，信号越强。",
 
-  "createpropulsion.thruster.tooltip.summary": "提供最大_{} kN_的推力推动物理结构",
-  "createpropulsion.thruster.tooltip.condition1": "当供应燃料且被红石充能时",
-  "createpropulsion.thruster.tooltip.behaviour1": "对物理结构施加推力。推力大小取决于_红石信号_的强度。"
+    "createpropulsion.optical_sensor.tooltip.summary": "可配置的_光学传感器_。可以设置_距离_，也可以配置_过滤器_以设定会被检测的方块。",
+    "createpropulsion.optical_sensor.tooltip.condition1": "当检测到方块时",
+    "createpropulsion.optical_sensor.tooltip.behaviour1": "当检测到符合条件的方块时，发出_红石信号_。方块距离越近，信号越强。",
+
+    "createpropulsion.thruster.tooltip.summary": "提供最大_{} kN_的推力以推动物理结构",
+    "createpropulsion.thruster.tooltip.condition1": "当燃料充足且被红石充能时",
+    "createpropulsion.thruster.tooltip.behaviour1": "对物理结构施加推力。推力大小取决于_红石信号_的强度。",
+
+    "createpropulsion.lodestone_tracker.tooltip.summary": "将_指南针_指向的方向映射为_红石信号_。",
+    "createpropulsion.lodestone_tracker.tooltip.condition1": "当安装了指南针时",
+    "createpropulsion.lodestone_tracker.tooltip.behaviour1": "在与_指南针_指向方向相反的方向上发出_红石信号_。",
+
+    "createpropulsion.redstone_magnet.tooltip.summary": "根据磁极_吸引_或_排斥_附近被充能的磁铁。",
+    "createpropulsion.redstone_magnet.tooltip.condition1": "当被充能时",
+    "createpropulsion.redstone_magnet.tooltip.behaviour1": "影响附近_被充能的磁铁_。",
+
+    "createpropulsion.physics_assembler.tooltip.summary": "将方块组装成物理结构。",
+    "createpropulsion.physics_assembler.tooltip.condition1": "当被充能且安装了组装测量仪时",
+    "createpropulsion.physics_assembler.tooltip.behaviour1": "将_组装测量仪_所定义_区域_内的方块_组装_成一个物理结构。",
+
+    "item.createpropulsion.pine_resin": "松脂",
+    "fluid.createpropulsion.turpentine": "松节油",
+    "item.createpropulsion.turpentine_bucket": "松节油桶",
+
+    "item.createpropulsion.optical_lens": "光学透镜",
+    "item.createpropulsion.fluid_lens": "流体透镜",
+    "item.createpropulsion.focus_lens": "聚焦透镜",
+    "item.createpropulsion.invisibility_lens": "隐形透镜",
+    "item.createpropulsion.unfinished_lens": "透镜（半成品）",
+
+    "item.createpropulsion.assembly_gauge": "组装测量仪",
+    "createpropulsion.gauge.selection.same_structure": "选区的起点与终点必须在同一结构上",
+    "createpropulsion.gauge.selection.too_big": "选区过大",
+    "createpropulsion.gauge.selection.cancel": "再次点击以取消",
+    "createpropulsion.gauge.selection.confirm": "再次点击以确认",
+    "createpropulsion.assembler.selection.cannot_be_inside": "物理结构组装器不可处于选区内",
+    "createpropulsion.assembler.selection.too_far": "选区距离过远",
+
+    "createpropulsion.optical_lens.tooltip.summary": "可被_染色_的光学镜片，用于为_光学传感器_的光束着色。",
+    "createpropulsion.fluid_lens.tooltip.summary": "使_光学传感器_能够检测_流体_。",
+    "createpropulsion.focus_lens.tooltip.summary": "使_光学传感器_的最大_探测距离_加倍。",
+    "createpropulsion.invisibility_lens.tooltip.summary": "使_光学传感器_的光束_不再可见_。"
 }
