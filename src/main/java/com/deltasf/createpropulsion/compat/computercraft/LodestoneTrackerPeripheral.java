@@ -24,8 +24,8 @@ public class LodestoneTrackerPeripheral extends SyncedPeripheral<LodestoneTracke
     @Override
     public boolean equals(IPeripheral other) {
         if (this == other) return true;
-        if (other instanceof LodestoneTrackerPeripheral otherThruster) {
-            return this.blockEntity == otherThruster.blockEntity;
+        if (other instanceof LodestoneTrackerPeripheral otherTracker) {
+            return this.blockEntity == otherTracker.blockEntity;
         }
         return false;
     }

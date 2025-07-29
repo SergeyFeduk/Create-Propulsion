@@ -3,6 +3,7 @@ package com.deltasf.createpropulsion.compat.computercraft;
 import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerBlockEntity;
 import com.deltasf.createpropulsion.magnet.RedstoneMagnetBlockEntity;
 import com.deltasf.createpropulsion.optical_sensors.OpticalSensorBlockEntity;
+import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerBlockEntity;
 import com.deltasf.createpropulsion.thruster.thruster.ThrusterBlockEntity;
 import com.simibubi.create.compat.computercraft.AbstractComputerBehaviour;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
@@ -36,6 +37,8 @@ public class ComputerBehaviour extends AbstractComputerBehaviour {
             return () -> new LodestoneTrackerPeripheral(tracker);
         if (blockEntity instanceof RedstoneMagnetBlockEntity redstoneMagner)
             return () -> new MagnetPeripheral(redstoneMagner);
+        if (blockEntity instanceof PhysicsAssemblerBlockEntity physicsAssembler)
+            return () -> new PhysicsAssemblerPeripheral(physicsAssembler);
         throw new IllegalArgumentException("No peripheral available for " + ForgeRegistries.BLOCK_ENTITY_TYPES.getKey(blockEntity.getType()));
     }
 

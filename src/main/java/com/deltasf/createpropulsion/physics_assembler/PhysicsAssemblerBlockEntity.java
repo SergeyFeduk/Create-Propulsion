@@ -61,14 +61,21 @@ import org.valkyrienskies.mod.common.networking.PacketStopChunkUpdates;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
 import com.deltasf.createpropulsion.PropulsionConfig;
+import com.deltasf.createpropulsion.compat.PropulsionCompatibility;
+import com.deltasf.createpropulsion.compat.computercraft.ComputerBehaviour;
+import com.simibubi.create.compat.computercraft.AbstractComputerBehaviour;
+import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
+import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 
 @SuppressWarnings("null")
-public class PhysicsAssemblerBlockEntity extends BlockEntity {
+public class PhysicsAssemblerBlockEntity extends SmartBlockEntity {
     private final BlockState AIR = Blocks.AIR.defaultBlockState();
 
     public PhysicsAssemblerBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
     }
+    //CC
+    public AbstractComputerBehaviour computerBehaviour;
 
     private List<Vector2i> chunkPoses = new ArrayList<Vector2i>();
     private List<Vector2i> destchunkPoses = new ArrayList<Vector2i>();
@@ -86,6 +93,7 @@ public class PhysicsAssemblerBlockEntity extends BlockEntity {
 
         //Obtain pos from stack
         ItemStack gaugeStack = itemHandler.getStackInSlot(0);
+        if (gaugeStack == null) return;
         if (!(gaugeStack.getItem() instanceof AssemblyGaugeItem)) return;
 
         BlockPos posA = AssemblyGaugeItem.getPosA(gaugeStack);
@@ -421,17 +429,23 @@ public class PhysicsAssemblerBlockEntity extends BlockEntity {
         return 90.0f;
     }
 
+    public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
+        if (PropulsionCompatibility.CC_ACTIVE) {
+            behaviours.add(computerBehaviour = new ComputerBehaviour(this));
+        }
+    }
+
     //Serialization
 
     @Override
-    public void saveAdditional(@Nonnull CompoundTag tag) {
-        super.saveAdditional(tag);
+    protected void write(CompoundTag tag, boolean clientPacket) {
+        super.write(tag, clientPacket);
         tag.put("inventory", itemHandler.serializeNBT());
     }
 
     @Override
-    public void load(@Nonnull CompoundTag tag) {
-        super.load(tag);
+    protected void read(CompoundTag tag, boolean clientPacket) {
+        super.read(tag, clientPacket);
         if (tag.contains("inventory", Tag.TAG_COMPOUND)) {
             itemHandler.deserializeNBT(tag.getCompound("inventory"));
         }
@@ -450,12 +464,6 @@ public class PhysicsAssemblerBlockEntity extends BlockEntity {
         load(tag);
     }
 
-    @Nullable
-    @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
-
     //Capabilities
 
     @Nonnull
@@ -464,6 +472,10 @@ public class PhysicsAssemblerBlockEntity extends BlockEntity {
         if (cap == ForgeCapabilities.ITEM_HANDLER) {
             return lazyItemHandler.cast();
         }
+        if (PropulsionCompatibility.CC_ACTIVE && computerBehaviour.isPeripheralCap(cap)) {
+            return computerBehaviour.getPeripheralCapability();
+        }
+
         return super.getCapability(cap, side);
     }
 
