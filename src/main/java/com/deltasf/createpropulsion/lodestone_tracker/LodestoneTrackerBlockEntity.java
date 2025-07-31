@@ -227,7 +227,6 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
         notifyUpdate();
     }
 
-
     private static Vector2f getHorizontalAndVerticalAngles(Vector3d targetPosition, Vector3d trackerPosition) {
         Vector3d direction = new Vector3d();
         targetPosition.sub(trackerPosition, direction);

@@ -109,7 +109,6 @@ public class PhysicsAssemblerBlockEntity extends SmartBlockEntity {
 
         //Create ship
         var parentShip = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
-        //BlockPos centerOfRegion = new BlockPos((minX + maxX) / 2, (minY + maxY) / 2, (minZ + maxZ) / 2);
         String dimensionId = VSGameUtilsKt.getDimensionId(level);
         Vector3d gc = region.geometricCenter;
         BlockPos creationAnchorPos = new BlockPos(
@@ -192,7 +191,6 @@ public class PhysicsAssemblerBlockEntity extends SmartBlockEntity {
         if (ship instanceof ShipDataCommon shipData) {
             shipData.setTransform(newShipTransform);
             //TODO: Inherit linear velocity and angular momentum
-            //if (parentShip != null && parentShip instanceof ShipDataCommon parentShipData) {}
         }
 
         //Sync FROM chunks to resume updated when TO chunks start to tick
