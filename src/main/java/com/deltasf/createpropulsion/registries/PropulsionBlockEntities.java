@@ -47,13 +47,13 @@ public class PropulsionBlockEntities {
         .renderer(() -> LodestoneTrackerRenderer::new)
         .register();
 
-    /*public static final BlockEntityEntry<TiltSensorBlockEntity> TILT_SENSOR_BLOCK_ENTITY =
-        REGISTRATE.blockEntity("tilt_sensor_block_entity", TiltSensorBlockEntity::new)
-        .validBlock(PropulsionBlocks.TILT_SENSOR_BLOCK)
-        .register();*/
-
     public static final BlockEntityEntry<RedstoneMagnetBlockEntity> REDSTONE_MAGNET_BLOCK_ENTITY =
         REGISTRATE.blockEntity("redstone_magnet_block_entity", RedstoneMagnetBlockEntity::new)
         .validBlock(PropulsionBlocks.REDSTONE_MAGNET_BLOCK)
         .register();
+
+    /*public static final BlockEntityEntry<TiltSensorBlockEntity> TILT_SENSOR_BLOCK_ENTITY =
+        REGISTRATE.blockEntity("tilt_sensor_block_entity", TiltSensorBlockEntity::new)
+        .validBlock(PropulsionBlocks.TILT_SENSOR_BLOCK)
+        .register();*/
 }

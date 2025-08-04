@@ -41,13 +41,22 @@ public class LodestoneTrackerRenderer extends SafeBlockEntityRenderer<LodestoneT
         VertexConsumer vertexBuffer = bufferSource.getBuffer(RenderType.cutout()); 
         SuperByteBuffer partialIndicatorModel = CachedBufferer.partial(PropulsionPartialModels.LODESTONE_TRACKER_INDICATOR, blockState);
 
-        int[] powers = {
-            blockEntity.powerSouth(),
-            blockEntity.powerEast(),
-            blockEntity.powerNorth(),
-            blockEntity.powerWest()
-        };
-
+        int powers[];
+        if (blockEntity.IsInverted()) {
+            powers = new int[]{
+                blockEntity.powerSouth(),
+                blockEntity.powerEast(),
+                blockEntity.powerNorth(),
+                blockEntity.powerWest()
+            };
+        } else {
+            powers = new int[]{
+                blockEntity.powerNorth(),
+                blockEntity.powerWest(),
+                blockEntity.powerSouth(),
+                blockEntity.powerEast()
+            };
+        }
 
         for (int i = 0; i < 4; i++) {
             poseStack.pushPose();

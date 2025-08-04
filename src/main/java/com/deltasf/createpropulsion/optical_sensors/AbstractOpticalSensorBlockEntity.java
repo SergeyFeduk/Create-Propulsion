@@ -190,7 +190,6 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
     }
 
     // Lenses
-
     public NonNullList<ItemStack> getLenses() {
         return lenses;
     }
@@ -276,7 +275,6 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
 
     //Goggles info
 
-    //private static final ChatFormatting LENS_TEXT_COLOR = ;
     @Override
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         if (getCurrentLensCount() == 0) return false; // No lenses - no need for goggle info

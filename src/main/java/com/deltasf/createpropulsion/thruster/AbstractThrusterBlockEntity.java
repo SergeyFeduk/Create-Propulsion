@@ -1,5 +1,6 @@
 package com.deltasf.createpropulsion.thruster;
 
+import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.compat.PropulsionCompatibility;
 import com.deltasf.createpropulsion.compat.computercraft.ComputerBehaviour;
@@ -43,6 +44,8 @@ import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 import java.awt.*;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 @SuppressWarnings({"deprecation", "unchecked"})
 public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggleInformation {
     // Constants
@@ -57,6 +60,7 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
     protected ThrusterData thrusterData;
     protected int emptyBlocks;
     protected boolean isThrustDirty = false;
+    private final ThrusterDamager damager;
 
     // Ticking
     private int currentTick = 0;
@@ -75,6 +79,7 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
         super(typeIn, pos, state);
         thrusterData = new ThrusterData();
         particleType = (ParticleType<PlumeParticleData>) ParticleTypes.getPlumeType();
+        this.damager = new ThrusterDamager(this);
     }
 
     public abstract void updateThrust(BlockState currentBlockState);
@@ -92,15 +97,28 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
 
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
+        if (side == getFluidCapSide()) return super.getCapability(cap, side);
         if (PropulsionCompatibility.CC_ACTIVE && computerBehaviour.isPeripheralCap(cap)) {
             return computerBehaviour.getPeripheralCapability();
         }
         return super.getCapability(cap, side);
     }
 
+    @Nullable
+    protected abstract Direction getFluidCapSide();
+
     @SuppressWarnings("null")
     @Override
     public void tick() {
+        if (this.isRemoved()) {
+            return;
+        }
+        //This part should ACTUALLY fix the issue with particle emission 
+        if (level.getBlockState(worldPosition).getBlock() != this.getBlockState().getBlock()) {
+            this.setRemoved();
+            return;
+        }
+
         super.tick();
         BlockState currentBlockState = getBlockState();
         if (level.isClientSide) {
@@ -110,12 +128,8 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
             return;
         }
         currentTick++;
-
+        damager.tick(currentTick);
         int tick_rate = PropulsionConfig.THRUSTER_TICKS_PER_UPDATE.get();
-
-        if (shouldDamageEntities()) {
-            doEntityDamageCheck(currentTick);
-        }
 
         // Periodically recalculate obstruction
         if (currentTick % (tick_rate * 2) == 0) {
@@ -293,115 +307,4 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
         addSpecificGoggleInfo(tooltip, isPlayerSneaking);
         return true;
     }
-
-    @SuppressWarnings("null")
-    private void doEntityDamageCheck(int tick) {
-        if (tick % TICKS_PER_ENTITY_CHECK != 0) return;
-        int power = getOverriddenPowerOrState(getBlockState());
-        float visualPowerPercent = ((float)Math.max(power, LOWEST_POWER_THRSHOLD) - LOWEST_POWER_THRSHOLD) / 15.0f;
-        float distanceByPower = org.joml.Math.lerp(0.55f,1.5f, visualPowerPercent);
-
-        Direction plumeDirection = getBlockState().getValue(AbstractThrusterBlock.FACING).getOpposite();
-
-        // Calculate OBB World Position and Orientation
-        ObbCalculationResult obbResult = calculateObb(plumeDirection, distanceByPower);
-        if (obbResult.plumeLength <= 0.01) return;
-
-        // Calculate AABB for Broad-Phase Query
-        AABB plumeAABB = calculateAabb(plumeDirection, distanceByPower);
-
-        // Debug OBB
-        debugObb(obbResult, false);
-
-        // Query damage candidates
-        List<Entity> damageCandidates = level.getEntities(null, plumeAABB);
-        if (damageCandidates.isEmpty()) return;
-        applyDamageToEntities(level, damageCandidates, obbResult, visualPowerPercent);
-    }
-
-    private ObbCalculationResult calculateObb(Direction plumeDirection, float distanceByPower) {
-        double plumeStartOffset = 0.8;
-        double plumeEndOffset = emptyBlocks * distanceByPower + plumeStartOffset;
-        double plumeLength = Math.max(0, plumeEndOffset - plumeStartOffset);
-
-        Vector3d obbCenterWorldJOML;
-        Quaterniond obbRotationWorldJOML;
-        Vector3d thrusterCenterBlockWorldJOML;
-        double centerOffsetDistance = plumeStartOffset + (plumeLength / 2.0);
-        Vector3d relativeCenterOffsetJOML = VectorConversionsMCKt.toJOMLD(plumeDirection.getNormal()).mul(centerOffsetDistance);
-        Quaterniond relativeRotationJOML = new Quaterniond().rotateTo(new Vector3d(0, 0, 1), VectorConversionsMCKt.toJOMLD(plumeDirection.getNormal()));
-
-        Vector3d thrusterCenterBlockShipCoordsJOMLD = VectorConversionsMCKt.toJOML(Vec3.atCenterOf(worldPosition));
-
-        Ship ship = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
-        if (ship != null) {
-            //Ship-space
-            thrusterCenterBlockWorldJOML = ship.getShipToWorld().transformPosition(thrusterCenterBlockShipCoordsJOMLD, new Vector3d());
-            obbCenterWorldJOML = ship.getShipToWorld().transformPosition(relativeCenterOffsetJOML.add(thrusterCenterBlockShipCoordsJOMLD, new Vector3d()), new Vector3d());
-            obbRotationWorldJOML = ship.getTransform().getShipToWorldRotation().mul(relativeRotationJOML, new Quaterniond());
-        } else {
-            // World space
-            thrusterCenterBlockWorldJOML = thrusterCenterBlockShipCoordsJOMLD;
-            obbCenterWorldJOML = thrusterCenterBlockWorldJOML.add(relativeCenterOffsetJOML, new Vector3d());
-            obbRotationWorldJOML = relativeRotationJOML;
-        }
-
-        //Calculate actuall nozzle position for distance-based damage calculation
-        Vector3d nozzleOffsetLocal = new Vector3d(0, 0, 0.5); // Offset from block center to face along local Z
-        Vector3d nozzleOffsetWorld = obbRotationWorldJOML.transform(nozzleOffsetLocal, new Vector3d()); // Rotate offset into world orientation
-        Vector3d thrusterNozzleWorldPos = thrusterCenterBlockWorldJOML.add(nozzleOffsetWorld, new Vector3d());
-        Vec3 thrusterNozzleWorldPosMC = VectorConversionsMCKt.toMinecraft(thrusterNozzleWorldPos);
-
-        //Calculate OBB for Narrow check
-        Vector3d plumeHalfExtentsJOML = new Vector3d(0.7, 0.7, plumeLength / 2.0);
-        Vec3 plumeCenterMC = VectorConversionsMCKt.toMinecraft(obbCenterWorldJOML);
-        Vec3 plumeHalfExtentsMC = VectorConversionsMCKt.toMinecraft(plumeHalfExtentsJOML);
-
-        Matrix3d plumeRotationMatrix = MathUtility.createMatrixFromQuaternion(obbRotationWorldJOML);
-        OrientedBB plumeOBB = new OrientedBB(plumeCenterMC, plumeHalfExtentsMC, plumeRotationMatrix);
-
-        return new ObbCalculationResult(plumeLength, thrusterNozzleWorldPosMC, plumeOBB, obbCenterWorldJOML, plumeHalfExtentsJOML, obbRotationWorldJOML);
-    }
-
-    private AABB calculateAabb(Direction plumeDirection, float distanceByPower) {
-        BlockPos blockBehind = worldPosition.relative(plumeDirection);
-        int aabbEndOffset = (int)Math.floor(emptyBlocks * distanceByPower) + 1;
-        BlockPos blockEnd = worldPosition.relative(plumeDirection, aabbEndOffset);
-        return new AABB(blockBehind).minmax(new AABB(blockEnd)).inflate(1.0); //Inflation is optional but it makes me a bit more confident
-    }
-
-    private void debugObb(ObbCalculationResult obbResult, boolean debug) {
-        if (debug) {
-            String identifier = "thruster_" + this.hashCode() + "_obb";
-            Quaternionf debugRotation = new Quaternionf((float)obbResult.obbRotationWorldJOML.x, (float)obbResult.obbRotationWorldJOML.y, (float)obbResult.obbRotationWorldJOML.z, (float)obbResult.obbRotationWorldJOML.w);
-            Vec3 debugSize = new Vec3(obbResult.plumeHalfExtentsJOML.x * 2, obbResult.plumeHalfExtentsJOML.y * 2, obbResult.plumeHalfExtentsJOML.z * 2);
-            Vec3 debugCenter = VectorConversionsMCKt.toMinecraft(obbResult.obbCenterWorldJOML);
-
-            DebugRenderer.drawBox(identifier, debugCenter, debugSize, debugRotation, Color.ORANGE, false, TICKS_PER_ENTITY_CHECK + 1);
-        }
-    }
-
-    private void applyDamageToEntities(Level level, List<Entity> damageCandidates, ObbCalculationResult obbResult, float visualPowerPercent) {
-        DamageSource fireDamageSource = level.damageSources().onFire();
-        for (Entity entity : damageCandidates) {
-            if (entity.isRemoved() || entity.fireImmune()) continue;
-            AABB entityAABB = entity.getBoundingBox();
-            if (obbResult.plumeOBB.intersect(entityAABB) != null) {
-                float invSqrDistance = visualPowerPercent * 8.0f / (float)Math.max(1, entity.position().distanceToSqr(obbResult.thrusterNozzleWorldPosMC));
-                float damageAmount = 3 + invSqrDistance;
-
-                // Apply damage and fire
-                entity.hurt(fireDamageSource, damageAmount);
-                entity.setSecondsOnFire(3);
-            }
-        }
-    }
-
-    private static record ObbCalculationResult(
-        double plumeLength,
-        Vec3 thrusterNozzleWorldPosMC,
-        OrientedBB plumeOBB,
-        Vector3d obbCenterWorldJOML,
-        Vector3d plumeHalfExtentsJOML,
-        Quaterniond obbRotationWorldJOML) {}
 }

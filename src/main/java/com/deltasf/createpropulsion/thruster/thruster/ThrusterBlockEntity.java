@@ -42,10 +42,15 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
         // Provide the fluid handler capability on the correct face
-        if (side == getBlockState().getValue(ThrusterBlock.FACING) && cap == ForgeCapabilities.FLUID_HANDLER) {
+        if (side == getFluidCapSide() && cap == ForgeCapabilities.FLUID_HANDLER) {
             return tank.getCapability().cast();
         }
         return super.getCapability(cap, side);
+    }
+
+    @Override
+    protected Direction getFluidCapSide() {
+        return getBlockState().getValue(ThrusterBlock.FACING);
     }
 
     @Override

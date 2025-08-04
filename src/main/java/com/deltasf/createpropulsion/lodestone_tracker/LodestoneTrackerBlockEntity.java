@@ -52,6 +52,8 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
     public int powerEast() { return POWER_EAST; }
     public int powerSouth() { return POWER_SOUTH; }
     public int powerWest() { return POWER_WEST; }
+    private boolean isInverted = false;
+    public boolean IsInverted() {return isInverted; }
 
     //What am I doing with my life
     private ItemStack compass = ItemStack.EMPTY;
@@ -217,6 +219,14 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
         redstoneOutputs.set(intPowerN, intPowerE, intPowerS, intPowerW);
     }
 
+    public void toggleInverted() {
+        this.isInverted = !this.isInverted;
+        if (level != null) {
+            level.updateNeighborsAt(worldPosition, getBlockState().getBlock());
+        }
+        notifyUpdate();
+    }
+
     private static Vector2f getHorizontalAndVerticalAngles(Vector3d targetPosition, Vector3d trackerPosition) {
         Vector3d direction = new Vector3d();
         targetPosition.sub(trackerPosition, direction);
@@ -318,6 +328,7 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
         super.write(tag, clientPacket);
         tag.put("CompassItem", compass.save(new CompoundTag()));
         tag.putInt("currentTick", currentTick);
+        tag.putBoolean("isInverted", isInverted);
 
         tag.putInt("powerNorth", this.POWER_NORTH);
         tag.putInt("powerEast", this.POWER_EAST);
@@ -330,6 +341,7 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
         super.read(tag, clientPacket);
         compass = ItemStack.of(tag.getCompound("CompassItem"));
         currentTick = tag.getInt("currentTick");
+        isInverted = tag.getBoolean("isInverted");
 
         this.POWER_NORTH = tag.getInt("powerNorth");
         this.POWER_EAST = tag.getInt("powerEast");

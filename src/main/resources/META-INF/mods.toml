@@ -3,7 +3,7 @@ loaderVersion="${loader_version_range}"
 license="MIT"
 [[mods]]
 modId="createpropulsion"
-version="0.2.0"
+version="0.2.1"
 displayName="Create: Propulsion"
 displayURL="https://modrinth.com/mod/create-propulsion"
 logoFile="icon.png"
@@ -45,12 +45,6 @@ description='''A mod that adds optical sensors and thruster to the Create mod. A
 	modId = "createdieselgenerators"
 	mandatory = false
 	versionRange = "[1.2,)"
-	ordering = "AFTER"
-	side = "BOTH"
-[[dependencies.${mod_id}]]
-	modId = "shimmer"
-	mandatory = false
-	versionRange = "[0.2.2,)"
 	ordering = "AFTER"
 	side = "BOTH"
 [[dependencies.${mod_id}]]

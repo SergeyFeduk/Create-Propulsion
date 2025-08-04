@@ -34,11 +34,11 @@
 
     "createpropulsion.thruster.tooltip.summary": "Provides thrust up to _{} kN_ to push vehicles.",
     "createpropulsion.thruster.tooltip.condition1": "When fueled and powered",
-    "createpropulsion.thruster.tooltip.behaviour1": "Pushes vehicles. Thrust depends on _redstone signal_ strength.",
+    "createpropulsion.thruster.tooltip.behaviour1": "Pushes vehicles. Thrust depends on _redstone signal_ strength and fuel type.",
 
     "createpropulsion.lodestone_tracker.tooltip.summary": "Maps _compass_ direction to _redstone signal_.",
     "createpropulsion.lodestone_tracker.tooltip.condition1": "When a compass is inserted",
-    "createpropulsion.lodestone_tracker.tooltip.behaviour1": "Emits _redstone signal_ in the direction opposite to where the _compass_ points.",
+    "createpropulsion.lodestone_tracker.tooltip.behaviour1": "Emits _redstone signal_ based on the direction _compass_ points.",
 
     "createpropulsion.redstone_magnet.tooltip.summary": "_Attracts_ or _repels_ nearby powered magnets based on polarity.",
     "createpropulsion.redstone_magnet.tooltip.condition1": "When powered",
@@ -59,6 +59,12 @@
     "item.createpropulsion.unfinished_lens": "Unfinished Lens",
 
     "item.createpropulsion.assembly_gauge": "Assembly Gauge",
+    "createpropulsion.gauge.selection.same_structure": "Selection must start and end on the same structure",
+    "createpropulsion.gauge.selection.too_big": "Selection is too big",
+    "createpropulsion.gauge.selection.cancel": "Click again to cancel",
+    "createpropulsion.gauge.selection.confirm": "Click again to confirm",
+    "createpropulsion.assembler.selection.cannot_be_inside": "Assembler cannot be inside the selection",
+    "createpropulsion.assembler.selection.too_far": "Selection is too far away",
 
     "createpropulsion.optical_lens.tooltip.summary": "Optical lens that can be _colored_ to tint an _optical sensor_'s beam.",
     "createpropulsion.fluid_lens.tooltip.summary": "Enables an _optical sensor_ to detect _fluids_.",
