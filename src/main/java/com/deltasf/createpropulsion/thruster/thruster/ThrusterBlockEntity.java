@@ -54,11 +54,6 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
     }
 
     @Override
-    protected Direction getFluidCapSide() {
-        return getBlockState().getValue(ThrusterBlock.FACING);
-    }
-
-    @Override
     public void updateThrust(BlockState currentBlockState) {
         float thrust = 0;
         int power = getOverriddenPowerOrState(currentBlockState);
@@ -91,6 +86,11 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
     @Override
     protected boolean isWorking() {
         return validFluid();
+    }
+
+    @Override
+    protected Direction getFluidCapSide() {
+        return getBlockState().getValue(ThrusterBlock.FACING);
     }
 
     @Override

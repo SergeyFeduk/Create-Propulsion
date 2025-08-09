@@ -91,21 +91,12 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
         }
     }
 
-    public abstract void updateThrust(BlockState currentBlockState);
-
-    protected abstract boolean isWorking();
-
-    protected abstract LangBuilder getGoggleStatus();
-
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
         if (PropulsionCompatibility.CC_ACTIVE) {
             behaviours.add(computerBehaviour = new ComputerBehaviour(this));
         }
     }
-
-    @Nullable
-    protected abstract Direction getFluidCapSide();
 
     @SuppressWarnings("null")
     @Override
@@ -148,15 +139,14 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
         }
     }
 
-    protected boolean shouldEmitParticles() {
-        return isPowered() && isWorking();
-    }
+    public abstract void updateThrust(BlockState currentBlockState);
 
-    protected boolean shouldDamageEntities() {
-        return PropulsionConfig.THRUSTER_DAMAGE_ENTITIES.get() && isPowered() && isWorking();
-    }
+    protected abstract boolean isWorking();
 
-    protected void addSpecificGoggleInfo(List<Component> tooltip, boolean isPlayerSneaking) {}
+    protected abstract LangBuilder getGoggleStatus();
+
+    @Nullable
+    protected abstract Direction getFluidCapSide();
 
     public ThrusterData getThrusterData() {
         return thrusterData;
@@ -169,6 +159,16 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
     public void dirtyThrust() {
         isThrustDirty = true;
     }
+
+    protected boolean shouldEmitParticles() {
+        return isPowered() && isWorking();
+    }
+
+    protected boolean shouldDamageEntities() {
+        return PropulsionConfig.THRUSTER_DAMAGE_ENTITIES.get() && isPowered() && isWorking();
+    }
+
+    protected void addSpecificGoggleInfo(List<Component> tooltip, boolean isPlayerSneaking) {}
 
     protected boolean isPowered() {
         return getOverriddenPowerOrState(getBlockState()) > 0;
@@ -183,28 +183,6 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
             return overridenPower;
         }
         return currentBlockState.getValue(AbstractThrusterBlock.POWER);
-    }
-
-    @Override
-    protected void write(CompoundTag compound, boolean clientPacket) {
-        super.write(compound, clientPacket);
-        compound.putInt("emptyBlocks", emptyBlocks);
-        compound.putInt("currentTick", currentTick);
-        if (PropulsionCompatibility.CC_ACTIVE) {
-            compound.putInt("overridenPower", overridenPower);
-            compound.putBoolean("overridePower", overridePower);
-        }
-    }
-
-    @Override
-    protected void read(CompoundTag compound, boolean clientPacket) {
-        super.read(compound, clientPacket);
-        emptyBlocks = compound.getInt("emptyBlocks");
-        currentTick = compound.getInt("currentTick");
-        if (PropulsionCompatibility.CC_ACTIVE) {
-            overridenPower = compound.getInt("overridenPower");
-            overridePower = compound.getBoolean("overridePower");
-        }
     }
 
     public void emitParticles(Level level, BlockPos pos, BlockState state) {
@@ -308,5 +286,27 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
 
         addSpecificGoggleInfo(tooltip, isPlayerSneaking);
         return true;
+    }
+
+    @Override
+    protected void write(CompoundTag compound, boolean clientPacket) {
+        super.write(compound, clientPacket);
+        compound.putInt("emptyBlocks", emptyBlocks);
+        compound.putInt("currentTick", currentTick);
+        if (PropulsionCompatibility.CC_ACTIVE) {
+            compound.putInt("overridenPower", overridenPower);
+            compound.putBoolean("overridePower", overridePower);
+        }
+    }
+
+    @Override
+    protected void read(CompoundTag compound, boolean clientPacket) {
+        super.read(compound, clientPacket);
+        emptyBlocks = compound.getInt("emptyBlocks");
+        currentTick = compound.getInt("currentTick");
+        if (PropulsionCompatibility.CC_ACTIVE) {
+            overridenPower = compound.getInt("overridenPower");
+            overridePower = compound.getBoolean("overridePower");
+        }
     }
 }
