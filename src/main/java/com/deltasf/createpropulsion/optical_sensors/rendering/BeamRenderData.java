@@ -1,5 +1,6 @@
 package com.deltasf.createpropulsion.optical_sensors.rendering;
 
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -23,6 +24,8 @@ public class BeamRenderData {
     public Vector3f eTopRight;
     public Vector3f eTopLeft;
     public PoseStack.Pose poseSnapshot;
+    public Matrix4f worldToLocalTransform;
+
     
     public BeamRenderData() {
         this.startColor = new Vector4f();
@@ -42,6 +45,7 @@ public class BeamRenderData {
         this.eTopRight = new Vector3f();
         this.eTopLeft = new Vector3f();
 
+        this.worldToLocalTransform = new Matrix4f();
         this.poseSnapshot = null;
     }
 }

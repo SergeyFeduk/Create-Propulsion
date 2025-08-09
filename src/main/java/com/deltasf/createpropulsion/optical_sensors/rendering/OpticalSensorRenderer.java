@@ -158,6 +158,7 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<AbstractOptic
             setBeamColors(beamData, powered);
         }
 
+        beamData.worldToLocalTransform.set(poseStack.last().pose()).invert();
         beamData.poseSnapshot = poseStack.last();
 
         //Rendering setup
