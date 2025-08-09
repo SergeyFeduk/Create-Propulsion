@@ -1,7 +1,10 @@
 package com.deltasf.createpropulsion.compat.computercraft;
 
 import dan200.computercraft.api.lua.LuaFunction;
+import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
+
+import org.jetbrains.annotations.NotNull;
 
 import com.deltasf.createpropulsion.thruster.thruster.ThrusterBlockEntity;
 import com.simibubi.create.compat.computercraft.implementation.peripherals.SyncedPeripheral;
@@ -26,8 +29,14 @@ public class ThrusterPeripheral extends SyncedPeripheral<ThrusterBlockEntity> {
     @LuaFunction(mainThread = true)
     public void setPower(int power) {
         int clampedPower = Math.max(Math.min(power, 15), 0);
-        blockEntity.overridePower = clampedPower != 0;
-        blockEntity.overridenPower = clampedPower;
+        
+        if (blockEntity.overridenPower != clampedPower || blockEntity.overridePower != (clampedPower != 0)) {
+            blockEntity.overridePower = clampedPower != 0;
+            blockEntity.overridenPower = clampedPower;
+            blockEntity.dirtyThrust();
+            blockEntity.setChanged();
+            blockEntity.sendData();
+        }
     }
 
     //Get name of the current fuel
@@ -59,4 +68,17 @@ public class ThrusterPeripheral extends SyncedPeripheral<ThrusterBlockEntity> {
         }
         return false;
     }
+
+    @Override
+	public void detach(@NotNull IComputerAccess computer) {
+		if (blockEntity.overridePower) {
+            blockEntity.overridePower = false;
+            blockEntity.overridenPower = 0;
+            blockEntity.dirtyThrust();
+            blockEntity.setChanged();
+            blockEntity.sendData();
+        }
+
+        super.detach(computer);
+	}
 }

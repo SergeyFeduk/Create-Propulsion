@@ -82,6 +82,15 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
         this.damager = new ThrusterDamager(this);
     }
 
+    @SuppressWarnings("null")
+    @Override
+    public void initialize() {
+        super.initialize();
+        if (!level.isClientSide) {
+            calculateObstruction(level, worldPosition, getBlockState().getValue(AbstractThrusterBlock.FACING));
+        }
+    }
+
     public abstract void updateThrust(BlockState currentBlockState);
 
     protected abstract boolean isWorking();
@@ -93,15 +102,6 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
         if (PropulsionCompatibility.CC_ACTIVE) {
             behaviours.add(computerBehaviour = new ComputerBehaviour(this));
         }
-    }
-
-    @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-        if (side == getFluidCapSide()) return super.getCapability(cap, side);
-        if (PropulsionCompatibility.CC_ACTIVE && computerBehaviour.isPeripheralCap(cap)) {
-            return computerBehaviour.getPeripheralCapability();
-        }
-        return super.getCapability(cap, side);
     }
 
     @Nullable
@@ -166,6 +166,10 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
         return emptyBlocks;
     }
 
+    public void dirtyThrust() {
+        isThrustDirty = true;
+    }
+
     protected boolean isPowered() {
         return getOverriddenPowerOrState(getBlockState()) > 0;
     }
@@ -186,7 +190,6 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
         super.write(compound, clientPacket);
         compound.putInt("emptyBlocks", emptyBlocks);
         compound.putInt("currentTick", currentTick);
-        compound.putBoolean("isThrustDirty", isThrustDirty);
         if (PropulsionCompatibility.CC_ACTIVE) {
             compound.putInt("overridenPower", overridenPower);
             compound.putBoolean("overridePower", overridePower);
@@ -198,7 +201,6 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
         super.read(compound, clientPacket);
         emptyBlocks = compound.getInt("emptyBlocks");
         currentTick = compound.getInt("currentTick");
-        isThrustDirty = compound.getBoolean("isThrustDirty");
         if (PropulsionCompatibility.CC_ACTIVE) {
             overridenPower = compound.getInt("overridenPower");
             overridePower = compound.getBoolean("overridePower");
