@@ -1,4 +1,4 @@
-package com.deltasf.createpropulsion.utility;
+package com.deltasf.createpropulsion.events;
 
 import java.util.HashMap;
 import java.util.Map;
