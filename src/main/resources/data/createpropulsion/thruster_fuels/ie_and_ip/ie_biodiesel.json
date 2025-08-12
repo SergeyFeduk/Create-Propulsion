@@ -1,6 +1,0 @@
-{
-    "fluid": "immersiveengineering:biodiesel",
-    "thrust_multiplier": 1.0,
-    "consumption_multiplier": 0.95,
-    "required_mod": "immersiveengineering"
-}
