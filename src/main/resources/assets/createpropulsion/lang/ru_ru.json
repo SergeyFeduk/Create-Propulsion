@@ -69,5 +69,9 @@
     "createpropulsion.optical_lens.tooltip.summary": "Оптическая линза, которую можно _покрасить_, чтобы изменить цвет луча _оптического сенсора_.",
     "createpropulsion.fluid_lens.tooltip.summary": "Позволяет _оптическому сенсору_ обнаруживать _жидкости_.",
     "createpropulsion.focus_lens.tooltip.summary": "_Удваивает_ предельную дальность _оптического сенсора_.",
-    "createpropulsion.invisibility_lens.tooltip.summary": "Делает луч _оптического сенсора невидимым_."
+    "createpropulsion.invisibility_lens.tooltip.summary": "Делает луч _оптического сенсора невидимым_.",
+
+    "createpropulsion.tooltip.holdForRocketFuelSummary": "Удерживайте [%1$s] для сводки о ракетном топливе",
+    "createpropulsion.tooltip.thrust": "Тяга",
+    "createpropulsion.tooltip.consumption": "Расход топлива"
 }

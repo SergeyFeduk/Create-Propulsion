@@ -1,6 +1,7 @@
 package com.deltasf.createpropulsion.thruster.thruster;
 
 import com.deltasf.createpropulsion.PropulsionConfig;
+import com.deltasf.createpropulsion.compat.PropulsionCompatibility;
 import com.deltasf.createpropulsion.thruster.AbstractThrusterBlockEntity;
 import com.deltasf.createpropulsion.thruster.FluidThrusterProperties;
 import com.deltasf.createpropulsion.thruster.ThrusterFuelManager;
@@ -23,6 +24,8 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
     public static final float BASE_FUEL_CONSUMPTION = 2;
     public static final int BASE_MAX_THRUST = 400000;
@@ -40,17 +43,14 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
     }
 
     @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-        // Provide the fluid handler capability on the correct face
-        if (side == getFluidCapSide() && cap == ForgeCapabilities.FLUID_HANDLER) {
+    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
+        if (cap == ForgeCapabilities.FLUID_HANDLER && side == getFluidCapSide()) {
             return tank.getCapability().cast();
         }
+        if (PropulsionCompatibility.CC_ACTIVE && computerBehaviour.isPeripheralCap(cap)) {
+            return computerBehaviour.getPeripheralCapability().cast();
+        }
         return super.getCapability(cap, side);
-    }
-
-    @Override
-    protected Direction getFluidCapSide() {
-        return getBlockState().getValue(ThrusterBlock.FACING);
     }
 
     @Override
@@ -86,6 +86,11 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
     @Override
     protected boolean isWorking() {
         return validFluid();
+    }
+
+    @Override
+    protected Direction getFluidCapSide() {
+        return getBlockState().getValue(ThrusterBlock.FACING);
     }
 
     @Override

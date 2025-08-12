@@ -1,10 +1,11 @@
 {
     "textures": [
-        "createpropulsion:plume_shimmer/plume1",
-        "createpropulsion:plume_shimmer/plume2",
-        "createpropulsion:plume_shimmer/plume3",
-        "createpropulsion:plume_shimmer/plume4",
-        "createpropulsion:plume_shimmer/plume5",
+        "createpropulsion:plume/plume1",
+        "createpropulsion:plume/plume2",
+        "createpropulsion:plume/plume3",
+        "createpropulsion:plume/plume4",
+        "createpropulsion:plume/plume5",
+        "createpropulsion:plume/plume6",
         "createpropulsion:smoke/big_smoke_2",
         "createpropulsion:smoke/big_smoke_3",
         "createpropulsion:smoke/big_smoke_4",

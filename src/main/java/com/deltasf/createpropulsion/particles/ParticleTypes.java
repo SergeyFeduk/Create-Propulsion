@@ -23,7 +23,7 @@ import net.minecraftforge.registries.RegistryObject;
 //Create actually handles registration so elegantly, this is the only reason I just copied it from their repo
 @EventBusSubscriber(modid = CreatePropulsion.ID, bus = Bus.MOD, value = Dist.CLIENT)
 public enum ParticleTypes {
-    PLUME_DEFAULT(PlumeParticleData::new);
+    PLUME(PlumeParticleData::new);
 
     private final ParticleEntry<?> entry;
 
@@ -38,7 +38,7 @@ public enum ParticleTypes {
     }
 
     public static ParticleType<?> getPlumeType() {
-        return PLUME_DEFAULT.get();
+        return PLUME.get();
     }
 
     public static void register(IEventBus modEventBus){

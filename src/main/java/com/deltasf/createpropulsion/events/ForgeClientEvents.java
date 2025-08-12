@@ -1,4 +1,4 @@
-package com.deltasf.createpropulsion.utility;
+package com.deltasf.createpropulsion.events;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.network.PropulsionPackets;
