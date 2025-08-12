@@ -70,4 +70,8 @@
     "createpropulsion.fluid_lens.tooltip.summary": "使_光学传感器_能够检测_流体_。",
     "createpropulsion.focus_lens.tooltip.summary": "使_光学传感器_的最大_探测距离_加倍。",
     "createpropulsion.invisibility_lens.tooltip.summary": "使_光学传感器_的光束_不再可见_。"
+
+    "createpropulsion.tooltip.holdForRocketFuelSummary": "按住 [%1$s] 可查看推进剂概要",
+    "createpropulsion.tooltip.thrust": "推力",
+    "createpropulsion.tooltip.consumption": "燃烧率"
 }
