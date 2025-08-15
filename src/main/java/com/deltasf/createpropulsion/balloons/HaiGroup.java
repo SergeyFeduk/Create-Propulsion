@@ -42,10 +42,7 @@ public class HaiGroup {
         public PotentialBalloon(int id) { this.id = id; }
     }
 
-
-    private record LBLSubGroup(Set<BlockPos> volume) {}
-
-
+    private record LBLSubGroup(Set<BlockPos> volume, Set<BlockPos> traversed) {}
 
     public void addHai(HaiData data) {
         hais.add(data);
@@ -137,29 +134,21 @@ public class HaiGroup {
     }
 
     public void scan(Level level) {
-        if (rleVolume == null || groupAABB == null) {
-            System.out.println("[Create: Propulsion] ERROR: Scan called on HaiGroup before RLE Volume was generated!");
-            return;
-        }
-
+        if (rleVolume == null || groupAABB == null) { return; }
         finalizedBalloons.clear();
         Map<Integer, PotentialBalloon> inProgressBalloons = new HashMap<>();
         int nextBalloonId = 0;
         int topY = (int) groupAABB.maxY;
         int bottomY = (int) groupAABB.minY;
-
-        System.out.println("[Create: Propulsion] Starting scan for group with " + hais.size() + " HAIs from Y=" + topY + " to Y=" + bottomY);
-
         for (int y = topY; y >= bottomY; y--) {
             List<LBLSubGroup> currentLayerSubGroups = scanLayer(y, level);
             nextBalloonId = correlateLayerResults(currentLayerSubGroups, inProgressBalloons, level, nextBalloonId);
         }
-
         for (PotentialBalloon pb : inProgressBalloons.values()) {
-            finalizeBalloon(pb); // Use helper for finalization
+            finalizeBalloon(pb);
         }
-        System.out.println("[Create: Propulsion] Scan complete. Found " + finalizedBalloons.size() + " valid balloon(s).");
     }
+
 
     private void finalizeBalloon(PotentialBalloon pb) {
         if (pb.volume.isEmpty()) return;
@@ -168,10 +157,14 @@ public class HaiGroup {
         finalBalloon.interiorAir.addAll(pb.volume);
         finalBalloon.shell.addAll(pb.shell);
 
-        // Build the DSU for connectivity tracking
+        // ### START OF THE CRITICAL FIX ###
+        // Phase 1: Initialize every single element in the DSU first.
         for (BlockPos pos : finalBalloon.interiorAir) {
             finalBalloon.connectivity.makeSet(pos.hashCode());
-            // Check neighbors that are also in the balloon and union them
+        }
+
+        // Phase 2: Now that all elements are guaranteed to exist, connect them.
+        for (BlockPos pos : finalBalloon.interiorAir) {
             // Only need to check in 3 directions to avoid redundant checks
             for (Direction dir : new Direction[]{Direction.EAST, Direction.SOUTH, Direction.DOWN}) {
                 BlockPos neighbor = pos.relative(dir);
@@ -180,20 +173,21 @@ public class HaiGroup {
                 }
             }
         }
+        // ### END OF THE CRITICAL FIX ###
+
         finalizedBalloons.add(finalBalloon);
     }
+
 
 
     private List<LBLSubGroup> scanLayer(int y, Level level) {
         List<LBLSubGroup> foundSubGroups = new ArrayList<>();
         Set<BlockPos> visitedOnThisLayer = new HashSet<>();
-
         for (HaiData hai : hais) {
             BlockPos seedPos = new BlockPos(hai.position().getX(), y, hai.position().getZ());
             if (visitedOnThisLayer.contains(seedPos)) continue;
-
+            // The floodFillLayer method will handle checking if the seed is valid to start from.
             LBLSubGroup potentialSubGroup = floodFillLayer(seedPos, level, visitedOnThisLayer);
-
             if (potentialSubGroup != null && !potentialSubGroup.volume().isEmpty()) {
                 foundSubGroups.add(potentialSubGroup);
             }
@@ -201,95 +195,93 @@ public class HaiGroup {
         return foundSubGroups;
     }
 
-    private static boolean isHab(BlockState state) {
+
+    public static boolean isHab(BlockState state) {
         return state.is(PropulsionBlocks.HAB_BLOCK.get());
     }
 
 
     private LBLSubGroup floodFillLayer(BlockPos start, Level level, Set<BlockPos> globalVisited) {
-        if (!isInsideRleVolume(start)) {
-            return null;
-        }
+        if (!isInsideRleVolume(start) || globalVisited.contains(start)) { return null; }
+        BlockState startState = level.getBlockState(start);
+        if (isHab(startState)) { return null; }
 
         Set<BlockPos> foundVolume = new HashSet<>();
+        Set<BlockPos> traversedInBlob = new HashSet<>();
         Queue<BlockPos> toVisit = new LinkedList<>();
 
         toVisit.add(start);
         globalVisited.add(start);
+        traversedInBlob.add(start);
 
         while (!toVisit.isEmpty()) {
             BlockPos currentPos = toVisit.poll();
-
-            // Only add actual AIR blocks to the final volume.
-            // This allows the scan to pass through non-HAB blocks without including them.
             if (level.getBlockState(currentPos).isAir()) {
                 foundVolume.add(currentPos);
             }
-
-            BlockPos[] neighbors = {
-                currentPos.north(), currentPos.south(), currentPos.east(), currentPos.west()
-            };
-
+            BlockPos[] neighbors = { currentPos.north(), currentPos.south(), currentPos.east(), currentPos.west() };
             for (BlockPos neighborPos : neighbors) {
                 if (globalVisited.contains(neighborPos)) continue;
-
-                if (!isInsideRleVolume(neighborPos)) {
-                    return null; // Hard failure: leak to the true outside world.
-                }
-                
+                if (!isInsideRleVolume(neighborPos)) { return null; }
                 globalVisited.add(neighborPos);
-
                 BlockState neighborState = level.getBlockState(neighborPos);
-                
-                // The scan can travel through AIR or any SOLID block that is NOT a HAB block.
                 boolean isTraversable = neighborState.isAir() || !isHab(neighborState);
-
                 if (isTraversable) {
                     toVisit.add(neighborPos);
+                    traversedInBlob.add(neighborPos);
                 }
-                // If the neighbor is a HAB block, it's a wall. The scan stops here naturally.
             }
         }
-        return new LBLSubGroup(foundVolume);
+        return new LBLSubGroup(foundVolume, traversedInBlob);
     }
 
-    private Set<BlockPos> validateAndCollectShellForBlob(Set<BlockPos> airBlob, Map<BlockPos, PotentialBalloon> parentLayerMap, Level level) {
+
+
+    private Set<BlockPos> validateAndCollectShellForBlob(LBLSubGroup subGroup, Map<BlockPos, PotentialBalloon> parentLayerMap, Level level) {
+        Set<BlockPos> airBlob = subGroup.volume();
+        Set<BlockPos> traversedBlob = subGroup.traversed();
         Set<BlockPos> foundShell = new HashSet<>();
+
+        // We only need to check the perimeter of the air, not the whole traversed volume.
         for (BlockPos pos : airBlob) {
-            // Check all 6 neighbors to find the shell
             for (Direction dir : Direction.values()) {
                 BlockPos neighborPos = pos.relative(dir);
+
+                // If the neighbor is also air in this blob, it's not shell.
                 if (airBlob.contains(neighborPos)) {
-                    continue; // Neighbor is part of the same blob, not the shell.
+                    continue;
+                }
+                
+                // If the neighbor is a non-air internal obstacle, it's part of our cavity but not shell.
+                if (traversedBlob.contains(neighborPos)) {
+                    continue;
                 }
 
-                // Vertical Shell (Ceiling) Check: TDD 2.5, Phase 2
-                if (dir == Direction.UP) {
-                    // Is the block above us part of a valid, continuing balloon?
-                    if (parentLayerMap.containsKey(neighborPos)) {
-                        continue; // Yes, it's open air from above. Not a shell block.
-                    }
+                // If the ceiling is air from a parent balloon, it's a valid continuation, not shell.
+                if (dir == Direction.UP && parentLayerMap.containsKey(neighborPos)) {
+                    continue;
                 }
 
+                // At this point, the neighbor is truly external. It must be a valid shell block or empty air.
                 BlockState neighborState = level.getBlockState(neighborPos);
                 if (isHab(neighborState)) {
                     foundShell.add(neighborPos);
                 } else if (!neighborState.isAir()) {
-                    // This neighbor is a solid block but NOT a HAB block. This is an invalid shell.
-                    // E.g., a wall made of Dirt, or a ceiling made of Wood.
+                    // It's a solid block that isn't HAB. This is a hole in the shell.
                     return null;
                 }
-                // If it's air, it's a leak that should have been caught by floodFill, but we ignore it here.
             }
         }
         return foundShell;
     }
 
 
-    private int correlateLayerResults(List<LBLSubGroup> currentLayerSubGroups, Map<Integer, PotentialBalloon> inProgressBalloons, Level level, int nextId) {
-        if (inProgressBalloons.isEmpty() && currentLayerSubGroups.isEmpty()) {
-            return nextId;
-        }
+
+
+
+
+     private int correlateLayerResults(List<LBLSubGroup> currentLayerSubGroups, Map<Integer, PotentialBalloon> inProgressBalloons, Level level, int nextId) {
+        if (inProgressBalloons.isEmpty() && currentLayerSubGroups.isEmpty()) { return nextId; }
 
         Map<BlockPos, PotentialBalloon> parentLayerMap = new HashMap<>();
         for (PotentialBalloon pb : inProgressBalloons.values()) {
@@ -299,27 +291,22 @@ public class HaiGroup {
         }
 
         Map<LBLSubGroup, Set<BlockPos>> validatedShells = new HashMap<>();
-
-        // Phase 1 (Modified): Validate all subgroups first.
         List<LBLSubGroup> validSubGroups = new ArrayList<>();
         for (LBLSubGroup subGroup : currentLayerSubGroups) {
-            Set<BlockPos> shell = validateAndCollectShellForBlob(subGroup.volume(), parentLayerMap, level);
+            Set<BlockPos> shell = validateAndCollectShellForBlob(subGroup, parentLayerMap, level);
             if (shell != null) {
                 validSubGroups.add(subGroup);
                 validatedShells.put(subGroup, shell);
             }
         }
 
-
         Map<LBLSubGroup, Set<PotentialBalloon>> connections = new HashMap<>();
         Set<PotentialBalloon> allConnectedParents = new HashSet<>();
-        for (LBLSubGroup subGroup : currentLayerSubGroups) {
+        for (LBLSubGroup subGroup : validSubGroups) {
             Set<PotentialBalloon> parents = new HashSet<>();
-            for (BlockPos pos : subGroup.volume()) {
+            for (BlockPos pos : subGroup.volume()) { // Note: we use .volume() here for connection checks
                 PotentialBalloon parent = parentLayerMap.get(pos.above());
-                if (parent != null) {
-                    parents.add(parent);
-                }
+                if (parent != null) { parents.add(parent); }
             }
             connections.put(subGroup, parents);
             allConnectedParents.addAll(parents);
@@ -329,15 +316,11 @@ public class HaiGroup {
         while (iterator.hasNext()) {
             PotentialBalloon pb = iterator.next().getValue();
             if (!allConnectedParents.contains(pb)) {
-                if (!pb.volume.isEmpty()) {
-                    Balloon finalBalloon = new Balloon();
-                    finalBalloon.interiorAir.addAll(pb.volume);
-                    finalizedBalloons.add(finalBalloon);
-                }
+                finalizeBalloon(pb);
                 iterator.remove();
             }
         }
-        
+
         DisjointSetUnion dsu = new DisjointSetUnion();
         for (PotentialBalloon pb : inProgressBalloons.values()) { dsu.makeSet(pb.id); }
 
@@ -354,6 +337,7 @@ public class HaiGroup {
             int rootId = dsu.find(pb.id);
             PotentialBalloon newPb = nextInProgressBalloons.computeIfAbsent(rootId, k -> new PotentialBalloon(k));
             newPb.volume.addAll(pb.volume);
+            newPb.shell.addAll(pb.shell);
         }
 
         for (Map.Entry<LBLSubGroup, Set<PotentialBalloon>> entry : connections.entrySet()) {
@@ -361,15 +345,18 @@ public class HaiGroup {
             if (!entry.getValue().isEmpty()) {
                 int rootId = dsu.find(entry.getValue().iterator().next().id);
                 if (nextInProgressBalloons.containsKey(rootId)) {
-                    nextInProgressBalloons.get(rootId).volume.addAll(subGroup.volume());
+                    PotentialBalloon target = nextInProgressBalloons.get(rootId);
+                    target.volume.addAll(subGroup.volume());
+                    target.shell.addAll(validatedShells.get(subGroup));
                 }
             }
         }
-        
-        for (LBLSubGroup subGroup : currentLayerSubGroups) {
+
+        for (LBLSubGroup subGroup : validSubGroups) {
             if (connections.get(subGroup).isEmpty()) {
                 PotentialBalloon newBalloon = new PotentialBalloon(nextId);
                 newBalloon.volume.addAll(subGroup.volume());
+                newBalloon.shell.addAll(validatedShells.get(subGroup));
                 nextInProgressBalloons.put(nextId, newBalloon);
                 nextId++;
             }
@@ -377,11 +364,11 @@ public class HaiGroup {
 
         inProgressBalloons.clear();
         inProgressBalloons.putAll(nextInProgressBalloons);
-
         return nextId;
     }
 
-    private boolean isInsideRleVolume(BlockPos pos) {
+
+    public boolean isInsideRleVolume(BlockPos pos) {
         if (groupAABB == null) return false;
         int y = pos.getY() - (int) groupAABB.minY;
         int x = pos.getX() - (int) groupAABB.minX;
