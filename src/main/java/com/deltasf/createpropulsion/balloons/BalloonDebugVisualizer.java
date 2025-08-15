@@ -15,15 +15,37 @@ import net.minecraftforge.fml.common.Mod;
 import java.awt.Color;
 import java.util.List;
 import java.util.Collection;
+import java.util.EnumSet;
 
 @Mod.EventBusSubscriber(modid = CreatePropulsion.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class BalloonDebugVisualizer {
 
-    // Set to 'false' to see MAXAABBs and the final calculated balloon volume.
-    // Set to 'true' to see the precise RLE union volume.
-    private static final boolean DISPLAY_RLE_VOLUME = false;
+    /**
+     * Enum representing the different visualization modes.
+     */
+    public enum DisplayMode {
+        MAXAABBS,       // Renders the initial maxAABB for each HAI.
+        BALLOON_VOLUME, // Renders the final calculated interior air volume of each balloon.
+        RLE_VOLUME,     // Renders the optimized Run-Length Encoded scan volume.
+        SHELL_VOLUME    // Renders the collected shell blocks of each balloon.
+    }
 
-    // Colors for the MAXAABB groups
+    /**
+     * Controls which debug visualizations are currently active.
+     * This EnumSet acts like a bitmask, allowing multiple modes to be enabled simultaneously.
+     * To change what's displayed, modify the line below.
+     * Example: EnumSet.of(DisplayMode.BALLOON_VOLUME)
+     * Example: EnumSet.allOf(DisplayMode.class) to show everything.
+     */
+    private static final EnumSet<DisplayMode> ACTIVE_MODES = EnumSet.of(
+        DisplayMode.MAXAABBS,
+        DisplayMode.SHELL_VOLUME,
+        DisplayMode.BALLOON_VOLUME
+    );
+
+    // --- COLOR PALETTES ---
+    private static final Color SHELL_COLOR = Color.WHITE;
+
     private static final Color[] GROUP_COLORS = new Color[] {
         new Color(255, 0, 0, 150),   // Red
         new Color(0, 255, 0, 150),   // Green
@@ -33,7 +55,6 @@ public class BalloonDebugVisualizer {
         new Color(255, 0, 255, 150)  // Magenta
     };
 
-    // --- NEW COLOR PALETTE for the final, distinct balloons ---
     private static final Color[] BALLOON_COLORS = new Color[] {
         new Color(255, 165, 0),    // Orange
         new Color(255, 192, 203),  // Pink
@@ -45,7 +66,7 @@ public class BalloonDebugVisualizer {
 
     @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) {
+        if (event.phase != TickEvent.Phase.END || ACTIVE_MODES.isEmpty()) {
             return;
         }
 
@@ -64,10 +85,18 @@ public class BalloonDebugVisualizer {
             for (HaiGroup group : groups) {
                 Color groupColor = GROUP_COLORS[groupIndex % GROUP_COLORS.length];
 
-                if (DISPLAY_RLE_VOLUME) {
+                // Conditionally render each part based on the ACTIVE_MODES set.
+                if (ACTIVE_MODES.contains(DisplayMode.MAXAABBS)) {
+                    renderMaxAabbs(group, groupColor);
+                }
+                if (ACTIVE_MODES.contains(DisplayMode.BALLOON_VOLUME)) {
+                    renderBalloonVolume(group, groupIndex);
+                }
+                if (ACTIVE_MODES.contains(DisplayMode.RLE_VOLUME)) {
                     renderRleVolume(group, groupColor, groupIndex);
-                } else {
-                    renderDebugVisualization(group, groupColor, groupIndex);
+                }
+                if (ACTIVE_MODES.contains(DisplayMode.SHELL_VOLUME)) {
+                    renderShellVolume(group, groupIndex);
                 }
 
                 groupIndex++;
@@ -76,17 +105,19 @@ public class BalloonDebugVisualizer {
     }
 
     /**
-     * Renders the MAXAABBs for each HAI in a group, AND renders the final calculated
-     * interior air blocks for any successfully discovered balloons with unique colors.
+     * Renders the MAXAABBs for each HAI in a group.
      */
-    private static void renderDebugVisualization(HaiGroup group, Color color, int groupIndex) {
-        // Part 1: Render the MAXAABBs for the group (same as before).
+    private static void renderMaxAabbs(HaiGroup group, Color color) {
         for (BalloonRegistry.HaiData hai : group.getHais()) {
-            String identifier = "hai_group_aabb_" + hai.id().toString();
+            String identifier = "max_aabb_" + hai.id().toString();
             DebugRenderer.drawBox(identifier, hai.maxAABB(), color, 3);
         }
+    }
 
-        // Part 2: Render the final calculated air blocks with unique colors per balloon.
+    /**
+     * Renders the final calculated interior air blocks for any discovered balloons.
+     */
+    private static void renderBalloonVolume(HaiGroup group, int groupIndex) {
         List<HaiGroup.Balloon> finalizedBalloons = group.getFinalizedBalloons();
         if (finalizedBalloons == null || finalizedBalloons.isEmpty()) {
             return;
@@ -94,22 +125,39 @@ public class BalloonDebugVisualizer {
 
         int balloonIndex = 0;
         for (HaiGroup.Balloon balloon : finalizedBalloons) {
-            // --- THIS IS THE FIX ---
-            // Assign a unique color to each balloon found within the group.
             Color balloonColor = BALLOON_COLORS[balloonIndex % BALLOON_COLORS.length];
 
             for (BlockPos pos : balloon.interiorAir) {
-                String identifier = "final_air_" + groupIndex + "_" + balloonIndex + "_" + pos.getX() + "_" + pos.getY() + "_" + pos.getZ();
-                // Draw the box using the unique balloon color instead of white.
+                String identifier = "balloon_vol_" + groupIndex + "_" + balloonIndex + "_" + pos.hashCode();
                 DebugRenderer.drawBox(identifier, pos, balloonColor, 3);
             }
             balloonIndex++;
         }
     }
 
+    /**
+     * Renders the collected shell blocks for any discovered balloons in white.
+     */
+    private static void renderShellVolume(HaiGroup group, int groupIndex) {
+        List<HaiGroup.Balloon> finalizedBalloons = group.getFinalizedBalloons();
+        if (finalizedBalloons == null || finalizedBalloons.isEmpty()) {
+            return;
+        }
 
+        int balloonIndex = 0;
+        for (HaiGroup.Balloon balloon : finalizedBalloons) {
+            for (BlockPos pos : balloon.shell) {
+                String identifier = "shell_vol_" + groupIndex + "_" + balloonIndex + "_" + pos.hashCode();
+                DebugRenderer.drawBox(identifier, pos, SHELL_COLOR, 3);
+            }
+            balloonIndex++;
+        }
+    }
+
+    /**
+     * Renders the precise Run-Length Encoded union volume for a group.
+     */
     private static void renderRleVolume(HaiGroup group, Color color, int groupIndex) {
-        // ... (This method remains unchanged) ...
         AABB groupAABB = group.getGroupAABB();
         List<Pair<Integer, Integer>>[][] rleVolume = group.getRleVolume();
 
@@ -117,6 +165,7 @@ public class BalloonDebugVisualizer {
             return;
         }
         for (int y = 0; y < rleVolume.length; y++) {
+            if (rleVolume[y] == null) continue;
             for (int x = 0; x < rleVolume[y].length; x++) {
                 List<Pair<Integer, Integer>> zIntervals = rleVolume[y][x];
                 if (zIntervals == null || zIntervals.isEmpty()) {
@@ -130,7 +179,7 @@ public class BalloonDebugVisualizer {
                         zInterval.getFirst(),
                         groupAABB.minX + x + 1,
                         groupAABB.minY + y + 1,
-                        zInterval.getSecond()
+                        zInterval.getSecond() + 1 // Add 1 to maxZ for correct AABB rendering
                     );
                     String identifier = "rle_" + groupIndex + "_" + x + "_" + y + "_" + i;
                     DebugRenderer.drawBox(identifier, segmentAABB, color, 3);
