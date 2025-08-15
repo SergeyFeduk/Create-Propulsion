@@ -216,7 +216,7 @@ public class HaiGroup {
 
         while (!toVisit.isEmpty()) {
             BlockPos currentPos = toVisit.poll();
-            if (level.getBlockState(currentPos).isAir()) {
+            if (!isHab(level.getBlockState(currentPos))) {
                 foundVolume.add(currentPos);
             }
             BlockPos[] neighbors = { currentPos.north(), currentPos.south(), currentPos.east(), currentPos.west() };
@@ -225,7 +225,7 @@ public class HaiGroup {
                 if (!isInsideRleVolume(neighborPos)) { return null; }
                 globalVisited.add(neighborPos);
                 BlockState neighborState = level.getBlockState(neighborPos);
-                boolean isTraversable = neighborState.isAir() || !isHab(neighborState);
+                boolean isTraversable = !isHab(neighborState);
                 if (isTraversable) {
                     toVisit.add(neighborPos);
                     traversedInBlob.add(neighborPos);
@@ -242,17 +242,11 @@ public class HaiGroup {
         Set<BlockPos> traversedBlob = subGroup.traversed();
         Set<BlockPos> foundShell = new HashSet<>();
 
-        // We only need to check the perimeter of the air, not the whole traversed volume.
         for (BlockPos pos : airBlob) {
             for (Direction dir : Direction.values()) {
                 BlockPos neighborPos = pos.relative(dir);
 
-                // If the neighbor is also air in this blob, it's not shell.
-                if (airBlob.contains(neighborPos)) {
-                    continue;
-                }
-                
-                // If the neighbor is a non-air internal obstacle, it's part of our cavity but not shell.
+                // If the neighbor is part of the same internal cavity (air or obstacle), it's not shell.
                 if (traversedBlob.contains(neighborPos)) {
                     continue;
                 }
@@ -262,18 +256,24 @@ public class HaiGroup {
                     continue;
                 }
 
-                // At this point, the neighbor is truly external. It must be a valid shell block or empty air.
+                // At this point, the neighbor is TRULY external.
                 BlockState neighborState = level.getBlockState(neighborPos);
+
                 if (isHab(neighborState)) {
                     foundShell.add(neighborPos);
-                } else if (!neighborState.isAir()) {
-                    // It's a solid block that isn't HAB. This is a hole in the shell.
-                    return null;
+                } else { // The neighbor is AIR.
+                    // --- THIS IS THE FIX ---
+                    // Air is ONLY permissible if it's below the balloon (a valid opening).
+                    // Any air gap on the sides or ceiling is a fatal leak.
+                    if (dir != Direction.DOWN) {
+                        return null;
+                    }
                 }
             }
         }
         return foundShell;
     }
+
 
 
 
