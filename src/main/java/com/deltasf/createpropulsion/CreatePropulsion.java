@@ -1,5 +1,7 @@
 package com.deltasf.createpropulsion;
 
+import org.slf4j.Logger;
+
 import com.deltasf.createpropulsion.compat.computercraft.CCProxy;
 import com.deltasf.createpropulsion.network.PropulsionPackets;
 import com.deltasf.createpropulsion.particles.ParticleTypes;

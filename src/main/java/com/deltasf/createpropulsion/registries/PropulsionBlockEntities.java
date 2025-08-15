@@ -1,6 +1,7 @@
 package com.deltasf.createpropulsion.registries;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
+import com.deltasf.createpropulsion.balloons.blocks.HaiBlockEntity;
 import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerBlockEntity;
 import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerRenderer;
 import com.deltasf.createpropulsion.magnet.RedstoneMagnetBlockEntity;
@@ -50,6 +51,11 @@ public class PropulsionBlockEntities {
     public static final BlockEntityEntry<RedstoneMagnetBlockEntity> REDSTONE_MAGNET_BLOCK_ENTITY =
         REGISTRATE.blockEntity("redstone_magnet_block_entity", RedstoneMagnetBlockEntity::new)
         .validBlock(PropulsionBlocks.REDSTONE_MAGNET_BLOCK)
+        .register();
+
+    public static final BlockEntityEntry<HaiBlockEntity> HAI_BLOCK_ENTITY =
+        REGISTRATE.blockEntity("hai_block_entity", HaiBlockEntity::new)
+        .validBlock(PropulsionBlocks.HAI_BLOCK)
         .register();
 
     /*public static final BlockEntityEntry<TiltSensorBlockEntity> TILT_SENSOR_BLOCK_ENTITY =
