@@ -8,8 +8,11 @@
 
 ## What does it add?
 - Thruster: Provides thrust to vehicles. Controllable by redstone.
+- Redstone Magnet: Attracts or repels other magnets based on polarity.
 - Inline Optical Sensor: Basic and small raycast block detector.
 - Optical Sensor: Configurable raycast block detector. Set target distance and filter by block type.
+- Physics Assembler: Assembles blocks into physical entities.
+- Lodestone Tracker: Tracks lodestone blocks with compass bound to them.
 
 ## FAQ:
 ### When will you add Create 6 support?
