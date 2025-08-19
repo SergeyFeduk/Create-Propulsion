@@ -90,13 +90,13 @@ public class BalloonDebugVisualizer {
                     renderMaxAabbs(group, groupColor);
                 }
                 if (ACTIVE_MODES.contains(DisplayMode.BALLOON_VOLUME)) {
-                    renderBalloonVolume(group, groupIndex);
+                    //renderBalloonVolume(group, groupIndex);
                 }
                 if (ACTIVE_MODES.contains(DisplayMode.RLE_VOLUME)) {
                     renderRleVolume(group, groupColor, groupIndex);
                 }
                 if (ACTIVE_MODES.contains(DisplayMode.SHELL_VOLUME)) {
-                    renderShellVolume(group, groupIndex);
+                    //renderShellVolume(group, groupIndex);
                 }
 
                 groupIndex++;
@@ -117,7 +117,7 @@ public class BalloonDebugVisualizer {
     /**
      * Renders the final calculated interior air blocks for any discovered balloons.
      */
-    private static void renderBalloonVolume(HaiGroup group, int groupIndex) {
+    /*private static void renderBalloonVolume(HaiGroup group, int groupIndex) {
         List<HaiGroup.Balloon> finalizedBalloons = group.getFinalizedBalloons();
         if (finalizedBalloons == null || finalizedBalloons.isEmpty()) {
             return;
@@ -137,7 +137,7 @@ public class BalloonDebugVisualizer {
 
     /**
      * Renders the collected shell blocks for any discovered balloons in white.
-     */
+     
     private static void renderShellVolume(HaiGroup group, int groupIndex) {
         List<HaiGroup.Balloon> finalizedBalloons = group.getFinalizedBalloons();
         if (finalizedBalloons == null || finalizedBalloons.isEmpty()) {
@@ -152,7 +152,7 @@ public class BalloonDebugVisualizer {
             }
             balloonIndex++;
         }
-    }
+    }*/
 
     /**
      * Renders the precise Run-Length Encoded union volume for a group.

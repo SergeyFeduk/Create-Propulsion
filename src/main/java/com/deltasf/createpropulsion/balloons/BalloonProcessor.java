@@ -24,7 +24,7 @@ import javax.annotation.Nullable;
  * This is called directly from the HabBlock's onPlace and onRemove methods.
  */
 public class BalloonProcessor {
-
+    /*
     private static final int MAX_LEAK_SCAN_ITERATIONS = 64;
 
     public record InvalidationResult(boolean hasLeaked, @Nullable BlockPos leakPosition, int blocksScanned) {
@@ -85,7 +85,7 @@ public class BalloonProcessor {
 
     /**
      * The final filtering stage. Checks if the block change actually affects a balloon's shell.
-     */
+     
     private static void findAndProcessAffectedBalloons(HaiGroup group, BlockPos pos, boolean isBreak, Level level) {
         if (isBreak) {
             List<HaiGroup.Balloon> affectedBalloons = new ArrayList<>();
@@ -201,5 +201,5 @@ public class BalloonProcessor {
         return InvalidationResult.noLeak(visited.size());
     }
 
-
+*/
 }

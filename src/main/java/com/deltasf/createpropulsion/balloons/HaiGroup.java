@@ -26,10 +26,10 @@ public class HaiGroup {
     private List<Pair<Integer, Integer>>[][] rleVolume;
     private AABB groupAABB;
 
-    private final List<Balloon> finalizedBalloons = new ArrayList<>();
+    //private final List<Balloon> finalizedBalloons = new ArrayList<>();
 
 
-    public static class Balloon {
+    /*public static class Balloon {
         public final Set<BlockPos> interiorAir = new HashSet<>();
         public final Set<BlockPos> shell = new HashSet<>();
         public final DisjointSetUnion connectivity = new DisjointSetUnion();
@@ -42,7 +42,7 @@ public class HaiGroup {
         public PotentialBalloon(int id) { this.id = id; }
     }
 
-    private record LBLSubGroup(Set<BlockPos> volume, Set<BlockPos> traversed) {}
+    private record LBLSubGroup(Set<BlockPos> volume, Set<BlockPos> traversed) {}*/
 
     public void addHai(HaiData data) {
         hais.add(data);
@@ -56,9 +56,9 @@ public class HaiGroup {
         return groupAABB;
     }
 
-    public List<Balloon> getFinalizedBalloons() {
+    /*public List<Balloon> getFinalizedBalloons() {
         return this.finalizedBalloons;
-    }
+    }*/
 
 
     public List<Pair<Integer, Integer>>[][] getRleVolume() {
@@ -133,7 +133,30 @@ public class HaiGroup {
         return merged;
     }
 
-    public void scan(Level level) {
+    public boolean isInsideRleVolume(BlockPos pos) {
+        if (groupAABB == null) return false;
+        int y = pos.getY() - (int) groupAABB.minY;
+        int x = pos.getX() - (int) groupAABB.minX;
+
+        if (y < 0 || y >= rleVolume.length || x < 0 || x >= rleVolume[y].length) {
+            return false;
+        }
+
+        List<Pair<Integer, Integer>> zIntervals = rleVolume[y][x];
+        if (zIntervals == null || zIntervals.isEmpty()) {
+            return false;
+        }
+
+        int worldZ = pos.getZ();
+        for (Pair<Integer, Integer> interval : zIntervals) {
+            if (worldZ >= interval.getFirst() && worldZ <= interval.getSecond()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /*public void scan(Level level) {
         if (rleVolume == null || groupAABB == null) { return; }
         finalizedBalloons.clear();
         Map<Integer, PotentialBalloon> inProgressBalloons = new HashMap<>();
@@ -147,10 +170,10 @@ public class HaiGroup {
         for (PotentialBalloon pb : inProgressBalloons.values()) {
             finalizeBalloon(pb);
         }
-    }
+    }*/
 
 
-    private void finalizeBalloon(PotentialBalloon pb) {
+    /*private void finalizeBalloon(PotentialBalloon pb) {
         if (pb.volume.isEmpty()) return;
 
         Balloon finalBalloon = new Balloon();
@@ -176,11 +199,11 @@ public class HaiGroup {
         // ### END OF THE CRITICAL FIX ###
 
         finalizedBalloons.add(finalBalloon);
-    }
+    }*/
 
 
 
-    private List<LBLSubGroup> scanLayer(int y, Level level) {
+    /*private List<LBLSubGroup> scanLayer(int y, Level level) {
         List<LBLSubGroup> foundSubGroups = new ArrayList<>();
         Set<BlockPos> visitedOnThisLayer = new HashSet<>();
         for (HaiData hai : hais) {
@@ -198,10 +221,10 @@ public class HaiGroup {
 
     public static boolean isHab(BlockState state) {
         return state.is(PropulsionBlocks.HAB_BLOCK.get());
-    }
+    }*/
 
 
-    private LBLSubGroup floodFillLayer(BlockPos start, Level level, Set<BlockPos> globalVisited) {
+    /*private LBLSubGroup floodFillLayer(BlockPos start, Level level, Set<BlockPos> globalVisited) {
         if (!isInsideRleVolume(start) || globalVisited.contains(start)) { return null; }
         BlockState startState = level.getBlockState(start);
         if (isHab(startState)) { return null; }
@@ -233,11 +256,11 @@ public class HaiGroup {
             }
         }
         return new LBLSubGroup(foundVolume, traversedInBlob);
-    }
+    }*/
 
 
 
-    private Set<BlockPos> validateAndCollectShellForBlob(LBLSubGroup subGroup, Map<BlockPos, PotentialBalloon> parentLayerMap, Level level) {
+    /*private Set<BlockPos> validateAndCollectShellForBlob(LBLSubGroup subGroup, Map<BlockPos, PotentialBalloon> parentLayerMap, Level level) {
         Set<BlockPos> airBlob = subGroup.volume();
         Set<BlockPos> traversedBlob = subGroup.traversed();
         Set<BlockPos> foundShell = new HashSet<>();
@@ -270,7 +293,7 @@ public class HaiGroup {
             }
         }
         return foundShell;
-    }
+    }*/
 
     //1) Iterate upwards till we hit the y end
     //If we DO NOT FIND the hab block anywhere here - return null
@@ -289,7 +312,7 @@ public class HaiGroup {
 
 
 
-     private int correlateLayerResults(List<LBLSubGroup> currentLayerSubGroups, Map<Integer, PotentialBalloon> inProgressBalloons, Level level, int nextId) {
+    /* private int correlateLayerResults(List<LBLSubGroup> currentLayerSubGroups, Map<Integer, PotentialBalloon> inProgressBalloons, Level level, int nextId) {
         if (inProgressBalloons.isEmpty() && currentLayerSubGroups.isEmpty()) { return nextId; }
 
         Map<BlockPos, PotentialBalloon> parentLayerMap = new HashMap<>();
@@ -378,29 +401,8 @@ public class HaiGroup {
         inProgressBalloons.clear();
         inProgressBalloons.putAll(nextInProgressBalloons);
         return nextId;
-    }
+    }*/
 
 
-    public boolean isInsideRleVolume(BlockPos pos) {
-        if (groupAABB == null) return false;
-        int y = pos.getY() - (int) groupAABB.minY;
-        int x = pos.getX() - (int) groupAABB.minX;
-
-        if (y < 0 || y >= rleVolume.length || x < 0 || x >= rleVolume[y].length) {
-            return false;
-        }
-
-        List<Pair<Integer, Integer>> zIntervals = rleVolume[y][x];
-        if (zIntervals == null || zIntervals.isEmpty()) {
-            return false;
-        }
-
-        int worldZ = pos.getZ();
-        for (Pair<Integer, Integer> interval : zIntervals) {
-            if (worldZ >= interval.getFirst() && worldZ <= interval.getSecond()) {
-                return true;
-            }
-        }
-        return false;
-    }
+    
 }

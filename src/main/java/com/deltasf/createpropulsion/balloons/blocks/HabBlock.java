@@ -21,7 +21,7 @@ public class HabBlock extends Block {
 
         // Delegate the logic to our central processor.
         // For onPlace, 'state' is the newState and 'oldState' is the block that was replaced.
-        BalloonProcessor.processBlockChange(level, pos, oldState, state, isMoving);
+        //BalloonProcessor.processBlockChange(level, pos, oldState, state, isMoving);
     }
 
     @Override
@@ -35,7 +35,7 @@ public class HabBlock extends Block {
         if (!level.isClientSide()) {
             // Delegate the logic to our central processor.
             // For onRemove, 'state' is the oldState and 'newState' is what it's becoming.
-            BalloonProcessor.processBlockChange(level, pos, state, newState, isMoving);
+            //BalloonProcessor.processBlockChange(level, pos, state, newState, isMoving);
         }
         
         // super.onRemove must be called last, as it removes the block entity.
