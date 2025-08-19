@@ -262,10 +262,8 @@ public class HaiGroup {
                 if (isHab(neighborState)) {
                     foundShell.add(neighborPos);
                 } else { // The neighbor is AIR.
-                    // --- THIS IS THE FIX ---
-                    // Air is ONLY permissible if it's below the balloon (a valid opening).
-                    // Any air gap on the sides or ceiling is a fatal leak.
                     if (dir != Direction.DOWN) {
+                        if (dir == Direction.UP) return new HashSet<>(); //Anomaly
                         return null;
                     }
                 }
@@ -274,7 +272,18 @@ public class HaiGroup {
         return foundShell;
     }
 
+    //1) Iterate upwards till we hit the y end
+    //If we DO NOT FIND the hab block anywhere here - return null
+    //If we FIND a HAB here - go to step 2
 
+    //2) At the position below the found hab run floodFillLayer(posBelowHab, level, newGlobalVisited), this will return a lblsubgroup...
+    //3) Do a simplified validation to check if this subgroup is not a hole (check if it leaks into RLE end or has no blocks above)
+    //If it leaks - its a hole, return null
+    //If it does not leak - go to step 4
+
+    //4) If we did not reach the bottom layer (we know it from the pos field as it contains current position of the layer we were scanning) - go to step 2 but at layer below
+    //If we reached the bottom layer - add all the LBLSubGroups we collected to the layers above us (we have already executed the correlateLayerResults...)
+    //... on them, so there is no race condition. For this layer - add the layer above (we have scanned it) to the parentLayerMap and simply continue the scan.
 
 
 
@@ -295,6 +304,10 @@ public class HaiGroup {
         for (LBLSubGroup subGroup : currentLayerSubGroups) {
             Set<BlockPos> shell = validateAndCollectShellForBlob(subGroup, parentLayerMap, level);
             if (shell != null) {
+                if (shell.isEmpty()) {
+                    //This is an anomaly, handle it
+                }
+
                 validSubGroups.add(subGroup);
                 validatedShells.put(subGroup, shell);
             }
