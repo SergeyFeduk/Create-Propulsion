@@ -164,9 +164,12 @@ public class HaiGroup {
     PriorityQueue<WorkItem> workList = new PriorityQueue<>((WorkItem a, WorkItem b) -> Integer.compare(b.y, a.y));
     Map<Integer, BlobNode> graph = new HashMap<>();
     Map<BlockPos, Integer> blockToNodeId = new HashMap<>();
+    Set<BlockPos> initialRootSeeds = new HashSet<>();
+    Map<Integer, Set<BlockPos>> anomalySources = new HashMap<>();
     int nextNodeId = 0;
     public int getNextNodeId() { return nextNodeId++; }
     public static final int VERTICAL_PROBE_DISTANCE = 32;
+    
 
     public static boolean isHab(BlockState state) {
         return state.is(PropulsionBlocks.HAB_BLOCK.get());
@@ -179,6 +182,7 @@ public class HaiGroup {
         graph.clear();
         blockToNodeId.clear();
         workList.clear();
+        initialRootSeeds.clear();
         nextNodeId = 0;
         seedWorklistFromHais(level);
         //Phase 1: Scan worklist and construct a DAG
@@ -194,6 +198,90 @@ public class HaiGroup {
     private void finalizeGraph() {
         Set<Integer> invalidNodeIds = new HashSet<>();
         Queue<Integer> toPrune = new LinkedList<>();
+
+        //Find all nodes that cannot be reached from any seed and kill them
+        Set<Integer> rootNodeIds = new HashSet<>();
+        for (BlockPos seed : initialRootSeeds) {
+            if (blockToNodeId.containsKey(seed)) {
+                rootNodeIds.add(blockToNodeId.get(seed));
+            }
+        }
+
+        Set<Integer> connectedToRoot = new HashSet<>();
+        Queue<Integer> toVisit = new LinkedList<>(rootNodeIds);
+        connectedToRoot.addAll(rootNodeIds);
+
+        while (!toVisit.isEmpty()) {
+            BlobNode currentNode = graph.get(toVisit.poll());
+            if (currentNode == null) continue;
+            
+            // Traverse all physical parent/child connections
+            for (int parentId : currentNode.parentIds) {
+                if (connectedToRoot.add(parentId)) toVisit.add(parentId);
+            }
+            for (int childId : currentNode.childrenIds) {
+                if (connectedToRoot.add(childId)) toVisit.add(childId);
+            }
+        }
+
+        for (Integer nodeId : graph.keySet()) {
+            if (!connectedToRoot.contains(nodeId)) {
+                invalidNodeIds.add(nodeId); // Mark disconnected nodes as invalid
+            }
+        }
+
+        //Propagate invalidation from anomaly bridges
+        
+        Map<Integer, Set<Integer>> reverseAnomalyLinks = new HashMap<>();
+        for (Map.Entry<Integer, Set<BlockPos>> entry : anomalySources.entrySet()) {
+            int sourceNodeId = entry.getKey();
+            Set<BlockPos> discoveredSeeds = entry.getValue();
+
+            for (BlockPos seed : discoveredSeeds) {
+                Integer discoveredNodeId = blockToNodeId.get(seed);
+                if (discoveredNodeId != null) {
+                    reverseAnomalyLinks.computeIfAbsent(discoveredNodeId, k -> new HashSet<>()).add(sourceNodeId);
+                }
+            }
+        }
+
+        // Step 2: Seed a queue for backward propagation. We start with all nodes that are currently known to be invalid
+        // for ANY reason (disconnected or having a fatal leak).
+        Queue<Integer> toBackPropagate = new LinkedList<>();
+        
+        // Add all nodes that were already marked as invalid from the "disconnected" pass above.
+        toBackPropagate.addAll(invalidNodeIds);
+        
+        // Also add any nodes with a fatal leak, ensuring we don't add duplicates to the queue.
+        for (BlobNode node : graph.values()) {
+            if (node.hasFatalLeak) {
+                // The .add() method of a Set returns true if the element was not already present.
+                // This is a concise way to add to both the set and the queue simultaneously.
+                if (invalidNodeIds.add(node.id)) {
+                    toBackPropagate.add(node.id);
+                }
+            }
+        }
+
+        // Step 3: Propagate the invalid status backwards through the anomaly links.
+        while (!toBackPropagate.isEmpty()) {
+            int invalidNodeId = toBackPropagate.poll();
+            
+            // Find which node(s) discovered this now-invalid node.
+            Set<Integer> sources = reverseAnomalyLinks.get(invalidNodeId);
+            if (sources == null) continue; // This node was not discovered via an anomaly.
+
+            for (int sourceId : sources) {
+                // If the discovering node is not already invalid, mark it as such and add it to the queue
+                // to continue the backward propagation chain.
+                if (invalidNodeIds.add(sourceId)) {
+                    toBackPropagate.add(sourceId);
+                }
+            }
+        }
+
+
+
 
         //Find initial invalid links
         for (BlobNode node : graph.values()) {
@@ -260,10 +348,13 @@ public class HaiGroup {
     private void seedWorklistFromHais(Level level) {
         for(int i = 0; i < hais.size(); i++) {
             HaiData data = hais.get(i);
+            
             for(int d = 0; d < VERTICAL_PROBE_DISTANCE; d++) {
                 BlockState nextBlockState = level.getBlockState(data.position().above(d));
                 if (isHab(nextBlockState)) {
-                    WorkItem workItem = new WorkItem(data.position().above(d-1)); //d-1 as we need a block below the hab block
+                    BlockPos seed = data.position().above(d-1);//d-1 as we need a block below the hab block
+                    initialRootSeeds.add(seed);
+                    WorkItem workItem = new WorkItem(seed); 
                     workList.add(workItem);
                     break;
                 }
@@ -272,6 +363,10 @@ public class HaiGroup {
     }
 
     private void scanAndProcessSeed(BlockPos seed, Level level) {
+        if (isHab(level.getBlockState(seed))) {
+            return;
+        }
+
         BlobScanResult scanResult = discoverBlob(seed, level);
         
         //Create and process the node
@@ -280,67 +375,6 @@ public class HaiGroup {
         node.volume = scanResult.volume();
         node.hasFatalLeak = scanResult.hasLeak;
         graph.put(node.id, node);
-
-        /*for(BlockPos pos : node.volume) {
-            //Populate global map
-            blockToNodeId.put(pos, node.id);
-
-            //Find parents
-            BlockPos above = pos.above();
-            boolean isAboveDiscovered = blockToNodeId.containsKey(above);
-            if (isAboveDiscovered) {
-                int parentId = blockToNodeId.get(above);
-                node.parentIds.add(parentId);
-                BlobNode parent = graph.get(parentId);
-                parent.childrenIds.add(node.id);
-            }
-
-            //Find children (not useful for normal nodes but required for anomaly-discovered ones)
-            BlockPos below = pos.below();
-            if (blockToNodeId.containsKey(below)) {
-                int childId = blockToNodeId.get(below);
-                node.childrenIds.add(childId);
-                BlobNode child = graph.get(childId);
-                child.parentIds.add(node.id);
-            }
-
-            //Discover anomalies
-            if (!isAboveDiscovered && !isHab(level.getBlockState(above))) {
-                BlockPos anomalyStartPos = above;
-                //Do a vertical probe
-                int distanceToHab = -1; // -1 is a leak flag. Any other value is vertical distance to hab block
-                for(int d = 0; d < VERTICAL_PROBE_DISTANCE; d++) {
-                    BlockPos probePos = anomalyStartPos.above(d);
-                    BlockState nextBlockState = level.getBlockState(probePos);
-                    if (isHab(nextBlockState)) {
-                        distanceToHab = d;
-                        break;
-                    }
-                    if (!isInsideRleVolume(probePos)) {
-                        //Found a leak due to leaving RLE volume
-                        node.hasFatalLeak = true;
-                        break;
-                    }
-                }
-
-                if (distanceToHab == -1) {
-                    //Found a leak
-                    node.hasFatalLeak = true;
-                } else {
-                    //There is no leak, create and queue new seed
-                    WorkItem workItem = new WorkItem(anomalyStartPos.above(distanceToHab-1));
-                    workList.add(workItem);
-                }
-            }
-        }
-
-        if (!node.hasFatalLeak) {
-            //Node is non-leaky guaranteed. Seed blocks below it
-            for (BlockPos pos : node.volume) {
-                WorkItem childWorkItem = new WorkItem(pos.below());
-                workList.add(childWorkItem);
-            }
-        }*/
 
         if (!node.hasFatalLeak) {
             for (BlockPos pos : node.volume) {
@@ -367,8 +401,11 @@ public class HaiGroup {
                     if (distanceToHab == -1) {
                         node.hasFatalLeak = true;
                     } else {
-                        WorkItem workItem = new WorkItem(anomalyStartPos.above(distanceToHab - 1));
+                        BlockPos anomalySeed = anomalyStartPos.above(distanceToHab - 1);
+                        WorkItem workItem = new WorkItem(anomalySeed);
                         workList.add(workItem);
+
+                        anomalySources.computeIfAbsent(node.id, k -> new HashSet<>()).add(anomalySeed);
                     }
 
                     // If an anomaly probe found a leak, we can stop checking for other anomalies.
@@ -379,11 +416,8 @@ public class HaiGroup {
             }
         }
 
-        // 4. Now that the node's leak status is FINAL, we perform all linking and seeding.
         if (!node.hasFatalLeak) {
-            // The node is sealed. It can be a valid part of the graph and can seed downwards.
             for (BlockPos pos : node.volume) {
-                // Populate global map
                 blockToNodeId.put(pos, node.id);
 
                 // Find parents
@@ -409,8 +443,7 @@ public class HaiGroup {
                 workList.add(childWorkItem);
             }
         } else {
-            // The node is leaky. Its ONLY purpose is to occupy space to prevent re-scans.
-            // We do NOT link it to parents/children and we do NOT seed below it.
+            // The node is leaky. Its only purpose is to occupy space to prevent re-scans.
             for (BlockPos pos : node.volume) {
                 blockToNodeId.put(pos, node.id);
             }
