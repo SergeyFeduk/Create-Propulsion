@@ -8,8 +8,11 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
+
+import org.valkyrienskies.core.impl.shadow.pu;
 
 import com.deltasf.createpropulsion.balloons.BalloonRegistry.HaiData;
 import com.deltasf.createpropulsion.registries.PropulsionBlocks;
@@ -25,24 +28,6 @@ public class HaiGroup {
     private final List<HaiData> hais = new ArrayList<>();
     private List<Pair<Integer, Integer>>[][] rleVolume;
     private AABB groupAABB;
-
-    //private final List<Balloon> finalizedBalloons = new ArrayList<>();
-
-
-    /*public static class Balloon {
-        public final Set<BlockPos> interiorAir = new HashSet<>();
-        public final Set<BlockPos> shell = new HashSet<>();
-        public final DisjointSetUnion connectivity = new DisjointSetUnion();
-    }
-
-    private static class PotentialBalloon {
-        private int id;
-        private final Set<BlockPos> volume = new HashSet<>();
-        private final Set<BlockPos> shell = new HashSet<>(); 
-        public PotentialBalloon(int id) { this.id = id; }
-    }
-
-    private record LBLSubGroup(Set<BlockPos> volume, Set<BlockPos> traversed) {}*/
 
     public void addHai(HaiData data) {
         hais.add(data);
@@ -155,6 +140,205 @@ public class HaiGroup {
         }
         return false;
     }
+
+    public class BlobNode {
+        public int id;
+        public Set<BlockPos> volume;
+        public Set<Integer> parentIds;
+        public Set<Integer> childrenIds;
+        boolean hasFatalLeak;
+    }
+
+    public class WorkItem {
+        public BlockPos seed;
+        public int y;
+        public WorkItem(BlockPos seed) {
+            this.seed = seed;
+            this.y = seed.getY();
+        }
+    }
+
+    private record BlobScanResult(Set<BlockPos> volume, boolean hasLeak) {}
+
+    PriorityQueue<WorkItem> workList = new PriorityQueue<>((WorkItem a, WorkItem b) -> Integer.compare(a.y, b.y));
+    Map<Integer, BlobNode> graph = new HashMap<>();
+    Map<BlockPos, Integer> blockToNodeId = new HashMap<>();
+    int nextNodeId = 0;
+    public int getNextNodeId() { return nextNodeId++; }
+    public static final int VERTICAL_PROBE_DISTANCE = 32;
+
+    public static boolean isHab(BlockState state) {
+        return state.is(PropulsionBlocks.HAB_BLOCK.get());
+    }
+
+
+    public void scan(Level level) {
+        //Initialize scan
+        graph.clear();
+        blockToNodeId.clear();
+        workList.clear();
+        nextNodeId = 0;
+        seedWorklistFromHais(level);
+        //Scan worklist
+        while (!workList.isEmpty()) {
+            WorkItem currentWork = workList.poll();
+            if (blockToNodeId.containsKey(currentWork.seed)) continue; //Skip redundant
+            scanAndProcessSeed(currentWork.seed, level);
+        }
+    }
+
+    private void seedWorklistFromHais(Level level) {
+        for(int i = 0; i < hais.size(); i++) {
+            HaiData data = hais.get(i);
+            for(int d = 0; d < VERTICAL_PROBE_DISTANCE; d++) {
+                BlockState nextBlockState = level.getBlockState(data.position().above(d));
+                if (nextBlockState.is(PropulsionBlocks.HAB_BLOCK.get())) {
+                    WorkItem workItem = new WorkItem(data.position().above(d-1)); //d-1 as we need a block below the hab block
+                    workList.add(workItem);
+                    break;
+                }
+            }
+        }
+    }
+
+    private void scanAndProcessSeed(BlockPos seed, Level level) {
+        BlobScanResult scanResult = discoverBlob(seed, level);
+        
+        //Create and process the node
+        BlobNode node = new BlobNode();
+        node.id = getNextNodeId();
+        node.volume = scanResult.volume();
+        node.hasFatalLeak = scanResult.hasLeak;
+    }
+
+    
+
+    private BlobScanResult discoverBlob(BlockPos seed, Level level) {
+        Set<BlockPos> volume = new HashSet<>();
+        Queue<BlockPos> queue = new LinkedList<>();
+        boolean hasLeak = false;
+
+        queue.add(seed);
+        volume.add(seed);
+
+        //BFS
+        while (!queue.isEmpty()) {
+            BlockPos currentPos = queue.poll();
+            for (Direction dir : Direction.Plane.HORIZONTAL) {
+                BlockPos neighborPos = currentPos.relative(dir);
+
+                if (!isInsideRleVolume(neighborPos)) {
+                    hasLeak = true;
+                    continue; //Found a leak
+                }
+
+                if (volume.contains(neighborPos) || blockToNodeId.containsKey(neighborPos)) {
+                    continue; //Already visited
+                }
+
+                BlockState neighbourState = level.getBlockState(neighborPos);
+                if (isHab(neighbourState)) {
+                    continue; //Found a hab
+                }
+
+                volume.add(neighborPos);
+                queue.add(neighborPos);
+            }
+        }
+
+        return new BlobScanResult(volume, hasLeak);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //private final List<Balloon> finalizedBalloons = new ArrayList<>();
+
+
+    /*public static class Balloon {
+        public final Set<BlockPos> interiorAir = new HashSet<>();
+        public final Set<BlockPos> shell = new HashSet<>();
+        public final DisjointSetUnion connectivity = new DisjointSetUnion();
+    }
+
+    private static class PotentialBalloon {
+        private int id;
+        private final Set<BlockPos> volume = new HashSet<>();
+        private final Set<BlockPos> shell = new HashSet<>(); 
+        public PotentialBalloon(int id) { this.id = id; }
+    }
+
+    private record LBLSubGroup(Set<BlockPos> volume, Set<BlockPos> traversed) {}*/
 
     /*public void scan(Level level) {
         if (rleVolume == null || groupAABB == null) { return; }
