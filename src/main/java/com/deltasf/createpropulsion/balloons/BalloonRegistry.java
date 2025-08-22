@@ -25,7 +25,7 @@ public class BalloonRegistry {
 
     public void registerHai(UUID haiId, HaiBlockEntity hai) {
         int probeResult = verticalProbe(hai.getLevel(), hai.getBlockPos());
-        if (probeResult == -1) {
+        if (probeResult == -1 || probeResult == 0) {
             // This HAI is invalid, do not register it for scanning.
             // You might want to log this or have a state on the BE.
             return;
@@ -111,8 +111,9 @@ public class BalloonRegistry {
 
     public static AABB getMaxAABB(int probeResult, BlockPos origin) {
         int halfExtents = BalloonShipRegistry.MAX_HORIZONTAL_SCAN / 2;
-        BlockPos posStart = new BlockPos(origin.getX() - halfExtents, origin.getY(), origin.getZ() - halfExtents);
-        BlockPos posEnd = new BlockPos(origin.getX() + halfExtents, origin.getY() + probeResult, origin.getZ() + halfExtents);
+        int halfExtentsMod = BalloonShipRegistry.MAX_HORIZONTAL_SCAN % 2;
+        BlockPos posStart = new BlockPos(origin.getX() - halfExtents, origin.getY() + 1, origin.getZ() - halfExtents);
+        BlockPos posEnd = new BlockPos(origin.getX() + halfExtents + halfExtentsMod, origin.getY() + 1 + probeResult, origin.getZ() + halfExtents + halfExtentsMod);
 
         return new AABB(posStart, posEnd);
     }

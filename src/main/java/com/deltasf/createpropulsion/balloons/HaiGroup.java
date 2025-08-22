@@ -245,7 +245,7 @@ public class HaiGroup {
             }
         }
 
-        // Step 2: Seed a queue for backward propagation. We start with all nodes that are currently known to be invalid
+        // Seed a queue for backward propagation. We start with all nodes that are currently known to be invalid
         // for ANY reason (disconnected or having a fatal leak).
         Queue<Integer> toBackPropagate = new LinkedList<>();
         
@@ -263,7 +263,7 @@ public class HaiGroup {
             }
         }
 
-        // Step 3: Propagate the invalid status backwards through the anomaly links.
+        // Propagate the invalid status backwards through the anomaly links.
         while (!toBackPropagate.isEmpty()) {
             int invalidNodeId = toBackPropagate.poll();
             

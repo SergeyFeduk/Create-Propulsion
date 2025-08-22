@@ -15,9 +15,7 @@ public class BalloonShipRegistry {
     }
     private BalloonShipRegistry() {}
 
-    public static final int MAX_HORIZONTAL_SCAN = 16;
-    public static final int MAX_VERTICAL_SCAN = 16;
-    public static final int MAX_VOLUME_PER_HAI = 1024;
+    public static final int MAX_HORIZONTAL_SCAN = 17;
 
     //We use long2obj hashmap as our ships have id's which are stored as longs. So key is still a ship's id
     private final Long2ObjectOpenHashMap<BalloonRegistry> registries = new Long2ObjectOpenHashMap<>();
