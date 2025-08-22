@@ -24,16 +24,7 @@ public class BalloonRegistry {
     private final List<HaiGroup> haiGroups = new ArrayList<>();
 
     public void registerHai(UUID haiId, HaiBlockEntity hai) {
-        int probeResult = verticalProbe(hai.getLevel(), hai.getBlockPos());
-        if (probeResult == -1 || probeResult == 0) {
-            // This HAI is invalid, do not register it for scanning.
-            // You might want to log this or have a state on the BE.
-            return;
-        }
-        AABB maxAabb = getMaxAABB(probeResult, hai.getBlockPos());
-        HaiData data = new HaiData(haiId, hai.getBlockPos(), maxAabb);
-        haiDataMap.put(haiId, data);
-        recomputeGroups();
+        probeAndRegroup(haiId, hai.getLevel(), hai.getBlockPos());
     }
 
     public List<HaiGroup> getHaiGroups() {
@@ -82,7 +73,10 @@ public class BalloonRegistry {
         }
     }
 
-    public void startScanFor(UUID haiId, Level level) {
+    public void startScanFor(UUID haiId, Level level, BlockPos position) {
+        //Redo vertical probe and grouping
+        probeAndRegroup(haiId, level, position);
+        //Actually find a relevant haiGroup. I should really unretard this
         for (HaiGroup haiGroup : haiGroups) {
             // A more efficient way to check if the group contains the HAI
             if (haiGroup.getHais().stream().anyMatch(data -> data.id().equals(haiId))) {
@@ -92,11 +86,25 @@ public class BalloonRegistry {
         }
     }
 
+    private void probeAndRegroup(UUID haiId, Level level, BlockPos blockPos) {
+        int probeResult = initialVerticalProbe(level, blockPos);
+        if (probeResult == -1 || probeResult == 0) {
+            // This HAI is invalid, do not register it for scanning.
+            // You might want to log this or have a state on the BE.
+            return;
+        }
+        AABB maxAabb = getMaxAABB(probeResult, blockPos);
+        HaiData data = new HaiData(haiId, blockPos, maxAabb);
+        haiDataMap.put(haiId, data);
+
+        recomputeGroups();
+    }
+
 
     //Static helper methods for vertical probing
 
     //Returns distance to the first met HAB block. If no block found - returns -1
-    private static int verticalProbe(LevelAccessor level, BlockPos origin) {
+    private static int initialVerticalProbe(LevelAccessor level, BlockPos origin) {
         final int verticalProbeDistance = 32;
         for(int i = 0; i < verticalProbeDistance; i++) {
             BlockState nextBlockState = level.getBlockState(origin.above(i));

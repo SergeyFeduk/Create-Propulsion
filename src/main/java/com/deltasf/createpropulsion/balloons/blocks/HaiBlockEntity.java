@@ -54,7 +54,7 @@ public class HaiBlockEntity extends SmartBlockEntity {
         Ship ship = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
         if (ship != null) {
             // FIX: Pass the level instance down the call chain.
-            BalloonShipRegistry.forShip(ship.getId()).startScanFor(haiId, this.level);
+            BalloonShipRegistry.forShip(ship.getId()).startScanFor(haiId, this.level, worldPosition);
         }
     }
 
