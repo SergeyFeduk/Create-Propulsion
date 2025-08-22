@@ -8,6 +8,9 @@ import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.mod.common.VSGameUtilsKt;
+
 import com.deltasf.createpropulsion.balloons.blocks.HaiBlockEntity;
 import com.deltasf.createpropulsion.registries.PropulsionBlocks;
 
@@ -103,18 +106,23 @@ public class BalloonRegistry {
 
     //Static helper methods for vertical probing
 
-    //Returns distance to the first met HAB block. If no block found - returns -1
-    private static int initialVerticalProbe(LevelAccessor level, BlockPos origin) {
-        final int verticalProbeDistance = 32;
-        for(int i = 0; i < verticalProbeDistance; i++) {
-            BlockState nextBlockState = level.getBlockState(origin.above(i));
-            if (nextBlockState.is(PropulsionBlocks.HAB_BLOCK.get())) {
-                //Found a block, vertical probe success
-                return i;
+    //Returns distance to the LAST met HAB block above the hai. If no block found - returns -1
+    //This is the best compromise I found
+    private static int initialVerticalProbe(Level level, BlockPos origin) {
+        //Obtain a ship
+        Ship ship = VSGameUtilsKt.getShipManagingPos(level, origin);
+        if (ship == null) return -1;
+        //Obtain the topmost hab block
+        int maxY = ship.getShipAABB().maxY();
+        int highestHabY = -1;
+        for(int y = origin.getY(); y < maxY; y++) {
+            BlockState currenBlockState = level.getBlockState(new BlockPos(origin.getX(), y, origin.getZ()));
+            if (HaiGroup.isHab(currenBlockState)) {
+                highestHabY = y;
             }
         }
-        //Did not find a block, vertical probe failed
-        return -1;
+        if (highestHabY == -1) return -1; //Did not find a block, vertical probe failed
+        return highestHabY - origin.getY();
     }
 
     public static AABB getMaxAABB(int probeResult, BlockPos origin) {
