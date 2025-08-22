@@ -24,6 +24,7 @@ public class BalloonRegistry {
     public BalloonRegistry() {}
     public record HaiData(UUID id, BlockPos position, AABB maxAABB) {}
     private final Map<UUID, HaiData> haiDataMap = new ConcurrentHashMap<>();
+    private final Map<UUID, HaiGroup> haiGroupMap = new ConcurrentHashMap<>();
     private final List<HaiGroup> haiGroups = new ArrayList<>();
 
     public void registerHai(UUID haiId, HaiBlockEntity hai) {
@@ -44,6 +45,7 @@ public class BalloonRegistry {
 
     private void recomputeGroups() {
         haiGroups.clear();
+        haiGroupMap.clear();
         List<HaiData> remainingHais = new ArrayList<>(haiDataMap.values());
 
         while (!remainingHais.isEmpty()) {
@@ -53,6 +55,7 @@ public class BalloonRegistry {
             HaiData firstHai = remainingHais.remove(0);
             newGroup.addHai(firstHai);
             toCheck.add(firstHai);
+
             while (!toCheck.isEmpty()) {
                 HaiData currentHai = toCheck.poll();
 
@@ -73,27 +76,25 @@ public class BalloonRegistry {
             }
             newGroup.generateRleVolume();
             haiGroups.add(newGroup);
-        }
-    }
 
-    public void startScanFor(UUID haiId, Level level, BlockPos position) {
-        //Redo vertical probe and grouping
-        probeAndRegroup(haiId, level, position);
-        //Actually find a relevant haiGroup. I should really unretard this
-        for (HaiGroup haiGroup : haiGroups) {
-            // A more efficient way to check if the group contains the HAI
-            if (haiGroup.getHais().stream().anyMatch(data -> data.id().equals(haiId))) {
-                haiGroup.scan(level);
-                return;
+            for (HaiData haiData : newGroup.getHais()) {
+                haiGroupMap.put(haiData.id(), newGroup);
             }
         }
     }
 
+    public void startScanFor(UUID haiId, Level level, BlockPos position) {
+        probeAndRegroup(haiId, level, position);
+        HaiGroup haiGroup = haiGroupMap.get(haiId);
+        if (haiGroup != null) {
+            haiGroup.scan(level);
+        }
+    }
+
+
     private void probeAndRegroup(UUID haiId, Level level, BlockPos blockPos) {
         int probeResult = initialVerticalProbe(level, blockPos);
-        if (probeResult == -1 || probeResult == 0) {
-            // This HAI is invalid, do not register it for scanning.
-            // You might want to log this or have a state on the BE.
+        if (probeResult == -1 || probeResult == 0) { // This HAI is invalid
             return;
         }
         AABB maxAabb = getMaxAABB(probeResult, blockPos);
@@ -102,9 +103,6 @@ public class BalloonRegistry {
 
         recomputeGroups();
     }
-
-
-    //Static helper methods for vertical probing
 
     //Returns distance to the LAST met HAB block above the hai. If no block found - returns -1
     //This is the best compromise I found
