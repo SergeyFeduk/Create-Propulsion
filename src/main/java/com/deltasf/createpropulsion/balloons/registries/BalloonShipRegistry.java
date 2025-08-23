@@ -1,4 +1,4 @@
-package com.deltasf.createpropulsion.balloons;
+package com.deltasf.createpropulsion.balloons.registries;
 
 import java.util.Collection;
 import java.util.Map;

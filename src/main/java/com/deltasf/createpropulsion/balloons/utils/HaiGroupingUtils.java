@@ -9,10 +9,10 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
 
-import com.deltasf.createpropulsion.balloons.BalloonRegistry;
 import com.deltasf.createpropulsion.balloons.HaiGroup;
-import com.deltasf.createpropulsion.balloons.BalloonRegistry.HaiData;
 import com.deltasf.createpropulsion.balloons.HaiGroup.Balloon;
+import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry;
+import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry.HaiData;
 
 import net.minecraft.core.BlockPos;
 

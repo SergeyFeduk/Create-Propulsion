@@ -15,7 +15,8 @@ import java.util.Set;
 import org.valkyrienskies.core.impl.shadow.cl;
 import org.valkyrienskies.core.impl.shadow.pu;
 
-import com.deltasf.createpropulsion.balloons.BalloonRegistry.HaiData;
+import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry;
+import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry.HaiData;
 import com.deltasf.createpropulsion.registries.PropulsionBlocks;
 import com.mojang.datafixers.util.Pair;
 

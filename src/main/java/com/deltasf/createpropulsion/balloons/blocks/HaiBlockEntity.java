@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
-import com.deltasf.createpropulsion.balloons.BalloonShipRegistry;
+import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
 import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
 import com.deltasf.createpropulsion.registries.PropulsionBlocks;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;

@@ -1,4 +1,4 @@
-package com.deltasf.createpropulsion.balloons;
+package com.deltasf.createpropulsion.balloons.registries;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

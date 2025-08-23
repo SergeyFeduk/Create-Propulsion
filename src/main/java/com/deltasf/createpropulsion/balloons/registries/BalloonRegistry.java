@@ -1,4 +1,4 @@
-package com.deltasf.createpropulsion.balloons;
+package com.deltasf.createpropulsion.balloons.registries;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,6 +10,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
 
+import com.deltasf.createpropulsion.balloons.HaiGroup;
 import com.deltasf.createpropulsion.balloons.blocks.HaiBlockEntity;
 import com.deltasf.createpropulsion.balloons.utils.BalloonScanUtils;
 import com.deltasf.createpropulsion.balloons.utils.HaiGroupingUtils;

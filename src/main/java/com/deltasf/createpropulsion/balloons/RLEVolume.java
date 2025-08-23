@@ -5,7 +5,8 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.deltasf.createpropulsion.balloons.BalloonRegistry.HaiData;
+import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry;
+import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry.HaiData;
 import com.mojang.datafixers.util.Pair;
 
 import net.minecraft.core.BlockPos;

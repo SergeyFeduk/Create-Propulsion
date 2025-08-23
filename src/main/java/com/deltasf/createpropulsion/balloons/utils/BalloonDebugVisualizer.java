@@ -1,9 +1,11 @@
-package com.deltasf.createpropulsion.balloons;
+package com.deltasf.createpropulsion.balloons.utils;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
-import com.deltasf.createpropulsion.balloons.BalloonRegistry;
-import com.deltasf.createpropulsion.balloons.BalloonShipRegistry;
 import com.deltasf.createpropulsion.balloons.HaiGroup;
+import com.deltasf.createpropulsion.balloons.HaiGroup.Balloon;
+import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry;
+import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
+import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry.HaiData;
 import com.deltasf.createpropulsion.debug.DebugRenderer;
 import com.mojang.datafixers.util.Pair;
 
