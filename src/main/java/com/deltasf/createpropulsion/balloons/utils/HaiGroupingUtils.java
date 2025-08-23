@@ -20,7 +20,7 @@ public class HaiGroupingUtils {
     public static void addHaiAndRegroup(HaiData newData, List<HaiGroup> haiGroups, Map<UUID, HaiGroup> haiGroupMap) {
         List<HaiGroup> intersectingGroups = new ArrayList<>();
         for (HaiGroup group : haiGroups) {
-            if (group.getGroupAABB().intersects(newData.maxAABB())) {
+            if (group.getRleVolume().getGroupAABB().intersects(newData.maxAABB())) {
                 intersectingGroups.add(group);
             }
         }
@@ -29,7 +29,7 @@ public class HaiGroupingUtils {
             // Case 1: New HAI
             HaiGroup newGroup = new HaiGroup();
             newGroup.addHai(newData);
-            newGroup.generateRleVolume();
+            newGroup.generateRLEVolume();
             haiGroups.add(newGroup);
             haiGroupMap.put(newData.id(), newGroup);
 
@@ -37,7 +37,7 @@ public class HaiGroupingUtils {
             // Case 2: Add HAI to group
             HaiGroup targetGroup = intersectingGroups.get(0);
             targetGroup.addHai(newData);
-            targetGroup.generateRleVolume(); // Regenerate volume for the updated group
+            targetGroup.generateRLEVolume(); // Regenerate volume for the updated group
             haiGroupMap.put(newData.id(), targetGroup);
 
         } else {
@@ -60,7 +60,7 @@ public class HaiGroupingUtils {
                 haiGroups.remove(groupToMerge);
             }
             
-            primaryGroup.generateRleVolume();
+            primaryGroup.generateRLEVolume();
         }
     }
 
@@ -116,7 +116,7 @@ public class HaiGroupingUtils {
                 }
             }
 
-            newSubGroup.generateRleVolume();
+            newSubGroup.generateRLEVolume();
             haiGroups.add(newSubGroup);
             for (HaiData haiData : newSubGroup.getHais()) {
                 haiGroupMap.put(haiData.id(), newSubGroup);
@@ -132,7 +132,7 @@ public class HaiGroupingUtils {
 
         for (HaiGroup.Balloon balloon : group.getFinalizedBalloons()) {
             for (BlockPos airBlock : balloon.interiorAir) {
-                if (!group.isInsideRleVolume(airBlock)) {
+                if (!group.getRleVolume().isInsideRleVolume(airBlock)) {
                     // Found a single air block that is now outside the boundary
                     return false;
                 }

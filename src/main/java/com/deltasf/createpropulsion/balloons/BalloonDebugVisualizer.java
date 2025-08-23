@@ -95,8 +95,8 @@ public class BalloonDebugVisualizer {
     }
 
     private static void renderRleVolume(HaiGroup group, Color color, int groupIndex) {
-        AABB groupAABB = group.getGroupAABB();
-        List<Pair<Integer, Integer>>[][] rleVolume = group.getRleVolume();
+        AABB groupAABB = group.getRleVolume().getGroupAABB();
+        List<Pair<Integer, Integer>>[][] rleVolume = group.getRleVolume().get();
 
         if (groupAABB == null || rleVolume == null) {
             return;

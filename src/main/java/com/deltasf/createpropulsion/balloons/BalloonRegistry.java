@@ -86,7 +86,7 @@ public class BalloonRegistry {
             // Check 2 (NEW ORDER): First, perform the intelligent logical check to prune any orphaned balloons.
             affectedGroup.checkAndPruneOrphanedBalloons(level);
 
-            affectedGroup.generateRleVolume();
+            affectedGroup.generateRLEVolume();
             // Check 3 (NEW ORDER): Now, perform the geometric check on the REMAINING balloons.
             // This ensures that the survivors are still within the new, smaller boundaries.
             if (!HaiGroupingUtils.areBalloonsContainedInCurrentVolume(affectedGroup)) {

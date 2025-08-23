@@ -8,6 +8,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nonnull;
 
+@SuppressWarnings("deprecation")
 public class HabBlock extends Block {
 
     public HabBlock(Properties properties) {
