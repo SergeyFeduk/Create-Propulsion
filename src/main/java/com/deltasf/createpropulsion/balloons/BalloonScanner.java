@@ -40,9 +40,7 @@ public class BalloonScanner {
     private int nextNodeId = 0;
     private int getNextNodeId() { return nextNodeId++; }
 
-    public List<Balloon> finalizedBalloons = new ArrayList<>();
-
-    public ScanResult scan() {
+    public FullScanResult scan() {
         //Initialize scan
         graph.clear();
         blockToNodeId.clear();
@@ -57,16 +55,12 @@ public class BalloonScanner {
             scanAndProcessSeed(currentWork.seed, level);
         }
         //Phase 2: Finalize the graph
-        finalizeGraph();
-        
-        return new ScanResult(finalizedBalloons, graph, blockToNodeId);
+        return finalizeGraph();
     }
     
-    private void finalizeGraph() {
+    private FullScanResult finalizeGraph() {
+        // --- Phase 1: Invalidate nodes that are disconnected from any HAI seed ---
         Set<Integer> invalidNodeIds = new HashSet<>();
-        Queue<Integer> toPrune = new LinkedList<>();
-
-        //Find all nodes that cannot be reached from any seed and kill them
         Set<Integer> rootNodeIds = new HashSet<>();
         for (BlockPos seed : initialRootSeeds) {
             if (blockToNodeId.containsKey(seed)) {
@@ -75,19 +69,19 @@ public class BalloonScanner {
         }
 
         Set<Integer> connectedToRoot = new HashSet<>();
-        Queue<Integer> toVisit = new LinkedList<>(rootNodeIds);
+        Queue<Integer> toVisitFromRoot = new LinkedList<>(rootNodeIds);
         connectedToRoot.addAll(rootNodeIds);
 
-        while (!toVisit.isEmpty()) {
-            BlobNode currentNode = graph.get(toVisit.poll());
+        while (!toVisitFromRoot.isEmpty()) {
+            BlobNode currentNode = graph.get(toVisitFromRoot.poll());
             if (currentNode == null) continue;
             
             // Traverse all physical parent/child connections
             for (int parentId : currentNode.parentIds) {
-                if (connectedToRoot.add(parentId)) toVisit.add(parentId);
+                if (connectedToRoot.add(parentId)) toVisitFromRoot.add(parentId);
             }
             for (int childId : currentNode.childrenIds) {
-                if (connectedToRoot.add(childId)) toVisit.add(childId);
+                if (connectedToRoot.add(childId)) toVisitFromRoot.add(childId);
             }
         }
 
@@ -97,114 +91,104 @@ public class BalloonScanner {
             }
         }
 
-        //Propagate invalidation from anomaly bridges
-        
+        // --- Phase 2: Invalidate nodes connected to leaks or anomalies ---
         Map<Integer, Set<Integer>> reverseAnomalyLinks = new HashMap<>();
         for (Map.Entry<Integer, Set<BlockPos>> entry : anomalySources.entrySet()) {
             int sourceNodeId = entry.getKey();
-            Set<BlockPos> discoveredSeeds = entry.getValue();
-
-            for (BlockPos seed : discoveredSeeds) {
-                Integer discoveredNodeId = blockToNodeId.get(seed);
+            for (BlockPos discoveredSeed : entry.getValue()) {
+                Integer discoveredNodeId = blockToNodeId.get(discoveredSeed);
                 if (discoveredNodeId != null) {
                     reverseAnomalyLinks.computeIfAbsent(discoveredNodeId, k -> new HashSet<>()).add(sourceNodeId);
                 }
             }
         }
 
-        // Seed a queue for backward propagation. We start with all nodes that are currently known to be invalid
-        // for ANY reason (disconnected or having a fatal leak).
         Queue<Integer> toBackPropagate = new LinkedList<>();
+        toBackPropagate.addAll(invalidNodeIds); // Seed with already disconnected nodes
         
-        // Add all nodes that were already marked as invalid from the "disconnected" pass above.
-        toBackPropagate.addAll(invalidNodeIds);
-        
-        // Also add any nodes with a fatal leak, ensuring we don't add duplicates to the queue.
+        // Also seed with any nodes that have a fatal leak
         for (BlobNode node : graph.values()) {
             if (node.hasFatalLeak) {
-                // The .add() method of a Set returns true if the element was not already present.
-                // This is a concise way to add to both the set and the queue simultaneously.
                 if (invalidNodeIds.add(node.id)) {
                     toBackPropagate.add(node.id);
                 }
             }
         }
 
-        // Propagate the invalid status backwards through the anomaly links.
+        // Propagate invalidation backwards through the anomaly links
         while (!toBackPropagate.isEmpty()) {
             int invalidNodeId = toBackPropagate.poll();
-            
-            // Find which node(s) discovered this now-invalid node.
             Set<Integer> sources = reverseAnomalyLinks.get(invalidNodeId);
-            if (sources == null) continue; // This node was not discovered via an anomaly.
+            if (sources == null) continue;
 
             for (int sourceId : sources) {
-                // If the discovering node is not already invalid, mark it as such and add it to the queue
-                // to continue the backward propagation chain.
                 if (invalidNodeIds.add(sourceId)) {
                     toBackPropagate.add(sourceId);
                 }
             }
         }
 
-
-
-
-        //Find initial invalid links
+        // --- Phase 3: Propagate invalidation downwards from leaky nodes ---
+        Queue<Integer> toPruneForward = new LinkedList<>();
         for (BlobNode node : graph.values()) {
             if (node.hasFatalLeak) { 
-                invalidNodeIds.add(node.id);
-                toPrune.add(node.id);
+                // We already added these to invalidNodeIds, but we need to seed the forward propagation
+                toPruneForward.add(node.id);
             }
         }
 
-        //Propagate invalidation
-        while (!toPrune.isEmpty()) {
-            int invalidId = toPrune.poll();
+        while (!toPruneForward.isEmpty()) {
+            int invalidId = toPruneForward.poll();
             BlobNode invalidNode = graph.get(invalidId);
+            if (invalidNode == null) continue;
             for (Integer childrenId : invalidNode.childrenIds) {
-                if (invalidNodeIds.contains(childrenId)) continue;
-                invalidNodeIds.add(childrenId);
-                toPrune.add(childrenId);
+                if (invalidNodeIds.add(childrenId)) {
+                    toPruneForward.add(childrenId);
+                }
             }
         }
 
-        //Resolve connectivity
-        List<Balloon> finalBalloons = new ArrayList<>();
+        // --- Phase 4: Group all remaining valid nodes into balloons ---
         Set<Integer> visitedValidNodes = new HashSet<>();
+        List<Set<BlockPos>> allBalloonVolumes = new ArrayList<>();
+
 
         for (BlobNode node : graph.values()) {
-            if (invalidNodeIds.contains(node.id) || visitedValidNodes.contains(node.id)) continue; //Skip invalid or visited nodes
+            if (invalidNodeIds.contains(node.id) || visitedValidNodes.contains(node.id)) {
+                continue; // Skip invalid or already-grouped nodes
+            }
 
-            //Create new balloon
-            Balloon newBalloon = new Balloon();
+            // Start of a new, valid balloon
+            Set<BlockPos> currentBalloonVolume = new HashSet<>();
             Queue<Integer> toGroup = new LinkedList<>();
+            
             toGroup.add(node.id);
             visitedValidNodes.add(node.id);
-            //Group via traversal
+
+            // Traverse all connected valid nodes to gather the full volume of this balloon
             while (!toGroup.isEmpty()) {
                 int currentId = toGroup.poll();
                 BlobNode currentNode = graph.get(currentId);
+                
+                currentBalloonVolume.addAll(currentNode.volume);
 
-                newBalloon.interiorAir.addAll(currentNode.volume);
                 for (Integer parentId : currentNode.parentIds) {
-                    if (invalidNodeIds.contains(parentId) || visitedValidNodes.contains(parentId)) continue;
-                    toGroup.add(parentId);
-                    visitedValidNodes.add(parentId);
+                    if (!invalidNodeIds.contains(parentId) && visitedValidNodes.add(parentId)) {
+                        toGroup.add(parentId);
+                    }
                 }
-
                 for (Integer childrenId : currentNode.childrenIds) {
-                    if (invalidNodeIds.contains(childrenId) || visitedValidNodes.contains(childrenId)) continue;
-                    toGroup.add(childrenId);
-                    visitedValidNodes.add(childrenId);
+                    if (!invalidNodeIds.contains(childrenId) && visitedValidNodes.add(childrenId)) {
+                        toGroup.add(childrenId);
+                    }
                 }
             }
 
-            finalBalloons.add(newBalloon);
+            // Create a result for this complete balloon
+            allBalloonVolumes.add(currentBalloonVolume);
         }
 
-        finalizedBalloons.clear();
-        finalizedBalloons.addAll(finalBalloons);
+        return new FullScanResult(allBalloonVolumes, this.graph, this.blockToNodeId);
     }
 
     private void seedWorklistFromHais(Level level) {
@@ -349,12 +333,6 @@ public class BalloonScanner {
     }
 
     //Classes
-
-    public class Balloon {
-        public Set<BlockPos> interiorAir = new HashSet<>();
-        public Set<BlockPos> shell = new HashSet<>();
-    }
-
     public class BlobNode {
         public int id;
         public Set<BlockPos> volume = new HashSet<>();
@@ -374,5 +352,5 @@ public class BalloonScanner {
 
     private record BlobScanResult(Set<BlockPos> volume, boolean hasLeak) {}
 
-    public record ScanResult(List<Balloon> balloons, Map<Integer, BlobNode> graph, Map<BlockPos, Integer> blockToNodeId) {}
+    public record FullScanResult(List<Set<BlockPos>> balloonVolumes, Map<Integer, BlobNode> graph,Map<BlockPos, Integer> blockToNodeId) {}
 }

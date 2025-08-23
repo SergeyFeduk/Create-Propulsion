@@ -9,8 +9,8 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
 
+import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.HaiGroup;
-import com.deltasf.createpropulsion.balloons.BalloonScanner.Balloon;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry.HaiData;
 
