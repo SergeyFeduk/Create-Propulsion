@@ -12,7 +12,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 
 public class BalloonScanUtils {
-
     //Returns distance to the LAST met HAB block above the hai. If no block found - returns -1
     //This is the best compromise I found
     public static int initialVerticalProbe(Level level, BlockPos origin) {

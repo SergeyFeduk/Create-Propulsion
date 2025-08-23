@@ -124,9 +124,7 @@ public class HaiGroupingUtils {
         }
     }
 
-    public static boolean doBalloonsFitInNewVolume(HaiGroup group) {
-        // Regenerate the RLE volume based on the updated list of hais
-        group.generateRleVolume();
+    public static boolean areBalloonsContainedInCurrentVolume(HaiGroup group) {
 
         if (group.getFinalizedBalloons().isEmpty()) {
             return true; // No balloons to invalidate
