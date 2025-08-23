@@ -1,17 +1,18 @@
 package com.deltasf.createpropulsion.balloons;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.mod.common.VSGameUtilsKt;
-
 import com.deltasf.createpropulsion.balloons.blocks.HaiBlockEntity;
+import com.deltasf.createpropulsion.balloons.utils.BalloonScanUtils;
+import com.deltasf.createpropulsion.balloons.utils.HaiGroupingUtils;
 import com.deltasf.createpropulsion.registries.PropulsionBlocks;
 
 import net.minecraft.core.BlockPos;
@@ -27,108 +28,100 @@ public class BalloonRegistry {
     private final Map<UUID, HaiGroup> haiGroupMap = new ConcurrentHashMap<>();
     private final List<HaiGroup> haiGroups = new ArrayList<>();
 
-    public void registerHai(UUID haiId, HaiBlockEntity hai) {
-        probeAndRegroup(haiId, hai.getLevel(), hai.getBlockPos());
-    }
-
     public List<HaiGroup> getHaiGroups() {
         return haiGroups;
     }
 
+    public void registerHai(UUID haiId, HaiBlockEntity hai) {
+        Level level = hai.getLevel();
+        BlockPos blockPos = hai.getBlockPos();
 
-    public void unregisterHai(UUID haiId) {
-        if (haiDataMap.remove(haiId) != null) {
-            // If a HAI was actually removed, we need to recompute the groups
-            recomputeGroups();
+        int probeResult = BalloonScanUtils.initialVerticalProbe(level, blockPos);
+        if (probeResult <= 0) { // This HAI is invalid or found no blocks
+            // If it was previously registered, its removal might cause a split.
+            unregisterHai(haiId, level);
+            return;
         }
+
+        AABB maxAabb = BalloonScanUtils.getMaxAABB(probeResult, blockPos);
+        HaiData newData = new HaiData(haiId, blockPos, maxAabb);
+
+        // If the HAI already exists, unregister it first to handle position changes correctly.
+        if (haiDataMap.containsKey(haiId)) {
+            unregisterHai(haiId, level);
+        }
+        
+        haiDataMap.put(haiId, newData);
+        HaiGroupingUtils.addHaiAndRegroup(newData, haiGroups, haiGroupMap);
     }
 
-    private void recomputeGroups() {
-        haiGroups.clear();
-        haiGroupMap.clear();
-        List<HaiData> remainingHais = new ArrayList<>(haiDataMap.values());
+    public void unregisterHai(UUID haiId, Level level) {
+        HaiData removedHai = haiDataMap.remove(haiId);
+        if (removedHai == null) {
+            return; // Not registered.
+        }
 
-        while (!remainingHais.isEmpty()) {
-            HaiGroup newGroup = new HaiGroup();
-            Queue<HaiData> toCheck = new LinkedList<>();
+        // Find the group this HAI belonged to using its ID.
+        HaiGroup affectedGroup = haiGroupMap.get(haiId);
+        
+        // Now we can remove the HAI's specific mapping from the map.
+        haiGroupMap.remove(haiId);
 
-            HaiData firstHai = remainingHais.remove(0);
-            newGroup.addHai(firstHai);
-            toCheck.add(firstHai);
+        if (affectedGroup == null) {
+            return; // The HAI existed but wasn't part of a group.
+        }
 
-            while (!toCheck.isEmpty()) {
-                HaiData currentHai = toCheck.poll();
+        // Remove the HAI from its group's internal list.
+        affectedGroup.getHais().remove(removedHai);
 
-                // Find all neighbors of the current HAI from the remaining list.
-                List<HaiData> neighbors = new ArrayList<>();
-                for (HaiData potentialNeighbor : remainingHais) {
-                    if (potentialNeighbor.maxAABB().intersects(currentHai.maxAABB())) {
-                        neighbors.add(potentialNeighbor);
-                    }
-                }
+        // If the group is now empty, it's simple: just remove it.
+        if (affectedGroup.getHais().isEmpty()) {
+            haiGroups.remove(affectedGroup);
+            return;
+        }
 
-                // Move the found neighbors from the remaining list to our new group and the queue.
-                remainingHais.removeAll(neighbors);
-                for (HaiData neighbor : neighbors) {
-                    newGroup.addHai(neighbor);
-                    toCheck.add(neighbor);
-                }
+        // --- Safety Checks (Corrected Order) ---
+
+        // Check 1: Did removing the HAI split the group into multiple pieces? This is the most severe outcome.
+        if (HaiGroupingUtils.doesGroupSplit(affectedGroup.getHais())) {
+            // Unsafe: The group is no longer contiguous.
+            // We must destroy the old group and create new ones for each split piece.
+            haiGroups.remove(affectedGroup);
+            HaiGroupingUtils.splitAndRecreateGroups(affectedGroup.getHais(), haiGroups, haiGroupMap);
+
+        } else {
+            // The group is still connected.
+            // Check 2 (NEW ORDER): First, perform the intelligent logical check to prune any orphaned balloons.
+            affectedGroup.checkAndPruneOrphanedBalloons(level);
+
+            // Check 3 (NEW ORDER): Now, perform the geometric check on the REMAINING balloons.
+            // This ensures that the survivors are still within the new, smaller boundaries.
+            if (!HaiGroupingUtils.doBalloonsFitInNewVolume(affectedGroup)) {
+                // Unsafe: A surviving balloon was breached by the shrinking volume.
+                // This is an edge case, but we must invalidate the state if it happens.
+                affectedGroup.invalidateBalloonState();
             }
-            newGroup.generateRleVolume();
-            haiGroups.add(newGroup);
-
-            for (HaiData haiData : newGroup.getHais()) {
-                haiGroupMap.put(haiData.id(), newGroup);
-            }
+            // If both checks pass, the group's state is now correctly and minimally updated.
         }
     }
 
     public void startScanFor(UUID haiId, Level level, BlockPos position) {
-        probeAndRegroup(haiId, level, position);
+        // First, ensure the HAI is correctly registered and its group is up-to-date.
+        // We get the BlockEntity from the world to pass to registerHai.
+        if (level.getBlockEntity(position) instanceof HaiBlockEntity hai) {
+            // This call performs the probe and non-destructively updates the groups.
+            this.registerHai(haiId, hai);
+        } else {
+            // The block entity doesn't exist or is the wrong type. We can't scan.
+            // It might be a good idea to ensure it's unregistered.
+            unregisterHai(haiId, level);
+            return;
+        }
+
+        // The rest of the logic remains the same.
         HaiGroup haiGroup = haiGroupMap.get(haiId);
         if (haiGroup != null) {
             haiGroup.scan(level);
         }
-    }
-
-
-    private void probeAndRegroup(UUID haiId, Level level, BlockPos blockPos) {
-        int probeResult = initialVerticalProbe(level, blockPos);
-        if (probeResult == -1 || probeResult == 0) { // This HAI is invalid
-            return;
-        }
-        AABB maxAabb = getMaxAABB(probeResult, blockPos);
-        HaiData data = new HaiData(haiId, blockPos, maxAabb);
-        haiDataMap.put(haiId, data);
-
-        recomputeGroups();
-    }
-
-    //Returns distance to the LAST met HAB block above the hai. If no block found - returns -1
-    //This is the best compromise I found
-    private static int initialVerticalProbe(Level level, BlockPos origin) {
-        //Obtain a ship
-        Ship ship = VSGameUtilsKt.getShipManagingPos(level, origin);
-        if (ship == null) return -1;
-        //Obtain the topmost hab block
-        int maxY = ship.getShipAABB().maxY();
-        int highestHabY = -1;
-        for(int y = origin.getY(); y < maxY; y++) {
-            BlockState currenBlockState = level.getBlockState(new BlockPos(origin.getX(), y, origin.getZ()));
-            if (HaiGroup.isHab(currenBlockState)) {
-                highestHabY = y;
-            }
-        }
-        if (highestHabY == -1) return -1; //Did not find a block, vertical probe failed
-        return highestHabY - origin.getY();
-    }
-
-    public static AABB getMaxAABB(int probeResult, BlockPos origin) {
-        int halfExtents = BalloonShipRegistry.MAX_HORIZONTAL_SCAN / 2;
-        int halfExtentsMod = BalloonShipRegistry.MAX_HORIZONTAL_SCAN % 2;
-        BlockPos posStart = new BlockPos(origin.getX() - halfExtents, origin.getY() + 1, origin.getZ() - halfExtents);
-        BlockPos posEnd = new BlockPos(origin.getX() + halfExtents + halfExtentsMod, origin.getY() + 1 + probeResult, origin.getZ() + halfExtents + halfExtentsMod);
-
-        return new AABB(posStart, posEnd);
     }
 }

@@ -34,8 +34,17 @@ public class HaiGroup {
         hais.add(data);
     }
 
+    public void addAllHais(List<HaiData> newHais) {
+        this.hais.addAll(newHais);
+    }
+
     public List<BalloonRegistry.HaiData> getHais() {
         return this.hais;
+    }
+
+    public void invalidateBalloonState() {
+        this.finalizedBalloons.clear();
+        // In the future, you could also clear other state here if needed.
     }
 
     public AABB getGroupAABB() {
@@ -51,7 +60,7 @@ public class HaiGroup {
         return rleVolume;
     }
 
-    //TODO: Optimize so it DOES NOT use the bounding AABB. 
+    //TODO: Optimize so it DOES NOT use the entire bounding AABB. 
     @SuppressWarnings("unchecked") // For the generic array creation
     public void generateRleVolume() {
         if (hais.isEmpty()) {
@@ -485,4 +494,70 @@ public class HaiGroup {
 
         return new BlobScanResult(volume, hasLeak);
     }
+
+    public void checkAndPruneOrphanedBalloons(Level level) {
+        if (finalizedBalloons.isEmpty() || graph.isEmpty()) {
+            return; // Nothing to prune.
+        }
+
+        // --- Part A & B: Find all root nodes based on the CURRENT list of HAIs ---
+        Set<BlockPos> currentSeeds = new HashSet<>();
+        for (HaiData data : this.hais) {
+            for (int d = 0; d < VERTICAL_PROBE_DISTANCE; d++) {
+                BlockState nextBlockState = level.getBlockState(data.position().above(d));
+                if (isHab(nextBlockState)) {
+                    currentSeeds.add(data.position().above(d - 1));
+                    break;
+                }
+            }
+        }
+
+        Set<Integer> rootNodeIds = new HashSet<>();
+        for (BlockPos seed : currentSeeds) {
+            if (blockToNodeId.containsKey(seed)) {
+                rootNodeIds.add(blockToNodeId.get(seed));
+            }
+        }
+
+        // --- Part C: Traverse the graph to find all currently reachable nodes ---
+        Set<Integer> reachableNodeIds = new HashSet<>();
+        Queue<Integer> toVisit = new LinkedList<>(rootNodeIds);
+        reachableNodeIds.addAll(rootNodeIds);
+
+        while (!toVisit.isEmpty()) {
+            BlobNode currentNode = graph.get(toVisit.poll());
+            if (currentNode == null) continue;
+
+            for (int parentId : currentNode.parentIds) {
+                if (reachableNodeIds.add(parentId)) toVisit.add(parentId);
+            }
+            for (int childId : currentNode.childrenIds) {
+                if (reachableNodeIds.add(childId)) toVisit.add(childId);
+            }
+        }
+
+        // --- Part D & E: Validate each balloon and prune orphans ---
+        List<Balloon> validBalloons = new ArrayList<>();
+        for (Balloon balloon : this.finalizedBalloons) {
+            boolean isBalloonValid = true;
+            for (BlockPos pos : balloon.interiorAir) {
+                Integer nodeId = blockToNodeId.get(pos);
+                if (nodeId == null || !reachableNodeIds.contains(nodeId)) {
+                    isBalloonValid = false;
+                    break;
+                }
+            }
+
+            if (isBalloonValid) {
+                validBalloons.add(balloon);
+            }
+        }
+
+        // If the list of valid balloons is smaller, update the main list.
+        if (validBalloons.size() < this.finalizedBalloons.size()) {
+            this.finalizedBalloons.clear();
+            this.finalizedBalloons.addAll(validBalloons);
+        }
+    }
+
 }

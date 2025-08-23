@@ -45,7 +45,7 @@ public class HaiBlockEntity extends SmartBlockEntity {
     public void onBlockBroken() {
         Ship ship = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
         if (ship != null && this.haiId != null) {
-            BalloonShipRegistry.forShip(ship.getId()).unregisterHai(haiId);
+            BalloonShipRegistry.forShip(ship.getId()).unregisterHai(haiId, level);
         }
     }
 
