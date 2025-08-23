@@ -2,7 +2,7 @@ package com.deltasf.createpropulsion.balloons.utils;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.balloons.HaiGroup;
-import com.deltasf.createpropulsion.balloons.HaiGroup.Balloon;
+import com.deltasf.createpropulsion.balloons.BalloonScanner.Balloon;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry;
 import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry.HaiData;
@@ -128,13 +128,13 @@ public class BalloonDebugVisualizer {
     }
 
     private static void renderBalloonVolume(HaiGroup group, int groupIndex) {
-        List<HaiGroup.Balloon> balloons = group.getFinalizedBalloons();
+        List<Balloon> balloons = group.getFinalizedBalloons();
         if (balloons == null || balloons.isEmpty()) {
             return;
         }
 
         int balloonIndex = 0;
-        for (HaiGroup.Balloon balloon : balloons) {
+        for (Balloon balloon : balloons) {
             // Cycle through the balloon color palette for each separate balloon
             Color balloonColor = BALLOON_COLORS[balloonIndex % BALLOON_COLORS.length];
 

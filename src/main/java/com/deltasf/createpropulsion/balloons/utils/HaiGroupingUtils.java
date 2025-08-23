@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.deltasf.createpropulsion.balloons.HaiGroup;
-import com.deltasf.createpropulsion.balloons.HaiGroup.Balloon;
+import com.deltasf.createpropulsion.balloons.BalloonScanner.Balloon;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry.HaiData;
 
@@ -130,7 +130,7 @@ public class HaiGroupingUtils {
             return true; // No balloons to invalidate
         }
 
-        for (HaiGroup.Balloon balloon : group.getFinalizedBalloons()) {
+        for (Balloon balloon : group.getFinalizedBalloons()) {
             for (BlockPos airBlock : balloon.interiorAir) {
                 if (!group.getRleVolume().isInsideRleVolume(airBlock)) {
                     // Found a single air block that is now outside the boundary
