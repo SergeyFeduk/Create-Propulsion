@@ -79,59 +79,59 @@ public class HaiGroup {
     }
 
     private Balloon translateScanResult(Set<BlockPos> balloonVolume) {
-        Map<BlockPos, Balloon.BalloonSegment> segments = new HashMap<>();
+        Map<Integer, Balloon.BalloonSegment> nodeIdToSegmentMap = new HashMap<>();
+        
+        // First pass: Create a BalloonSegment for each relevant BlobNode
+        for (Map.Entry<Integer, BalloonScanner.BlobNode> entry : this.graph.entrySet()) {
+            Integer nodeId = entry.getKey();
+            BalloonScanner.BlobNode node = entry.getValue();
+            
+            // Ensure this node is part of the current balloon we are processing
+            // We check if the first block of the node's volume is in our target set.
+            if (!node.volume.isEmpty() && balloonVolume.contains(node.volume.iterator().next())) {
+                nodeIdToSegmentMap.put(nodeId, new Balloon.BalloonSegment(node.volume));
+            }
+        }
+
+        // Second pass: Link the newly created segments together into a DAG
+        for (Map.Entry<Integer, Balloon.BalloonSegment> entry : nodeIdToSegmentMap.entrySet()) {
+            Integer nodeId = entry.getKey();
+            Balloon.BalloonSegment segment = entry.getValue();
+            BalloonScanner.BlobNode node = this.graph.get(nodeId);
+
+            // Link to parents
+            for (int parentId : node.parentIds) {
+                if (nodeIdToSegmentMap.containsKey(parentId)) {
+                    segment.parents.add(nodeIdToSegmentMap.get(parentId));
+                }
+            }
+            // Link to children
+            for (int childId : node.childrenIds) {
+                if (nodeIdToSegmentMap.containsKey(childId)) {
+                    segment.children.add(nodeIdToSegmentMap.get(childId));
+                }
+            }
+        }
+
+        // Third pass: Build the final data structures for the Balloon object
+        List<Balloon.BalloonSegment> allSegments = new ArrayList<>(nodeIdToSegmentMap.values());
+        Map<BlockPos, Balloon.BalloonSegment> blockToSegmentMap = new HashMap<>();
         List<Balloon.BalloonSegment> bottomLayerSegments = new ArrayList<>();
 
-        // First pass: Create a segment object for every block in this specific balloon's volume
-        for (BlockPos pos : balloonVolume) {
-            segments.put(pos, new Balloon.BalloonSegment(pos));
-        }
-
-        // Second pass: Link the segments together into a DAG using the graph data stored in this HaiGroup
-        for (Balloon.BalloonSegment segment : segments.values()) {
-            // Use the HaiGroup's 'blockToNodeId' map
-            Integer nodeId = this.blockToNodeId.get(segment.pos);
-            if (nodeId == null) continue;
-
-            // Use the HaiGroup's 'graph'
-            BalloonScanner.BlobNode node = this.graph.get(nodeId);
-            if (node == null) continue;
-
-            // Link to all parents (segments directly above)
-            for (int parentId : node.parentIds) {
-                BalloonScanner.BlobNode parentNode = this.graph.get(parentId);
-                if (parentNode != null) {
-                    BlockPos parentPos = segment.pos.above();
-                    // Check if the parent block is part of THIS balloon's volume
-                    if (segments.containsKey(parentPos)) {
-                        segment.parents.add(segments.get(parentPos));
-                    }
-                }
+        for (Balloon.BalloonSegment segment : allSegments) {
+            // Populate the reverse-lookup map
+            for (BlockPos pos : segment.volume) {
+                blockToSegmentMap.put(pos, segment);
             }
-
-            // Link to all children (segments directly below)
-            for (int childId : node.childrenIds) {
-                BalloonScanner.BlobNode childNode = this.graph.get(childId);
-                if (childNode != null) {
-                    BlockPos childPos = segment.pos.below();
-                    // Check if the child block is part of THIS balloon's volume
-                    if (segments.containsKey(childPos)) {
-                        segment.children.add(segments.get(childPos));
-                    }
-                }
-            }
-        }
-        
-        // Third pass: Identify the bottom-most segments for gameplay logic, now that the DAG is built
-        for (Balloon.BalloonSegment segment : segments.values()) {
-            // A segment is at the bottom of the physical structure if it has no children within this balloon
+            // Identify bottom layers for gameplay
             if (segment.children.isEmpty()) {
                 bottomLayerSegments.add(segment);
             }
         }
 
-        return new Balloon(balloonVolume, segments, bottomLayerSegments);
+        return new Balloon(balloonVolume, allSegments, blockToSegmentMap, bottomLayerSegments);
     }
+
 
 
     public void checkAndPruneOrphanedBalloons(Level level) {
