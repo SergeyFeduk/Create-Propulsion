@@ -1,5 +1,6 @@
 package com.deltasf.createpropulsion.balloons;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -12,7 +13,7 @@ public class Balloon {
     public AABB bounds; 
     public Set<UUID> supportHais;
     //Dynamic state
-    public Set<BlockPos> holes;
+    public Set<BlockPos> holes = new HashSet<>();
 
     public Balloon(Set<BlockPos> volume, AABB bounds, Set<UUID> supportHais) {
         this.volume = volume;

@@ -64,6 +64,12 @@ public class BalloonDebug {
                     
                     renderBalloonVolume(balloon, balloonColor);
                     balloonIndex++;
+
+                    //Render holes
+                    for(BlockPos hole : balloon.holes) {
+                        String identifier = hole.toShortString() + "_hole";
+                        DebugRenderer.drawBox(identifier, new AABB(hole), Color.white, 3);
+                    }
                 }
 
                 groupIndex++;

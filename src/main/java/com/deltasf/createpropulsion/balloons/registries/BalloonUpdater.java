@@ -5,6 +5,7 @@ import java.util.Map;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -12,11 +13,15 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.NotImplementedException;
+
 import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.HaiGroup;
 import com.deltasf.createpropulsion.balloons.utils.BalloonDebug;
+import com.deltasf.createpropulsion.balloons.utils.BalloonRegistryUtility;
 import com.deltasf.createpropulsion.balloons.utils.BalloonScanner;
+import com.deltasf.createpropulsion.balloons.utils.BalloonStitcher;
 import com.deltasf.createpropulsion.balloons.utils.BalloonScanner.DiscoveredVolume;
 
 import net.minecraft.core.BlockPos;
@@ -24,12 +29,14 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = CreatePropulsion.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class BalloonUpdater {
+    //Todo: for every ship we perform scan for - recalculate the topY as it may change 
     
     private Map<ResourceKey<Level>, Queue<DynamicUpdate>> eventQueues = new HashMap<>();
     private record DynamicUpdate(BlockPos position, boolean isPlacement) {};
@@ -71,32 +78,159 @@ public class BalloonUpdater {
             
             //Phase 2.2: Perform scan on each subgroup
             for (EventSubGroup subGroup : subGroups) {
-                //TODO: We only need to scan the removal groups, not placement ones
-
-                HaiGroup haiGroup = subGroup.haiGroup();
-                List<BlockPos> seeds = new ArrayList<>(subGroup.affectedBalloonsMap().keySet());
-                //TODO: Meh, there should be an easier way with much less performance killed in the process of setting union excluded volume
-                Set<BlockPos> excludedVolume = subGroup.affectedBalloonsMap().values().stream()
-                    .flatMap(Collection::stream) // Get a stream of all lists of balloons
-                    .distinct()                  // Get each unique balloon only once
-                    .map(b -> b.volume)          // Get their volume sets
-                    .flatMap(Set::stream)        // Get a stream of all BlockPos in all volumes
-                    .collect(Collectors.toSet());
-
-                List<DiscoveredVolume> discoveredVolumes = BalloonScanner.scan(
-                    level, 
-                    seeds, 
-                    haiGroup, 
-                    new ArrayList<>(excludedVolume)
-                );
-
-                for(DiscoveredVolume volume : discoveredVolumes) {
-                    for(BlockPos pos : volume.volume()) {
-                        BalloonDebug.displayBlockFor(pos, 100, volume.isLeaky() ? Color.red : Color.white);
-                    }
+                if (subGroup.isPlacement) {
+                    handlePlacementSubGroup(subGroup);
+                } else {
+                    handleRemovalSubGroup(subGroup, level);
                 }
             }
         }
+    }
+
+    private void handlePlacementSubGroup(EventSubGroup subGroup) {
+        for (Map.Entry<BlockPos, List<Balloon>> entry : subGroup.affectedBalloonsMap().entrySet()) {
+            BlockPos pos = entry.getKey();
+            List<Balloon> affectedBalloons = entry.getValue();
+
+            boolean eventHandled = false;
+
+            // 1. Check if the placement plugs a pre-existing hole.
+            for (Balloon balloon : affectedBalloons) {
+                // The `holes` set contains the BlockPos of the *removed block*,
+                // which is exactly where we are now placing a new one.
+                if (balloon.holes.contains(pos)) {
+                    BalloonStitcher.removeHole(balloon, pos);
+                    eventHandled = true;
+                    // As per your correct analysis, a hole can only belong to one balloon.
+                    // Once we've handled it, we can stop processing this placement event.
+                    break;
+                }
+            }
+
+            if (eventHandled) {
+                continue; // Move to the next placement event in the subgroup.
+            }
+
+            // 2. If it wasn't a hole, check if the placement is inside a balloon's volume,
+            // which would cause a potential split.
+            for (Balloon balloon : affectedBalloons) {
+                // The pre-filter already found balloons containing this position.
+                if (balloon.volume.contains(pos)) {
+                    BalloonStitcher.handleSplit(balloon, pos, subGroup.haiGroup());
+                    // A single block can only be inside one balloon's volume.
+                    // Once we've initiated the split, we are done with this event.
+                    break;
+                }
+            }
+
+            // If neither of the above conditions are met, it means the block was placed
+            // on the outer shell of a balloon, which simply expands the solid part.
+            // This requires no change to the balloon's internal air volume, so no action is needed.
+        }
+    }
+
+    private void handleRemovalSubGroup(EventSubGroup subGroup, Level level) {
+        HaiGroup haiGroup = subGroup.haiGroup();
+        List<BlockPos> seeds = new ArrayList<>(subGroup.affectedBalloonsMap().keySet());
+        //TODO: Meh, there should be an easier way with much less performance killed in the process of setting union excluded volume
+        Set<BlockPos> excludedVolume = subGroup.affectedBalloonsMap().values().stream()
+            .flatMap(Collection::stream) // Get a stream of all lists of balloons
+            .distinct()                  // Get each unique balloon only once
+            .map(b -> b.volume)          // Get their volume sets
+            .flatMap(Set::stream)        // Get a stream of all BlockPos in all volumes
+            .collect(Collectors.toSet());
+
+        //Perform scan
+        List<DiscoveredVolume> discoveredVolumes = BalloonScanner.scan(
+            level, 
+            seeds, 
+            haiGroup, 
+            new ArrayList<>(excludedVolume)
+        );
+
+        /*for(DiscoveredVolume volume : discoveredVolumes) {
+            for(BlockPos pos : volume.volume()) {
+                BalloonDebug.displayBlockFor(pos, 100, volume.isLeaky() ? Color.red : Color.white);
+            }
+        }*/
+
+        Set<Balloon> modifiedBalloons = new HashSet<>();
+
+        //Associate seeds with DiscoveredVolumes
+        Map<BlockPos, DiscoveredVolume> blockToVolumeMap = new HashMap<>();
+        for (DiscoveredVolume volume : discoveredVolumes) {
+            for (BlockPos pos : volume.volume()) {
+                blockToVolumeMap.put(pos, volume);
+            }
+        }
+        //Invoke correct handlers
+        Set<DiscoveredVolume> processedVolumes = new HashSet<>();
+        for (BlockPos seed : seeds) {
+            DiscoveredVolume resultVolume = blockToVolumeMap.get(seed);
+            //Skip processed volume
+            if (resultVolume == null || !processedVolumes.add(resultVolume)) {
+                continue;
+            }
+            //Detect holes
+            if (resultVolume.isLeaky()) {
+                // Find all original seeds that are part of this specific leaky volume.
+                for (BlockPos holeSeed : seeds) {
+                    if (resultVolume.volume().contains(holeSeed)) {
+                        // For each seed, get the balloons that were originally next to it.
+                        List<Balloon> balloonsToGetHole = subGroup.affectedBalloonsMap().get(holeSeed);
+                        for (Balloon balloon : balloonsToGetHole) {
+                            BalloonStitcher.createHole(balloon, holeSeed);
+                            modifiedBalloons.add(balloon);
+                        }
+                    }
+                }
+                continue; // Done with this volume.
+            }
+            //Handle merge/extend
+            Set<Balloon> allOriginalBalloonsForThisVolume = new HashSet<>();
+            for (BlockPos s : seeds) {
+                if (resultVolume.volume().contains(s)) {
+                    allOriginalBalloonsForThisVolume.addAll(subGroup.affectedBalloonsMap().get(s));
+                }
+            }
+            //Find balloons overlapping with seed's volume
+            Set<Balloon> overlappingBalloons = BalloonStitcher.findOverlappingBalloons(
+                resultVolume,
+                haiGroup,
+                allOriginalBalloonsForThisVolume
+            );
+            //Find primary balloon and merge everything into it
+            Set<Balloon> balloonsToMerge = new HashSet<>(allOriginalBalloonsForThisVolume);
+            balloonsToMerge.addAll(overlappingBalloons);
+
+            Balloon primaryBalloon = balloonsToMerge.stream()
+                .max(Comparator.comparingInt(b -> b.volume.size()))
+                .orElse(null);
+
+            if (primaryBalloon == null) continue;
+            modifiedBalloons.add(primaryBalloon);
+
+            //Extend
+            BalloonStitcher.extend(primaryBalloon, resultVolume);
+
+            //Merge
+            for (Balloon otherBalloon : balloonsToMerge) {
+                if (otherBalloon != primaryBalloon) {
+                    BalloonStitcher.mergeInto(primaryBalloon, otherBalloon, haiGroup);
+                }
+            }
+
+            //Tiho v lesu...
+            primaryBalloon.bounds = BalloonStitcher.calculateBoundsForVolume(primaryBalloon.volume);
+        }
+        //TODO: Temp, replace with invalidation
+        //I'm actually not sure if there is a case when modified balloon will be invalid, but better safe than sorry
+        for (Balloon modified : modifiedBalloons) {
+            if (!BalloonRegistryUtility.isBalloonValid(modified, haiGroup)) {
+                System.out.println("WARNING: Balloon " + modified.hashCode() + " became invalid after dynamic update!");
+            }
+        }
+
     }
 
     private List<EventSubGroup> prefilterAndSubgroupEvents(EventGroup group) {
