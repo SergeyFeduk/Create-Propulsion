@@ -17,7 +17,6 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 
 @SuppressWarnings("null")
 public class HaiBlock extends Block implements EntityBlock {
-
     public static final BooleanProperty POWERED = BooleanProperty.create("powered");
 
     public HaiBlock(Properties properties) {

@@ -7,11 +7,11 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nonnull;
 
-import com.deltasf.createpropulsion.balloons.registries.BalloonProcessor;
+import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
+import com.deltasf.createpropulsion.balloons.registries.BalloonUpdater;
 
 @SuppressWarnings("deprecation")
 public class HabBlock extends Block {
-
     public HabBlock(Properties properties) {
         super(properties);
     }
@@ -19,9 +19,11 @@ public class HabBlock extends Block {
     @Override
     public void onPlace(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull BlockState oldState, boolean isMoving) {
         super.onPlace(state, level, pos, oldState, isMoving);
-        if (level.isClientSide()) return;
+        if (!level.isClientSide()) {
+            BalloonShipRegistry.updater().habBlockPlaced(pos, level);
+        }
 
-        BalloonProcessor.processBlockPlacement(level, pos);
+        
     }
 
     @Override
@@ -32,7 +34,7 @@ public class HabBlock extends Block {
         }
         
         if (!level.isClientSide()) {
-            //BalloonProcessor.processBlockChange(level, pos, state, newState, isMoving);
+            BalloonShipRegistry.updater().habBlockRemoved(pos, level);
         }
         
         super.onRemove(state, level, pos, newState, isMoving);

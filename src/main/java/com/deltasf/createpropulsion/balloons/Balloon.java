@@ -1,36 +1,22 @@
 package com.deltasf.createpropulsion.balloons;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
 
 public class Balloon {
-    public final Set<BlockPos> interiorAir;
-    public final List<BalloonSegment> allSegments;
-    public final Map<BlockPos, BalloonSegment> blockToSegmentMap;
-    public final List<BalloonSegment> bottomLayerSegments;
+    //Scan-state
+    public Set<BlockPos> volume;
+    public AABB bounds; 
+    public Set<UUID> supportHais;
+    //Dynamic state
+    public Set<BlockPos> holes;
 
-    public Balloon(Set<BlockPos> interiorAir, List<BalloonSegment> allSegments, Map<BlockPos, BalloonSegment> blockToSegmentMap, List<BalloonSegment> bottomLayerSegments) {
-        this.interiorAir = interiorAir;
-        this.allSegments = allSegments;
-        this.blockToSegmentMap = blockToSegmentMap;
-        this.bottomLayerSegments = bottomLayerSegments;
-    }
-
-    public static class BalloonSegment {
-        public final Set<BlockPos> volume;
-        public final int y;
-        public final List<BalloonSegment> parents = new ArrayList<>();
-        public final List<BalloonSegment> children = new ArrayList<>();
-
-
-        public BalloonSegment(Set<BlockPos> volume) {
-            this.volume = volume;
-            // All blocks in a segment are at the same Y level
-            this.y = volume.iterator().next().getY();
-        }
+    public Balloon(Set<BlockPos> volume, AABB bounds, Set<UUID> supportHais) {
+        this.volume = volume;
+        this.bounds = bounds;
+        this.supportHais = supportHais;
     }
 }

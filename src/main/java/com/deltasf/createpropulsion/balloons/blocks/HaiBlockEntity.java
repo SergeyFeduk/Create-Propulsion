@@ -19,15 +19,19 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 
-@SuppressWarnings("null")
 public class HaiBlockEntity extends SmartBlockEntity {
-    
     public HaiBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
         tryRegister();
     }
 
     private UUID haiId;
+
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        tryRegister();
+    }
 
     public void tryRegister() {
         if (level == null || level.isClientSide) return;
@@ -49,20 +53,12 @@ public class HaiBlockEntity extends SmartBlockEntity {
         }
     }
 
-    public void scan() {
+     public void scan() {
         if (this.haiId == null || this.level == null || this.level.isClientSide()) return;
         Ship ship = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
         if (ship != null) {
-            // FIX: Pass the level instance down the call chain.
             BalloonShipRegistry.forShip(ship.getId()).startScanFor(haiId, this.level, worldPosition);
         }
-    }
-
-
-    @Override
-    public void onLoad() {
-        super.onLoad();
-        tryRegister();
     }
 
     @Override

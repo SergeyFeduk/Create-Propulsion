@@ -1,201 +1,148 @@
 package com.deltasf.createpropulsion.balloons;
 
+import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Queue;
 import java.util.Set;
+import java.util.UUID;
 
-import com.deltasf.createpropulsion.balloons.BalloonScanner.BlobNode;
-import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry.HaiData;
+import com.deltasf.createpropulsion.balloons.utils.BalloonDebug;
+import com.deltasf.createpropulsion.balloons.utils.BalloonRegistryUtility;
+import com.deltasf.createpropulsion.balloons.utils.BalloonScanner;
+import com.deltasf.createpropulsion.balloons.utils.RLEVolume;
+import com.deltasf.createpropulsion.balloons.utils.BalloonScanner.DiscoveredVolume;
 import com.deltasf.createpropulsion.registries.PropulsionBlocks;
 import com.mojang.datafixers.util.Pair;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 
 public class HaiGroup {
-    private final List<HaiData> hais = new ArrayList<>();
-    private final RLEVolume rleVolume = new RLEVolume();
+    public static final int HAI_TO_BALLOON_DIST = 5;
 
-    private Map<Integer, BalloonScanner.BlobNode> graph = new HashMap<>();
-    private Map<BlockPos, Integer> blockToNodeId = new HashMap<>();
-    public List<Balloon> finalizedBalloons = new ArrayList<>();
+    public final List<HaiData> hais = new ArrayList<>();
+    public final List<Balloon> balloons = new ArrayList<>();
 
-    public void addHai(HaiData data) {
-        hais.add(data);
-    }
-
-    public void addAllHais(List<HaiData> newHais) {
-        hais.addAll(newHais);
-    }
-
-    public List<BalloonRegistry.HaiData> getHais() {
-        return hais;
-    }
-
-    public void invalidateBalloonState() {
-        finalizedBalloons.clear();
-    }
-
-    public List<Balloon> getFinalizedBalloons() {
-        return finalizedBalloons;
-    }
-
-    public RLEVolume getRleVolume() {
-        return rleVolume;
-    }
-
-    public void generateRLEVolume() {
-        rleVolume.setHais(hais);
-        rleVolume.generateRleVolume();
-    }
-
-    public static boolean isHab(BlockState state) {
-        return state.is(PropulsionBlocks.HAB_BLOCK.get());
-    }
+    public RLEVolume rleVolume = new RLEVolume();
+    public AABB groupAABB;
 
     public void scan(Level level) {
-        BalloonScanner scanner = new BalloonScanner(hais, rleVolume, level);
-        BalloonScanner.FullScanResult rawResult = scanner.scan();
+        //We shouldn't really recalculate the RLE volume here as it should be constantly valid, but this fails at some place in hai management logic
+        //Needs to be fixed anyway
+        regenerateRLEVolume();
+        //Probe to get seeds
+        //TODO: Do not seed hais that are associated with valid balloons. But think about that first
+        List<BlockPos> seeds = new ArrayList<>();
+        for(HaiData data : hais) {
+            BlockPos seed = getSeedFromHai(data, level);
+            if (seed != null) {
+                seeds.add(seed);
+            }
+        }
 
-        finalizedBalloons.clear();
-        graph = rawResult.graph();
-        blockToNodeId = rawResult.blockToNodeId();
+        List<DiscoveredVolume> discoveredVolumes = BalloonScanner.scan(level, seeds, this, new ArrayList<>());
+        //Temp debug view
+        /*for(DiscoveredVolume volume : discoveredVolumes) {
+            Color color = volume.isLeaky() ? Color.red : Color.white;
+            for(BlockPos pos : volume.volume()) {
+                BalloonDebug.displayBlockFor(pos, 100, color);
+            }
+        }*/
 
-        for (Set<BlockPos> balloonVolume : rawResult.balloonVolumes()) {
-            this.finalizedBalloons.add(translateScanResult(balloonVolume));
+        generateBalloons(discoveredVolumes);
+    }
+
+    public void regenerateRLEVolume() {
+        groupAABB = BalloonRegistryUtility.calculateGroupAABB(hais);
+        rleVolume.regenerate(hais, groupAABB);
+    }
+
+    public static boolean isHab(BlockPos pos, Level level) {
+        return level.getBlockState(pos).is(PropulsionBlocks.HAB_BLOCK.get());
+    }
+
+    public static BlockPos getSeedFromHai(HaiData data, Level level) {
+        for(int d = 0; d < BalloonScanner.VERTICAL_ANOMALY_SCAN_DISTANCE; d++) {
+            if (isHab(data.position().above(d), level)) {
+                BlockPos seed = data.position().above(d-1);
+                return seed;
+            }
+        }
+
+        return null;
+    }
+
+    private void generateBalloons(List<DiscoveredVolume> discoveredVolumes) {
+        this.balloons.clear();
+
+        for(DiscoveredVolume discoveredVolume : discoveredVolumes) {
+            if (discoveredVolume.isLeaky() || discoveredVolume.volume().isEmpty()) continue; //Leaky volume cannot become a balloon
+            //Find support hais and obtain aabb
+            Set<UUID> supportHais = findSupportHaisForVolume(discoveredVolume.volume());
+            if (supportHais.isEmpty()) {
+                continue;
+            }
+            AABB bounds = calculateBoundsForVolume(discoveredVolume.volume());
+            //Create balloon
+            Balloon balloon = new Balloon(discoveredVolume.volume(), bounds, supportHais);
+            this.balloons.add(balloon);
         }
     }
 
-    private Balloon translateScanResult(Set<BlockPos> balloonVolume) {
-        Map<Integer, Balloon.BalloonSegment> nodeIdToSegmentMap = new HashMap<>();
-        
-        // First pass: Create a BalloonSegment for each relevant BlobNode
-        for (Map.Entry<Integer, BalloonScanner.BlobNode> entry : this.graph.entrySet()) {
-            Integer nodeId = entry.getKey();
-            BalloonScanner.BlobNode node = entry.getValue();
-            
-            // Ensure this node is part of the current balloon we are processing
-            // We check if the first block of the node's volume is in our target set.
-            if (!node.volume.isEmpty() && balloonVolume.contains(node.volume.iterator().next())) {
-                nodeIdToSegmentMap.put(nodeId, new Balloon.BalloonSegment(node.volume));
-            }
-        }
-
-        // Second pass: Link the newly created segments together into a DAG
-        for (Map.Entry<Integer, Balloon.BalloonSegment> entry : nodeIdToSegmentMap.entrySet()) {
-            Integer nodeId = entry.getKey();
-            Balloon.BalloonSegment segment = entry.getValue();
-            BalloonScanner.BlobNode node = this.graph.get(nodeId);
-
-            // Link to parents
-            for (int parentId : node.parentIds) {
-                if (nodeIdToSegmentMap.containsKey(parentId)) {
-                    segment.parents.add(nodeIdToSegmentMap.get(parentId));
-                }
-            }
-            // Link to children
-            for (int childId : node.childrenIds) {
-                if (nodeIdToSegmentMap.containsKey(childId)) {
-                    segment.children.add(nodeIdToSegmentMap.get(childId));
-                }
-            }
-        }
-
-        // Third pass: Build the final data structures for the Balloon object
-        List<Balloon.BalloonSegment> allSegments = new ArrayList<>(nodeIdToSegmentMap.values());
-        Map<BlockPos, Balloon.BalloonSegment> blockToSegmentMap = new HashMap<>();
-        List<Balloon.BalloonSegment> bottomLayerSegments = new ArrayList<>();
-
-        for (Balloon.BalloonSegment segment : allSegments) {
-            // Populate the reverse-lookup map
-            for (BlockPos pos : segment.volume) {
-                blockToSegmentMap.put(pos, segment);
-            }
-            // Identify bottom layers for gameplay
-            if (segment.children.isEmpty()) {
-                bottomLayerSegments.add(segment);
-            }
-        }
-
-        return new Balloon(balloonVolume, allSegments, blockToSegmentMap, bottomLayerSegments);
-    }
-
-
-
-    public void checkAndPruneOrphanedBalloons(Level level) {
-        if (finalizedBalloons.isEmpty() || graph.isEmpty()) {
-            return; // Nothing to prune.
-        }
-
-        // --- Part A & B: Find all root nodes based on the CURRENT list of HAIs ---
-        Set<BlockPos> currentSeeds = new HashSet<>();
-        for (HaiData data : hais) {
-            for (int d = 0; d < BalloonScanner.VERTICAL_ANOMALY_SCAN_DISTANCE; d++) {
-                BlockState nextBlockState = level.getBlockState(data.position().above(d));
-                if (HaiGroup.isHab(nextBlockState)) {
-                    currentSeeds.add(data.position().above(d - 1));
+    private Set<UUID> findSupportHaisForVolume(Set<BlockPos> volume) {
+        Set<UUID> supporters = new HashSet<>();
+        for (HaiData hai : this.hais) {
+            for (int d = 1; d <= HAI_TO_BALLOON_DIST; d++) {
+                BlockPos probePos = hai.position().above(d);
+                if (volume.contains(probePos)) {
+                    supporters.add(hai.id());
                     break;
                 }
             }
         }
+        return supporters;
+    }
 
-        Set<Integer> rootNodeIds = new HashSet<>();
-        for (BlockPos seed : currentSeeds) {
-            if (blockToNodeId.containsKey(seed)) {
-                rootNodeIds.add(blockToNodeId.get(seed));
-            }
+    private AABB calculateBoundsForVolume(Set<BlockPos> volume) {
+        int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE;
+        int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE, maxZ = Integer.MIN_VALUE;
+
+        for (BlockPos pos : volume) {
+            minX = Math.min(minX, pos.getX());
+            minY = Math.min(minY, pos.getY());
+            minZ = Math.min(minZ, pos.getZ());
+            maxX = Math.max(maxX, pos.getX());
+            maxY = Math.max(maxY, pos.getY());
+            maxZ = Math.max(maxZ, pos.getZ());
         }
 
-        // --- Part C: Traverse the graph to find all currently reachable nodes ---
-        Set<Integer> reachableNodeIds = new HashSet<>();
-        Queue<Integer> toVisit = new LinkedList<>(rootNodeIds);
-        reachableNodeIds.addAll(rootNodeIds);
+        return new AABB(minX, minY, minZ, maxX + 1, maxY + 1, maxZ + 1);
+    }
 
-        while (!toVisit.isEmpty()) {
-            BlobNode currentNode = graph.get(toVisit.poll());
-            if (currentNode == null) continue;
+    public boolean isInsideRleVolume(BlockPos pos) {
+        if (groupAABB == null) return false;
+        int y = pos.getY() - (int) groupAABB.minY;
+        int x = pos.getX() - (int) groupAABB.minX;
 
-            for (int parentId : currentNode.parentIds) {
-                if (reachableNodeIds.add(parentId)) toVisit.add(parentId);
-            }
-            for (int childId : currentNode.childrenIds) {
-                if (reachableNodeIds.add(childId)) toVisit.add(childId);
-            }
+        if (y < 0 || y >= rleVolume.get().length || x < 0 || x >= rleVolume.get()[y].length) {
+            return false;
         }
 
-        // --- Part D & E: Validate each balloon and prune orphans ---
-        List<Balloon> validBalloons = new ArrayList<>();
-        for (Balloon balloon : finalizedBalloons) {
-            boolean isBalloonValid = true;
-            for (BlockPos pos : balloon.interiorAir) {
-                Integer nodeId = blockToNodeId.get(pos);
-                if (nodeId == null || !reachableNodeIds.contains(nodeId)) {
-                    isBalloonValid = false;
-                    break;
-                }
-            }
-
-            if (isBalloonValid) {
-                validBalloons.add(balloon);
-            }
+        List<Pair<Integer, Integer>> zIntervals = rleVolume.get()[y][x];
+        if (zIntervals == null || zIntervals.isEmpty()) {
+            return false;
         }
 
-        // If the list of valid balloons is smaller, update the main list.
-        if (validBalloons.size() < finalizedBalloons.size()) {
-            finalizedBalloons.clear();
-            finalizedBalloons.addAll(validBalloons);
+        int worldZ = pos.getZ();
+        for (Pair<Integer, Integer> interval : zIntervals) {
+            if (worldZ >= interval.getFirst() && worldZ <= interval.getSecond()) {
+                return true;
+            }
         }
+        return false;
     }
 }

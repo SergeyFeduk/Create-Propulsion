@@ -1,31 +1,31 @@
 package com.deltasf.createpropulsion.balloons.registries;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.core.impl.chunk_tracking.i;
+import org.valkyrienskies.mod.common.VSGameUtilsKt;
+
+import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.HaiGroup;
 import com.deltasf.createpropulsion.balloons.blocks.HaiBlockEntity;
-import com.deltasf.createpropulsion.balloons.utils.BalloonScanUtils;
-import com.deltasf.createpropulsion.balloons.utils.HaiGroupingUtils;
-import com.deltasf.createpropulsion.registries.PropulsionBlocks;
+import com.deltasf.createpropulsion.balloons.utils.BalloonRegistryUtility;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 
 public class BalloonRegistry {
     public BalloonRegistry() {}
-    public record HaiData(UUID id, BlockPos position, AABB maxAABB) {}
-
+    public record HaiData(UUID id, BlockPos position, AABB aabb) {}
+    
     private final Map<UUID, HaiData> haiDataMap = new HashMap<>();
     private final Map<UUID, HaiGroup> haiGroupMap = new HashMap<>();
     private final List<HaiGroup> haiGroups = new ArrayList<>();
@@ -34,81 +34,105 @@ public class BalloonRegistry {
         return haiGroups;
     }
 
-    public void registerHai(UUID haiId, HaiBlockEntity hai) {
-        Level level = hai.getLevel();
-        BlockPos blockPos = hai.getBlockPos();
+    public void registerHai(UUID id, HaiBlockEntity blockEntity) {
+        Level level = blockEntity.getLevel();
+        BlockPos pos = blockEntity.getBlockPos();
 
-        int probeResult = BalloonScanUtils.initialVerticalProbe(level, blockPos);
-        if (probeResult <= 0) { // HAI is invalid or found no blocks, kill
-            unregisterHai(haiId, level);
-            return;
+        //Originally I done probe here, but lets actually set maxY to ships maxY. We still use probing in scan tho
+        Ship ship = VSGameUtilsKt.getShipManagingPos(level, pos);
+        int deltaY = ship.getShipAABB().maxY() - pos.getY() - 1;
+
+        AABB haiAabb = BalloonRegistryUtility.getHaiAABB(deltaY, pos);
+        HaiData data = new HaiData(id, pos, haiAabb);
+
+        //Update = unregister and register back 
+        if (haiDataMap.containsKey(id)) {
+            unregisterHai(id, level);
         }
 
-        AABB maxAabb = BalloonScanUtils.getMaxAABB(probeResult, blockPos);
-        HaiData newData = new HaiData(haiId, blockPos, maxAabb);
-
-        // If the HAI already exists, unregister it first to handle position changes correctly.
-        if (haiDataMap.containsKey(haiId)) {
-            unregisterHai(haiId, level);
-        }
-        
-        haiDataMap.put(haiId, newData);
-        HaiGroupingUtils.addHaiAndRegroup(newData, haiGroups, haiGroupMap);
+        haiDataMap.put(id, data);
+        BalloonRegistryUtility.addHaiAndRegroup(data, haiGroups, haiGroupMap);
     }
 
-    public void unregisterHai(UUID haiId, Level level) {
-        HaiData removedHai = haiDataMap.remove(haiId);
-        if (removedHai == null) { return; }
+    public void unregisterHai(UUID id, Level level) {
+        HaiData data = haiDataMap.remove(id);
+        if (data == null) return; //Huh
 
         //Kill
-        HaiGroup affectedGroup = haiGroupMap.get(haiId);
-        haiGroupMap.remove(haiId);
+        HaiGroup affectedGroup = haiGroupMap.get(id);
+        if (affectedGroup == null) return;
 
-        if (affectedGroup == null) { return; } //This should not happen
-        affectedGroup.getHais().remove(removedHai);
+        affectedGroup.hais.remove(data);
+        haiGroupMap.remove(id);
 
-        // If the group is emptied - kill
-        if (affectedGroup.getHais().isEmpty()) {
+        //The group is empty, destroy it
+        if (affectedGroup.hais.isEmpty()) {
             haiGroups.remove(affectedGroup);
+            haiGroupMap.remove(id);
             return;
         }
 
-        //Do to the group what it deserves
+        boolean groupHasSplit = BalloonRegistryUtility.didGroupSplit(affectedGroup.hais);
 
-        // Check 1: Did removing the HAI split the group into multiple pieces? This is the most severe outcome.
-        if (HaiGroupingUtils.doesGroupSplit(affectedGroup.getHais())) {
-            // Unsafe: The group is no longer contiguous.
-            // We must destroy the old group and create new ones for each split piece.
-            haiGroups.remove(affectedGroup);
-            HaiGroupingUtils.splitAndRecreateGroups(affectedGroup.getHais(), haiGroups, haiGroupMap);
-
+        if (!groupHasSplit) {
+            handleShrinkedGroup(id, affectedGroup);
         } else {
-            // The group is still connected.
-            // Check 2 (NEW ORDER): First, perform the intelligent logical check to prune any orphaned balloons.
-            affectedGroup.checkAndPruneOrphanedBalloons(level);
-
-            affectedGroup.generateRLEVolume();
-            // Check 3 (NEW ORDER): Now, perform the geometric check on the REMAINING balloons.
-            // This ensures that the survivors are still within the new, smaller boundaries.
-            if (!HaiGroupingUtils.areBalloonsContainedInCurrentVolume(affectedGroup)) {
-                // Unsafe: A surviving balloon was breached by the shrinking volume.
-                // This is an edge case, but we must invalidate the state if it happens.
-                affectedGroup.invalidateBalloonState();
-            }
+            handleSplitGroups(id, affectedGroup);
         }
     }
 
-    public void startScanFor(UUID haiId, Level level, BlockPos position) {
-        if (level.getBlockEntity(position) instanceof HaiBlockEntity hai) {
-            this.registerHai(haiId, hai);
+    public void startScanFor(UUID haiId, Level level, BlockPos pos) {
+        if (level.getBlockEntity(pos) instanceof HaiBlockEntity hai) {
+            registerHai(haiId, hai);
         } else {
             unregisterHai(haiId, level);
             return;
         }
+        HaiGroup group = haiGroupMap.get(haiId);
+        if (group != null) group.scan(level);
+    }
 
-        HaiGroup haiGroup = haiGroupMap.get(haiId);
-        if (haiGroup != null) {
-            haiGroup.scan(level);
+    private void handleShrinkedGroup(UUID id, HaiGroup affectedGroup) {
+        //Recalculate AABB
+        affectedGroup.regenerateRLEVolume();
+
+        //Revalidate all balloons
+        List<Balloon> survivingBalloons = new ArrayList<>();
+        for (Balloon balloon : affectedGroup.balloons) {
+            balloon.supportHais.remove(id);
+            if (BalloonRegistryUtility.isBalloonValid(balloon, affectedGroup)) {
+                survivingBalloons.add(balloon);
+            }
+        }
+
+        //Update list of group balloons
+        affectedGroup.balloons.clear();
+        affectedGroup.balloons.addAll(survivingBalloons);
+    }
+
+    private void handleSplitGroups(UUID id, HaiGroup affectedGroup) {
+        //Original group is invalid, remove it but keep orphaned balloons
+        haiGroups.remove(affectedGroup);
+        List<Balloon> orphanedBalloons = new ArrayList<>(affectedGroup.balloons);
+
+        //Create new groups from remaining pieces, add to registry and map
+        List<HaiGroup> newGroups = BalloonRegistryUtility.splitAndRecreateGroups(affectedGroup.hais, haiGroups, haiGroupMap);
+
+        //Try to rehome each orphaned balloon
+        for(Balloon orphan : orphanedBalloons) {
+            orphan.supportHais.remove(id);
+            
+            for(HaiGroup potentialOwner : newGroups) {
+                Set<UUID> ownerHaiIds = potentialOwner.hais.stream().map(HaiData::id).collect(Collectors.toSet()); //TODO: Optimize too
+                if (!Collections.disjoint(orphan.supportHais, ownerHaiIds)) {
+                    //Potential home for balloon, check if it actually fits. If it does not - it is guaranteed that it is dead
+                    if (BalloonRegistryUtility.isBalloonValid(orphan, potentialOwner)) {
+                        potentialOwner.balloons.add(orphan);
+                    }
+
+                    break;
+                }
+            }
         }
     }
 }
