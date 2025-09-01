@@ -169,7 +169,7 @@ public class BalloonRegistryUtility {
         if (balloon.isEmpty()) return false;
 
         //Rule 1: balloon is fully contained within its group
-        if (!isInside(group.groupAABB, balloon.bounds)) return false;
+        if (!isInside(group.groupAABB, balloon.getAABB())) return false;
 
         //Rule 2 (partial): there must be at least one hai block below balloons bottom
         Set<UUID> currentGroupHais = group.hais.stream().map(HaiData::id).collect(Collectors.toSet()); //TODO: just store a set in haiGroup to avoid THIS

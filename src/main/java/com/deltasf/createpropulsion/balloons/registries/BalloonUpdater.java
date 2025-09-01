@@ -148,12 +148,6 @@ public class BalloonUpdater {
             new ArrayList<>(excludedVolume)
         );
 
-        /*for(DiscoveredVolume volume : discoveredVolumes) {
-            for(BlockPos pos : volume.volume()) {
-                BalloonDebug.displayBlockFor(pos, 100, volume.isLeaky() ? Color.red : Color.white);
-            }
-        }*/
-
         Set<Balloon> modifiedBalloons = new HashSet<>();
 
         //Associate seeds with DiscoveredVolumes
@@ -219,10 +213,6 @@ public class BalloonUpdater {
                     BalloonStitcher.mergeInto(primaryBalloon, otherBalloon, haiGroup);
                 }
             }
-
-            //Tiho v lesu...
-            //TODO: This is very TEMP btw
-            primaryBalloon.bounds = BalloonStitcher.calculateBoundsForVolume(new HashSet<>(primaryBalloon.toList()));
         }
         //TODO: Temp, replace with invalidation
         //I'm actually not sure if there is a case when modified balloon will be invalid, but better safe than sorry

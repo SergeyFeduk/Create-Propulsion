@@ -99,9 +99,8 @@ public class BalloonStitcher {
         List<Balloon> newBalloons = new ArrayList<>();
 
         for (Set<BlockPos> newVolume : rootToVolume.values()) {
-            AABB newBounds = calculateBoundsForVolume(newVolume);
             Set<UUID> newSupportHais = findSupportHaisForVolume(newVolume, owner.hais);
-            Balloon newBalloon = new Balloon(newVolume, newBounds, newSupportHais);
+            Balloon newBalloon = new Balloon(newVolume, null, newSupportHais);
             newBalloon.holes = partitionHoles(newVolume, originalBalloon.holes);
             newBalloons.add(newBalloon);
         }
@@ -125,7 +124,7 @@ public class BalloonStitcher {
         AABB dvBounds = calculateBoundsForVolume(dv.volume());
 
         for (Balloon candidate : owner.balloons) {
-            if (excludedBalloons.contains(candidate) || !candidate.bounds.intersects(dvBounds)) {
+            if (excludedBalloons.contains(candidate) || !candidate.getAABB().intersects(dvBounds)) {
                 continue;
             }
 
@@ -165,7 +164,7 @@ public class BalloonStitcher {
         return newHoles;
     }
 
-    public static AABB calculateBoundsForVolume(Set<BlockPos> volume) {
+    private static AABB calculateBoundsForVolume(Set<BlockPos> volume) {
         if (volume.isEmpty()) return new AABB(0,0,0,0,0,0);
         int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE;
         int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE, maxZ = Integer.MIN_VALUE;
