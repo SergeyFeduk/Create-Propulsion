@@ -39,19 +39,13 @@ public class Balloon implements Iterable<BlockPos> {
 
     //Api
 
-    @Override
-    public Iterator<BlockPos> iterator() {
-        final LongIterator it = volume.iterator();
-        return new Iterator<BlockPos>() {
-            @Override
-            public boolean hasNext() { return it.hasNext(); }
-            @Override
-            public BlockPos next() { return unpackPos(it.nextLong()); }
-        };
-    }
-
     public Iterable<BlockPos> getVolume() {
         return this;
+    }
+
+    public AABB getAABB() {
+        if (boundsCache == null) updateBoundsCache();
+        return boundsCache;
     }
 
     public boolean isEmpty() { return volume.isEmpty(); }
@@ -109,9 +103,15 @@ public class Balloon implements Iterable<BlockPos> {
         return list;
     }
 
-    public AABB getAABB() {
-    if (boundsCache == null) updateBoundsCache();
-        return boundsCache;
+    @Override
+    public Iterator<BlockPos> iterator() {
+        final LongIterator it = volume.iterator();
+        return new Iterator<BlockPos>() {
+            @Override
+            public boolean hasNext() { return it.hasNext(); }
+            @Override
+            public BlockPos next() { return unpackPos(it.nextLong()); }
+        };
     }
 
     //Incremental bounds
@@ -200,9 +200,8 @@ public class Balloon implements Iterable<BlockPos> {
             boundsCache = new AABB(0,0,0,0,0,0);
             return;
         }
-        // In Minecraft AABB, the max coordinates are exclusive for block-space; using +1 to create the box
-        boundsCache = new AABB((double) minX, (double) minY, (double) minZ,
-                               (double) maxX + 1.0, (double) maxY + 1.0, (double) maxZ + 1.0);
+        boundsCache = new AABB((double) minX,     (double) minY,     (double) minZ,
+                               (double) maxX + 1, (double) maxY + 1, (double) maxZ + 1);
     }
 
     //Position packing
