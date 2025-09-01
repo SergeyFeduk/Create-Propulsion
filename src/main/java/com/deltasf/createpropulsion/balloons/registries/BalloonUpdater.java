@@ -88,6 +88,7 @@ public class BalloonUpdater {
     }
 
     private void handlePlacementSubGroup(EventSubGroup subGroup) {
+        Set<Balloon> modifiedBalloons = new HashSet<>();
         for (Map.Entry<BlockPos, List<Balloon>> entry : subGroup.affectedBalloonsMap().entrySet()) {
             BlockPos pos = entry.getKey();
             List<Balloon> affectedBalloons = entry.getValue();
@@ -100,6 +101,7 @@ public class BalloonUpdater {
                 // which is exactly where we are now placing a new one.
                 if (balloon.holes.contains(pos)) {
                     BalloonStitcher.removeHole(balloon, pos);
+                    modifiedBalloons.add(balloon);
                     eventHandled = true;
                     // As per your correct analysis, a hole can only belong to one balloon.
                     // Once we've handled it, we can stop processing this placement event.
@@ -117,6 +119,7 @@ public class BalloonUpdater {
                 // The pre-filter already found balloons containing this position.
                 if (balloon.contains(pos)) {
                     BalloonStitcher.handleSplit(balloon, pos, subGroup.haiGroup());
+                    modifiedBalloons.add(balloon);
                     // A single block can only be inside one balloon's volume.
                     // Once we've initiated the split, we are done with this event.
                     break;
@@ -126,6 +129,11 @@ public class BalloonUpdater {
             // If neither of the above conditions are met, it means the block was placed
             // on the outer shell of a balloon, which simply expands the solid part.
             // This requires no change to the balloon's internal air volume, so no action is needed.
+        }
+
+        //Resolve balloon's chunks
+        for(Balloon balloon : modifiedBalloons) {
+            balloon.resolveDirtyChunks();
         }
     }
 
@@ -216,10 +224,12 @@ public class BalloonUpdater {
         }
         //TODO: Temp, replace with invalidation
         //I'm actually not sure if there is a case when modified balloon will be invalid, but better safe than sorry
-        for (Balloon modified : modifiedBalloons) {
-            if (!BalloonRegistryUtility.isBalloonValid(modified, haiGroup)) {
-                System.out.println("WARNING: Balloon " + modified.hashCode() + " became invalid after dynamic update!");
+        for (Balloon balloon : modifiedBalloons) {
+            if (!BalloonRegistryUtility.isBalloonValid(balloon, haiGroup)) {
+                System.out.println("WARNING: Balloon " + balloon.hashCode() + " became invalid after dynamic update!");
             }
+
+            balloon.resolveDirtyChunks();
         }
 
     }
