@@ -134,7 +134,7 @@ public class DebugRenderer {
             return;
         }
         Vec3 center = blockPos.getCenter();
-        Vec3 size = new Vec3(1.0, 1.0, 1.0);
+        Vec3 size = new Vec3(0.999, 0.999, 0.999); // 0.999 to avoid z-figting
         drawBox(identifier, center, size, new Quaternionf(), color, false, ticksToRender);
     }
 

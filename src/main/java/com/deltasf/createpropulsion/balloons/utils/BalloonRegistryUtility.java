@@ -166,7 +166,7 @@ public class BalloonRegistryUtility {
 
     public static boolean isBalloonValid(Balloon balloon, HaiGroup group) {
         //Rule 3: balloon is not empty
-        if (balloon.volume.isEmpty()) return false;
+        if (balloon.isEmpty()) return false;
 
         //Rule 1: balloon is fully contained within its group
         if (!isInside(group.groupAABB, balloon.bounds)) return false;

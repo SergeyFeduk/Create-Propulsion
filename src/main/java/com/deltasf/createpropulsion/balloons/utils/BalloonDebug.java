@@ -80,9 +80,9 @@ public class BalloonDebug {
     private static void renderBalloonVolume(Balloon balloon, Color color) {
         String balloonIdPrefix = "balloon_vol_" + balloon.hashCode() + "_";
 
-        for (BlockPos pos : balloon.volume) {
+        for (BlockPos pos : balloon) {
             String blockIdentifier = balloonIdPrefix + pos.asLong();
-            DebugRenderer.drawBox(blockIdentifier, new AABB(pos), color, 3);
+            DebugRenderer.drawBox(blockIdentifier, pos, color, 3);
         }
     }
 

@@ -28,23 +28,23 @@ public class BalloonStitcher {
     }
 
     public static void extend(Balloon target, DiscoveredVolume extension) {
-        target.volume.addAll(extension.volume());
+        target.addAll(extension.volume());
     }
 
     public static void mergeInto(Balloon target, Balloon source, HaiGroup owner) {
-        target.volume.addAll(source.volume);
+        target.mergeFrom(source);
         target.supportHais.addAll(source.supportHais);
         owner.balloons.remove(source);
     }
 
     public static void handleSplit(Balloon originalBalloon, BlockPos splitPos, HaiGroup owner) {
         // Step 1: Initial State Preparation
-        originalBalloon.volume.remove(splitPos);
+        originalBalloon.remove(splitPos);
 
         List<BlockPos> neighborSeeds = new ArrayList<>();
         for (Direction dir : Direction.values()) {
             BlockPos neighbor = splitPos.relative(dir);
-            if (originalBalloon.volume.contains(neighbor)) {
+            if (originalBalloon.contains(neighbor)) {
                 neighborSeeds.add(neighbor);
             }
         }
@@ -57,18 +57,18 @@ public class BalloonStitcher {
         // Step 2: DSU Construction
         DisjointSetUnion dsu = new DisjointSetUnion();
         Map<BlockPos, Integer> posToId = new HashMap<>();
-        List<BlockPos> idToPos = new ArrayList<>(originalBalloon.volume);
+        List<BlockPos> idToPos = originalBalloon.toList();
         for (int i = 0; i < idToPos.size(); i++) {
             posToId.put(idToPos.get(i), i);
             dsu.makeSet(i);
         }
 
-        for (BlockPos pos : originalBalloon.volume) {
+        for (BlockPos pos : originalBalloon) {
             int posId = posToId.get(pos);
             // Check 3 neighbors to avoid redundant checks (East, Up, South)
             for (Direction dir : new Direction[]{Direction.EAST, Direction.UP, Direction.SOUTH}) {
                 BlockPos neighbor = pos.relative(dir);
-                if (originalBalloon.volume.contains(neighbor)) {
+                if (originalBalloon.contains(neighbor)) {
                     dsu.union(posId, posToId.get(neighbor));
                 }
             }
@@ -130,7 +130,7 @@ public class BalloonStitcher {
             }
 
             for (BlockPos posInDv : dv.volume()) {
-                if (candidate.volume.contains(posInDv)) {
+                if (candidate.contains(posInDv)) {
                     overlapping.add(candidate);
                     break; 
                 }

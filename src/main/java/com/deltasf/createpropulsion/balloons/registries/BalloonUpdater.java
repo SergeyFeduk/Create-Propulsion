@@ -115,7 +115,7 @@ public class BalloonUpdater {
             // which would cause a potential split.
             for (Balloon balloon : affectedBalloons) {
                 // The pre-filter already found balloons containing this position.
-                if (balloon.volume.contains(pos)) {
+                if (balloon.contains(pos)) {
                     BalloonStitcher.handleSplit(balloon, pos, subGroup.haiGroup());
                     // A single block can only be inside one balloon's volume.
                     // Once we've initiated the split, we are done with this event.
@@ -133,12 +133,12 @@ public class BalloonUpdater {
         HaiGroup haiGroup = subGroup.haiGroup();
         List<BlockPos> seeds = new ArrayList<>(subGroup.affectedBalloonsMap().keySet());
         //TODO: Meh, there should be an easier way with much less performance killed in the process of setting union excluded volume
-        Set<BlockPos> excludedVolume = subGroup.affectedBalloonsMap().values().stream()
-            .flatMap(Collection::stream) // Get a stream of all lists of balloons
-            .distinct()                  // Get each unique balloon only once
-            .map(b -> b.volume)          // Get their volume sets
-            .flatMap(Set::stream)        // Get a stream of all BlockPos in all volumes
-            .collect(Collectors.toSet());
+        Set<BlockPos> excludedVolume = new HashSet<>();
+        for (Collection<Balloon> bucket : subGroup.affectedBalloonsMap().values()) {
+            for (Balloon b : bucket) {
+                b.addAllTo(excludedVolume);
+            }
+        }
 
         //Perform scan
         List<DiscoveredVolume> discoveredVolumes = BalloonScanner.scan(
@@ -204,7 +204,7 @@ public class BalloonUpdater {
             balloonsToMerge.addAll(overlappingBalloons);
 
             Balloon primaryBalloon = balloonsToMerge.stream()
-                .max(Comparator.comparingInt(b -> b.volume.size()))
+                .max(Comparator.comparingInt(b -> b.size()))
                 .orElse(null);
 
             if (primaryBalloon == null) continue;
@@ -221,7 +221,8 @@ public class BalloonUpdater {
             }
 
             //Tiho v lesu...
-            primaryBalloon.bounds = BalloonStitcher.calculateBoundsForVolume(primaryBalloon.volume);
+            //TODO: This is very TEMP btw
+            primaryBalloon.bounds = BalloonStitcher.calculateBoundsForVolume(new HashSet<>(primaryBalloon.toList()));
         }
         //TODO: Temp, replace with invalidation
         //I'm actually not sure if there is a case when modified balloon will be invalid, but better safe than sorry
@@ -267,14 +268,14 @@ public class BalloonUpdater {
             for (Balloon balloon : parentHaiGroup.balloons) {
                 boolean isRelevant = false;
                 //For placement event the position may be in the volume, so we need to check for that
-                if (group.isPlacement() && balloon.volume.contains(pos)) {
+                if (group.isPlacement() && balloon.contains(pos)) {
                     isRelevant = true;
                 }
                 // If not already found to be relevant, check all neighbors.
                 if (!isRelevant) {
                     for (Direction dir : Direction.values()) {
                         BlockPos neighborPos = pos.relative(dir);
-                        if (balloon.volume.contains(neighborPos)) {
+                        if (balloon.contains(neighborPos)) {
                             isRelevant = true;
                             break;
                         }
