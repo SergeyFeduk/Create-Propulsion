@@ -16,6 +16,9 @@ import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.debug.DebugRenderer;
+import com.deltasf.createpropulsion.debug.PropulsionDebug;
+import com.deltasf.createpropulsion.debug.routes.MainDebugRoute;
+import com.deltasf.createpropulsion.registries.PropulsionCommands;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.core.BlockPos;
@@ -44,9 +47,6 @@ public class MagnetLevelRegistry {
 
     public MagnetLevelRegistry(Level level) {
         this.level = level;
-        if (CreatePropulsion.constDebug) {
-            System.out.println("Creating MagnetLevelRegistry for " + level.dimension().toString());
-        }
     }
 
     public MagnetData getMagnet(UUID id) {
@@ -123,7 +123,7 @@ public class MagnetLevelRegistry {
         //Gather active magnets
         List<MagnetData> active = new ArrayList<>(magnets.values());
         int n = active.size();
-        if (CreatePropulsion.debug) {
+        if (PropulsionDebug.isDebug(MainDebugRoute.MAGNET)) {
             //Draw active magnets
             for (int i = 0; i < n; i++) {
                 var data = active.get(i);
@@ -185,7 +185,7 @@ public class MagnetLevelRegistry {
         //Update shipToPairs
         this.shipToPairs = newShipToPairs;
 
-        if (CreatePropulsion.debug) {
+        if (PropulsionDebug.isDebug(MainDebugRoute.MAGNET)) {
             //Draw edges
             int i = 0;
             for(int[] edge : edges) {

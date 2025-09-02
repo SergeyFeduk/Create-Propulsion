@@ -26,9 +26,6 @@ public class CreatePropulsion {
     public static final CreateRegistrate REGISTRATE = CreateRegistrate.create(ID);
     public static CreateRegistrate registrate() { return REGISTRATE; }
 
-    public static boolean debug = false;
-    public static final boolean constDebug = false; //To produce debug and non-debug builds :P
-
     public CreatePropulsion() {
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
         //Content
