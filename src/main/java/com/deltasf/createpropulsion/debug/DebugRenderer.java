@@ -7,7 +7,9 @@ import org.joml.Quaterniondc;
 import org.joml.Quaternionf;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
+import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.core.api.ships.properties.ShipTransform;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
@@ -35,46 +37,22 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(modid = CreatePropulsion.ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class DebugRenderer {
     private static class TimedBoxData {
-        Vec3 position;
-        Vec3 size;
-        Quaternionf rotation;
+        final Vec3 position;
+        final Vec3 size;
+        final Quaternionf rotation;
         final Color color;
         final boolean onlyInDebugMode;
         int remainingTicks;
+        final ClientShip ship;
 
         TimedBoxData(Level level, Vec3 position, Vec3 size, Quaternionf rotation, Color color, boolean onlyInDebugMode, int initialTicks) {
-            //Test if on ship and if so - modify position to be in world space and multiply rotation to account for ships rotation
-            boolean inShipyard = VSGameUtilsKt.isBlockInShipyard(level, position);
-            boolean def = true;
-            if (inShipyard) {
-                //Ship case
-                Ship ship = VSGameUtilsKt.getShipManagingPos(level, position.x, position.y, position.z);
-                if (ship != null) {
-                    def = false;
-                    Matrix4dc shipToWorldMatrix = ship.getShipToWorld();
-                    Quaterniondc shipRotation = ship.getTransform().getShipToWorldRotation();
-                    //Transform Position
-                    Vector3d posInShip = VectorConversionsMCKt.toJOML(position);
-                    Vector3d posInWorld = shipToWorldMatrix.transformPosition(posInShip, new Vector3d());
-                    //Transform Rotation
-                    Quaterniond rotInShip = new Quaterniond(rotation.x, rotation.y, rotation.z, rotation.w);
-                    Quaterniond rotInWorld = shipRotation.mul(rotInShip, new Quaterniond());
-                    //Set values
-                    this.position = VectorConversionsMCKt.toMinecraft(posInWorld);
-                    this.size = size;
-                    this.rotation = new Quaternionf((float)rotInWorld.x, (float)rotInWorld.y, (float)rotInWorld.z, (float)rotInWorld.w);
-                }
-            }
-            if (def) {
-                //World case
-                this.position = position;
-                this.size = size;
-                this.rotation = rotation;
-            }
-            //Invariant
+            this.position = position;
+            this.size = size;
+            this.rotation = rotation;
             this.color = color;
             this.onlyInDebugMode = onlyInDebugMode;
             this.remainingTicks = initialTicks;
+            this.ship = (ClientShip)VSGameUtilsKt.getShipManagingPos(level, position.x, position.y, position.z);
         }
     }
 
@@ -93,7 +71,7 @@ public class DebugRenderer {
         Minecraft mc = Minecraft.getInstance();
         Level level = mc.level;
         if (level == null) return; //In case we do not have a level yet for some reason
-        
+
         TimedBoxData data = new TimedBoxData(level, center, size, rotation, color, onlyInDebugMode, ticksToRender);
         timedBoxes.put(identifier, data);
     }
@@ -210,8 +188,29 @@ public class DebugRenderer {
     private static void renderWireBox(PoseStack poseStack, VertexConsumer vertexConsumer, TimedBoxData data) {
         poseStack.pushPose();
 
-        poseStack.translate(data.position.x, data.position.y, data.position.z);
-        poseStack.mulPose(data.rotation);
+        Vec3 finalPosition;
+        Quaternionf finalRotation;
+
+        if (data.ship != null) {
+            ShipTransform clientTransform = data.ship.getRenderTransform();
+            Matrix4dc shipToWorldMatrix = clientTransform.getShipToWorld();
+            Quaterniondc shipRotation = clientTransform.getShipToWorldRotation();
+
+            Vector3d posInShip = VectorConversionsMCKt.toJOML(data.position);
+            Vector3d posInWorld = shipToWorldMatrix.transformPosition(posInShip, new Vector3d());
+
+            Quaterniond rotInShip = new Quaterniond(data.rotation.x, data.rotation.y, data.rotation.z, data.rotation.w);
+            Quaterniond rotInWorld = shipRotation.mul(rotInShip, new Quaterniond());
+
+            finalPosition = VectorConversionsMCKt.toMinecraft(posInWorld);
+            finalRotation = new Quaternionf((float)rotInWorld.x, (float)rotInWorld.y, (float)rotInWorld.z, (float)rotInWorld.w);
+        } else {
+            finalPosition = data.position;
+            finalRotation = data.rotation;
+        }
+
+        poseStack.translate(finalPosition.x, finalPosition.y, finalPosition.z);
+        poseStack.mulPose(finalRotation);
 
         Matrix4f matrix = poseStack.last().pose();
 
