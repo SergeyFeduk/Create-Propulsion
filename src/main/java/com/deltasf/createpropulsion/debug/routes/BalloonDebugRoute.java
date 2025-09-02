@@ -3,8 +3,11 @@ package com.deltasf.createpropulsion.debug.routes;
 import com.deltasf.createpropulsion.debug.IDebugRoute;
 
 public enum BalloonDebugRoute implements IDebugRoute {
+    HAI_AABBS,
     AABB,
-    VOLUME;
+    VOLUME, 
+    HOLES,
+    FORCE_CHUNKS;
     
     private final IDebugRoute[] children;
     BalloonDebugRoute(IDebugRoute... children) { this.children = children; }

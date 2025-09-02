@@ -33,8 +33,9 @@ public class Balloon implements Iterable<BlockPos> {
     public Set<UUID> supportHais;
     public Set<BlockPos> holes = new HashSet<>();
 
-    private final ConcurrentHashMap<Long, BalloonForceChunk> chunkMap = new ConcurrentHashMap<>();
-    private final Set<Long> dirtyChunks = new HashSet<>();
+    private final ConcurrentHashMap<ChunkKey, BalloonForceChunk> chunkMap = new ConcurrentHashMap<>();
+    private final Set<ChunkKey> dirtyChunks = new HashSet<>();
+
 
     public Balloon(Collection<BlockPos> initialVolume, AABB initialBounds, Set<UUID> supportHais) {
         this.supportHais = (supportHais == null) ? new HashSet<>() : new HashSet<>(supportHais);
@@ -58,7 +59,7 @@ public class Balloon implements Iterable<BlockPos> {
         return boundsCache;
     }
 
-    public ConcurrentHashMap<Long, BalloonForceChunk> getChunkMap() {
+    public ConcurrentHashMap<ChunkKey, BalloonForceChunk> getChunkMap() {
         return chunkMap;
     }
 
@@ -215,7 +216,7 @@ public class Balloon implements Iterable<BlockPos> {
     }
 
     private void updateBoundsCache() {
-    if (!boundsInitialized) {
+        if (!boundsInitialized) {
             boundsCache = new AABB(0,0,0,0,0,0);
             return;
         }
@@ -227,13 +228,13 @@ public class Balloon implements Iterable<BlockPos> {
 
     public void resolveDirtyChunks() {
         if (dirtyChunks.isEmpty()) return;
-        // snapshot keys to avoid concurrent modification while iterating
-        List<Long> keys = new ArrayList<>(dirtyChunks);
-        for (long ck : keys) {
-            // compute chunk coords & origin
-            int cx = unpackChunkX(ck);
-            int cy = unpackChunkY(ck);
-            int cz = unpackChunkZ(ck);
+
+        List<ChunkKey> keys = new ArrayList<>(dirtyChunks);
+        for (ChunkKey ck : keys) {
+            int cx = ck.x();
+            int cy = ck.y();
+            int cz = ck.z();
+
             int originX = cx * CHUNK_SIZE;
             int originY = cy * CHUNK_SIZE;
             int originZ = cz * CHUNK_SIZE;
@@ -241,12 +242,9 @@ public class Balloon implements Iterable<BlockPos> {
             int centerY = originY + (CHUNK_SIZE - 1) / 2;
             int centerZ = originZ + (CHUNK_SIZE - 1) / 2;
 
-
             int blockCount = 0;
-            int sumX = 0, sumY = 0, sumZ = 0; // sums relative to chunk center
+            double sumX = 0.0, sumY = 0.0, sumZ = 0.0;
 
-
-            // scan the bounded chunk cube
             for (int lx = 0; lx < CHUNK_SIZE; lx++) {
                 for (int ly = 0; ly < CHUNK_SIZE; ly++) {
                     for (int lz = 0; lz < CHUNK_SIZE; lz++) {
@@ -255,10 +253,10 @@ public class Balloon implements Iterable<BlockPos> {
                         int wz = originZ + lz;
                         long packed = packPos(wx, wy, wz);
                         if (volume.contains(packed)) {
-                            blockCount += 1;
-                            sumX += (wx - centerX);
-                            sumY += (wy - centerY);
-                            sumZ += (wz - centerZ);
+                            blockCount++;
+                            sumX += (wx + 0.5) - (double) centerX;
+                            sumY += (wy + 0.5) - (double) centerY;
+                            sumZ += (wz + 0.5) - (double) centerZ;
                         }
                     }
                 }
@@ -267,13 +265,18 @@ public class Balloon implements Iterable<BlockPos> {
             if (blockCount == 0) {
                 chunkMap.remove(ck);
             } else {
-                BalloonForceChunk c = new BalloonForceChunk(blockCount, sumX, sumY, sumZ);
+                float centroidRelX = (float) (sumX / (double) blockCount);
+                float centroidRelY = (float) (sumY / (double) blockCount);
+                float centroidRelZ = (float) (sumZ / (double) blockCount);
+
+                BalloonForceChunk c = new BalloonForceChunk(blockCount, centroidRelX, centroidRelY, centroidRelZ);
                 chunkMap.put(ck, c);
             }
-
-            dirtyChunks.remove(ck);
         }
+
+        dirtyChunks.removeAll(keys);
     }
+
 
     //Position packing
 
@@ -307,30 +310,7 @@ public class Balloon implements Iterable<BlockPos> {
         return packPos(pos.getX(), pos.getY(), pos.getZ());
     }
 
-    // Chunk position packing
-
-    private static long packChunkKey(int cx, int cy, int cz) {
-        long key = (((long) cx & 0x1FFFFFL) << 42) | 
-                   (((long) cy & 0x1FFFFFL) << 21) | 
-                   ( (long) cz & 0x1FFFFFL);
-        return key;
-    }
-
-    private static int unpackChunkX(long key) {
-        int cx = (int) (key >> 42);
-        if (cx >= (1 << 20)) cx -= (1 << 21);
-        return cx;
-    }
-    private static int unpackChunkY(long key) {
-        int cy = (int) ((key >> 21) & 0x1FFFFFL);
-        if (cy >= (1 << 20)) cy -= (1 << 21);
-        return cy;
-    }
-    private static int unpackChunkZ(long key) {
-        int cz = (int) (key & 0x1FFFFFL);
-        if (cz >= (1 << 20)) cz -= (1 << 21);
-        return cz;
-    }
+    // Chunk position handling
 
     private static int worldToChunkCoord(int worldCoord) {
         return Math.floorDiv(worldCoord, CHUNK_SIZE);
@@ -340,7 +320,9 @@ public class Balloon implements Iterable<BlockPos> {
         int cx = worldToChunkCoord(worldX);
         int cy = worldToChunkCoord(worldY);
         int cz = worldToChunkCoord(worldZ);
-        long ck = packChunkKey(cx, cy, cz);
-        dirtyChunks.add(ck);
+        dirtyChunks.add(new ChunkKey(cx, cy, cz));
     }
+
+    //Data
+    public record ChunkKey(int x, int y, int z) {}
 }

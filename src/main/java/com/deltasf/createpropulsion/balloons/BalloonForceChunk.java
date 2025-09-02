@@ -2,16 +2,12 @@ package com.deltasf.createpropulsion.balloons;
 
 public class BalloonForceChunk {
     public final int blockCount;
-    public final int sumX, sumY, sumZ; // sums relative to chunk center
+    public final float centroidX, centroidY, centroidZ;
 
-    public BalloonForceChunk(int blockCount, int sumX, int sumY, int sumZ) {
+    public BalloonForceChunk(int blockCount, float centroidX, float centroidY, float centroidZ) {
         this.blockCount = blockCount;
-        this.sumX = sumX;
-        this.sumY = sumY;
-        this.sumZ = sumZ;
+        this.centroidX = centroidX;
+        this.centroidY = centroidY;
+        this.centroidZ = centroidZ;
     }
-
-    public double getCentroidRelX() { return ((double) sumX) / blockCount; }
-    public double getCentroidRelY() { return ((double) sumY) / blockCount; }
-    public double getCentroidRelZ() { return ((double) sumZ) / blockCount; }
 }
