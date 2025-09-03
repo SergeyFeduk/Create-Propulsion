@@ -28,6 +28,8 @@ public class PropulsionConfig {
     //Balloons
     public static final ForgeConfigSpec.ConfigValue<Double> BALLOON_FORCE_COEFFICIENT;
     public static final ForgeConfigSpec.ConfigValue<Double> BALLOON_K_COEFFICIENT;
+    public static final ForgeConfigSpec.ConfigValue<Double> BALLOON_ANGULAR_DAMPING;
+    public static final ForgeConfigSpec.ConfigValue<Double> BALLOON_ALIGNMENT_KP;
 
     static {
         //#region Server
@@ -65,11 +67,15 @@ public class PropulsionConfig {
                 .define("Max distance to region", 3);
         SERVER_BUILDER.pop();
 
-        SERVER_BUILDER.push("Physics assembler");
+        SERVER_BUILDER.push("Hot air balloons");
             BALLOON_FORCE_COEFFICIENT = SERVER_BUILDER.comment("BALLOON_FORCE_COEFFICIENT.")
                     .define("BALLOON_FORCE_COEFFICIENT", 2000.0);
             BALLOON_K_COEFFICIENT = SERVER_BUILDER.comment("BALLOON_K_COEFFICIENT.")
                     .define("BALLOON_K_COEFFICIENT", 0.3);
+            BALLOON_ANGULAR_DAMPING = SERVER_BUILDER.comment("BALLOON_ANGULAR_DAMPING.")
+                    .define("BALLOON_ANGULAR_DAMPING", 0.8);
+            BALLOON_ALIGNMENT_KP = SERVER_BUILDER.comment("BALLOON_ALIGNMENT_KP.")
+                    .define("BALLOON_ALIGNMENT_KP", 10.0);
         SERVER_BUILDER.pop();
 
         SERVER_SPEC = SERVER_BUILDER.build();

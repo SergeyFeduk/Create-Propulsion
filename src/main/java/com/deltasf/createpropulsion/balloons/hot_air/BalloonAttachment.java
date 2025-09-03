@@ -9,12 +9,15 @@ import javax.annotation.Nonnull;
 import org.antlr.v4.parse.ANTLRParser.finallyClause_return;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Math;
+import org.joml.Matrix3dc;
 import org.joml.Matrix4dc;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.valkyrienskies.core.api.ships.PhysShip;
 import org.valkyrienskies.core.api.ships.ServerShip;
+import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.core.api.ships.ShipForcesInducer;
+import org.valkyrienskies.core.impl.game.ships.PhysShipImpl;
 
 import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.balloons.Balloon;
@@ -32,10 +35,10 @@ public class BalloonAttachment implements ShipForcesInducer {
     public BalloonAttachment() {}
     private final double epsilon = 1e-5;
 
-    public double pressureAtSea = 1.225; 
-    public double SCALE_HEIGHT = 200;
+    private double pressureAtSea = 1.225; 
+    private double SCALE_HEIGHT = 200;
 
-    public final double G = 9.81;
+    private final double G = 9.81;
 
     @Override
     public void applyForces(@NotNull PhysShip physicShip) {
@@ -49,6 +52,36 @@ public class BalloonAttachment implements ShipForcesInducer {
             double fullness = balloon.hotAir / balloon.getVolumeSize();
             if (fullness <= epsilon) continue;
             calculateForcesForBalloon(shipToWorld, physicShip, balloon, fullness);
+        }
+
+        //Angular dampening
+        Vector3d shipUpWorld = new Vector3d(0, 1, 0);
+        shipToWorld.transformDirection(shipUpWorld, shipUpWorld);
+        shipUpWorld.normalize();
+
+        Vector3d worldUp = new Vector3d(0, 1, 0);
+        Vector3d alignAxis = new Vector3d();
+        shipUpWorld.cross(worldUp, alignAxis); // axis direction and magnitude ~ sin(angle)
+        double alignMag = alignAxis.length();
+
+        //P torque dampening
+        if (alignMag > 1e-6) {
+            alignAxis.normalize();
+            Vector3d alignTorque = new Vector3d(alignAxis).mul(PropulsionConfig.BALLOON_ALIGNMENT_KP.get() * alignMag);
+            accumulatedTorque.add(alignTorque);
+        }
+        
+        //D torque dampening
+        PhysShipImpl simpl = (PhysShipImpl)physicShip;
+        Vector3dc angVelShipSpace = simpl.getPoseVel().getOmega();
+
+        if (angVelShipSpace != null && angVelShipSpace.lengthSquared() > 1e-9) {
+            Matrix3dc momentOfInertia = simpl.getInertia().getMomentOfInertiaTensor();
+            momentOfInertia.transform(angVelShipSpace, angMomentumShipSpace);
+            dampingTorqueShipSpace.set(angMomentumShipSpace).mul(-PropulsionConfig.BALLOON_ANGULAR_DAMPING.get());
+            shipToWorld.transformDirection(dampingTorqueShipSpace, dampingTorqueWorldSpace);
+            
+            accumulatedTorque.add(dampingTorqueWorldSpace);
         }
 
         //Apply aggregated force and torque
@@ -107,6 +140,11 @@ public class BalloonAttachment implements ShipForcesInducer {
     private final Vector3d leverArmWorld = new Vector3d();
     private final Vector3d upWorld = new Vector3d(0, 1, 0);
     private final Vector3d tmpForce = new Vector3d();
+
+    //Angualr dampening
+    private final Vector3d angMomentumShipSpace = new Vector3d();
+    private final Vector3d dampingTorqueShipSpace = new Vector3d();
+    private final Vector3d dampingTorqueWorldSpace = new Vector3d();
 
     public static BalloonAttachment getOrCreateAsAttachment(Level level, ServerShip ship){
         return AttachmentUtils.getOrCreate(ship, BalloonAttachment.class, () -> {
