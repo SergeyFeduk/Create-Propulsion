@@ -78,7 +78,7 @@ public class PropulsionBlocks {
         .simpleItem()
         .register();
     
-        /*public static final BlockEntry<TiltSensorBlock> TILT_SENSOR_BLOCK = REGISTRATE.block("tilt_sensor", TiltSensorBlock::new)
+    /*public static final BlockEntry<TiltSensorBlock> TILT_SENSOR_BLOCK = REGISTRATE.block("tilt_sensor", TiltSensorBlock::new)
         .properties(p -> p.mapColor(MapColor.COLOR_YELLOW))
         .properties(p -> p.sound(SoundType.METAL))
         .properties(p -> p.strength(2.5F, 2.0F))

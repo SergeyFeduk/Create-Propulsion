@@ -28,5 +28,10 @@
         "block": "createpropulsion:physics_assembler",
         "mass": 1600.0,
         "friction": 0.4
+    },
+    {
+        "block": "createpropulsion:hab_block",
+        "mass": 10.0,
+        "friction": 0.2
     }
 ]

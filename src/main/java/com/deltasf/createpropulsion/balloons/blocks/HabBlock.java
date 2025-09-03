@@ -22,8 +22,6 @@ public class HabBlock extends Block {
         if (!level.isClientSide()) {
             BalloonShipRegistry.updater().habBlockPlaced(pos, level);
         }
-
-        
     }
 
     @Override
@@ -36,7 +34,6 @@ public class HabBlock extends Block {
         if (!level.isClientSide()) {
             BalloonShipRegistry.updater().habBlockRemoved(pos, level);
         }
-        
         super.onRemove(state, level, pos, newState, isMoving);
     }
 }

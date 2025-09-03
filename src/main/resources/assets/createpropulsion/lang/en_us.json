@@ -15,6 +15,8 @@
     "block.createpropulsion.redstone_magnet": "Redstone Magnet",
     "block.createpropulsion.physics_assembler": "Physics Assembler",
 
+    "block.createpropulsion.hab_block": "Envelope",
+
     "create.gui.goggles.thruster.status": "Thruster Status",
     "create.gui.goggles.thruster.status.no_fuel": "No Fuel",
     "create.gui.goggles.thruster.status.wrong_fuel": "Wrong Fuel",
