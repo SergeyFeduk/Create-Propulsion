@@ -2,11 +2,13 @@ package com.deltasf.createpropulsion.balloons;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import com.deltasf.createpropulsion.balloons.hot_air.HotAirSolver;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry.HaiData;
 import com.deltasf.createpropulsion.balloons.utils.BalloonDebug;
 import com.deltasf.createpropulsion.balloons.utils.BalloonRegistryUtility;
@@ -25,7 +27,7 @@ public class HaiGroup {
     public static final int HAI_TO_BALLOON_DIST = 5;
 
     public final List<HaiData> hais = new ArrayList<>();
-    public final List<Balloon> balloons = new ArrayList<>();
+    public final List<Balloon> balloons = Collections.synchronizedList(new ArrayList<>());
 
     public RLEVolume rleVolume = new RLEVolume();
     public AABB groupAABB;
@@ -45,20 +47,18 @@ public class HaiGroup {
         }
 
         List<DiscoveredVolume> discoveredVolumes = BalloonScanner.scan(level, seeds, this, new ArrayList<>());
-        //Temp debug view
-        /*for(DiscoveredVolume volume : discoveredVolumes) {
-            Color color = volume.isLeaky() ? Color.red : Color.white;
-            for(BlockPos pos : volume.volume()) {
-                BalloonDebug.displayBlockFor(pos, 100, color);
-            }
-        }*/
-
         generateBalloons(discoveredVolumes);
     }
 
     public void regenerateRLEVolume() {
         groupAABB = BalloonRegistryUtility.calculateGroupAABB(hais);
         rleVolume.regenerate(hais, groupAABB);
+    }
+
+    public void tickBalloons() {
+        for(Balloon balloon : balloons) {
+            HotAirSolver.tickBalloon(balloon);
+        }
     }
 
     public static boolean isHab(BlockPos pos, Level level) {

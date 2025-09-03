@@ -34,7 +34,6 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = CreatePropulsion.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class BalloonUpdater {
     //Todo: for every ship we perform scan for - recalculate the topY as it may change 
     
@@ -53,13 +52,8 @@ public class BalloonUpdater {
                    .add(new DynamicUpdate(pos.immutable(), false));
     }
 
-    @SubscribeEvent
-    public static void onServerTick(TickEvent.ServerTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) { return; }
-        BalloonUpdater instance = BalloonShipRegistry.updater();
-
+    public static void tick(BalloonUpdater instance, Iterable<ServerLevel> levels) {
         //Handle all dimensions separately
-        var levels = event.getServer().getAllLevels();
         for(ServerLevel level : levels) {
             Queue<DynamicUpdate> queue = instance.eventQueues.get(level.dimension());
             if (queue != null && !queue.isEmpty()) {

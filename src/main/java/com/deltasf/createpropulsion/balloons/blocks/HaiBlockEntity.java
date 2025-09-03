@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
+import com.deltasf.createpropulsion.balloons.hot_air.BalloonAttachment;
 import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
 import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
 import com.deltasf.createpropulsion.registries.PropulsionBlocks;
@@ -44,6 +45,7 @@ public class HaiBlockEntity extends SmartBlockEntity {
         Ship ship = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
         if (ship != null) {
             BalloonShipRegistry.forShip(ship.getId()).registerHai(haiId, this);
+            BalloonAttachment.ensureAttachmentExists(level, worldPosition);
         }
     }
 
@@ -59,6 +61,7 @@ public class HaiBlockEntity extends SmartBlockEntity {
         Ship ship = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
         if (ship != null) {
             BalloonShipRegistry.forShip(ship.getId()).startScanFor(haiId, this.level, worldPosition);
+            BalloonAttachment.ensureAttachmentExists(level, worldPosition);
         }
     }
 

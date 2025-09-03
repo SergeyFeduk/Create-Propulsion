@@ -25,6 +25,9 @@ public class PropulsionConfig {
     public static final ForgeConfigSpec.ConfigValue<Double> REDSTONE_MAGNET_FORCE_INDUCED_TORQUE_MULTIPLIER;
     //Physics assembler
     public static final ForgeConfigSpec.ConfigValue<Integer> PHYSICS_ASSEMBLER_MAX_MINK_DISTANCE;
+    //Balloons
+    public static final ForgeConfigSpec.ConfigValue<Double> BALLOON_FORCE_COEFFICIENT;
+    public static final ForgeConfigSpec.ConfigValue<Double> BALLOON_K_COEFFICIENT;
 
     static {
         //#region Server
@@ -60,6 +63,13 @@ public class PropulsionConfig {
         SERVER_BUILDER.push("Physics assembler");
             PHYSICS_ASSEMBLER_MAX_MINK_DISTANCE = SERVER_BUILDER.comment("Maximum distance between region selected with assembly gauge and physics assembler block.")
                 .define("Max distance to region", 3);
+        SERVER_BUILDER.pop();
+
+        SERVER_BUILDER.push("Physics assembler");
+            BALLOON_FORCE_COEFFICIENT = SERVER_BUILDER.comment("BALLOON_FORCE_COEFFICIENT.")
+                    .define("BALLOON_FORCE_COEFFICIENT", 2000.0);
+            BALLOON_K_COEFFICIENT = SERVER_BUILDER.comment("BALLOON_K_COEFFICIENT.")
+                    .define("BALLOON_K_COEFFICIENT", 0.3);
         SERVER_BUILDER.pop();
 
         SERVER_SPEC = SERVER_BUILDER.build();

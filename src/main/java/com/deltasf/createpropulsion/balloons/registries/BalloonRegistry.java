@@ -28,7 +28,7 @@ public class BalloonRegistry {
     
     private final Map<UUID, HaiData> haiDataMap = new HashMap<>();
     private final Map<UUID, HaiGroup> haiGroupMap = new HashMap<>();
-    private final List<HaiGroup> haiGroups = new ArrayList<>();
+    private final List<HaiGroup> haiGroups = Collections.synchronizedList(new ArrayList<>());
 
     public List<HaiGroup> getHaiGroups() {
         return haiGroups;
@@ -90,6 +90,24 @@ public class BalloonRegistry {
         }
         HaiGroup group = haiGroupMap.get(haiId);
         if (group != null) group.scan(level);
+    }
+
+    public void tickHaiGroups() {
+        for(HaiGroup group : haiGroups) {
+            group.tickBalloons();
+        }
+    }
+
+    public List<Balloon> getBalloons() {
+        List<Balloon> balloons = new ArrayList<>();
+        synchronized (haiGroups) {
+            for (HaiGroup group : haiGroups) {
+                synchronized (group.balloons) {
+                    balloons.addAll(group.balloons);
+                }
+            }
+        }
+        return Collections.unmodifiableList(balloons);
     }
 
     private void handleShrinkedGroup(UUID id, HaiGroup affectedGroup) {

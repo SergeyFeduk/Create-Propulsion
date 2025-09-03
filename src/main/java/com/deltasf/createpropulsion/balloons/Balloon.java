@@ -29,13 +29,14 @@ public class Balloon implements Iterable<BlockPos> {
     private int minX, maxX, minY, maxY, minZ, maxZ;
     private boolean boundsInitialized = false;
     private AABB boundsCache = null;
-
-    public Set<UUID> supportHais;
-    public Set<BlockPos> holes = new HashSet<>();
-
+    //Force chunks
     private final ConcurrentHashMap<ChunkKey, BalloonForceChunk> chunkMap = new ConcurrentHashMap<>();
     private final Set<ChunkKey> dirtyChunks = new HashSet<>();
-
+    //Validation data
+    public Set<UUID> supportHais;
+    public Set<BlockPos> holes = new HashSet<>();
+    //Gameplay data
+    public volatile double hotAir = 0;
 
     public Balloon(Collection<BlockPos> initialVolume, AABB initialBounds, Set<UUID> supportHais) {
         this.supportHais = (supportHais == null) ? new HashSet<>() : new HashSet<>(supportHais);
@@ -52,6 +53,10 @@ public class Balloon implements Iterable<BlockPos> {
 
     public Iterable<BlockPos> getVolume() {
         return this;
+    }
+
+    public double getVolumeSize() {
+        return (double)volume.size();
     }
 
     public AABB getAABB() {
