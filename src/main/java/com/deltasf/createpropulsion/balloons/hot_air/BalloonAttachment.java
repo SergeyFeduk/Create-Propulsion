@@ -73,14 +73,16 @@ public class BalloonAttachment implements ShipForcesInducer {
         
         //D torque dampening
         PhysShipImpl simpl = (PhysShipImpl)physicShip;
-        Vector3dc angVelShipSpace = simpl.getPoseVel().getOmega();
+        Vector3dc angVel = simpl.getPoseVel().getOmega();
 
-        if (angVelShipSpace != null && angVelShipSpace.lengthSquared() > 1e-9) {
+        if (angVel != null && angVel.lengthSquared() > 1e-9) {
+            Matrix4dc worldToShip = physicShip.getTransform().getWorldToShip();
+            Vector3d angVelShipSpace = new Vector3d();
+            worldToShip.transformDirection(angVel, angVelShipSpace);
             Matrix3dc momentOfInertia = simpl.getInertia().getMomentOfInertiaTensor();
             momentOfInertia.transform(angVelShipSpace, angMomentumShipSpace);
             dampingTorqueShipSpace.set(angMomentumShipSpace).mul(-PropulsionConfig.BALLOON_ANGULAR_DAMPING.get());
             shipToWorld.transformDirection(dampingTorqueShipSpace, dampingTorqueWorldSpace);
-            
             accumulatedTorque.add(dampingTorqueWorldSpace);
         }
 
