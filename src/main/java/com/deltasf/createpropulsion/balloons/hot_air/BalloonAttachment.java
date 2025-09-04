@@ -86,6 +86,28 @@ public class BalloonAttachment implements ShipForcesInducer {
             accumulatedTorque.add(dampingTorqueWorldSpace);
         }
 
+        //Vertical linear drag based on surface area of all balloons
+        Vector3dc linearVel = simpl.getPoseVel().getVel();
+        double verticalVelocity = linearVel.y();
+
+        if (Math.abs(verticalVelocity) > epsilon) {
+            double totalBalloonVolume = 0;
+            for (Balloon balloon : balloons) {
+                if (balloon.hotAir > epsilon) {
+                    totalBalloonVolume += balloon.getVolumeSize();
+                }
+            }
+
+            if (totalBalloonVolume > epsilon) {
+                double approxSurfaceArea = java.lang.Math.pow(totalBalloonVolume, 2.0/3.0);
+                double dragForceY = -verticalVelocity * approxSurfaceArea * PropulsionConfig.BALLOON_VERTICAL_DRAG_COEFFICIENT.get();
+                
+                Vector3d verticalDragForce = tmpForce.set(0, dragForceY, 0);
+                accumulatedForce.add(verticalDragForce);
+            }
+        }
+
+
         //Apply aggregated force and torque
         if (accumulatedForce.lengthSquared() > 1e-9) {
             physicShip.applyInvariantForce(accumulatedForce);
