@@ -60,9 +60,9 @@ public class BalloonDebug {
 
             for (HaiGroup group : groups) {
                 Color baseColor = GROUP_COLORS[groupIndex % GROUP_COLORS.length];
-                if (PropulsionDebug.isDebug(BalloonDebugRoute.HAI_AABBS))
+                if (PropulsionDebug.isDebug(BalloonDebugRoute.HAI_AABBS)) {
                     renderHaiGroupBounds(group, baseColor);
-                
+                }
                 for (Balloon balloon : group.balloons) {
                     // Generate a unique color
                     float hue = (balloonIndex * GOLDEN_RATIO_CONJUGATE) % 1.0f;

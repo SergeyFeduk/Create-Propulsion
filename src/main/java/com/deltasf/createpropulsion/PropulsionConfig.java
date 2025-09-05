@@ -31,6 +31,7 @@ public class PropulsionConfig {
     public static final ForgeConfigSpec.ConfigValue<Double> BALLOON_ANGULAR_DAMPING;
     public static final ForgeConfigSpec.ConfigValue<Double> BALLOON_ALIGNMENT_KP;
     public static final ForgeConfigSpec.ConfigValue<Double> BALLOON_VERTICAL_DRAG_COEFFICIENT;
+    public static final ForgeConfigSpec.ConfigValue<Double> BALLOON_HORIZONTAL_DRAG_COEFFICIENT;
 
     static {
         //#region Server
@@ -74,11 +75,13 @@ public class PropulsionConfig {
             BALLOON_K_COEFFICIENT = SERVER_BUILDER.comment("BALLOON_K_COEFFICIENT.")
                     .define("BALLOON_K_COEFFICIENT", 0.3);
             BALLOON_ANGULAR_DAMPING = SERVER_BUILDER.comment("BALLOON_ANGULAR_DAMPING.")
-                    .define("BALLOON_ANGULAR_DAMPING", 1.8); //May need to tune down
+                    .define("BALLOON_ANGULAR_DAMPING", 1.0); //May need to tune down
             BALLOON_ALIGNMENT_KP = SERVER_BUILDER.comment("BALLOON_ALIGNMENT_KP.")
-                    .define("BALLOON_ALIGNMENT_KP", 100.0); //May need to tune down
+                    .define("BALLOON_ALIGNMENT_KP", 10.0); //May need to tune down
             BALLOON_VERTICAL_DRAG_COEFFICIENT = SERVER_BUILDER.comment("BALLOON_VERTICAL_DRAG_COEFFICIENT.")
-                    .define("BALLOON_VERTICAL_DRAG_COEFFICIENT", 200.0);
+                    .define("BALLOON_VERTICAL_DRAG_COEFFICIENT", 100.0);
+            BALLOON_HORIZONTAL_DRAG_COEFFICIENT = SERVER_BUILDER.comment("BALLOON_HORIZONTAL_DRAG_COEFFICIENT.")
+                    .define("BALLOON_HORIZONTAL_DRAG_COEFFICIENT", 100.0);
         SERVER_BUILDER.pop();
 
         SERVER_SPEC = SERVER_BUILDER.build();

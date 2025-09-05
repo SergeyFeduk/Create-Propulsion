@@ -30,6 +30,8 @@ import com.deltasf.createpropulsion.utility.AttachmentUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 
+//Current model adds some custom drag, both linear and angular. VS 2.5 should handle this for us
+//So after updating to it - get rid of our drag, or at least change default values
 @SuppressWarnings("deprecation")
 public class BalloonAttachment implements ShipForcesInducer {
     public BalloonAttachment() {}
@@ -82,15 +84,15 @@ public class BalloonAttachment implements ShipForcesInducer {
             Matrix3dc momentOfInertia = simpl.getInertia().getMomentOfInertiaTensor();
             momentOfInertia.transform(angVelShipSpace, angMomentumShipSpace);
             dampingTorqueShipSpace.set(angMomentumShipSpace).mul(-PropulsionConfig.BALLOON_ANGULAR_DAMPING.get());
+            dampingTorqueShipSpace.y *= 0.2; //Dampen the dampening to make rotation along Y axis actually possible
             shipToWorld.transformDirection(dampingTorqueShipSpace, dampingTorqueWorldSpace);
             accumulatedTorque.add(dampingTorqueWorldSpace);
         }
 
         //Vertical linear drag based on surface area of all balloons
         Vector3dc linearVel = simpl.getPoseVel().getVel();
-        double verticalVelocity = linearVel.y();
 
-        if (Math.abs(verticalVelocity) > epsilon) {
+        if (linearVel.lengthSquared() > epsilon * epsilon) {
             double totalBalloonVolume = 0;
             for (Balloon balloon : balloons) {
                 if (balloon.hotAir > epsilon) {
@@ -100,13 +102,21 @@ public class BalloonAttachment implements ShipForcesInducer {
 
             if (totalBalloonVolume > epsilon) {
                 double approxSurfaceArea = java.lang.Math.pow(totalBalloonVolume, 2.0/3.0);
-                double dragForceY = -verticalVelocity * approxSurfaceArea * PropulsionConfig.BALLOON_VERTICAL_DRAG_COEFFICIENT.get();
-                
-                Vector3d verticalDragForce = tmpForce.set(0, dragForceY, 0);
-                accumulatedForce.add(verticalDragForce);
+                //Vertical and horizontal drag are applied separatelty as I need some fine control over them
+                //Vertical drag
+                double verticalVelocity = linearVel.y();
+                if (Math.abs(verticalVelocity) > epsilon) {
+                    double dragForceY = -verticalVelocity * approxSurfaceArea * PropulsionConfig.BALLOON_VERTICAL_DRAG_COEFFICIENT.get();
+                    accumulatedForce.add(0, dragForceY, 0);
+                }
+                //Horizontal drag
+                Vector3d horizontalVelocity = new Vector3d(linearVel.x(), 0, linearVel.z());
+                if (horizontalVelocity.lengthSquared() > epsilon * epsilon) {
+                    Vector3d horizontalDragForce = horizontalVelocity.mul(-approxSurfaceArea * PropulsionConfig.BALLOON_HORIZONTAL_DRAG_COEFFICIENT.get());
+                    accumulatedForce.add(horizontalDragForce);
+                }
             }
         }
-
 
         //Apply aggregated force and torque
         if (accumulatedForce.lengthSquared() > 1e-9) {
