@@ -86,9 +86,8 @@ public class HaiGroup {
             if (supportHais.isEmpty()) {
                 continue;
             }
-            AABB bounds = calculateBoundsForVolume(discoveredVolume.volume());
             //Create balloon
-            Balloon balloon = new Balloon(discoveredVolume.volume(), bounds, supportHais);
+            Balloon balloon = new Balloon(discoveredVolume.volume(), null, supportHais);
             this.balloons.add(balloon);
         }
     }
@@ -105,22 +104,6 @@ public class HaiGroup {
             }
         }
         return supporters;
-    }
-
-    private AABB calculateBoundsForVolume(Set<BlockPos> volume) {
-        int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE;
-        int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE, maxZ = Integer.MIN_VALUE;
-
-        for (BlockPos pos : volume) {
-            minX = Math.min(minX, pos.getX());
-            minY = Math.min(minY, pos.getY());
-            minZ = Math.min(minZ, pos.getZ());
-            maxX = Math.max(maxX, pos.getX());
-            maxY = Math.max(maxY, pos.getY());
-            maxZ = Math.max(maxZ, pos.getZ());
-        }
-
-        return new AABB(minX, minY, minZ, maxX + 1, maxY + 1, maxZ + 1);
     }
 
     public boolean isInsideRleVolume(BlockPos pos) {

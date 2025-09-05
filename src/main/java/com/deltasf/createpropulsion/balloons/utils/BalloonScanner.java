@@ -135,15 +135,15 @@ public  class BalloonScanner {
 
     private static BlobScanResult discoverBlob(BlockPos origin, Level level, ScanState state) {
         Set<BlockPos> volume = new HashSet<>();
-        Queue<BlockPos> queue = new LinkedList<>();
+        List<BlockPos> queue = new ArrayList<>();
         boolean hasLeak = false;
 
         queue.add(origin);
         volume.add(origin);
 
-        //Perform 2D bfs
-        while (!queue.isEmpty()) {
-            BlockPos currentPos = queue.poll();
+        int head = 0;
+        while (head < queue.size()) {
+            BlockPos currentPos = queue.get(head++);
             for (Direction dir : Direction.Plane.HORIZONTAL) {
                 BlockPos neighborPos = currentPos.relative(dir);
 
