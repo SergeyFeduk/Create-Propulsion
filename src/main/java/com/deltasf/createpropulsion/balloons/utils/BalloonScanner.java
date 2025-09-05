@@ -342,18 +342,10 @@ public  class BalloonScanner {
 
     //On performance
 
-    //Q: Do we REALLY need a priority queue for vertical scan? Does it really matter that all work items are processed from top to bottom?
-    //Q: If no, replacing with ArrayDeque should yield better performance
-    // However upon testing I found that in most cases we have like 10 workitems, not thousands, so this probably does not matter at all
-
-    //I: Replacing BlockPos everywhere with long equivalent and using Long2X objects will probably help with performance by avoiding hashing BlockPos'es
+    //Updating from PriorityQueue does not yield better performance, tested
+    //Caching isHab makes it even worse :(
+    //Replacing BlockPos decreases GC load and improves performance a little. I tried it, but it is questionable so I scraped this for now
     
-    //I: Cache HaiGroup.isHab calls as they perform quite a few checks and query the level
-    // Caching it in a separate class via a hashmap can be also utilized to determine the approximate size of the shell (and hence area). 
-    // Not the correct one, but good enough for hole system thresholds
-
     //I: I had early exit planned (if out of RLE volume - stop the scan immediately), but need to impl it still. I also need to be very fucking accurate cus
     // naive implementation won't work as we are seeding downwards and will still rediscover most of the volume if done naively
-
-    //I And also... Please, do not forget about profiling before/after each change, cool future me
 }

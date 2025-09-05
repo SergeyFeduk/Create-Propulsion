@@ -8,6 +8,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.joml.primitives.AABBic;
+import org.valkyrienskies.core.api.ships.ServerShip;
+import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.mod.common.VSGameUtilsKt;
+
 import com.deltasf.createpropulsion.balloons.hot_air.HotAirSolver;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry.HaiData;
 import com.deltasf.createpropulsion.balloons.utils.BalloonDebug;
@@ -31,11 +36,12 @@ public class HaiGroup {
 
     public RLEVolume rleVolume = new RLEVolume();
     public AABB groupAABB;
+    private ServerShip ship;
 
     public void scan(Level level) {
         //We shouldn't really recalculate the RLE volume here as it should be constantly valid, but this fails at some place in hai management logic
         //Needs to be fixed anyway
-        regenerateRLEVolume();
+        regenerateRLEVolume(level);
         //Probe to get seeds
         //TODO: Do not seed hais that are associated with valid balloons. But think about that first
         List<BlockPos> seeds = new ArrayList<>();
@@ -50,8 +56,11 @@ public class HaiGroup {
         generateBalloons(discoveredVolumes);
     }
 
-    public void regenerateRLEVolume() {
+    public void regenerateRLEVolume(Level level) {
         groupAABB = BalloonRegistryUtility.calculateGroupAABB(hais);
+        if (ship == null && hais.size() > 0) {
+            ship = (ServerShip)VSGameUtilsKt.getShipManagingPos(level, hais.get(0).position());
+        }
         rleVolume.regenerate(hais, groupAABB);
     }
 
@@ -107,25 +116,7 @@ public class HaiGroup {
     }
 
     public boolean isInsideRleVolume(BlockPos pos) {
-        if (groupAABB == null) return false;
-        int y = pos.getY() - (int) groupAABB.minY;
-        int x = pos.getX() - (int) groupAABB.minX;
-
-        if (y < 0 || y >= rleVolume.get().length || x < 0 || x >= rleVolume.get()[y].length) {
-            return false;
-        }
-
-        List<Pair<Integer, Integer>> zIntervals = rleVolume.get()[y][x];
-        if (zIntervals == null || zIntervals.isEmpty()) {
-            return false;
-        }
-
-        int worldZ = pos.getZ();
-        for (Pair<Integer, Integer> interval : zIntervals) {
-            if (worldZ >= interval.getFirst() && worldZ <= interval.getSecond()) {
-                return true;
-            }
-        }
-        return false;
+        AABBic shipAABB = ship.getShipAABB();
+        return rleVolume.isInside(pos.getX(), pos.getY(), pos.getZ(), groupAABB, shipAABB);
     }
 }

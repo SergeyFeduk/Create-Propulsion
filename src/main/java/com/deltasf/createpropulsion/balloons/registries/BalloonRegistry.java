@@ -51,7 +51,7 @@ public class BalloonRegistry {
         }
 
         haiDataMap.put(id, data);
-        BalloonRegistryUtility.addHaiAndRegroup(data, haiGroups, haiGroupMap);
+        BalloonRegistryUtility.addHaiAndRegroup(data, haiGroups, haiGroupMap, level);
     }
 
     public void unregisterHai(UUID id, Level level) {
@@ -75,9 +75,9 @@ public class BalloonRegistry {
         boolean groupHasSplit = BalloonRegistryUtility.didGroupSplit(affectedGroup.hais);
 
         if (!groupHasSplit) {
-            handleShrinkedGroup(id, affectedGroup);
+            handleShrinkedGroup(id, affectedGroup, level);
         } else {
-            handleSplitGroups(id, affectedGroup);
+            handleSplitGroups(id, affectedGroup, level);
         }
     }
 
@@ -110,9 +110,9 @@ public class BalloonRegistry {
         return Collections.unmodifiableList(balloons);
     }
 
-    private void handleShrinkedGroup(UUID id, HaiGroup affectedGroup) {
+    private void handleShrinkedGroup(UUID id, HaiGroup affectedGroup, Level level) {
         //Recalculate AABB
-        affectedGroup.regenerateRLEVolume();
+        affectedGroup.regenerateRLEVolume(level);
 
         //Revalidate all balloons
         List<Balloon> survivingBalloons = new ArrayList<>();
@@ -128,13 +128,13 @@ public class BalloonRegistry {
         affectedGroup.balloons.addAll(survivingBalloons);
     }
 
-    private void handleSplitGroups(UUID id, HaiGroup affectedGroup) {
+    private void handleSplitGroups(UUID id, HaiGroup affectedGroup, Level level) {
         //Original group is invalid, remove it but keep orphaned balloons
         haiGroups.remove(affectedGroup);
         List<Balloon> orphanedBalloons = new ArrayList<>(affectedGroup.balloons);
 
         //Create new groups from remaining pieces, add to registry and map
-        List<HaiGroup> newGroups = BalloonRegistryUtility.splitAndRecreateGroups(affectedGroup.hais, haiGroups, haiGroupMap);
+        List<HaiGroup> newGroups = BalloonRegistryUtility.splitAndRecreateGroups(affectedGroup.hais, haiGroups, haiGroupMap, level);
 
         //Try to rehome each orphaned balloon
         for(Balloon orphan : orphanedBalloons) {

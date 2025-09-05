@@ -20,6 +20,7 @@ import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry.HaiData;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 
 public class BalloonRegistryUtility {
@@ -66,7 +67,7 @@ public class BalloonRegistryUtility {
         return visited.size() < group.size();
     }
 
-    public static void addHaiAndRegroup(HaiData data, List<HaiGroup> haiGroups, Map<UUID, HaiGroup> haiGroupMap) {
+    public static void addHaiAndRegroup(HaiData data, List<HaiGroup> haiGroups, Map<UUID, HaiGroup> haiGroupMap, Level level) {
         List<HaiGroup> intersectingGroups = new ArrayList<>();
 
         for (HaiGroup group : haiGroups) {
@@ -79,14 +80,14 @@ public class BalloonRegistryUtility {
             //Case 1: New hai group
             HaiGroup group = new HaiGroup();
             group.hais.add(data);
-            group.regenerateRLEVolume();
+            group.regenerateRLEVolume(level);
             haiGroups.add(group);
             haiGroupMap.put(data.id(), group);
         } else if (intersectingGroups.size() == 1) {
             //Case 2: Add hai to a single group
             HaiGroup group = intersectingGroups.get(0);
             group.hais.add(data);
-            group.regenerateRLEVolume();
+            group.regenerateRLEVolume(level);
             haiGroupMap.put(data.id(), group);
         } else {
             //Case 3: Add hai and merge intersecting groups
@@ -125,7 +126,7 @@ public class BalloonRegistryUtility {
         return combinedAABB;
     }
 
-    public static List<HaiGroup> splitAndRecreateGroups(List<HaiData> group, List<HaiGroup> haiGroups, Map<UUID, HaiGroup> haiGroupMap) {
+    public static List<HaiGroup> splitAndRecreateGroups(List<HaiData> group, List<HaiGroup> haiGroups, Map<UUID, HaiGroup> haiGroupMap, Level level) {
         List<HaiData> remainingHais = new ArrayList<>(group);
         List<HaiGroup> generatedSubGroups = new ArrayList<>();
 
@@ -153,7 +154,7 @@ public class BalloonRegistryUtility {
                 }
             }
             //Finalize new sub group
-            newSubGroup.regenerateRLEVolume();
+            newSubGroup.regenerateRLEVolume(level);
             haiGroups.add(newSubGroup);
             for(HaiData hai : newSubGroup.hais) {
                 haiGroupMap.put(hai.id(), newSubGroup);
