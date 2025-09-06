@@ -2,6 +2,7 @@ package com.deltasf.createpropulsion.balloons.hot_air;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Nonnull;
@@ -24,26 +25,33 @@ import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.BalloonForceChunk;
 import com.deltasf.createpropulsion.balloons.HaiGroup;
 import com.deltasf.createpropulsion.balloons.Balloon.ChunkKey;
+import com.deltasf.createpropulsion.balloons.atmosphere.BalloonDimensionManager;
+import com.deltasf.createpropulsion.balloons.atmosphere.DimensionAtmosphere;
+import com.deltasf.createpropulsion.balloons.atmosphere.BalloonDimensionManager.AtmosphereProperties;
 import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
 import com.deltasf.createpropulsion.utility.AttachmentUtils;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.levelgen.FlatLevelSource;
+import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
 
 //Current model adds some custom drag, both linear and angular. VS 2.5 should handle this for us
 //So after updating to it - get rid of our drag, or at least change default values
 @SuppressWarnings("deprecation")
 public class BalloonAttachment implements ShipForcesInducer {
     public BalloonAttachment() {}
-    private final double epsilon = 1e-5;
+    private record AtmosphereData(double pressureAtSea, double scaleHeight, double gravity, int seaLevel) {}
+    private AtmosphereData atmosphereData;
 
-    private double pressureAtSea = 1.225; 
-    private double SCALE_HEIGHT = 200;
-
-    private final double G = 9.81;
+    private static final double epsilon = 1e-5;
 
     @Override
     public void applyForces(@NotNull PhysShip physicShip) {
+        if (this.atmosphereData == null) { return; }
+
         List<Balloon> balloons = BalloonShipRegistry.forShip(physicShip.getId()).getBalloons();
         Matrix4dc shipToWorld = physicShip.getTransform().getShipToWorld();
 
@@ -151,7 +159,7 @@ public class BalloonAttachment implements ShipForcesInducer {
 
             //Calculate force magnitude
             double externalDensity = calculateExternalAirDensity(tmpWorldPos.y);
-            double forceMagnitude = chunk.blockCount * externalDensity * G * PropulsionConfig.BALLOON_K_COEFFICIENT.get() * fullness;
+            double forceMagnitude = chunk.blockCount * externalDensity * atmosphereData.gravity() * PropulsionConfig.BALLOON_K_COEFFICIENT.get() * fullness;
             forceMagnitude = Math.max(0, forceMagnitude * PropulsionConfig.BALLOON_FORCE_COEFFICIENT.get());
             //Calculate force vector
             tmpForce.set(upWorld).mul(forceMagnitude);
@@ -163,10 +171,12 @@ public class BalloonAttachment implements ShipForcesInducer {
         }
     }
 
-    private double calculateExternalAirDensity(double altitude) {
-        return pressureAtSea * Math.exp(-altitude/SCALE_HEIGHT);
+    private double calculateExternalAirDensity(double worldY) {
+        double altitude = worldY - this.atmosphereData.seaLevel();
+        return this.atmosphereData.pressureAtSea() * Math.exp(-altitude / this.atmosphereData.scaleHeight());
     }
 
+    //Buoyant force
     private final Vector3d accumulatedForce = new Vector3d();
     private final Vector3d accumulatedTorque = new Vector3d();
     private final Vector3d tmpWorldPos = new Vector3d();
@@ -180,21 +190,42 @@ public class BalloonAttachment implements ShipForcesInducer {
     private final Vector3d dampingTorqueShipSpace = new Vector3d();
     private final Vector3d dampingTorqueWorldSpace = new Vector3d();
 
-    public static BalloonAttachment getOrCreateAsAttachment(Level level, ServerShip ship){
-        return AttachmentUtils.getOrCreate(ship, BalloonAttachment.class, () -> {
-            BalloonAttachment attachment = new BalloonAttachment();
-            return attachment;
-        });
-    }
-
+    //Attachment bloat
     public static BalloonAttachment get(Level level, BlockPos pos) {
         return AttachmentUtils.get(level, pos, BalloonAttachment.class, () -> {
             BalloonAttachment attachment = new BalloonAttachment();
+            
+            updateAtmosphereData(attachment, level);
+
             return attachment;
         });
     }
 
     public static void ensureAttachmentExists(@Nonnull Level level, @Nonnull BlockPos pos) {
         get(level, pos);
-    } 
+    }
+
+    public static void updateAtmosphereData(BalloonAttachment attachment, Level level) {
+        AtmosphereProperties atmosphere = BalloonDimensionManager.getProperties(level);
+        //Nuh uh no division by zero for you
+        double scaleHeight = atmosphere.scaleHeight() > epsilon ? atmosphere.scaleHeight() : BalloonDimensionManager.DEFAULT.scaleHeight();
+
+        attachment.atmosphereData = new AtmosphereData(
+            atmosphere.pressureAtSeaLevel(), 
+            scaleHeight, 
+            atmosphere.gravity(),
+            determineSeaLevel(level)
+        );
+    }
+
+    private static int determineSeaLevel(Level level) {
+        if (level instanceof ServerLevel serverLevel) {
+            ChunkGenerator generator = serverLevel.getChunkSource().getGenerator();
+            if (generator instanceof FlatLevelSource) {
+                return -60;
+            }
+        }
+
+        return level.getSeaLevel();
+    }
 }

@@ -1,6 +1,7 @@
 package com.deltasf.createpropulsion.events;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.valkyrienskies.core.api.ships.ServerShip;
@@ -8,6 +9,7 @@ import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
+import com.deltasf.createpropulsion.balloons.hot_air.BalloonAttachment;
 import com.deltasf.createpropulsion.magnet.MagnetForceAttachment;
 import com.deltasf.createpropulsion.magnet.MagnetRegistry;
 import com.deltasf.createpropulsion.network.PropulsionPackets;
@@ -20,6 +22,7 @@ import com.deltasf.createpropulsion.thruster.ThrusterFuelManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -64,9 +67,9 @@ public class ForgeEvents {
     @SubscribeEvent
     public static void onServerStarting(ServerStartingEvent event) {
         MagnetRegistry.get().reset();
+        //TODO: Reset balloon registry
     }
 
-    //Restore MagnetForceAttachment levels
     @SubscribeEvent
 	public static void onServerStart(ServerStartedEvent event) {
         Map<ResourceLocation, ServerLevel> levelLookup = new HashMap<>();
@@ -81,16 +84,23 @@ public class ForgeEvents {
 
         var allShips = VSGameUtilsKt.getAllShips(overworld);
         for (Ship ship : allShips) {
-            if (ship instanceof ServerShip sShip) {
-                var attachment = sShip.getAttachment(MagnetForceAttachment.class);
-                if (attachment == null) continue;
-                String shipDimensionId = sShip.getChunkClaimDimension();
+            if (ship instanceof ServerShip serverShip) {
+                String shipDimensionId = serverShip.getChunkClaimDimension();
                 if (shipDimensionId != null && shipDimensionId.startsWith(PREFIX)) {
                     String resourceLocationString = shipDimensionId.substring(PREFIX.length());
                     ResourceLocation dimensionKey = new ResourceLocation(resourceLocationString);
                     ServerLevel level = levelLookup.get(dimensionKey);
-                    if (level != null) {
-                        attachment.level = level;
+                    if (level == null) continue; //Wtf
+
+                    //Restore MagnetForceAttachment levels
+                    var magnetAttachment  = serverShip.getAttachment(MagnetForceAttachment.class);
+                    if (magnetAttachment != null) {
+                        magnetAttachment.level = level;
+                    }
+                    //Restore BalloonAttachment atmosphere data
+                    var balloonAttachment = serverShip.getAttachment(BalloonAttachment.class);
+                    if (balloonAttachment != null) {
+                        BalloonAttachment.updateAtmosphereData(balloonAttachment, level);
                     }
                 }
             }
