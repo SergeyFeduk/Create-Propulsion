@@ -10,6 +10,7 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.balloons.hot_air.BalloonAttachment;
+import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
 import com.deltasf.createpropulsion.magnet.MagnetForceAttachment;
 import com.deltasf.createpropulsion.magnet.MagnetRegistry;
 import com.deltasf.createpropulsion.network.PropulsionPackets;
@@ -67,7 +68,7 @@ public class ForgeEvents {
     @SubscribeEvent
     public static void onServerStarting(ServerStartingEvent event) {
         MagnetRegistry.get().reset();
-        //TODO: Reset balloon registry
+        BalloonShipRegistry.get().reset();
     }
 
     @SubscribeEvent
