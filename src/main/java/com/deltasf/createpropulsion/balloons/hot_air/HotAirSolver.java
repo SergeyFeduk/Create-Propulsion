@@ -4,14 +4,13 @@ import java.util.UUID;
 
 import java.lang.Math;
 
+import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.HaiGroup;
 
 //"Solver" word is a bit of overkill, but it sounds cooler this way :D
 public class HotAirSolver {
-    static final double surfaceLeakfactor = 1e-4;
     static final double surfaceAreaFactor = 6;
-    static final double holeLeakFactor = 0.2;
 
     public static void tickBalloon(Balloon balloon) {
         double hotAirAmount = balloon.hotAir;
@@ -28,9 +27,9 @@ public class HotAirSolver {
         //Global surface leak
         //TODO: For now we approximate area as it is a cube. I'll replace it with sphere approximation later 
         double surfaceArea = surfaceAreaFactor * Math.pow(volume, 2.0/3.0);
-        hotAirChange -= surfaceLeakfactor * surfaceArea * fullness;
+        hotAirChange -= PropulsionConfig.BALLOON_SURFACE_LEAK_FACTOR.get() * surfaceArea * fullness;
         //Hole leak
-        hotAirChange -= balloon.holes.size() * holeLeakFactor * fullness;
+        hotAirChange -= balloon.holes.size() * PropulsionConfig.BALLOON_HOLE_LEAK_FACTOR.get() * fullness;
 
         //Update hotAirAmount
         final double dt = 1 / 20.0; //For now a second will be the unit of time, may change

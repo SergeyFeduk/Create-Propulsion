@@ -32,6 +32,8 @@ public class PropulsionConfig {
     public static final ForgeConfigSpec.ConfigValue<Double> BALLOON_ALIGNMENT_KP;
     public static final ForgeConfigSpec.ConfigValue<Double> BALLOON_VERTICAL_DRAG_COEFFICIENT;
     public static final ForgeConfigSpec.ConfigValue<Double> BALLOON_HORIZONTAL_DRAG_COEFFICIENT;
+    public static final ForgeConfigSpec.ConfigValue<Double> BALLOON_SURFACE_LEAK_FACTOR;
+    public static final ForgeConfigSpec.ConfigValue<Double> BALLOON_HOLE_LEAK_FACTOR; 
 
     static {
         //#region Server
@@ -82,6 +84,11 @@ public class PropulsionConfig {
                     .define("BALLOON_VERTICAL_DRAG_COEFFICIENT", 100.0);
             BALLOON_HORIZONTAL_DRAG_COEFFICIENT = SERVER_BUILDER.comment("BALLOON_HORIZONTAL_DRAG_COEFFICIENT.")
                     .define("BALLOON_HORIZONTAL_DRAG_COEFFICIENT", 100.0);
+
+            BALLOON_SURFACE_LEAK_FACTOR = SERVER_BUILDER.comment("BALLOON_SURFACE_LEAK_FACTOR.")
+                    .define("BALLOON_SURFACE_LEAK_FACTOR", 1e-4);
+            BALLOON_HOLE_LEAK_FACTOR = SERVER_BUILDER.comment("BALLOON_HOLE_LEAK_FACTOR.")
+                    .define("BALLOON_HOLE_LEAK_FACTOR", 0.2);
         SERVER_BUILDER.pop();
 
         SERVER_SPEC = SERVER_BUILDER.build();
