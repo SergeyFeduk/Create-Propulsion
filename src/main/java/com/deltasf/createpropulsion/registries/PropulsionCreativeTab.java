@@ -55,7 +55,7 @@ public class PropulsionCreativeTab {
                 output.accept(PropulsionItems.FOCUS_LENS);
                 output.accept(PropulsionItems.INVISIBILITY_LENS);
                 //From 0.3
-                output.accept(PropulsionBlocks.HAB_BLOCK);
+                output.accept(PropulsionBlocks.ENVELOPE_BLOCK);
                 output.accept(PropulsionBlocks.HAI_BLOCK);
             }
         }

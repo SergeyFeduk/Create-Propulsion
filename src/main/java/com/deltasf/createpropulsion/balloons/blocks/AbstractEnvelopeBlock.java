@@ -1,18 +1,17 @@
 package com.deltasf.createpropulsion.balloons.blocks;
 
+import javax.annotation.Nonnull;
+
+import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
-import javax.annotation.Nonnull;
-
-import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
-import com.deltasf.createpropulsion.balloons.registries.BalloonUpdater;
-
 @SuppressWarnings("deprecation")
-public class HabBlock extends Block {
-    public HabBlock(Properties properties) {
+public abstract class AbstractEnvelopeBlock extends Block {
+    public AbstractEnvelopeBlock(Properties properties) {
         super(properties);
     }
 

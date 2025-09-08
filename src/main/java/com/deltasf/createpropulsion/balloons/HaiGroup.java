@@ -71,7 +71,7 @@ public class HaiGroup {
     }
 
     public static boolean isHab(BlockPos pos, Level level) {
-        return level.getBlockState(pos).is(PropulsionBlocks.HAB_BLOCK.get());
+        return level.getBlockState(pos).is(PropulsionBlocks.ENVELOPE_BLOCK.get());
     }
 
     public static BlockPos getSeedFromHai(HaiData data, Level level) {

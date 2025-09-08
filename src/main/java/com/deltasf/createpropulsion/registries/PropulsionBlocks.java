@@ -1,7 +1,7 @@
 package com.deltasf.createpropulsion.registries;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
-import com.deltasf.createpropulsion.balloons.blocks.HabBlock;
+import com.deltasf.createpropulsion.balloons.blocks.EnvelopeBlock;
 import com.deltasf.createpropulsion.balloons.blocks.HaiBlock;
 import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerBlock;
 import com.deltasf.createpropulsion.magnet.RedstoneMagnetBlock;
@@ -70,7 +70,7 @@ public class PropulsionBlocks {
         .simpleItem()
         .register();
     
-    public static final BlockEntry<HabBlock> HAB_BLOCK = REGISTRATE.block("hab_block", HabBlock::new)
+    public static final BlockEntry<EnvelopeBlock> ENVELOPE_BLOCK = REGISTRATE.block("envelope", EnvelopeBlock::new)
         .simpleItem()
         .register();
     
