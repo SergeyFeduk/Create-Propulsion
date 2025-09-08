@@ -9,7 +9,6 @@ import com.deltasf.createpropulsion.optical_sensors.InlineOpticalSensorBlock;
 import com.deltasf.createpropulsion.optical_sensors.OpticalSensorBlock;
 import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerBlock;
 import com.deltasf.createpropulsion.thruster.thruster.ThrusterBlock;
-import com.deltasf.createpropulsion.tilt_sensor.TiltSensorBlock;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.BlockEntry;
 
@@ -77,12 +76,4 @@ public class PropulsionBlocks {
     public static final BlockEntry<HaiBlock> HAI_BLOCK = REGISTRATE.block("hai_block", HaiBlock::new)
         .simpleItem()
         .register();
-    
-    /*public static final BlockEntry<TiltSensorBlock> TILT_SENSOR_BLOCK = REGISTRATE.block("tilt_sensor", TiltSensorBlock::new)
-        .properties(p -> p.mapColor(MapColor.COLOR_YELLOW))
-        .properties(p -> p.sound(SoundType.METAL))
-        .properties(p -> p.strength(2.5F, 2.0F))
-        .properties(p -> p.noOcclusion())
-        .simpleItem()
-        .register();*/
 }

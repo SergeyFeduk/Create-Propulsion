@@ -11,7 +11,6 @@ import com.deltasf.createpropulsion.optical_sensors.rendering.OpticalSensorRende
 import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerBlockEntity;
 import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerRenderer;
 import com.deltasf.createpropulsion.thruster.thruster.ThrusterBlockEntity;
-import com.deltasf.createpropulsion.tilt_sensor.TiltSensorBlockEntity;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.BlockEntityEntry;
 
@@ -57,9 +56,4 @@ public class PropulsionBlockEntities {
         REGISTRATE.blockEntity("hai_block_entity", HaiBlockEntity::new)
         .validBlock(PropulsionBlocks.HAI_BLOCK)
         .register();
-
-    /*public static final BlockEntityEntry<TiltSensorBlockEntity> TILT_SENSOR_BLOCK_ENTITY =
-        REGISTRATE.blockEntity("tilt_sensor_block_entity", TiltSensorBlockEntity::new)
-        .validBlock(PropulsionBlocks.TILT_SENSOR_BLOCK)
-        .register();*/
 }
