@@ -73,8 +73,10 @@ public class HaiGroup {
             }
         }
 
-        for(Balloon balloon : balloonsToKill) {
-            killBalloon(balloon);
+        synchronized(balloons) {
+            for(Balloon balloon : balloonsToKill) {
+                killBalloon(balloon);
+            }
         }
     }
 
