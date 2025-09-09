@@ -29,11 +29,13 @@ public class BalloonStitcher {
 
     public static void extend(Balloon target, DiscoveredVolume extension) {
         target.addAll(extension.volume());
+        target.resolveHolesAfterMerge();
     }
 
     public static void mergeInto(Balloon target, Balloon source, HaiGroup owner) {
         target.mergeFrom(source);
         owner.balloons.remove(source);
+        target.resolveHolesAfterMerge();
     }
 
     public static void handleSplit(Balloon originalBalloon, BlockPos splitPos, HaiGroup owner) {

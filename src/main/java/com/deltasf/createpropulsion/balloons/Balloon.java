@@ -121,6 +121,21 @@ public class Balloon implements Iterable<BlockPos> {
         supportHais.addAll(other.supportHais);
     }
 
+    public void resolveHolesAfterMerge() {
+        //Check if any holes ended up in the new volume. If they did - remove them
+        List<BlockPos> holesToKill = new ArrayList<>();
+        
+        for(BlockPos hole : holes) {
+            if (volume.contains(hole.asLong())) {
+                holesToKill.add(hole);
+            }
+        }
+        //Kill
+        for(BlockPos hole : holesToKill) {
+            holes.remove(hole);
+        }
+    }
+
     public void addAllTo(Collection<BlockPos> out) {
         Objects.requireNonNull(out);
         final LongIterator it = volume.iterator();

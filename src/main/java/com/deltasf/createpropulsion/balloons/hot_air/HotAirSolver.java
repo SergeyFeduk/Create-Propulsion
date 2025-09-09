@@ -15,6 +15,8 @@ public class HotAirSolver {
     public static void tickBalloon(Balloon balloon) {
         double hotAirAmount = balloon.hotAir;
         double hotAirChange = 0;
+        //TODO: If the balloon is marked as invalid and has zero hot air - recheck its validity and if still invalid - destroy it
+
         //Hai injections
         for(UUID hai : balloon.supportHais) {
             //TODO: obtain actual hai object and get the injection amount

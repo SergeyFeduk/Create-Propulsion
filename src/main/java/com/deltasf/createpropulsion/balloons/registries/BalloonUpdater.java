@@ -92,7 +92,6 @@ public class BalloonUpdater {
                     BalloonStitcher.removeHole(balloon, pos);
                     modifiedBalloons.add(balloon);
                     eventHandled = true;
-                    break;
                 }
             }
 
