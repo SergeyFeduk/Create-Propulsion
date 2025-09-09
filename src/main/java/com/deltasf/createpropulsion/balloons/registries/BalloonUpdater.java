@@ -35,8 +35,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 public class BalloonUpdater {
-    //Todo: for every ship we perform scan for - recalculate the topY as it may change 
-    
     private Map<ResourceKey<Level>, Queue<DynamicUpdate>> eventQueues = new HashMap<>();
     private record DynamicUpdate(BlockPos position, boolean isPlacement) {};
     private record EventGroup(List<BlockPos> positions, boolean isPlacement) {};
@@ -89,40 +87,26 @@ public class BalloonUpdater {
 
             boolean eventHandled = false;
 
-            // 1. Check if the placement plugs a pre-existing hole.
             for (Balloon balloon : affectedBalloons) {
-                // The `holes` set contains the BlockPos of the *removed block*,
-                // which is exactly where we are now placing a new one.
                 if (balloon.holes.contains(pos)) {
                     BalloonStitcher.removeHole(balloon, pos);
                     modifiedBalloons.add(balloon);
                     eventHandled = true;
-                    // As per your correct analysis, a hole can only belong to one balloon.
-                    // Once we've handled it, we can stop processing this placement event.
                     break;
                 }
             }
 
             if (eventHandled) {
-                continue; // Move to the next placement event in the subgroup.
+                continue;
             }
 
-            // 2. If it wasn't a hole, check if the placement is inside a balloon's volume,
-            // which would cause a potential split.
             for (Balloon balloon : affectedBalloons) {
-                // The pre-filter already found balloons containing this position.
                 if (balloon.contains(pos)) {
                     BalloonStitcher.handleSplit(balloon, pos, subGroup.haiGroup());
                     modifiedBalloons.add(balloon);
-                    // A single block can only be inside one balloon's volume.
-                    // Once we've initiated the split, we are done with this event.
                     break;
                 }
             }
-
-            // If neither of the above conditions are met, it means the block was placed
-            // on the outer shell of a balloon, which simply expands the solid part.
-            // This requires no change to the balloon's internal air volume, so no action is needed.
         }
 
         //Resolve balloon's chunks
