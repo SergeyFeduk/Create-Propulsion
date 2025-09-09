@@ -202,10 +202,7 @@ public class BalloonUpdater {
         //TODO: Temp, replace with invalidation
         //I'm actually not sure if there is a case when modified balloon will be invalid, but better safe than sorry
         for (Balloon balloon : modifiedBalloons) {
-            if (!BalloonRegistryUtility.isBalloonValid(balloon, haiGroup)) {
-                System.out.println("WARNING: Balloon " + balloon.hashCode() + " became invalid after dynamic update!");
-            }
-
+            balloon.isInvalid = !BalloonRegistryUtility.isBalloonValid(balloon, haiGroup);
             balloon.resolveDirtyChunks();
         }
 

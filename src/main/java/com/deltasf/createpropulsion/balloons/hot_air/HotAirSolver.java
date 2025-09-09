@@ -7,16 +7,27 @@ import java.lang.Math;
 import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.HaiGroup;
+import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry;
+import com.deltasf.createpropulsion.balloons.utils.BalloonRegistryUtility;
 
 //"Solver" word is a bit of an overkill, but it sounds cooler this way :D
 public class HotAirSolver {
     static final double surfaceAreaFactor = 6;
+    static final double epsilon = 1e-2;
 
-    public static void tickBalloon(Balloon balloon) {
+    public static void tickBalloon(Balloon balloon, HaiGroup group, BalloonRegistry registry) {
         double hotAirAmount = balloon.hotAir;
         double hotAirChange = 0;
-        //TODO: If the balloon is marked as invalid and has zero hot air - recheck its validity and if still invalid - destroy it
-
+        //Handle invalidation
+        if (balloon.isInvalid && hotAirAmount <= epsilon) {
+            //Recheck validity
+            balloon.isInvalid = !BalloonRegistryUtility.isBalloonValid(balloon, group);
+            if (balloon.isInvalid) {
+                //Bro did not survive this
+                group.killBalloon(balloon);
+                return;
+            }
+        }
         //Hai injections
         for(UUID hai : balloon.supportHais) {
             //TODO: obtain actual hai object and get the injection amount
@@ -27,7 +38,6 @@ public class HotAirSolver {
         double volume = balloon.getVolumeSize();
         double fullness = hotAirAmount / volume;
         //Global surface leak
-        //TODO: For now we approximate area as it is a cube. I'll replace it with sphere approximation later 
         double surfaceArea = surfaceAreaFactor * Math.pow(volume, 2.0/3.0);
         hotAirChange -= PropulsionConfig.BALLOON_SURFACE_LEAK_FACTOR.get() * surfaceArea * fullness;
         //Hole leak

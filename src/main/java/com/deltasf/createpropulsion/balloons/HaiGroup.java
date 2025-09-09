@@ -14,6 +14,7 @@ import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import com.deltasf.createpropulsion.balloons.hot_air.HotAirSolver;
+import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry.HaiData;
 import com.deltasf.createpropulsion.balloons.utils.BalloonDebug;
 import com.deltasf.createpropulsion.balloons.utils.BalloonRegistryUtility;
@@ -64,9 +65,9 @@ public class HaiGroup {
         rleVolume.regenerate(hais, groupAABB);
     }
 
-    public void tickBalloons() {
+    public void tickBalloons(BalloonRegistry registry) {
         for(Balloon balloon : balloons) {
-            HotAirSolver.tickBalloon(balloon);
+            HotAirSolver.tickBalloon(balloon, this, registry);
         }
     }
 
@@ -83,6 +84,11 @@ public class HaiGroup {
         }
 
         return null;
+    }
+
+    public void killBalloon(Balloon balloon) {
+        balloons.remove(balloon);
+        //Ugghh, do I need to update something else? 
     }
 
     private void generateBalloons(List<DiscoveredVolume> discoveredVolumes) {

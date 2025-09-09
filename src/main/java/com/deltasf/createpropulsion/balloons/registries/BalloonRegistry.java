@@ -91,7 +91,7 @@ public class BalloonRegistry {
 
     public void tickHaiGroups() {
         for(HaiGroup group : haiGroups) {
-            group.tickBalloons();
+            group.tickBalloons(this);
         }
     }
 

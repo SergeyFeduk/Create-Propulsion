@@ -37,6 +37,7 @@ public class Balloon implements Iterable<BlockPos> {
     public Set<BlockPos> holes = new HashSet<>();
     //Gameplay data
     public volatile double hotAir = 0;
+    public boolean isInvalid;
 
     public Balloon(Collection<BlockPos> initialVolume, AABB initialBounds, Set<UUID> supportHais) {
         this.supportHais = (supportHais == null) ? new HashSet<>() : new HashSet<>(supportHais);
@@ -47,6 +48,7 @@ public class Balloon implements Iterable<BlockPos> {
         } else {
             if (initialBounds != null) this.boundsCache = initialBounds;
         }
+        isInvalid = initialVolume == null || initialVolume.isEmpty();
     }
 
     //Api

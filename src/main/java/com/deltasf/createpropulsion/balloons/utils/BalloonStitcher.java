@@ -110,9 +110,7 @@ public class BalloonStitcher {
         owner.balloons.addAll(newBalloons);
 
         for (Balloon newBalloon : newBalloons) {
-            if (!BalloonRegistryUtility.isBalloonValid(newBalloon, owner)) {
-                System.out.println("WARNING: New balloon " + newBalloon.hashCode() + " created from split is invalid!");
-            }
+            newBalloon.isInvalid = !BalloonRegistryUtility.isBalloonValid(newBalloon, owner);
         }
     }
 
