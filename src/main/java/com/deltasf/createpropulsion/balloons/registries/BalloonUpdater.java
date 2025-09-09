@@ -158,8 +158,16 @@ public class BalloonUpdater {
                         // For each seed, get the balloons that were originally next to it.
                         List<Balloon> balloonsToGetHole = subGroup.affectedBalloonsMap().get(holeSeed);
                         for (Balloon balloon : balloonsToGetHole) {
-                            BalloonStitcher.createHole(balloon, holeSeed);
-                            modifiedBalloons.add(balloon);
+                            //Check if the hole is NOT EXCLUSIEVELY BELOW the balloon. If so - don't create a hole as blocks below balloons volume cannot be holes
+                            boolean isNotBelow = balloon.contains(holeSeed.below()) 
+                                              || balloon.contains(holeSeed.north()) 
+                                              || balloon.contains(holeSeed.south())
+                                              || balloon.contains(holeSeed.east())
+                                              || balloon.contains(holeSeed.west());
+                            if (isNotBelow) {
+                                BalloonStitcher.createHole(balloon, holeSeed);
+                                modifiedBalloons.add(balloon);
+                            }
                         }
                     }
                 }
