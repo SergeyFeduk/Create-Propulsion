@@ -15,7 +15,7 @@ public class HotAirSolver {
     static final double surfaceAreaFactor = 6;
     static final double epsilon = 1e-2;
 
-    public static void tickBalloon(Balloon balloon, HaiGroup group, BalloonRegistry registry) {
+    public static boolean tickBalloon(Balloon balloon, HaiGroup group, BalloonRegistry registry) {
         double hotAirAmount = balloon.hotAir;
         double hotAirChange = 0;
         //Handle invalidation
@@ -24,8 +24,7 @@ public class HotAirSolver {
             balloon.isInvalid = !BalloonRegistryUtility.isBalloonValid(balloon, group);
             if (balloon.isInvalid) {
                 //Bro did not survive this
-                group.killBalloon(balloon);
-                return;
+                return true;
             }
         }
         //Hai injections
@@ -46,5 +45,7 @@ public class HotAirSolver {
         //Update hotAirAmount
         final double dt = 1 / 20.0; //For now a second will be the unit of time, may change
         balloon.hotAir = org.joml.Math.clamp(0, volume, hotAirAmount + hotAirChange * dt);
+
+        return false;
     }
 }
