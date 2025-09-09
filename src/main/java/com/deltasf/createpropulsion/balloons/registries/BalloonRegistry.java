@@ -34,10 +34,7 @@ public class BalloonRegistry {
         return haiGroups;
     }
 
-    public void registerHai(UUID id, HaiBlockEntity blockEntity) {
-        Level level = blockEntity.getLevel();
-        BlockPos pos = blockEntity.getBlockPos();
-
+    public void registerHai(UUID id, Level level, BlockPos pos) {
         //Originally I done probe here, but lets actually set maxY to ships maxY. We still use probing in scan tho
         Ship ship = VSGameUtilsKt.getShipManagingPos(level, pos);
         int deltaY = ship.getShipAABB().maxY() - pos.getY() - 1;
@@ -82,8 +79,8 @@ public class BalloonRegistry {
     }
 
     public void startScanFor(UUID haiId, Level level, BlockPos pos) {
-        if (level.getBlockEntity(pos) instanceof HaiBlockEntity hai) {
-            registerHai(haiId, hai);
+        if (level.getBlockEntity(pos) instanceof HaiBlockEntity) {
+            registerHai(haiId, level, pos);
         } else {
             unregisterHai(haiId, level);
             return;

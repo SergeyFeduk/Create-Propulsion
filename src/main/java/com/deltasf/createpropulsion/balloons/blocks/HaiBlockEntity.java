@@ -20,67 +20,10 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 
-@SuppressWarnings("null")
-public class HaiBlockEntity extends SmartBlockEntity {
+public class HaiBlockEntity extends AbstractHotAirInjectorBlockEntity {
     public HaiBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
-        tryRegister();
     }
 
-    private UUID haiId;
-
-    @Override
-    public void onLoad() {
-        super.onLoad();
-        tryRegister();
-    }
-
-    public void tryRegister() {
-        if (level == null || level.isClientSide) return;
-        if (this.haiId == null) {
-            this.haiId = UUID.randomUUID();
-            setChanged();
-        }
-        //We are functional only on ship
-        Ship ship = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
-        if (ship != null) {
-            BalloonShipRegistry.forShip(ship.getId()).registerHai(haiId, this);
-            BalloonAttachment.ensureAttachmentExists(level, worldPosition);
-        }
-    }
-
-    public void onBlockBroken() {
-        Ship ship = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
-        if (ship != null && this.haiId != null) {
-            BalloonShipRegistry.forShip(ship.getId()).unregisterHai(haiId, level);
-        }
-    }
-
-     public void scan() {
-        if (this.haiId == null || this.level == null || this.level.isClientSide()) return;
-        Ship ship = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
-        if (ship != null) {
-            BalloonShipRegistry.forShip(ship.getId()).startScanFor(haiId, this.level, worldPosition);
-            BalloonAttachment.ensureAttachmentExists(level, worldPosition);
-        }
-    }
-
-    @Override
-    protected void read(CompoundTag tag, boolean isClient) {
-        super.read(tag, isClient);
-        if (tag.hasUUID("id")) {
-            this.haiId = tag.getUUID("id");
-        }
-    }
-
-    @Override
-    protected void write(CompoundTag tag, boolean isClient) {
-        super.write(tag, isClient);
-        if (this.haiId != null) {
-            tag.putUUID("id", this.haiId);
-        }
-    }
-
-    @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {}
 }

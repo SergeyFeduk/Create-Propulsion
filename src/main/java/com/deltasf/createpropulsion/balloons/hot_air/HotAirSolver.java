@@ -8,7 +8,7 @@ import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.HaiGroup;
 
-//"Solver" word is a bit of overkill, but it sounds cooler this way :D
+//"Solver" word is a bit of an overkill, but it sounds cooler this way :D
 public class HotAirSolver {
     static final double surfaceAreaFactor = 6;
 

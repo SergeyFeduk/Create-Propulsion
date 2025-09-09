@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 
 @SuppressWarnings("null")
-public class HaiBlock extends Block implements EntityBlock {
+public class HaiBlock extends AbstractHotAirInjectorBlock {
     public static final BooleanProperty POWERED = BooleanProperty.create("powered");
 
     public HaiBlock(Properties properties) {
@@ -39,19 +39,6 @@ public class HaiBlock extends Block implements EntityBlock {
         return RenderShape.MODEL;
     }
 
-    @SuppressWarnings("deprecation")
-    @Override
-    public void onRemove(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull BlockState newState, boolean isMoving) {
-        //Final destination
-        if (!state.is(newState.getBlock()) && !level.isClientSide) {
-            BlockEntity be = level.getBlockEntity(pos);
-            if (be instanceof HaiBlockEntity rbe) {
-                rbe.onBlockBroken();
-            }
-        }
-        super.onRemove(state, level, pos, newState, isMoving);
-    }
-
     @Override
     public void neighborChanged(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull Block block, @Nonnull BlockPos fromPos, boolean isMoving) {
         if (level.isClientSide()) {
@@ -64,10 +51,7 @@ public class HaiBlock extends Block implements EntityBlock {
         if (wasPowered != isNowPowered) {
             level.setBlock(pos, state.setValue(POWERED, isNowPowered), 3);
             if (isNowPowered) {
-                BlockEntity blockEntity = level.getBlockEntity(pos);
-                if (blockEntity instanceof HaiBlockEntity haiBlockEntity) {
-                    haiBlockEntity.scan();
-                }
+                triggerScan(level, pos);
             }
         }
     }
