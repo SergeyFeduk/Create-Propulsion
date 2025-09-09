@@ -105,6 +105,7 @@ public class Balloon implements Iterable<BlockPos> {
 
     public void mergeFrom(Balloon other) {
         if (other == null) return;
+        //Merge the volume and mark related chunks
         final LongIterator it = other.volume.iterator();
         while (it.hasNext()) {
             long packed = it.nextLong();
@@ -114,6 +115,10 @@ public class Balloon implements Iterable<BlockPos> {
                 markChunkDirtyForPos(x, y, z);
             }
         }
+        //Migrate holes
+        holes.addAll(other.holes);
+        //Migrate support hais
+        supportHais.addAll(other.supportHais);
     }
 
     public void addAllTo(Collection<BlockPos> out) {

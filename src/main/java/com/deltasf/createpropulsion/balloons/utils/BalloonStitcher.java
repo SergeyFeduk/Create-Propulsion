@@ -33,7 +33,6 @@ public class BalloonStitcher {
 
     public static void mergeInto(Balloon target, Balloon source, HaiGroup owner) {
         target.mergeFrom(source);
-        target.supportHais.addAll(source.supportHais);
         owner.balloons.remove(source);
     }
 
