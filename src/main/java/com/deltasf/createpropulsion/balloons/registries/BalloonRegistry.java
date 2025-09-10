@@ -15,6 +15,7 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.HaiGroup;
+import com.deltasf.createpropulsion.balloons.blocks.AbstractHotAirInjectorBlockEntity;
 import com.deltasf.createpropulsion.balloons.blocks.HaiBlockEntity;
 import com.deltasf.createpropulsion.balloons.utils.BalloonRegistryUtility;
 
@@ -32,6 +33,16 @@ public class BalloonRegistry {
 
     public List<HaiGroup> getHaiGroups() {
         return haiGroups;
+    }
+
+    public AbstractHotAirInjectorBlockEntity getInjector(Level level, UUID id) {
+        if (!haiDataMap.containsKey(id)) return null;
+        BlockPos injectorPos = haiDataMap.get(id).position();
+
+        if (level.getBlockEntity(injectorPos) instanceof AbstractHotAirInjectorBlockEntity hai) {
+            return hai;
+        }
+        return null;
     }
 
     public void registerHai(UUID id, Level level, BlockPos pos) {
@@ -89,9 +100,9 @@ public class BalloonRegistry {
         if (group != null) group.scan(level);
     }
 
-    public void tickHaiGroups() {
+    public void tickHaiGroups(Level level) {
         for(HaiGroup group : haiGroups) {
-            group.tickBalloons(this);
+            group.tickBalloons(level, this);
         }
     }
 

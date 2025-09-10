@@ -42,15 +42,16 @@ public abstract class AbstractHotAirInjectorBlockEntity extends SmartBlockEntity
         //We are functional only on ship
         Ship ship = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
         if (ship != null) {
-            BalloonShipRegistry.forShip(ship.getId()).registerHai(haiId, level, worldPosition);
+            BalloonShipRegistry.forShip(ship.getId(), level).registerHai(haiId, level, worldPosition);
             BalloonAttachment.ensureAttachmentExists(level, worldPosition);
         }
     }
 
+    @SuppressWarnings("null")
     public void onBlockBroken() {
         Ship ship = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
         if (ship != null && this.haiId != null) {
-            BalloonShipRegistry.forShip(ship.getId()).unregisterHai(haiId, level);
+            BalloonShipRegistry.forShip(ship.getId(), level).unregisterHai(haiId, level);
         }
     }
 
@@ -59,10 +60,12 @@ public abstract class AbstractHotAirInjectorBlockEntity extends SmartBlockEntity
         if (haiId == null || level == null || level.isClientSide()) return;
         Ship ship = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
         if (ship != null) {
-            BalloonShipRegistry.forShip(ship.getId()).startScanFor(haiId, level, worldPosition);
+            BalloonShipRegistry.forShip(ship.getId(), level).startScanFor(haiId, level, worldPosition);
             BalloonAttachment.ensureAttachmentExists(level, worldPosition);
         }
     }
+
+    public abstract double getInjectionAmount();
 
     //NBT
 

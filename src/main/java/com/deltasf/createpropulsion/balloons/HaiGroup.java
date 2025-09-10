@@ -65,10 +65,10 @@ public class HaiGroup {
         rleVolume.regenerate(hais, groupAABB);
     }
 
-    public void tickBalloons(BalloonRegistry registry) {
+    public void tickBalloons(Level level, BalloonRegistry registry) {
         final List<Balloon> balloonsToKill = new ArrayList<>();
         for(Balloon balloon : balloons) {
-            if (HotAirSolver.tickBalloon(balloon, this, registry)) {
+            if (HotAirSolver.tickBalloon(level, balloon, this, registry)) {
                 balloonsToKill.add(balloon);
             }
         }

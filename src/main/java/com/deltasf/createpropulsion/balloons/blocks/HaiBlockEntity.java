@@ -26,4 +26,8 @@ public class HaiBlockEntity extends AbstractHotAirInjectorBlockEntity {
     }
 
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {}
+
+    public double getInjectionAmount() {
+        return 1;
+    }
 }

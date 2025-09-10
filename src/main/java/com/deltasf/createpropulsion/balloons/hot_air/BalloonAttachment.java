@@ -52,7 +52,7 @@ public class BalloonAttachment implements ShipForcesInducer {
     public void applyForces(@NotNull PhysShip physicShip) {
         if (this.atmosphereData == null) { return; }
 
-        List<Balloon> balloons = BalloonShipRegistry.forShip(physicShip.getId()).getBalloons();
+        List<Balloon> balloons = BalloonShipRegistry.forShip(physicShip.getId()).getBalloons(); 
         Matrix4dc shipToWorld = physicShip.getTransform().getShipToWorld();
 
         accumulatedForce.zero();

@@ -2,7 +2,14 @@ package com.deltasf.createpropulsion.balloons.registries;
 
 import java.util.Collection;
 
+import javax.annotation.Nonnull;
+
+import org.valkyrienskies.mod.common.VSGameUtilsKt;
+
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
 
 public class BalloonShipRegistry {
     private static BalloonShipRegistry INSTANCE;
@@ -15,10 +22,18 @@ public class BalloonShipRegistry {
     public static final int MAX_HORIZONTAL_SCAN = 17;
 
     private final Long2ObjectOpenHashMap<BalloonRegistry> registries = new Long2ObjectOpenHashMap<>();
+    private final Long2ObjectOpenHashMap<ServerLevel> shipIdToLevel = new Long2ObjectOpenHashMap<>();
     private final BalloonUpdater updater = new BalloonUpdater();
 
     public static BalloonRegistry forShip(long shipId) {
         return BalloonShipRegistry.get().registries.computeIfAbsent(shipId, k -> new BalloonRegistry());
+    }
+
+    public static BalloonRegistry forShip(long shipId, @Nonnull Level level) {
+        if (level instanceof ServerLevel serverLevel) {
+            get().shipIdToLevel.put(shipId, serverLevel);
+        }
+        return forShip(shipId);
     }
 
     public static BalloonUpdater updater() { return get().updater; }
@@ -29,6 +44,14 @@ public class BalloonShipRegistry {
 
     public Collection<BalloonRegistry> getRegistries() {
         return registries.values();
+    }
+
+    public Long2ObjectMap<ServerLevel> getShipToLevelMap() {
+        return shipIdToLevel;
+    }
+
+    public Long2ObjectMap<BalloonRegistry> getShipRegistries() {
+        return registries;
     }
 }
  

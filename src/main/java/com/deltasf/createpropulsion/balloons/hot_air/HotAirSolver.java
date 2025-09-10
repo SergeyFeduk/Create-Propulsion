@@ -7,15 +7,18 @@ import java.lang.Math;
 import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.HaiGroup;
+import com.deltasf.createpropulsion.balloons.blocks.AbstractHotAirInjectorBlockEntity;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry;
 import com.deltasf.createpropulsion.balloons.utils.BalloonRegistryUtility;
+
+import net.minecraft.world.level.Level;
 
 //"Solver" word is a bit of an overkill, but it sounds cooler this way :D
 public class HotAirSolver {
     static final double surfaceAreaFactor = 6;
     static final double epsilon = 1e-2;
 
-    public static boolean tickBalloon(Balloon balloon, HaiGroup group, BalloonRegistry registry) {
+    public static boolean tickBalloon(Level level, Balloon balloon, HaiGroup group, BalloonRegistry registry) {
         double hotAirAmount = balloon.hotAir;
         double hotAirChange = 0;
         //Handle invalidation
@@ -28,9 +31,9 @@ public class HotAirSolver {
             }
         }
         //Hai injections
-        for(UUID hai : balloon.supportHais) {
-            //TODO: obtain actual hai object and get the injection amount
-            double injection = 1;
+        for(UUID id : balloon.supportHais) {
+            AbstractHotAirInjectorBlockEntity hai = registry.getInjector(level, id); 
+            double injection = hai.getInjectionAmount();
             hotAirChange += injection;
         }
         //Current volume and fullness
