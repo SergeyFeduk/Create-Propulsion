@@ -24,7 +24,7 @@ public abstract class AbstractHotAirInjectorBlockEntity extends SmartBlockEntity
         tryRegister();
     }
 
-    private UUID haiId;
+    protected UUID haiId;
 
     @Override
     public void onLoad() {

@@ -35,6 +35,12 @@ public class BalloonRegistry {
         return haiGroups;
     }
 
+    public Balloon getBalloonOf(UUID haiId) {
+        HaiGroup group = haiGroupMap.get(haiId);
+        if (group == null) return null;
+        return group.getBalloonFor(haiDataMap.get(haiId));
+    }
+
     public AbstractHotAirInjectorBlockEntity getInjector(Level level, UUID id) {
         if (!haiDataMap.containsKey(id)) return null;
         BlockPos injectorPos = haiDataMap.get(id).position();
@@ -46,7 +52,6 @@ public class BalloonRegistry {
     }
 
     public void registerHai(UUID id, Level level, BlockPos pos) {
-        //Originally I done probe here, but lets actually set maxY to ships maxY. We still use probing in scan tho
         Ship ship = VSGameUtilsKt.getShipManagingPos(level, pos);
         int deltaY = ship.getShipAABB().maxY() - pos.getY() - 1;
 
@@ -106,6 +111,7 @@ public class BalloonRegistry {
         }
     }
 
+    //This one should only be used for the physics thread logic as it requires syncing a bunch of stuff
     public List<Balloon> getBalloons() {
         List<Balloon> balloons = new ArrayList<>();
         synchronized (haiGroups) {

@@ -80,6 +80,16 @@ public class HaiGroup {
         }
     }
 
+    public Balloon getBalloonFor(HaiData hai) {
+        //TODO: Probably should replace with lookup instead but for testing it is fine
+        for(Balloon balloon : balloons) {
+            if (balloon.supportHais.contains(hai.id())) {
+                return balloon;
+            }
+        }
+        return null;
+    }
+
     public static boolean isHab(BlockPos pos, Level level) {
         return level.getBlockState(pos).is(PropulsionBlocks.ENVELOPE_BLOCK.get());
     }
