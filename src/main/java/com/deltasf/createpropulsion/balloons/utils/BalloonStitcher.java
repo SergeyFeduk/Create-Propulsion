@@ -39,6 +39,11 @@ public class BalloonStitcher {
     }
 
     public static void handleSplit(Balloon originalBalloon, BlockPos splitPos, HaiGroup owner) {
+        //Capture the density of hot air in original volume
+        final double originalHotAir = originalBalloon.hotAir;
+        final double originalVolumeSize = originalBalloon.getVolumeSize();
+        final double hotAirDensity = (originalVolumeSize > 0) ? originalHotAir / originalVolumeSize : 0;
+
         // Step 1: Initial State Preparation
         originalBalloon.remove(splitPos);
 
@@ -103,6 +108,9 @@ public class BalloonStitcher {
             Set<UUID> newSupportHais = findSupportHaisForVolume(newVolume, owner.hais);
             Balloon newBalloon = new Balloon(newVolume, null, newSupportHais);
             newBalloon.holes = partitionHoles(newVolume, originalBalloon.holes);
+            //Redistribute hot air
+            newBalloon.hotAir = newBalloon.getVolumeSize() * hotAirDensity;
+
             newBalloons.add(newBalloon);
         }
 

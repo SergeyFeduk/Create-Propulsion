@@ -121,6 +121,8 @@ public class Balloon implements Iterable<BlockPos> {
         holes.addAll(other.holes);
         //Migrate support hais
         supportHais.addAll(other.supportHais);
+        //Migrate hot air
+        hotAir += other.hotAir;
     }
 
     public void resolveHolesAfterMerge() {

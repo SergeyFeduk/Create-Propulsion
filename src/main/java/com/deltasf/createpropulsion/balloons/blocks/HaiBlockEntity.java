@@ -48,9 +48,14 @@ public class HaiBlockEntity extends AbstractHotAirInjectorBlockEntity implements
         }
 
         Lang.builder().text("Balloon").forGoggles(tooltip);
-        Lang.builder().text("Hot air: " + balloon.hotAir + " / " + balloon.getVolumeSize()).forGoggles(tooltip);
+        Lang.builder().text("Hot air: ")
+            .add(Lang.number(balloon.hotAir))
+            .text(" / ")
+            .add(Lang.number(balloon.getVolumeSize())).forGoggles(tooltip);
+        
         double percentage = balloon.hotAir / balloon.getVolumeSize();
-        Lang.builder().add(Lang.number(percentage * 100)).space().text("%").forGoggles(tooltip);
+        Lang.builder().add(Lang.number(percentage * 100)).text("%").forGoggles(tooltip);
+        
         Lang.builder().text("Holes: " + balloon.holes.size()).forGoggles(tooltip);
         return true;
     }
