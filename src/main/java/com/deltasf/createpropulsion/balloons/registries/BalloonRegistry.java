@@ -35,6 +35,26 @@ public class BalloonRegistry {
         return haiGroups;
     }
 
+    public HaiData getHaiById(UUID id) {
+        return haiDataMap.get(id);
+    }
+
+    public int getHaiCount() {
+        return haiDataMap.size();
+    }
+
+    public HaiData getHaiAt(Level level, BlockPos pos) {
+        //TODO: Remove level dependency and have a map BlockPos-HaiData
+        if (level.getBlockEntity(pos) instanceof AbstractHotAirInjectorBlockEntity hai) {
+            return getHaiById(hai.getId());
+        }
+        return null;
+    }
+
+    public HaiGroup getGroupOf(UUID id) {
+        return haiGroupMap.get(id);
+    }
+
     public Balloon getBalloonOf(UUID haiId) {
         HaiGroup group = haiGroupMap.get(haiId);
         if (group == null) return null;
@@ -112,6 +132,7 @@ public class BalloonRegistry {
     }
 
     //This one should only be used for the physics thread logic as it requires syncing a bunch of stuff
+    //But also can be used for serialization
     public List<Balloon> getBalloons() {
         List<Balloon> balloons = new ArrayList<>();
         synchronized (haiGroups) {

@@ -1,7 +1,13 @@
 package com.deltasf.createpropulsion;
 
 import org.slf4j.Logger;
+import org.valkyrienskies.core.impl.hooks.VSEvents;
+import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import org.valkyrienskies.mod.common.hooks.VSGameEvents;
 
+import com.deltasf.createpropulsion.balloons.serialization.BalloonSerializationHandler;
+import com.deltasf.createpropulsion.balloons.serialization.BalloonSerializer;
+import com.deltasf.createpropulsion.balloons.serialization.BalloonSerializationHandler.Query;
 import com.deltasf.createpropulsion.compat.computercraft.CCProxy;
 import com.deltasf.createpropulsion.network.PropulsionPackets;
 import com.deltasf.createpropulsion.particles.ParticleTypes;
@@ -14,6 +20,7 @@ import com.deltasf.createpropulsion.registries.PropulsionPartialModels;
 import com.simibubi.create.compat.Mods;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 
+import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -44,5 +51,10 @@ public class CreatePropulsion {
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, PropulsionConfig.CLIENT_SPEC, ID + "-client.toml");
         //Registrate
         REGISTRATE.registerEventListeners(modBus);
+
+        //Query ships for deserialization with balloons
+        VSEvents.ShipLoadEvent.Companion.on((e) -> {
+            BalloonSerializationHandler.queryShipLoad(new Query(e.getShip().getId(), e.getShip().getChunkClaimDimension()));
+        });
     }
 }

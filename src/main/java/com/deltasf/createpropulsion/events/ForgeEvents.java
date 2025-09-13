@@ -1,5 +1,6 @@
 package com.deltasf.createpropulsion.events;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,8 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.balloons.hot_air.BalloonAttachment;
 import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
+import com.deltasf.createpropulsion.balloons.serialization.BalloonSerializationUtil;
+import com.deltasf.createpropulsion.balloons.serialization.BalloonSerializer;
 import com.deltasf.createpropulsion.magnet.MagnetForceAttachment;
 import com.deltasf.createpropulsion.magnet.MagnetRegistry;
 import com.deltasf.createpropulsion.network.PropulsionPackets;
@@ -20,6 +23,7 @@ import com.deltasf.createpropulsion.registries.PropulsionCommands;
 import com.deltasf.createpropulsion.registries.PropulsionFluids;
 import com.deltasf.createpropulsion.thruster.ThrusterFuelManager;
 
+import net.minecraft.client.telemetry.events.WorldLoadEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -38,9 +42,11 @@ import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.event.level.BlockEvent.FluidPlaceBlockEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
+import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -138,6 +144,38 @@ public class ForgeEvents {
             if (isLava && neighborFluid.is(PropulsionFluids.TURPENTINE.get())) {
                 level.setBlock(neighborPos, Blocks.STONE.defaultBlockState(), 3);
                 return;
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onServerStopping(ServerStoppingEvent event) {
+        Map<ResourceLocation, ServerLevel> levelLookup = new HashMap<>();
+        for (ServerLevel level : event.getServer().getAllLevels()) {
+            levelLookup.put(level.dimension().location(), level);
+        }
+
+        ServerLevel overworld = event.getServer().getLevel(Level.OVERWORLD);
+        if (overworld == null) return;
+
+        var allShips = VSGameUtilsKt.getAllShips(overworld);
+        final String PREFIX = "minecraft:dimension:";
+
+        for (Ship ship : allShips) {
+            if (ship instanceof ServerShip serverShip) {
+                String shipDimensionId = serverShip.getChunkClaimDimension();
+                if (shipDimensionId != null && shipDimensionId.startsWith(PREFIX)) {
+                    String resourceLocationString = shipDimensionId.substring(PREFIX.length());
+                    ResourceLocation dimensionKey = new ResourceLocation(resourceLocationString);
+                    ServerLevel level = levelLookup.get(dimensionKey);
+                    if (level == null) continue; //Wtf
+
+                    try {
+                        BalloonSerializer.saveForShip(level, ship.getId());
+                    } catch (IOException e) {
+                        System.out.println("Failed to save ship: " + e);
+                    }
+                }
             }
         }
     }

@@ -1,5 +1,7 @@
 package com.deltasf.createpropulsion.balloons;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -9,6 +11,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+
+import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry;
 
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
@@ -51,10 +55,26 @@ public class Balloon implements Iterable<BlockPos> {
         isInvalid = initialVolume == null || initialVolume.isEmpty();
     }
 
+    public Balloon(double hotAir, Set<BlockPos> holes, long[] unpackedVolume) {
+        this.hotAir = hotAir;
+        this.holes = holes;
+        this.supportHais = new HashSet<>(); //This will be populated after relinking
+
+        for(long pos : unpackedVolume) {
+            this.volume.add(pos);
+        }
+
+        rebuildAllCaches();
+    }
+
     //Api
 
     public Iterable<BlockPos> getVolume() {
         return this;
+    }
+
+    public LongOpenHashSet getVolumeForSerialization() {
+    return volume;        
     }
 
     public double getVolumeSize() {
@@ -354,4 +374,44 @@ public class Balloon implements Iterable<BlockPos> {
 
     //Data
     public record ChunkKey(int x, int y, int z) {}
+
+    //Serialization
+
+    public void writeMetadata(DataOutputStream out, BalloonRegistry registry) throws IOException {
+        out.writeDouble(hotAir);
+        out.writeInt(holes.size());
+        out.writeInt(supportHais.size());
+
+        //Holes
+        for(BlockPos hole : holes) {
+            out.writeLong(hole.asLong());
+        }
+
+        //Support hais
+        if (registry != null) {
+            for(UUID id : supportHais) {
+                BalloonRegistry.HaiData data = registry.getHaiById(id);
+                out.writeLong(data.position().asLong());
+            }
+        }
+    }
+
+    public void rebuildAllCaches() {
+        countAtX.clear();
+        countAtY.clear();
+        countAtZ.clear();
+        boundsInitialized = false;
+
+        LongIterator it = volume.iterator();
+        while (it.hasNext()) {
+            long packed = it.nextLong();
+            int uX = unpackX(packed);
+            int uY = unpackY(packed);
+            int uZ = unpackZ(packed);
+            onAddCoords(uX, uY, uZ);
+            markChunkDirtyForPos(uX, uY, uZ);
+        }
+
+        resolveDirtyChunks();
+    }
 }

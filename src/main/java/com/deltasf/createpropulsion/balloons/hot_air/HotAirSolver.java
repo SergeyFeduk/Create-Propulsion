@@ -33,6 +33,7 @@ public class HotAirSolver {
         //Hai injections
         for(UUID id : balloon.supportHais) {
             AbstractHotAirInjectorBlockEntity hai = registry.getInjector(level, id); 
+            if (hai == null) continue; //May happen on hai destruction, before it got updated in registry
             double injection = hai.getInjectionAmount();
             hotAirChange += injection;
         }

@@ -10,6 +10,7 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import com.deltasf.createpropulsion.balloons.hot_air.BalloonAttachment;
 import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
+import com.deltasf.createpropulsion.balloons.serialization.BalloonSerializationHandler;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 
@@ -25,6 +26,8 @@ public abstract class AbstractHotAirInjectorBlockEntity extends SmartBlockEntity
     }
 
     protected UUID haiId;
+
+    public UUID getId() { return haiId; }
 
     @Override
     public void onLoad() {
@@ -44,6 +47,8 @@ public abstract class AbstractHotAirInjectorBlockEntity extends SmartBlockEntity
         if (ship != null) {
             BalloonShipRegistry.forShip(ship.getId(), level).registerHai(haiId, level, worldPosition);
             BalloonAttachment.ensureAttachmentExists(level, worldPosition);
+            BalloonSerializationHandler.onHaiReady(ship, level);
+
         }
     }
 
