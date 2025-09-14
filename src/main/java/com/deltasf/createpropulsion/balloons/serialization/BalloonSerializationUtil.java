@@ -105,6 +105,8 @@ public class BalloonSerializationUtil {
             if (group != null) {
                 group.balloons.add(balloon);
                 return balloon;
+            } else {
+                System.out.println("haiGroup is null!");
             }
         }
 
