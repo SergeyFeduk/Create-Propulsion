@@ -30,6 +30,7 @@ public class OpticalSensorBlockEntity extends AbstractOpticalSensorBlockEntity {
     private static final int LENS_LIMIT = 2;
     private FilteringBehaviour filtering;
     private boolean wasFocused;
+    private boolean wasUnfocused;
     public ScrollValueBehaviour targetDistance;
     //CC
     public AbstractComputerBehaviour computerBehaviour;
@@ -72,16 +73,23 @@ public class OpticalSensorBlockEntity extends AbstractOpticalSensorBlockEntity {
 
     public int getMaxPossibleRaycastDistance() {
         boolean isFocused = hasLens(PropulsionItems.FOCUS_LENS.get());
-        int maxDistance = PropulsionConfig.OPTICAL_SENSOR_MAX_DISTANCE.get() * (isFocused ? 2 : 1);
+        boolean isUnfocused = hasLens(PropulsionItems.UNFINISHED_LENS.get());
+        int maxDistance = (int)Math.floor(PropulsionConfig.OPTICAL_SENSOR_MAX_DISTANCE.get() * (isFocused ? 2 : 1)  * (isUnfocused ? 0.5f : 1));
         return maxDistance;
     }
 
     @Override
     protected float getMaxRaycastDistance() {
         boolean isFocused = hasLens(PropulsionItems.FOCUS_LENS.get());
-        if (isFocused != wasFocused) {
-            wasFocused = isFocused;
-            int maxDistance = PropulsionConfig.OPTICAL_SENSOR_MAX_DISTANCE.get() * (isFocused ? 2 : 1);
+        boolean isUnfocused = hasLens(PropulsionItems.UNFINISHED_LENS.get());
+        if (isFocused != wasFocused || isUnfocused != wasUnfocused) {
+            if (isFocused != wasFocused) {
+                wasFocused = isFocused;
+            }
+            if (isUnfocused != wasUnfocused) {
+                wasUnfocused = isUnfocused;
+            }
+            int maxDistance = (int)Math.floor(PropulsionConfig.OPTICAL_SENSOR_MAX_DISTANCE.get() * (isFocused ? 2 : 1) * (isUnfocused ? 0.5f : 1));
             int clampedValue = Math.min(targetDistance.value, maxDistance);
             targetDistance.setValue(clampedValue);
         }
