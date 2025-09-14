@@ -19,9 +19,9 @@ public class RLEVolume {
     private int sizeX;
 
     public boolean isInside(int worldX, int worldY, int worldZ, AABB groupAABB, AABBic shipAABB) {
-        if (worldX < shipAABB.minX() || worldX > shipAABB.maxX() ||
-            worldY > shipAABB.maxY() || // We deliberately DO NOT check worldY < shipAABB.minY() as bottomY is handled by our bottomYMap
-            worldZ < shipAABB.minZ() || worldZ > shipAABB.maxZ()) {
+        if (worldX < shipAABB.minX() - 1 || worldX > shipAABB.maxX() + 1 ||
+            worldY > shipAABB.maxY() + 1 || // We deliberately DO NOT check worldY < shipAABB.minY() as bottomY is handled by our bottomYMap
+            worldZ < shipAABB.minZ() - 1 || worldZ > shipAABB.maxZ() + 1) {
             return false;
         }
         int localX = worldX - (int) groupAABB.minX;
