@@ -207,8 +207,6 @@ public class BalloonUpdater {
                 }
             }
         }
-        //TODO: Temp, replace with invalidation
-        //I'm actually not sure if there is a case when modified balloon will be invalid, but better safe than sorry
         for (Balloon balloon : modifiedBalloons) {
             balloon.isInvalid = !BalloonRegistryUtility.isBalloonValid(balloon, haiGroup);
             balloon.resolveDirtyChunks();

@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.nio.file.StandardCopyOption;
 
 import org.valkyrienskies.core.api.ships.Ship;
 
@@ -22,6 +23,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.LevelResource;
 
 public class BalloonSerializer {
+    private BalloonSerializer() {}
 
     private static final String MOD_DATA_FOLDER = "propulsion";
     private static final String BALLOON_DATA_FOLDER = "balloons";
@@ -63,7 +65,7 @@ public class BalloonSerializer {
                 byte[] data = BalloonSerializationUtil.serialize(balloon, registry);
                 compoundData.add(data);
             } catch (IOException e) {
-                System.out.println("Failed to serialize balloon: " + e);
+                throw new IOException("Failed to serialize a balloon: ", e);
             }
         }
         //Save compoundData to disk
@@ -73,12 +75,16 @@ public class BalloonSerializer {
             return;
         }
 
-        try(OutputStream fileStream = Files.newOutputStream(filePath); DataOutputStream dataStream = new DataOutputStream(fileStream)) {
+        Path tempFilePath = filePath.resolveSibling(filePath.getFileName().toString() + ".tmp");
+
+        try(OutputStream fileStream = Files.newOutputStream(tempFilePath); DataOutputStream dataStream = new DataOutputStream(fileStream)) {
             for(byte[] balloonData : compoundData) {
                 dataStream.writeInt(balloonData.length);
                 dataStream.write(balloonData);
             }
         }
+
+        Files.move(tempFilePath, filePath, StandardCopyOption.REPLACE_EXISTING);
     }
 
     @SuppressWarnings("null")
