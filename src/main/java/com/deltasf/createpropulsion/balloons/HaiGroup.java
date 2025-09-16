@@ -161,7 +161,6 @@ public class HaiGroup {
         orphan.supportHais = managedSet;
     }
 
-
     private void generateBalloons(List<DiscoveredVolume> discoveredVolumes) {
         for(DiscoveredVolume discoveredVolume : discoveredVolumes) {
             if (discoveredVolume.isLeaky() || discoveredVolume.volume().isEmpty()) continue; //Leaky volume cannot become a balloon

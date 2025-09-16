@@ -44,12 +44,13 @@ public class HotAirSolver {
         //Current volume and fullness
         double volume = balloon.getVolumeSize();
         double fullness = hotAirAmount / volume;
+        double leakAdjustedFullness = Math.max(fullness, 0.1); //Use min here so leak is still significant for almost empty balloons
         //Global surface leak
         double surfaceArea = surfaceAreaFactor * Math.pow(volume, 2.0/3.0);
-        hotAirChange -= PropulsionConfig.BALLOON_SURFACE_LEAK_FACTOR.get() * surfaceArea * fullness;
+        hotAirChange -= PropulsionConfig.BALLOON_SURFACE_LEAK_FACTOR.get() * surfaceArea * leakAdjustedFullness;
         //Hole leak
         //TODO: Make dependency not linear. Smth like x^2 or worse so larger / more holes are significantly worse
-        hotAirChange -= balloon.holes.size() * PropulsionConfig.BALLOON_HOLE_LEAK_FACTOR.get() * fullness; 
+        hotAirChange -= balloon.holes.size() * PropulsionConfig.BALLOON_HOLE_LEAK_FACTOR.get() * leakAdjustedFullness; 
 
         //Update hotAirAmount
         final double dt = 1 / 20.0; //For now a second will be the unit of time, may change
