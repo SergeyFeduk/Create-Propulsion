@@ -88,30 +88,27 @@ public class BalloonSerializationUtil {
             long[] decompressedVolume = BalloonCompressor.decompress(compressedVolume, volumeSize);
 
             //Instantiating and re-linking stuff
-            Balloon balloon = new Balloon(hotAir, holes, decompressedVolume);
-
             HaiGroup group = null;
-            for(BlockPos pos : supportHaiPositions) {
+            for (BlockPos pos : supportHaiPositions) {
                 BalloonRegistry.HaiData haiData = registry.getHaiAt(level, pos);
-
                 if (haiData != null) {
-                    balloon.supportHais.add(haiData.id());
-                    if (group == null) {
-                        group = registry.getGroupOf(haiData.id());
-                    }
+                    group = registry.getGroupOf(haiData.id());
+                    if (group != null) break; // Found it
                 }
             }
 
-            if (group != null) {
-                group.balloons.add(balloon);
-                return balloon;
-            } else {
-                System.out.println("haiGroup is null!");
+            if (group == null) {
+                System.out.println("Achtung! Could not find a valid HaiGroup for balloon supported by HAIs at " + supportHaiPositions);
+                return null;
             }
+
+            Balloon balloon = group.createManagedBalloonFromSave(hotAir, holes, decompressedVolume, supportHaiPositions, level, registry);
+
+            if (balloon == null) {
+                 System.out.println("Achtung! Achtung! We havent managed to recreate the balloon. This is bad.");
+            }
+
+            return balloon;
         }
-
-        System.out.println("Achtung! Achtung! We havent managed to recreate the balloon. This is bad.");
-
-        return null;
     }
 }

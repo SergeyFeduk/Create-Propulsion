@@ -52,7 +52,6 @@ public class BalloonSerializer {
         for(byte[] balloonData : compoundData) {
             BalloonSerializationUtil.deserialize(balloonData, level);
         }
-        
     }
 
     public static void saveForShip(ServerLevel level, long shipId) throws IOException {

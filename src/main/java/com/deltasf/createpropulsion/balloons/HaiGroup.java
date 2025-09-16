@@ -3,8 +3,10 @@ package com.deltasf.createpropulsion.balloons;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -19,6 +21,7 @@ import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry.HaiData;
 import com.deltasf.createpropulsion.balloons.utils.BalloonDebug;
 import com.deltasf.createpropulsion.balloons.utils.BalloonRegistryUtility;
 import com.deltasf.createpropulsion.balloons.utils.BalloonScanner;
+import com.deltasf.createpropulsion.balloons.utils.ManagedHaiSet;
 import com.deltasf.createpropulsion.balloons.utils.RLEVolume;
 import com.deltasf.createpropulsion.balloons.utils.BalloonScanner.DiscoveredVolume;
 import com.deltasf.createpropulsion.registries.PropulsionBlocks;
@@ -34,6 +37,8 @@ public class HaiGroup {
 
     public final List<HaiData> hais = new ArrayList<>();
     public final List<Balloon> balloons = Collections.synchronizedList(new ArrayList<>());
+    private final Map<UUID, Balloon> haiToBalloonMap = new HashMap<>();
+
 
     public RLEVolume rleVolume = new RLEVolume();
     public AABB groupAABB;
@@ -49,7 +54,10 @@ public class HaiGroup {
         for(HaiData data : hais) {
             BlockPos seed = getSeedFromHai(data, level);
             if (seed != null) {
-                seeds.add(seed);
+                //Do not seed from hai that already supports a balloon
+                if (getBalloonFor(data) == null) {
+                    seeds.add(seed);
+                }
             }
         }
 
@@ -81,13 +89,7 @@ public class HaiGroup {
     }
 
     public Balloon getBalloonFor(HaiData hai) {
-        //TODO: Probably should replace with lookup instead but for testing it is fine
-        for(Balloon balloon : balloons) {
-            if (balloon.supportHais.contains(hai.id())) {
-                return balloon;
-            }
-        }
-        return null;
+        return haiToBalloonMap.get(hai.id());
     }
 
     public static boolean isHab(BlockPos pos, Level level) {
@@ -106,12 +108,61 @@ public class HaiGroup {
     }
 
     public void killBalloon(Balloon balloon) {
-        balloons.remove(balloon);
-        //Ugghh, do I need to update something else? 
+        synchronized (balloons)  {
+            if (balloons.remove(balloon)) {
+                balloon.supportHais.clear();
+            }
+        }
     }
 
+    public Balloon createBalloon(Set<BlockPos> volume, Set<UUID> supportHais) {
+        Balloon balloon = new Balloon(volume, null);
+        Set<UUID> managedSet = new ManagedHaiSet(balloon, this.haiToBalloonMap, new HashSet<>(supportHais));
+        balloon.supportHais = managedSet;
+
+        synchronized(balloons) {
+            this.balloons.add(balloon);
+        }
+
+        return balloon;
+    }
+
+    public Balloon createManagedBalloonFromSave(double hotAir, Set<BlockPos> holes, long[] unpackedVolume, List<BlockPos> supportHaiPositions, Level level, BalloonRegistry registry) {
+        //Pos's -> UUID's
+        Set<UUID> supportHaiIds = new HashSet<>();
+        for (BlockPos pos : supportHaiPositions) {
+            BalloonRegistry.HaiData haiData = registry.getHaiAt(level, pos);
+            if (haiData != null) {
+                if (this == registry.getGroupOf(haiData.id())) {
+                    supportHaiIds.add(haiData.id());
+                }
+            }
+        }
+        
+        if (supportHaiIds.isEmpty()) {
+            return null;
+        }
+
+        //Create balloon
+        Balloon balloon = new Balloon(hotAir, holes, unpackedVolume);
+        
+        // Create and inject the ManagedHaiSet
+        synchronized(balloons) {
+            Set<UUID> managedSet = new ManagedHaiSet(balloon, this.haiToBalloonMap, supportHaiIds);
+            balloon.supportHais = managedSet;
+            this.balloons.add(balloon);
+        }
+
+        return balloon;
+    }
+
+
     private void generateBalloons(List<DiscoveredVolume> discoveredVolumes) {
-        this.balloons.clear();
+        //TODO: Do not clear balloon list, we only need to create new balloons here (and link hais under balloons to correct balloons)
+        List<Balloon> balloonsToKill = new ArrayList<>(this.balloons);
+        for (Balloon balloon : balloonsToKill) {
+            killBalloon(balloon);
+        }
 
         for(DiscoveredVolume discoveredVolume : discoveredVolumes) {
             if (discoveredVolume.isLeaky() || discoveredVolume.volume().isEmpty()) continue; //Leaky volume cannot become a balloon
@@ -120,9 +171,10 @@ public class HaiGroup {
             if (supportHais.isEmpty()) {
                 continue;
             }
-            //Create balloon
-            Balloon balloon = new Balloon(discoveredVolume.volume(), null, supportHais);
-            this.balloons.add(balloon);
+            //TODO: Check if one of those hais is related to some balloon. If it is - add this hai to that balloon
+            //TODO: Otherwise - Create balloon
+
+            createBalloon(discoveredVolume.volume(), supportHais);
         }
     }
 

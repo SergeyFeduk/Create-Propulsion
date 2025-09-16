@@ -43,8 +43,9 @@ public class Balloon implements Iterable<BlockPos> {
     public volatile double hotAir = 0;
     public boolean isInvalid;
 
-    public Balloon(Collection<BlockPos> initialVolume, AABB initialBounds, Set<UUID> supportHais) {
-        this.supportHais = (supportHais == null) ? new HashSet<>() : new HashSet<>(supportHais);
+    public Balloon(Collection<BlockPos> initialVolume, AABB initialBounds/*, Set<UUID> supportHais*/) {
+        //We are supposed to assign ManagedHaiSet externally  
+        this.supportHais = new HashSet<>(); 
 
         if (initialVolume != null && !initialVolume.isEmpty()) {
             addAll(initialVolume);
@@ -61,7 +62,8 @@ public class Balloon implements Iterable<BlockPos> {
         this.supportHais = new HashSet<>(); //This will be populated after relinking
 
         for(long pos : unpackedVolume) {
-            this.volume.add(pos);
+            this.add(BlockPos.of(pos));
+            //this.volume.add(pos);
         }
 
         rebuildAllCaches();

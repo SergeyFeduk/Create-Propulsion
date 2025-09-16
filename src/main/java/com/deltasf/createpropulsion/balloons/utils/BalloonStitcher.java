@@ -34,7 +34,7 @@ public class BalloonStitcher {
 
     public static void mergeInto(Balloon target, Balloon source, HaiGroup owner) {
         target.mergeFrom(source);
-        owner.balloons.remove(source);
+        owner.killBalloon(source);
         target.resolveHolesAfterMerge();
     }
 
@@ -101,21 +101,18 @@ public class BalloonStitcher {
             rootToVolume.computeIfAbsent(rootId, k -> new HashSet<>()).add(idToPos.get(i));
         }
 
-        owner.balloons.remove(originalBalloon);
+        owner.killBalloon(originalBalloon);
         List<Balloon> newBalloons = new ArrayList<>();
 
         for (Set<BlockPos> newVolume : rootToVolume.values()) {
             Set<UUID> newSupportHais = findSupportHaisForVolume(newVolume, owner.hais);
-            Balloon newBalloon = new Balloon(newVolume, null, newSupportHais);
+            Balloon newBalloon = owner.createBalloon(newVolume, newSupportHais);
             newBalloon.holes = partitionHoles(newVolume, originalBalloon.holes);
-            //Redistribute hot air
             newBalloon.hotAir = newBalloon.getVolumeSize() * hotAirDensity;
-
             newBalloons.add(newBalloon);
         }
 
         // Step 5: Finalization
-        owner.balloons.addAll(newBalloons);
 
         for (Balloon newBalloon : newBalloons) {
             newBalloon.isInvalid = !BalloonRegistryUtility.isBalloonValid(newBalloon, owner);
