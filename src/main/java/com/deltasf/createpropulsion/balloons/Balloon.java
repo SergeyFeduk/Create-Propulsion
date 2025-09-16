@@ -43,7 +43,7 @@ public class Balloon implements Iterable<BlockPos> {
     public volatile double hotAir = 0;
     public boolean isInvalid;
 
-    public Balloon(Collection<BlockPos> initialVolume, AABB initialBounds/*, Set<UUID> supportHais*/) {
+    public Balloon(Collection<BlockPos> initialVolume, AABB initialBounds) {
         //We are supposed to assign ManagedHaiSet externally  
         this.supportHais = new HashSet<>(); 
 

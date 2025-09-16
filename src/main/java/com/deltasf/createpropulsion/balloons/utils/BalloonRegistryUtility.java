@@ -106,7 +106,9 @@ public class BalloonRegistryUtility {
                 }
 
                 //Migrate all balloons too
-                primaryGroup.balloons.addAll(groupToMerge.balloons);
+                for (Balloon balloonToMigrate : groupToMerge.balloons) {
+                    primaryGroup.adoptOrphanBalloon(balloonToMigrate);
+                }
 
                 //Remove merged group
                 haiGroups.remove(groupToMerge);

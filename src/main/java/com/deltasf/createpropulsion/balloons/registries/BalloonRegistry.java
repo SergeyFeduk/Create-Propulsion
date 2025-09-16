@@ -44,7 +44,6 @@ public class BalloonRegistry {
     }
 
     public HaiData getHaiAt(Level level, BlockPos pos) {
-        //TODO: Remove level dependency and have a map BlockPos-HaiData
         if (level.getBlockEntity(pos) instanceof AbstractHotAirInjectorBlockEntity hai) {
             return getHaiById(hai.getId());
         }
@@ -78,13 +77,27 @@ public class BalloonRegistry {
         AABB haiAabb = BalloonRegistryUtility.getHaiAABB(deltaY, pos);
         HaiData data = new HaiData(id, pos, haiAabb);
 
-        //Update = unregister and register back 
         if (haiDataMap.containsKey(id)) {
-            unregisterHai(id, level);
-        }
+            HaiGroup oldGroup = haiGroupMap.get(id);
+            if (oldGroup != null) {
+                HaiData oldData = getHaiById(id);
+                // c. Detach it from the old group structure.
+                oldGroup.hais.remove(oldData);
+                haiGroupMap.remove(id);
+                if (BalloonRegistryUtility.didGroupSplit(oldGroup.hais)) {
+                    handleSplitGroups(id, oldGroup, level);
+                }
+            }
+            haiDataMap.put(id, data);
+            // f. And finally, re-integrate it into the group structure as if it were new.
+            BalloonRegistryUtility.addHaiAndRegroup(data, haiGroups, haiGroupMap, level);
 
-        haiDataMap.put(id, data);
-        BalloonRegistryUtility.addHaiAndRegroup(data, haiGroups, haiGroupMap, level);
+        } else {
+            // --- NEW REGISTRATION PATH ---
+            // This is simple: just add the new HAI.
+            haiDataMap.put(id, data);
+            BalloonRegistryUtility.addHaiAndRegroup(data, haiGroups, haiGroupMap, level);
+        }
     }
 
     public void unregisterHai(UUID id, Level level) {
@@ -180,7 +193,7 @@ public class BalloonRegistry {
                 if (!Collections.disjoint(orphan.supportHais, ownerHaiIds)) {
                     //Potential home for balloon, check if it actually fits. If it does not - it is guaranteed that it is dead
                     if (BalloonRegistryUtility.isBalloonValid(orphan, potentialOwner)) {
-                        potentialOwner.balloons.add(orphan);
+                        potentialOwner.adoptOrphanBalloon(orphan);
                     }
 
                     break;

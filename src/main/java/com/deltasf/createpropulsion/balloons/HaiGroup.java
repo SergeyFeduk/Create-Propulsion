@@ -49,15 +49,11 @@ public class HaiGroup {
         //Needs to be fixed anyway
         regenerateRLEVolume(level);
         //Probe to get seeds
-        //TODO: Do not seed hais that are associated with valid balloons. But think about that first
         List<BlockPos> seeds = new ArrayList<>();
         for(HaiData data : hais) {
             BlockPos seed = getSeedFromHai(data, level);
             if (seed != null) {
-                //Do not seed from hai that already supports a balloon
-                if (getBalloonFor(data) == null) {
-                    seeds.add(seed);
-                }
+                seeds.add(seed);
             }
         }
 
@@ -156,25 +152,58 @@ public class HaiGroup {
         return balloon;
     }
 
+    public void adoptOrphanBalloon(Balloon orphan) {
+        Set<UUID> currentSupporterIds = new HashSet<>(orphan.supportHais);
+        synchronized (balloons) {
+            this.balloons.add(orphan);
+        }
+        Set<UUID> managedSet = new ManagedHaiSet(orphan, this.haiToBalloonMap, currentSupporterIds);
+        orphan.supportHais = managedSet;
+    }
+
 
     private void generateBalloons(List<DiscoveredVolume> discoveredVolumes) {
-        //TODO: Do not clear balloon list, we only need to create new balloons here (and link hais under balloons to correct balloons)
-        List<Balloon> balloonsToKill = new ArrayList<>(this.balloons);
-        for (Balloon balloon : balloonsToKill) {
-            killBalloon(balloon);
-        }
-
         for(DiscoveredVolume discoveredVolume : discoveredVolumes) {
             if (discoveredVolume.isLeaky() || discoveredVolume.volume().isEmpty()) continue; //Leaky volume cannot become a balloon
             //Find support hais and obtain aabb
             Set<UUID> supportHais = findSupportHaisForVolume(discoveredVolume.volume());
-            if (supportHais.isEmpty()) {
-                continue;
-            }
-            //TODO: Check if one of those hais is related to some balloon. If it is - add this hai to that balloon
-            //TODO: Otherwise - Create balloon
+            if (supportHais.isEmpty()) { continue; }
 
-            createBalloon(discoveredVolume.volume(), supportHais);
+            //Find all balloons that this volume connects to
+            Set<Balloon> connectedBalloons = new HashSet<>();
+            for (UUID haiId : supportHais) {
+                Balloon existingBalloon = haiToBalloonMap.get(haiId);
+                if (existingBalloon != null) {
+                    connectedBalloons.add(existingBalloon);
+                }
+            }
+
+            //Handle all cases
+            if (connectedBalloons.isEmpty()) {
+                //New balloon
+                createBalloon(discoveredVolume.volume(), supportHais);
+            } else if (connectedBalloons.size() == 1) {
+                //Extend a balloon
+                Balloon targetBalloon = connectedBalloons.iterator().next();
+
+                targetBalloon.addAll(discoveredVolume.volume());
+                targetBalloon.supportHais.addAll(supportHais);
+                targetBalloon.resolveHolesAfterMerge();
+            } else {
+                //Merge multiple balloons
+                List<Balloon> balloonsToMerge = new ArrayList<>(connectedBalloons);
+                Balloon targetBalloon = balloonsToMerge.get(0);
+
+                targetBalloon.addAll(discoveredVolume.volume());
+                targetBalloon.supportHais.addAll(supportHais);
+
+                for (int i = 1; i < balloonsToMerge.size(); i++) {
+                    Balloon sourceBalloon = balloonsToMerge.get(i);
+                    targetBalloon.mergeFrom(sourceBalloon);
+                    killBalloon(sourceBalloon);
+                }
+                targetBalloon.resolveHolesAfterMerge();
+            }
         }
     }
 

@@ -21,6 +21,10 @@ public class HotAirSolver {
     public static boolean tickBalloon(Level level, Balloon balloon, HaiGroup group, BalloonRegistry registry) {
         double hotAirAmount = balloon.hotAir;
         double hotAirChange = 0;
+
+        if (balloon.isEmpty()) {
+            return true; //Dead in a moment
+        }
         //Handle invalidation
         if (balloon.isInvalid && hotAirAmount <= epsilon) {
             //Recheck validity
