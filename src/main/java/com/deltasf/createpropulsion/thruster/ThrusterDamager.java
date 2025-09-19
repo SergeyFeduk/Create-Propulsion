@@ -1,11 +1,9 @@
 package com.deltasf.createpropulsion.thruster;
 
-import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.debug.DebugRenderer;
 import com.deltasf.createpropulsion.debug.PropulsionDebug;
 import com.deltasf.createpropulsion.debug.routes.MainDebugRoute;
-import com.deltasf.createpropulsion.registries.PropulsionCommands;
 import com.deltasf.createpropulsion.utility.MathUtility;
 import com.simibubi.create.foundation.collision.Matrix3d;
 import com.simibubi.create.foundation.collision.OrientedBB;
@@ -15,7 +13,6 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.joml.*;
 import org.joml.Math;

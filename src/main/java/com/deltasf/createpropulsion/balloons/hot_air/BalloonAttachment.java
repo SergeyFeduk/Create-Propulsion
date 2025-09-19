@@ -2,12 +2,10 @@ package com.deltasf.createpropulsion.balloons.hot_air;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Nonnull;
 
-import org.antlr.v4.parse.ANTLRParser.finallyClause_return;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Math;
 import org.joml.Matrix3dc;
@@ -15,18 +13,14 @@ import org.joml.Matrix4dc;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.valkyrienskies.core.api.ships.PhysShip;
-import org.valkyrienskies.core.api.ships.ServerShip;
-import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.core.api.ships.ShipForcesInducer;
 import org.valkyrienskies.core.impl.game.ships.PhysShipImpl;
 
 import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.BalloonForceChunk;
-import com.deltasf.createpropulsion.balloons.HaiGroup;
 import com.deltasf.createpropulsion.balloons.Balloon.ChunkKey;
 import com.deltasf.createpropulsion.balloons.atmosphere.BalloonDimensionManager;
-import com.deltasf.createpropulsion.balloons.atmosphere.DimensionAtmosphere;
 import com.deltasf.createpropulsion.balloons.atmosphere.BalloonDimensionManager.AtmosphereProperties;
 import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
 import com.deltasf.createpropulsion.utility.AttachmentUtils;
@@ -36,7 +30,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.FlatLevelSource;
-import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
 
 //Current model adds some custom drag, both linear and angular. VS 2.5 should handle this for us
 //So after updating to it - get rid of our drag, or at least change default values

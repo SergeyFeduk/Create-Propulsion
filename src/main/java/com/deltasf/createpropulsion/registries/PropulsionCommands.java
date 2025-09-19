@@ -1,18 +1,13 @@
 package com.deltasf.createpropulsion.registries;
 
-import java.util.EnumSet;
-
-import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.debug.PropulsionDebug;
 import com.deltasf.createpropulsion.magnet.MagnetRegistry;
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraftforge.server.command.EnumArgument;
 
 public class PropulsionCommands {
 

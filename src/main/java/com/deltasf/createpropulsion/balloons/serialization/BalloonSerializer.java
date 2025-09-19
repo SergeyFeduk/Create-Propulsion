@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.nio.file.StandardCopyOption;
 
-import org.valkyrienskies.core.api.ships.Ship;
-
 import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry;
 import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;

@@ -1,13 +1,5 @@
 package com.deltasf.createpropulsion.design_goggles;
 
-import java.util.concurrent.TimeUnit;
-
-//import com.deltasf.createpropulsion.network.PacketHandler;
-//import com.deltasf.createpropulsion.network.RequestShipDataPacket;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-
-
 /*public class ClientShipDataCache {
     public record ShipData(double mass) {}
 

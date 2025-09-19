@@ -1,15 +1,10 @@
 package com.deltasf.createpropulsion.heat;
 
-import javax.annotation.Nullable;
-
-import com.deltasf.createpropulsion.registries.PropulsionCapabilities;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BehaviourType;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 
-import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 
 public class HeatSourceBehavior extends BlockEntityBehaviour {

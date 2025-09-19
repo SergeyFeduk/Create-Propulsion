@@ -1,13 +1,5 @@
 package com.deltasf.createpropulsion.network;
 
-import java.util.function.Supplier;
-
-import org.valkyrienskies.core.api.ships.ServerShip;
-import org.valkyrienskies.mod.common.VSGameUtilsKt;
-
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.network.NetworkEvent;
 /*
 public class RequestShipDataPacket {
     private final long shipId;

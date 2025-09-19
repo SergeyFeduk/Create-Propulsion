@@ -2,8 +2,6 @@ package com.deltasf.createpropulsion.heat.burners.solid;
 
 import org.jetbrains.annotations.NotNull;
 
-import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
-
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.items.ItemHandlerHelper;

@@ -1,6 +1,5 @@
 package com.deltasf.createpropulsion.balloons;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,24 +11,20 @@ import java.util.UUID;
 
 import org.joml.primitives.AABBic;
 import org.valkyrienskies.core.api.ships.ServerShip;
-import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import com.deltasf.createpropulsion.balloons.hot_air.HotAirSolver;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry.HaiData;
-import com.deltasf.createpropulsion.balloons.utils.BalloonDebug;
 import com.deltasf.createpropulsion.balloons.utils.BalloonRegistryUtility;
 import com.deltasf.createpropulsion.balloons.utils.BalloonScanner;
 import com.deltasf.createpropulsion.balloons.utils.ManagedHaiSet;
 import com.deltasf.createpropulsion.balloons.utils.RLEVolume;
 import com.deltasf.createpropulsion.balloons.utils.BalloonScanner.DiscoveredVolume;
 import com.deltasf.createpropulsion.registries.PropulsionBlocks;
-import com.mojang.datafixers.util.Pair;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 
 public class HaiGroup {
