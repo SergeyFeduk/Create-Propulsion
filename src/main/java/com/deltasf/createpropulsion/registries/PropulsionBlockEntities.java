@@ -2,6 +2,7 @@ package com.deltasf.createpropulsion.registries;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.balloons.blocks.HaiBlockEntity;
+import com.deltasf.createpropulsion.heat.burners.solid.SolidBurnerBlockEntity;
 import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerBlockEntity;
 import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerRenderer;
 import com.deltasf.createpropulsion.magnet.RedstoneMagnetBlockEntity;
@@ -55,5 +56,10 @@ public class PropulsionBlockEntities {
     public static final BlockEntityEntry<HaiBlockEntity> HAI_BLOCK_ENTITY =
         REGISTRATE.blockEntity("hai_block_entity", HaiBlockEntity::new)
         .validBlock(PropulsionBlocks.HAI_BLOCK)
+        .register();
+
+    public static final BlockEntityEntry<SolidBurnerBlockEntity> SOLID_BURNER_BLOCK_ENTITY = 
+        REGISTRATE.blockEntity("solid_burner_block_entity", SolidBurnerBlockEntity::new)
+        .validBlock(PropulsionBlocks.SOLID_BURNER)
         .register();
 }

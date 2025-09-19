@@ -16,6 +16,7 @@
     "block.createpropulsion.physics_assembler": "Physics Assembler",
 
     "block.createpropulsion.envelope": "Envelope",
+    "block.createpropulsion.solid_burner": "Solid Burner",
 
     "create.gui.goggles.thruster.status": "Thruster Status",
     "create.gui.goggles.thruster.status.no_fuel": "No Fuel",

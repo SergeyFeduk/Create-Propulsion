@@ -3,6 +3,7 @@ package com.deltasf.createpropulsion.registries;
 import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.balloons.blocks.EnvelopeBlock;
 import com.deltasf.createpropulsion.balloons.blocks.HaiBlock;
+import com.deltasf.createpropulsion.heat.burners.solid.SolidBurnerBlock;
 import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerBlock;
 import com.deltasf.createpropulsion.magnet.RedstoneMagnetBlock;
 import com.deltasf.createpropulsion.optical_sensors.InlineOpticalSensorBlock;
@@ -74,6 +75,10 @@ public class PropulsionBlocks {
         .register();
     
     public static final BlockEntry<HaiBlock> HAI_BLOCK = REGISTRATE.block("hai_block", HaiBlock::new)
+        .simpleItem()
+        .register();
+
+    public static final BlockEntry<SolidBurnerBlock> SOLID_BURNER = REGISTRATE.block("solid_burner", SolidBurnerBlock::new)
         .simpleItem()
         .register();
 }
