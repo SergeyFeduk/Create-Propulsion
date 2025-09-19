@@ -13,7 +13,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-
 public class ThrusterBlock extends AbstractThrusterBlock {
     public ThrusterBlock(Properties properties) {
         super(properties);
@@ -32,5 +31,4 @@ public class ThrusterBlock extends AbstractThrusterBlock {
         }
         return null;
     }
-
 }
