@@ -73,7 +73,7 @@ public class PropulsionConfig {
 
         SERVER_BUILDER.push("Hot air balloons");
             BALLOON_FORCE_COEFFICIENT = SERVER_BUILDER.comment("BALLOON_FORCE_COEFFICIENT.")
-                    .define("BALLOON_FORCE_COEFFICIENT", 2000.0);
+                    .define("BALLOON_FORCE_COEFFICIENT", 1250.0);
             BALLOON_K_COEFFICIENT = SERVER_BUILDER.comment("BALLOON_K_COEFFICIENT.")
                     .define("BALLOON_K_COEFFICIENT", 0.3);
             BALLOON_ANGULAR_DAMPING = SERVER_BUILDER.comment("BALLOON_ANGULAR_DAMPING.")
