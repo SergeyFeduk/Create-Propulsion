@@ -2,9 +2,8 @@ package com.deltasf.createpropulsion.heat.burners;
 
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import com.deltasf.createpropulsion.heat.HeatSourceBehavior;
 import com.deltasf.createpropulsion.heat.IHeatSource;

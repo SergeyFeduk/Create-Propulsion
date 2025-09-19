@@ -63,9 +63,6 @@ public class CreatePropulsion {
         });
 
         modBus.addListener(CreatePropulsion::init);
-
-        
-        
     }
 
     public static void init(final FMLCommonSetupEvent event) {
