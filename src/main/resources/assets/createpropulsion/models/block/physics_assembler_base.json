@@ -4,7 +4,7 @@
 	"texture_size": [64, 64],
 	"textures": {
 		"0": "createpropulsion:block/physics_assembler_off",
-		"particle": "createpropulsion:block/physics_assembler_off"
+		"particle": "create:block/railway_casing"
 	},
 	"elements": [
 		{
