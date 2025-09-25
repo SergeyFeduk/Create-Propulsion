@@ -3,6 +3,11 @@ package com.deltasf.createpropulsion.lodestone_tracker;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.joml.Quaterniond;
+import org.joml.Vector3d;
+import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.mod.common.VSGameUtilsKt;
+
 import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
 import com.deltasf.createpropulsion.registries.PropulsionShapes;
 import com.simibubi.create.AllSoundEvents;
@@ -29,6 +34,7 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
@@ -79,7 +85,26 @@ public class LodestoneTrackerBlock extends Block implements EntityBlock, IWrench
         if (playerHoldingCompass && !trackerHasCompass) {
             // Player has compass, tracker is empty -> Place compass
             ItemStack compassToPlace = heldStack.split(1);
-            trackerBlockEntity.setCompass(compassToPlace, player.getDirection());
+
+            //Determine insertion direction
+            Ship ship = VSGameUtilsKt.getShipManagingPos(level, pos);
+            Direction insertionDirection;
+
+            if (ship != null) {
+                Vec3 playerLookWorld = player.getLookAngle();
+                Vector3d playerLookWorldJoml = new Vector3d(playerLookWorld.x, playerLookWorld.y, playerLookWorld.z);
+                Vector3d playerLookShipJoml = ship.getWorldToShip().transformDirection(playerLookWorldJoml, new Vector3d());
+
+                double relativeYawRadians = Math.atan2(-playerLookShipJoml.x, playerLookShipJoml.z);
+                double relativeYawDegrees = Math.toDegrees(relativeYawRadians);
+
+                insertionDirection = Direction.fromYRot(relativeYawDegrees);
+            } else {
+                insertionDirection = player.getDirection();
+            }
+
+            //Handle compass insertion
+            trackerBlockEntity.setCompass(compassToPlace, insertionDirection);
             AllSoundEvents.DEPOT_SLIDE.playOnServer(level, pos);
             dirtyBlockEntity(level, pos);
             return InteractionResult.CONSUME;

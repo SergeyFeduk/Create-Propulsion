@@ -33,9 +33,9 @@ public class LodestoneTrackerRenderer extends SafeBlockEntityRenderer<LodestoneT
         if (!compass.isEmpty()) {
             //This is to update compass every frame instead of every tick
             float targetAngle = blockEntity.getAngleFromCompass(compass);
-            int modelIndex = getIndexFromAngle(targetAngle);
             Direction facing = blockEntity.getCompassFacing();
             float facingAngle = facing.toYRot();
+            int modelIndex = getIndexFromAngle(targetAngle - facingAngle);
 
             renderCompass(blockEntity.getLevel(), poseStack, bufferSource, light, overlay, compass, new Vec3(0.5,0.85f,0.5), modelIndex, facingAngle);
         }
@@ -81,13 +81,13 @@ public class LodestoneTrackerRenderer extends SafeBlockEntityRenderer<LodestoneT
     }
 
     private int getIndexFromAngle(float targetAngle) {
-        //Angle is in degrees in range of 0..360
+        //Angle is in degrees in range of 0..360 (non-normalized)
         //Model index is from 0 to 31
         //Compass is always pointing to north, and index 31 is pointing west
         final int TOTAL_INDICES = 32;
         final float SLICE_SIZE = 360.0f / TOTAL_INDICES;
-
-        int index = (int)(targetAngle / SLICE_SIZE);
+        float normalizedAngle = (targetAngle % 360f + 360f) % 360f;
+        int index = (int)(normalizedAngle / SLICE_SIZE);
         return index;
     }
 
@@ -102,9 +102,8 @@ public class LodestoneTrackerRenderer extends SafeBlockEntityRenderer<LodestoneT
         ms.pushPose();
         //Move and twist compass around to make it look fine
         ms.translate(position.x, position.y, position.z);
-        ms.mulPose(Axis.YP.rotationDegrees(facingAngle)); //Account for our facing
+        ms.mulPose(Axis.YP.rotationDegrees(-facingAngle)); //Account for our facing
         ms.mulPose(Axis.XP.rotationDegrees(90.0f));
-        ms.mulPose(Axis.ZP.rotationDegrees(180.0f));
         ms.scale(0.5f, 0.5f, 0.5f);
         itemRenderer.render(item, ItemDisplayContext.FIXED, false, ms, buffer, light, overlay, model);
 
