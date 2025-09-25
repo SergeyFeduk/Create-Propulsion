@@ -52,7 +52,7 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
     public int powerEast() { return POWER_EAST; }
     public int powerSouth() { return POWER_SOUTH; }
     public int powerWest() { return POWER_WEST; }
-    private boolean isInverted = false;
+    private boolean isInverted = true;
     public boolean IsInverted() {return isInverted; }
 
     //What am I doing with my life
