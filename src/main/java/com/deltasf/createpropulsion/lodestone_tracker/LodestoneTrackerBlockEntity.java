@@ -52,7 +52,7 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
     public int powerEast() { return POWER_EAST; }
     public int powerSouth() { return POWER_SOUTH; }
     public int powerWest() { return POWER_WEST; }
-    private boolean isInverted = true;
+    private boolean isInverted = false;
     public boolean IsInverted() {return isInverted; }
 
     //What am I doing with my life
@@ -113,7 +113,7 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
         if (targetPosition == null || trackerPosition == null) return 0; // In case anything is on unloaded ship - set angle to 0 
 
         //Calculate angle between two positions
-        float angle = getHorizontalAndVerticalAngles(targetPosition, trackerPosition).x + 180;
+        float angle = getHorizontalAndVerticalAngles(targetPosition, trackerPosition).x;
 
         //Account for tracker's ship rotation
         boolean trackerInShipyard = VSGameUtilsKt.isBlockInShipyard(level, worldPosition);
@@ -174,10 +174,10 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
         float cosA = (float)Math.cos(angleRad);
         float sinA = (float)Math.sin(angleRad);
 
-        float weightN = Math.max(0.0f, -cosA);
-        float weightE = Math.max(0.0f, -sinA);
-        float weightS = Math.max(0.0f, cosA);
-        float weightW = Math.max(0.0f, sinA);
+        float weightN = Math.max(0.0f, cosA);
+        float weightE = Math.max(0.0f, sinA);
+        float weightS = Math.max(0.0f, -cosA);
+        float weightW = Math.max(0.0f, -sinA);
 
         float sumWeights = weightN + weightE + weightS + weightW;
 
