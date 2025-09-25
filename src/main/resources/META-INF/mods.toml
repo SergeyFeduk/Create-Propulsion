@@ -50,7 +50,7 @@ description='''A mod that adds optical sensors and thruster to the Create mod. A
 [[dependencies.${mod_id}]]
 	modId = "createbigcannons"
 	mandatory = false
-	versionRange = "[5.6.0,)"
+	versionRange = "*"
 	ordering = "NONE"
 	side = "BOTH"
 [[dependencies.${mod_id}]]
