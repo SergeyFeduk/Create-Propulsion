@@ -3,7 +3,6 @@ package com.deltasf.createpropulsion.lodestone_tracker;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.joml.Quaterniond;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
