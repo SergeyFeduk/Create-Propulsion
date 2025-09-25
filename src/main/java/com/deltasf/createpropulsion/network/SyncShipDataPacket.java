@@ -1,13 +1,5 @@
 package com.deltasf.createpropulsion.network;
 
-import java.util.function.Supplier;
-
-//import com.deltasf.createpropulsion.design_goggles.ClientShipDataCache;
-
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.network.NetworkEvent;
 /*
 public class SyncShipDataPacket {
     private final long shipId;

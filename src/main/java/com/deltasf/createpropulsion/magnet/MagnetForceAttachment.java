@@ -21,7 +21,6 @@ import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.utility.AttachmentUtils;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 
 @SuppressWarnings("deprecation")

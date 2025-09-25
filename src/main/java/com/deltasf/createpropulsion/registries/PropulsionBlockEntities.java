@@ -10,7 +10,6 @@ import com.deltasf.createpropulsion.optical_sensors.rendering.OpticalSensorRende
 import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerBlockEntity;
 import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerRenderer;
 import com.deltasf.createpropulsion.thruster.thruster.ThrusterBlockEntity;
-import com.deltasf.createpropulsion.tilt_sensor.TiltSensorBlockEntity;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.BlockEntityEntry;
 

@@ -2,7 +2,6 @@ package com.deltasf.createpropulsion.particles;
 
 import javax.annotation.Nonnull;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;

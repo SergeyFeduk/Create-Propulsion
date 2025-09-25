@@ -1,20 +1,15 @@
 package com.deltasf.createpropulsion.thruster;
 
-import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.compat.PropulsionCompatibility;
 import com.deltasf.createpropulsion.compat.computercraft.ComputerBehaviour;
-import com.deltasf.createpropulsion.debug.DebugRenderer;
 import com.deltasf.createpropulsion.particles.ParticleTypes;
 import com.deltasf.createpropulsion.particles.PlumeParticleData;
 import com.deltasf.createpropulsion.utility.GoggleUtils;
-import com.deltasf.createpropulsion.utility.MathUtility;
 import com.simibubi.create.compat.computercraft.AbstractComputerBehaviour;
 import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import com.simibubi.create.foundation.collision.Matrix3d;
-import com.simibubi.create.foundation.collision.OrientedBB;
 import com.simibubi.create.foundation.utility.Lang;
 import com.simibubi.create.foundation.utility.LangBuilder;
 import net.minecraft.ChatFormatting;
@@ -24,24 +19,16 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
 import org.joml.*;
 import org.joml.Math;
 import org.valkyrienskies.core.api.ships.ClientShip;
-import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
-import java.awt.*;
 import java.util.List;
 
 import javax.annotation.Nullable;

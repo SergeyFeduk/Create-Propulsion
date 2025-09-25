@@ -2,8 +2,6 @@ package com.deltasf.createpropulsion.tilt_sensor;
 
 import javax.annotation.Nonnull;
 
-import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;

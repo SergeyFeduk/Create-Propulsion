@@ -13,7 +13,6 @@ import com.deltasf.createpropulsion.optical_sensors.rendering.OpticalSensorBeamR
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
-import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraftforge.api.distmarker.Dist;

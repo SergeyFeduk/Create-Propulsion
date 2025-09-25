@@ -3,19 +3,14 @@ package com.deltasf.createpropulsion.physics_assembler;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.valkyrienskies.core.impl.shadow.nb;
-
 import com.deltasf.createpropulsion.network.PropulsionPackets;
 import com.deltasf.createpropulsion.physics_assembler.packets.GaugeUsedPacket;
 import com.deltasf.createpropulsion.physics_assembler.packets.ResetGaugePacket;
 
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -23,8 +18,6 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.ForgeMod;
 
 public class AssemblyGaugeItem extends Item {
 

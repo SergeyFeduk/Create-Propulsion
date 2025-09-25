@@ -1,11 +1,5 @@
 package com.deltasf.createpropulsion.design_goggles;
 
-import org.joml.Vector3dc;
-import org.valkyrienskies.core.api.ships.ClientShip;
-import org.valkyrienskies.core.api.ships.ServerShip;
-import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
-
 /*import com.deltasf.createpropulsion.design_goggles.ClientShipDataCache.ShipData;
 import com.simibubi.create.CreateClient;
 import com.simibubi.create.foundation.outliner.Outliner;
