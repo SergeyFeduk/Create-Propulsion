@@ -1,0 +1,18 @@
+{
+    "required": true,
+    "minVersion": "0.8.5",
+    "package": "com.deltasf.createpropulsion.mixin",
+    "compatibilityLevel": "JAVA_17",
+    "refmap": "createpropulsion.refmap.json",
+    "plugin": "com.deltasf.createpropulsion.mixin.plugin.PropulsionMixinPlugin",
+    "mixins": [
+      "CompassItemMixin"
+    ],
+    "client": [
+      "CompassItemPropertyFunctionMixin"
+    ],
+    "server": [],
+    "injectors": {
+      "defaultRequire": 1
+    }
+  }

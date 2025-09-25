@@ -10,10 +10,10 @@ import org.joml.Vector4f;
 import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.optical_sensors.rendering.BeamRenderData;
 import com.deltasf.createpropulsion.optical_sensors.rendering.OpticalSensorBeamRenderType;
-
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
+import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraftforge.api.distmarker.Dist;
@@ -75,12 +75,7 @@ public class TranslucentBeamRenderer {
         Matrix4f pose = data.poseSnapshot.pose();
         // We use this instead of NO_CULL cause the more faces we render the worse alpha duplication issue becomes.
         // Also this method halves amount of faces rendered
-        //Minecraft mc = Minecraft.getInstance();
-        //var eyes = mc.player.position(); //We expect player not to be null as this is happening in rendering event
-        //boolean reverse = data.boundingBox.contains(eyes); // TODO: set values based on eyes pos if is inside beam data.aabb
-        boolean reverse = false;
-        //Rendering
-        if (reverse) {
+        if (isCameraInside(data)) {
             drawQuadReversed(buffer, pose, data.sBottomLeft, data.sBottomRight, data.eBottomRight, data.eBottomLeft, data.startColor, data.endColor, data.normalBottom);
             drawQuadReversed(buffer, pose, data.sBottomRight, data.sTopRight, data.eTopRight, data.eBottomRight, data.startColor, data.endColor, data.normalRight);
             drawQuadReversed(buffer, pose, data.sTopRight, data.sTopLeft, data.eTopLeft, data.eTopRight, data.startColor, data.endColor, data.normalTop);
@@ -91,7 +86,6 @@ public class TranslucentBeamRenderer {
             drawQuad(buffer, pose, data.sTopRight, data.sTopLeft, data.eTopLeft, data.eTopRight, data.startColor, data.endColor, data.normalTop);
             drawQuad(buffer, pose, data.sTopLeft, data.sBottomLeft, data.eBottomLeft, data.eTopLeft, data.startColor, data.endColor, data.normalLeft);
         }
-        
     }
 
     private static void drawQuad(VertexConsumer buffer, Matrix4f pose,
@@ -153,5 +147,35 @@ public class TranslucentBeamRenderer {
             .color(startColor.x(), startColor.y(), startColor.z(), startColor.w())
             .normal(flippedNormal.x(), flippedNormal.y(), flippedNormal.z())
             .endVertex();
+    }
+
+    private static boolean isCameraInside(BeamRenderData data) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null || data.worldToLocalTransform == null) return false;
+
+        Vector4f cameraInLocalSpace4 = new Vector4f(0.0f, 0.0f, 0.0f, 1.0f);
+        cameraInLocalSpace4.mul(data.worldToLocalTransform);
+        Vector3f cameraInLocalSpace = new Vector3f(cameraInLocalSpace4.x, cameraInLocalSpace4.y, cameraInLocalSpace4.z);
+
+        Vector3f beamOrigin = data.sBottomLeft;
+        Vector3f relativePos = cameraInLocalSpace.sub(beamOrigin, new Vector3f());
+
+        Vector3f axisAlong = data.eBottomLeft.sub(data.sBottomLeft, new Vector3f());
+        Vector3f axisUp = data.sTopLeft.sub(data.sBottomLeft, new Vector3f());
+        Vector3f axisSide = data.sBottomRight.sub(data.sBottomLeft, new Vector3f());
+
+        float axisAlongLenSqr = axisAlong.lengthSquared();
+        float axisUpLenSqr = axisUp.lengthSquared();
+        float axisSideLenSqr = axisSide.lengthSquared();
+
+        if (axisAlongLenSqr < 1e-6 || axisUpLenSqr < 1e-6 || axisSideLenSqr < 1e-6) return false;
+
+        float projAlong = relativePos.dot(axisAlong) / axisAlongLenSqr;
+        float projUp = relativePos.dot(axisUp) / axisUpLenSqr;
+        float projSide = relativePos.dot(axisSide) / axisSideLenSqr;
+
+        return (projAlong >= 0f && projAlong <= 1f &&
+                projUp >= 0f && projUp <= 1f &&
+                projSide >= 0f && projSide <= 1f);
     }
 }

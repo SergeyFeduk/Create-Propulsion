@@ -1,12 +1,16 @@
 package com.deltasf.createpropulsion.utility;
 
 import org.joml.Quaterniond;
+import org.joml.Quaterniondc;
+import org.joml.Vector2f;
+import org.joml.Vector3d;
 
 import com.simibubi.create.foundation.collision.Matrix3d;
 
 public class MathUtility {
     
     public static Matrix3d createMatrixFromQuaternion(Quaterniond quaternion) {
+        //I need to do this very ugly thing because create matrix class has its elements private
         double qx = quaternion.x;
         double qy = quaternion.y;
         double qz = quaternion.z;
@@ -45,4 +49,39 @@ public class MathUtility {
 
         return resultMatrix;
     }
+
+    public static Vector2f toHorizontalCoordinateSystem(Quaterniondc shipRotation) {
+        Vector3d worldForwardDirection = new Vector3d();
+        Vector3d LOCAL_SHIP_FORWARD_NEGATIVE_Z = new Vector3d(0.0, 0.0, -1.0);
+        shipRotation.transform(LOCAL_SHIP_FORWARD_NEGATIVE_Z, worldForwardDirection);
+
+        if (worldForwardDirection.lengthSquared() < 1.0e-12) {
+            return new Vector2f(0.0f, 0.0f);
+        }
+
+        double horizontalDistance = Math.sqrt(worldForwardDirection.x * worldForwardDirection.x + worldForwardDirection.z * worldForwardDirection.z);
+
+        float yaw;
+        if (horizontalDistance < 1.0e-9) {
+            yaw = 0.0f;
+        } else {
+            yaw = (float) Math.toDegrees(Math.atan2(worldForwardDirection.x, -worldForwardDirection.z));
+        }
+
+        float pitch;
+        if (horizontalDistance < 1.0e-9) {
+            if (worldForwardDirection.y > 0.0) {
+                pitch = 90.0f;
+            } else if (worldForwardDirection.y < 0.0) {
+                pitch = -90.0f;
+            } else {
+                pitch = 0.0f;
+            }
+        } else {
+            pitch = (float) Math.toDegrees(Math.atan2(worldForwardDirection.y, horizontalDistance));
+        }
+
+        return new Vector2f(yaw, pitch);
+    }
+
 }

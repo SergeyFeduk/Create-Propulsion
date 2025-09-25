@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "   ",
+        "BMB",
+        "SSS"
+    ],
+    "key": {
+        "B": {
+            "item": "create:brass_sheet"
+        },
+        "M": {
+            "item": "create:precision_mechanism"
+        },
+        "S": {
+            "item": "create:sturdy_sheet"
+        }
+    },
+    "result": {
+        "item": "createpropulsion:physics_assembler"
+    }
+}

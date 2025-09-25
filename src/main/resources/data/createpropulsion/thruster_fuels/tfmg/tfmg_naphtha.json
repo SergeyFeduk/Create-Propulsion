@@ -1,0 +1,6 @@
+{
+    "fluid": "tfmg:naphtha",
+    "thrust_multiplier": 0.95,
+    "consumption_multiplier": 0.85,
+    "required_mod": "tfmg"
+}

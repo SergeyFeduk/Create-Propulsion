@@ -1,0 +1,56 @@
+{
+    "type": "create:sequenced_assembly",
+    "ingredient": {
+        "item": "minecraft:glass_pane"
+    },
+    "loops": 5,
+    "results": [
+        {
+        "chance": 95.0,
+        "item": "createpropulsion:optical_lens"
+        },
+        {
+        "chance": 5.0,
+        "item": "minecraft:glass_bottle"
+        }
+    ],
+    "sequence": [
+        {
+        "type": "create:deploying",
+        "ingredients": [
+            {
+            "item": "createpropulsion:unfinished_lens"
+            },
+            {
+                "item": "create:powdered_obsidian"
+            }
+        ],
+        "results": [
+            {
+            "item": "createpropulsion:unfinished_lens"
+            }
+        ]
+        },
+        {
+        "type": "create:filling",
+        "ingredients": [
+            {
+            "item": "createpropulsion:unfinished_lens"
+            },
+            {
+            "amount": 250,
+            "fluid": "minecraft:water",
+            "nbt": {}
+            }
+        ],
+        "results": [
+            {
+            "item": "createpropulsion:unfinished_lens"
+            }
+        ]
+        }
+    ],
+    "transitionalItem": {
+        "item": "createpropulsion:unfinished_lens"
+    }
+}

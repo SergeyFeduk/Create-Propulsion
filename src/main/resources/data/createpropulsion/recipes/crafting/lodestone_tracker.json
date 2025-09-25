@@ -1,0 +1,25 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "AAA",
+        " B ",
+        "RDR"
+    ],
+    "key": {
+        "R": {
+            "item": "minecraft:redstone"
+        },
+        "B": {
+            "item": "create:brass_ingot"
+        },
+        "D": {
+            "item": "create:brass_casing"
+        },
+        "A": {
+            "item": "create:andesite_alloy"
+        }
+    },
+    "result": {
+        "item": "createpropulsion:lodestone_tracker"
+    }
+}

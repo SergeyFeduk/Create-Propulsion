@@ -1,0 +1,6 @@
+{
+    "parent": "createpropulsion:block/physics_assembler_base",
+    "textures": {
+      "0": "createpropulsion:block/physics_assembler_on"
+    }
+}

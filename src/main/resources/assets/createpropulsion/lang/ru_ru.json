@@ -11,6 +11,10 @@
     "item.createpropulsion.optical_sensor": "Оптический датчик",
     "create.gui.optical_sensor.distance_behaviour": "Дальность действия датчика",
 
+    "block.createpropulsion.lodestone_tracker": "Трекер магнетита",
+    "block.createpropulsion.redstone_magnet": "Редстоун магнит",
+    "block.createpropulsion.physics_assembler": "Физический сборщик",
+
     "create.gui.goggles.thruster.status": "Статус реактивного двигателя",
     "create.gui.goggles.thruster.status.no_fuel": "Нет топлива",
     "create.gui.goggles.thruster.status.wrong_fuel": "Неправильное топливо",
@@ -18,16 +22,56 @@
     "create.gui.goggles.thruster.status.working": "Работает",
     "create.gui.goggles.thruster.obstructed": "Заблокировано",
     "create.gui.goggles.thruster.efficiency": "Эффективность",
+    "create.gui.goggles.optical_sensor.lenses": "Линзы",
 
     "createpropulsion.inline_optical_sensor.tooltip.summary": "Сканирует _лучом до {} блоков_.",
     "createpropulsion.inline_optical_sensor.tooltip.condition1": "Когда блок обнаружен",
-    "createpropulsion.inline_optical_sensor.tooltip.behaviour1": "Излучает редстоун-сигнал. Сигнал сильнее для блоков находящихся ближе.",
+    "createpropulsion.inline_optical_sensor.tooltip.behaviour1": "Излучает _редстоун-сигнал_. Сигнал сильнее для блоков находящихся ближе.",
 
-    "createpropulsion.optical_sensor.tooltip.summary": "Настраиваемый оптический датчик. Есть возможность изменить дистанцию и установить фильтр по типу блока.",
+    "createpropulsion.optical_sensor.tooltip.summary": "Настраиваемый _оптический датчик_. Есть возможность изменить _дальность_ и установить _фильтр_ по типу блока.",
     "createpropulsion.optical_sensor.tooltip.condition1": "Когда блок обнаружен",
-    "createpropulsion.optical_sensor.tooltip.behaviour1": "Если обнаружен подходящий блок — излучает редстоун-сигнал. Сигнал сильнее для блоков находящихся ближе.",
+    "createpropulsion.optical_sensor.tooltip.behaviour1": "Если обнаружен подходящий блок — излучает _редстоун-сигнал_. Сигнал сильнее для блоков находящихся ближе.",
 
     "createpropulsion.thruster.tooltip.summary": "Создаёт тягу до _{} кН_ при установке на корабль.",
     "createpropulsion.thruster.tooltip.condition1": "Когда заправлен и подан редстоун-сигнал",
-    "createpropulsion.thruster.tooltip.behaviour1": "Толкает корабль. Тяга зависит от мощности редстоун-сигнала и используемого топлива."
+    "createpropulsion.thruster.tooltip.behaviour1": "Толкает корабль. Тяга зависит от мощности _редстоун-сигнала_ и используемого топлива.",
+
+    "createpropulsion.lodestone_tracker.tooltip.summary": "Преобразует направление стрелки _компаса_ в _редстоун-сигнал_.",
+    "createpropulsion.lodestone_tracker.tooltip.condition1": "Когда установлен компас",
+    "createpropulsion.lodestone_tracker.tooltip.behaviour1": "Подаёт _редстоун-сигнал_ в направлении стрелки _компаса_.",
+
+    "createpropulsion.redstone_magnet.tooltip.summary": "_Притягивает_ или _отталкивает_ находящиеся рядом магниты в соответствии с их полярностью.",
+    "createpropulsion.redstone_magnet.tooltip.condition1": "Когда подан редстоун-сигнал",
+    "createpropulsion.redstone_magnet.tooltip.behaviour1": "Воздействует на находящиеся рядом _включённые магниты_.",
+
+    "createpropulsion.physics_assembler.tooltip.summary": "_Собирает_ блоки в физические сущности.",
+    "createpropulsion.physics_assembler.tooltip.condition1": "Когда установлен Калибратор и подан редстоун-сигнал",
+    "createpropulsion.physics_assembler.tooltip.behaviour1": "_Собирает_ блоки в _регионе_ заданном _калибратором сборщика_ в физическую сущность.",
+
+    "item.createpropulsion.pine_resin": "Еловая смола",
+    "fluid.createpropulsion.turpentine": "Скипидар",
+    "item.createpropulsion.turpentine_bucket": "Ведро скипидара",
+
+    "item.createpropulsion.optical_lens": "Оптическая линза",
+    "item.createpropulsion.fluid_lens": "Жидкостная линза",
+    "item.createpropulsion.focus_lens": "Фокусирующая линза",
+    "item.createpropulsion.invisibility_lens": "Линза невидимости",
+    "item.createpropulsion.unfinished_lens": "Незаконченная линза",
+
+    "item.createpropulsion.assembly_gauge": "Калибратор сборщика",
+    "createpropulsion.gauge.selection.same_structure": "Выделенная область должна начинаться и заканчиваться на одной структуре",
+    "createpropulsion.gauge.selection.too_big": "Выделенная область слишком большая",
+    "createpropulsion.gauge.selection.cancel": "Кликните ещё раз для отмены",
+    "createpropulsion.gauge.selection.confirm": "Кликните ещё раз для подтверждения",
+    "createpropulsion.assembler.selection.cannot_be_inside": "Сборщик не может находиться внутри выделенной области",
+    "createpropulsion.assembler.selection.too_far": "Выделенная область слишком далеко",
+
+    "createpropulsion.optical_lens.tooltip.summary": "Оптическая линза, которую можно _покрасить_, чтобы изменить цвет луча _оптического сенсора_.",
+    "createpropulsion.fluid_lens.tooltip.summary": "Позволяет _оптическому сенсору_ обнаруживать _жидкости_.",
+    "createpropulsion.focus_lens.tooltip.summary": "_Удваивает_ предельную дальность _оптического сенсора_.",
+    "createpropulsion.invisibility_lens.tooltip.summary": "Делает луч _оптического сенсора невидимым_.",
+
+    "createpropulsion.tooltip.holdForRocketFuelSummary": "Удерживайте [%1$s] для сводки о ракетном топливе",
+    "createpropulsion.tooltip.thrust": "Тяга",
+    "createpropulsion.tooltip.consumption": "Расход топлива"
 }

@@ -1,0 +1,73 @@
+{
+    "itemGroup.createpropulsion.base": "Create: Propulsion",
+
+    "block.createpropulsion.thruster": "Triebwerk",
+    "item.createpropulsion.thruster": "Triebwerk",
+
+    "block.createpropulsion.inline_optical_sensor": "Optischer Inline-Sensor",
+    "item.createpropulsion.inline_optical_sensor": "Optischer Inline-Sensor",
+
+    "block.createpropulsion.optical_sensor": "Optischer Sensor",
+    "item.createpropulsion.optical_sensor": "Optischer Sensor",
+    "create.gui.optical_sensor.distance_behaviour": "Raycast Distanz",
+
+    "block.createpropulsion.lodestone_tracker": "Leitstein Tracker",
+    "block.createpropulsion.redstone_magnet": "Redstone Magnet",
+    "block.createpropulsion.physics_assembler": "Physik-Assembler",
+
+    "create.gui.goggles.thruster.status": "Triebwerk Status",
+    "create.gui.goggles.thruster.status.no_fuel": "Kein Treibstoff",
+    "create.gui.goggles.thruster.status.wrong_fuel": "Falscher Treibstoff",
+    "create.gui.goggles.thruster.status.not_powered": "Nicht gepowered",
+    "create.gui.goggles.thruster.status.working": "An",
+    "create.gui.goggles.thruster.obstructed": "Obstruktiert",
+    "create.gui.goggles.thruster.efficiency": "Effizienz",
+    "create.gui.goggles.optical_sensor.lenses": "Linsen",
+
+    "createpropulsion.inline_optical_sensor.tooltip.summary": "Strahlt einen _Strahl_ bis zu _{} Blöcke weit_ und erkennt Blöcke.",
+    "createpropulsion.inline_optical_sensor.tooltip.condition1": "Wenn ein Block festgestellt wird.",
+    "createpropulsion.inline_optical_sensor.tooltip.behaviour1": "Gibt es ein _Redstonesignal_. Die Stärke ist stärker für nähere Blöcke.",
+
+    "createpropulsion.optical_sensor.tooltip.summary": "Konfigurabler _Raycast-Sensor_. Setze _Distanz_ und _filtere_ nach Blocktyp.",
+    "createpropulsion.optical_sensor.tooltip.condition1": "Wenn ein Block erkannt wird.",
+    "createpropulsion.optical_sensor.tooltip.behaviour1": "Wenn ein passender Block erkannt wird, emitiert es ein _Redstonesignal_. Die Stärke ist stärker für nähere Blöcke.",
+
+    "createpropulsion.thruster.tooltip.summary": "Erzeugt Schub bis zu _{} kN_ um Fahrzeuge zu bewegen.",
+    "createpropulsion.thruster.tooltip.condition1": "Wenn gepowered und mit Treibstoff versorgt,",
+    "createpropulsion.thruster.tooltip.behaviour1": "Bewegt es Fahrzeuge. Schub ist der _Redstonesignalstärke_ entsprechend.",
+
+    "createpropulsion.lodestone_tracker.tooltip.summary": "Konvertiert _Kompass_-Richtung zu einem _Redstonesignal_.",
+    "createpropulsion.lodestone_tracker.tooltip.condition1": "Wenn ein Kompass hineingelegt wird.",
+    "createpropulsion.lodestone_tracker.tooltip.behaviour1": "Emitiert es ein _Redstonesignal_ in die entgegengesetze Richtung wo der _Kompass_ hinzeigt.",
+
+    "createpropulsion.redstone_magnet.tooltip.summary": "_Attraktion_ oder _Abstossung_ von nahegelegenden aktivierten Magneten basierend auf Polarität.",
+    "createpropulsion.redstone_magnet.tooltip.condition1": "Wenn aktiviert",
+    "createpropulsion.redstone_magnet.tooltip.behaviour1": "Hat es Auswirkungen auf nahegelegende _aktivierte Magnete_.",
+
+    "createpropulsion.physics_assembler.tooltip.summary": "_Verwandelt_ Blöcke in physische Objekte.",
+    "createpropulsion.physics_assembler.tooltip.condition1": "Wenn aktiviert und es ein Assembly-Messgerät hat.",
+    "createpropulsion.physics_assembler.tooltip.behaviour1": "_Verwandelt_ Blöcke in der eingestellten _Region_ definiert vom _Assembly-Messgerät_ zu physischen Objekten.",
+
+    "item.createpropulsion.pine_resin": "Kiefernharz",
+    "fluid.createpropulsion.turpentine": "Turpentin",
+    "item.createpropulsion.turpentine_bucket": "Turpentineimer",
+
+    "item.createpropulsion.optical_lens": "Optische Linse",
+    "item.createpropulsion.fluid_lens": "Flüssigkeitslinse",
+    "item.createpropulsion.focus_lens": "Fokusierende Linse",
+    "item.createpropulsion.invisibility_lens": "Unsichtbarkeitslinse",
+    "item.createpropulsion.unfinished_lens": "Unfertige Linse",
+
+    "item.createpropulsion.assembly_gauge": "Assembly-Messgerät",
+
+    "createpropulsion.gauge.selection.same_structure": "Selektion muss auf der selben Struktur starten und enden.",
+    "createpropulsion.gauge.selection.too_big": "Selektion ist zu groß.",
+    "createpropulsion.gauge.selection.cancel": "Clicke nochmals um abzusagen",
+    "createpropulsion.gauge.selection.confirm": "Clicke nochmals um zu bestätigen",
+    "createpropulsion.assembler.selection.cannot_be_inside": "Assembler darf nicht in Selektion sein.",
+    "createpropulsion.assembler.selection.too_far": "Selektion ist zu weit weg.",
+    "createpropulsion.optical_lens.tooltip.summary": "Optische Linse die _gefärbt_ werden kann um den Strahl eines _optischen Sensors_ zu färben.",
+    "createpropulsion.fluid_lens.tooltip.summary": "Erlaubt einem _optischem Sensor_ _Flüssigkeiten_ zu erkennen.",
+    "createpropulsion.focus_lens.tooltip.summary": "_Verdoppelt_ die maximale _Distanz_ eines _optischen Sensors_.",
+    "createpropulsion.invisibility_lens.tooltip.summary": "Macht den Strahl eines _optischen Senors_ _unsichtbar_."
+}

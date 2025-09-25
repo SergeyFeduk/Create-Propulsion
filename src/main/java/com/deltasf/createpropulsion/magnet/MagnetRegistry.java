@@ -1,0 +1,29 @@
+package com.deltasf.createpropulsion.magnet;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
+
+public class MagnetRegistry {
+    private static MagnetRegistry INSTANCE;
+    public static MagnetRegistry get() {
+        if (INSTANCE == null) INSTANCE = new MagnetRegistry();
+        return INSTANCE;
+    }
+    private MagnetRegistry() {}
+    
+    public static final double magnetRange = 32.0;
+    public static final double magnetRangeSquared = magnetRange * magnetRange;
+
+    private final Map<ResourceKey<Level>, MagnetLevelRegistry> registries = new ConcurrentHashMap<>();
+
+    public static MagnetLevelRegistry forLevel(Level level) {
+        return MagnetRegistry.get().registries.computeIfAbsent(level.dimension(), k -> new MagnetLevelRegistry(level));
+    }
+
+    public void reset() {
+        registries.clear();
+    }
+}
