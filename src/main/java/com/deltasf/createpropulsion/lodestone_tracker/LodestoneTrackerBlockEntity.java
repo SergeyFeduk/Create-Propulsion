@@ -93,13 +93,13 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
             targetBlockPosition = CompassItem.getLodestonePosition(compass.getShareTag());
             if (targetBlockPosition == null) {
                 //This is triggered with lodestone compass which has its lodestone block destroyed
-                //In this case we just rotate the angle
-                float angle = ((float)currentTick * 10.0f) % 360.0f;
-                return angle;
+                return getConfusedAngle();
             }
         } else {
             targetBlockPosition = CompassItem.getSpawnPosition(getLevel());
         }
+
+        if (targetBlockPosition == null) return getConfusedAngle(); //Fix CH/Starlance setting compass target to null
         
         BlockPos targetBlock = targetBlockPosition.pos();
         //Acquire target and tracker world space positions
@@ -121,6 +121,11 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
             if (angle < 0) angle += 360.0f;
         }
 
+        return angle;
+    }
+
+    private float getConfusedAngle() {
+        float angle = ((float)currentTick * 10.0f) % 360.0f;
         return angle;
     }
 
