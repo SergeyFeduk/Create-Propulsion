@@ -79,7 +79,7 @@ public class LodestoneTrackerBlock extends Block implements EntityBlock, IWrench
         if (playerHoldingCompass && !trackerHasCompass) {
             // Player has compass, tracker is empty -> Place compass
             ItemStack compassToPlace = heldStack.split(1);
-            trackerBlockEntity.setCompass(compassToPlace);
+            trackerBlockEntity.setCompass(compassToPlace, player.getDirection());
             AllSoundEvents.DEPOT_SLIDE.playOnServer(level, pos);
             dirtyBlockEntity(level, pos);
             return InteractionResult.CONSUME;

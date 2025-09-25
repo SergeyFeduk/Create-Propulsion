@@ -16,6 +16,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -33,7 +34,10 @@ public class LodestoneTrackerRenderer extends SafeBlockEntityRenderer<LodestoneT
             //This is to update compass every frame instead of every tick
             float targetAngle = blockEntity.getAngleFromCompass(compass);
             int modelIndex = getIndexFromAngle(targetAngle);
-            renderCompass(blockEntity.getLevel(), poseStack, bufferSource, light, overlay, compass, new Vec3(0.5,0.85f,0.5), modelIndex);
+            Direction facing = blockEntity.getCompassFacing();
+            float facingAngle = facing.toYRot();
+
+            renderCompass(blockEntity.getLevel(), poseStack, bufferSource, light, overlay, compass, new Vec3(0.5,0.85f,0.5), modelIndex, facingAngle);
         }
 
         //Render partials
@@ -89,7 +93,7 @@ public class LodestoneTrackerRenderer extends SafeBlockEntityRenderer<LodestoneT
 
 
     private static void renderCompass(Level level, PoseStack ms, MultiBufferSource buffer, int light, int overlay, 
-        ItemStack item, Vec3 position, int modelIndex) {
+        ItemStack item, Vec3 position, int modelIndex, float facingAngle) {
         ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
         //Acquire target compass model
         modelIndex = Math.min(Math.max(0, modelIndex), 31);
@@ -98,6 +102,7 @@ public class LodestoneTrackerRenderer extends SafeBlockEntityRenderer<LodestoneT
         ms.pushPose();
         //Move and twist compass around to make it look fine
         ms.translate(position.x, position.y, position.z);
+        ms.mulPose(Axis.YP.rotationDegrees(facingAngle)); //Account for our facing
         ms.mulPose(Axis.XP.rotationDegrees(90.0f));
         ms.mulPose(Axis.ZP.rotationDegrees(180.0f));
         ms.scale(0.5f, 0.5f, 0.5f);

@@ -1,6 +1,7 @@
 package com.deltasf.createpropulsion.lodestone_tracker;
 import org.jetbrains.annotations.NotNull;
 
+import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.items.IItemHandler;
@@ -41,7 +42,7 @@ public class LodestoneTrackerItemHandler implements IItemHandler {
         toInsert.setCount(1);
 
         if (!simulate) {
-            blockEntity.setCompass(toInsert);
+            blockEntity.setCompass(toInsert, Direction.NORTH);
         }
 
         ItemStack remainder = stack.copy();
