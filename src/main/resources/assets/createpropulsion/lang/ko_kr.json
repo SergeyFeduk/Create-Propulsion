@@ -9,7 +9,11 @@
 
     "block.createpropulsion.optical_sensor": "광학 센서",
     "item.createpropulsion.optical_sensor": "광학 센서",
-    "create.gui.optical_sensor.distance_behaviour": "레이캐스트 거리",
+    "create.gui.optical_sensor.distance_behaviour": "광선 감지 거리",
+
+    "block.createpropulsion.lodestone_tracker": "자석석 추적기",
+    "block.createpropulsion.redstone_magnet": "레드스톤 자석",
+    "block.createpropulsion.physics_assembler": "물리 조립기",
 
     "create.gui.goggles.thruster.status": "추진기 상태",
     "create.gui.goggles.thruster.status.no_fuel": "연료 없음",
@@ -18,16 +22,56 @@
     "create.gui.goggles.thruster.status.working": "작동 중",
     "create.gui.goggles.thruster.obstructed": "막힘",
     "create.gui.goggles.thruster.efficiency": "효율",
+    "create.gui.goggles.optical_sensor.lenses": "렌즈 종류",
 
     "createpropulsion.inline_optical_sensor.tooltip.summary": "_광선_을 발사하여 최대 {}블록 거리까지 블록을 감지합니다.",
     "createpropulsion.inline_optical_sensor.tooltip.condition1": "블록을 감지하면",
     "createpropulsion.inline_optical_sensor.tooltip.behaviour1": "_레드스톤 신호_를 방출합니다. 가까운 블록일수록 출력이 강해집니다.",
 
-    "createpropulsion.optical_sensor.tooltip.summary": "설정 가능한 _레이캐스트 센서_입니다. _거리_와 블록 종류별 _필터_를 설정할 수 있습니다.",
+    "createpropulsion.optical_sensor.tooltip.summary": "설정 가능한 _광학 센서_입니다. _거리_와 블록 종류별 _필터_를 설정할 수 있습니다.",
     "createpropulsion.optical_sensor.tooltip.condition1": "블록을 감지하면",
     "createpropulsion.optical_sensor.tooltip.behaviour1": "일치하는 블록을 감지하면 _레드스톤 신호_를 출력합니다. 가까운 블록일수록 출력이 강해집니다.",
 
-    "createpropulsion.thruster.tooltip.summary": "최대 _{}kN_의 추진력을 제공하여 차량을 밀어냅니다.",
+    "createpropulsion.thruster.tooltip.summary": "최대 _{}kN_의 추진력을 제공하여 물체를 밀어냅니다.",
     "createpropulsion.thruster.tooltip.condition1": "연료가 공급되고 레드스톤 신호가 있을 때",
-    "createpropulsion.thruster.tooltip.behaviour1": "차량을 밀어냅니다. 추진력은 레드스톤 신호 세기에 따라 달라집니다."
+    "createpropulsion.thruster.tooltip.behaviour1": "차량을 밀어냅니다. 추진력은 레드스톤 신호 세기에 따라 달라집니다.",
+
+    "createpropulsion.lodestone_tracker.tooltip.summary": "적용된 _나침반_ 방향에 따라 _레드스톤 신호_를 생성합니다.",
+    "createpropulsion.lodestone_tracker.tooltip.condition1": "_나침반_을 적용 하면",
+    "createpropulsion.lodestone_tracker.tooltip.behaviour1": "_나침반_이 가리키는 방향에 따라 _레드스톤 신호_를 방출합니다.",
+
+    "createpropulsion.redstone_magnet.tooltip.summary": "자석의 극에 따라 주변 자석을 _끌어당기_거나 _밀어_냅니다.",
+    "createpropulsion.redstone_magnet.tooltip.condition1": "레드스톤 신호가 있을때",
+    "createpropulsion.redstone_magnet.tooltip.behaviour1": "주변의 _작동된 자석_에 작용합니다.",
+
+    "createpropulsion.physics_assembler.tooltip.summary": "블록을 물리적 개체로 _조립_합니다.",
+    "createpropulsion.physics_assembler.tooltip.condition1": "_조립 계량기_와 레드스톤 신호가 있을 때",
+    "createpropulsion.physics_assembler.tooltip.behaviour1": "_조립 계량기_가 계량한 _영역_안의 블록을 물리적 개체로 _조립_합니다.",
+
+    "item.createpropulsion.pine_resin": "가문비나무 송진",
+    "fluid.createpropulsion.turpentine": "송진유",
+    "item.createpropulsion.turpentine_bucket": "송진유 양동이",
+
+    "item.createpropulsion.optical_lens": "광학 렌즈",
+    "item.createpropulsion.fluid_lens": "액체 감지 렌즈",
+    "item.createpropulsion.focus_lens": "거리 확장 렌즈",
+    "item.createpropulsion.invisibility_lens": "투명화 렌즈",
+    "item.createpropulsion.unfinished_lens": "미완성된 렌즈",
+
+    "item.createpropulsion.assembly_gauge": "조립 계량기",
+    "createpropulsion.gauge.selection.same_structure": "선택은 연결된 구조 내에서만 가능합니다.",
+    "createpropulsion.gauge.selection.too_big": "선택된 영역이 너무 큽니다.",
+    "createpropulsion.gauge.selection.cancel": "쉬프트 우클릭하여 선택을 해제합니다.",
+    "createpropulsion.gauge.selection.confirm": "다시 클릭하여 확인합니다.",
+    "createpropulsion.assembler.selection.cannot_be_inside": "조립기는 선택된 영역 안에 있을 수 없습니다.",
+    "createpropulsion.assembler.selection.too_far": "선택한 영역이 너무 멀리 있습니다",
+
+    "createpropulsion.optical_lens.tooltip.summary": "렌즈에 색을 입혀 _광학 센서_의 빛을 _색칠_할 수 있습니다.",
+    "createpropulsion.fluid_lens.tooltip.summary": "_광학 센서_가 _액체_를 감지 할 수 있도록 합니다.",
+    "createpropulsion.focus_lens.tooltip.summary": "_광학 센서_의 감지 거리를 _두배_로 증가시킵니다.",
+    "createpropulsion.invisibility_lens.tooltip.summary": "_광학 센서_의 빛을 _투명_하게 변화시킵니다.",
+
+    "createpropulsion.tooltip.holdForRocketFuelSummary": "[%1$s]를 눌러 연료 성능 보기",
+    "createpropulsion.tooltip.thrust": "추진력",
+    "createpropulsion.tooltip.consumption": "소모량"
 }
