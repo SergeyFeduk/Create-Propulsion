@@ -70,6 +70,7 @@
     "createpropulsion.fluid_lens.tooltip.summary": "Enables an _optical sensor_ to detect _fluids_.",
     "createpropulsion.focus_lens.tooltip.summary": "_Doubles_ an _optical sensor_'s maximum _range_.",
     "createpropulsion.invisibility_lens.tooltip.summary": "Makes an _optical sensor_'s beam _invisible_.",
+    "createpropulsion.unfinished_lens.tooltip.summary": "_Halves_ an _optical sensor_'s maximum _range_.",
 
     "createpropulsion.tooltip.holdForRocketFuelSummary": "Hold [%1$s] for Rocket Fuel Summary",
     "createpropulsion.tooltip.thrust": "Thrust",

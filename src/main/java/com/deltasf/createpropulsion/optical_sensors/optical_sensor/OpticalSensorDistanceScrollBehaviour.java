@@ -23,12 +23,12 @@ public class OpticalSensorDistanceScrollBehaviour extends ScrollValueBehaviour {
     @Override
     public ValueSettingsBoard createBoard(Player player, BlockHitResult hitResult) {
         ImmutableList<Component> row = ImmutableList.of(Lang.builder().text("\u2191").component());
-        //Bazinga!
         var be = (AbstractOpticalSensorBlockEntity)getWorld().getBlockEntity(getPos());
         int maxDistance;
         if (be != null) {
             boolean isFocused = be.hasLens(PropulsionItems.FOCUS_LENS.get());
-            maxDistance = PropulsionConfig.OPTICAL_SENSOR_MAX_DISTANCE.get() * (isFocused ? 2 : 1);
+            boolean isUnfocused = be.hasLens(PropulsionItems.UNFINISHED_LENS.get());
+            maxDistance = (int)Math.floor(PropulsionConfig.OPTICAL_SENSOR_MAX_DISTANCE.get() * (isFocused ? 2 : 1) * (isUnfocused ? 0.5 : 1));
         } else {
             maxDistance = PropulsionConfig.OPTICAL_SENSOR_MAX_DISTANCE.get();
         }

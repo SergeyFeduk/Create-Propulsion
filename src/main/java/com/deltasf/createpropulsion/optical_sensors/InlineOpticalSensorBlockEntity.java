@@ -36,7 +36,8 @@ public class InlineOpticalSensorBlockEntity extends AbstractOpticalSensorBlockEn
     @Override
     protected float getMaxRaycastDistance() {
         boolean isFocused = hasLens(PropulsionItems.FOCUS_LENS.get());
-        return PropulsionConfig.INLINE_OPTICAL_SENSOR_MAX_DISTANCE.get() * (isFocused ? 2.0f : 1.0f);
+        boolean isUnfocused = hasLens(PropulsionItems.UNFINISHED_LENS.get());
+        return PropulsionConfig.INLINE_OPTICAL_SENSOR_MAX_DISTANCE.get() * (isFocused ? 2.0f : 1.0f) * (isUnfocused ? 0.5f : 1);
     }
 
     @Override
