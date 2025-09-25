@@ -7,11 +7,15 @@ import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntityTicker;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 
 public class SolidBurnerBlock extends AbstractBurnerBlock {
     public SolidBurnerBlock(Properties properties) {
@@ -29,5 +33,21 @@ public class SolidBurnerBlock extends AbstractBurnerBlock {
             return new SmartBlockEntityTicker<>();
         }
         return null;
+    }
+
+    @Override
+    public InteractionResult use(@Nonnull BlockState state, @Nonnull Level world, @Nonnull BlockPos pos, @Nonnull Player player, @Nonnull InteractionHand hand, @Nonnull BlockHitResult hit) { 
+        if (player.isSpectator() || player.isShiftKeyDown()) {
+            return InteractionResult.PASS;
+        }
+
+        if (world.getBlockEntity(pos) instanceof SolidBurnerBlockEntity blockEntity) {
+            FuelInventoryBehaviour behaviour = blockEntity.getBehaviour(FuelInventoryBehaviour.TYPE);
+            if (behaviour == null) return InteractionResult.PASS;
+
+            if (behaviour.handlePlayerInteraction(player, hand)) return InteractionResult.SUCCESS;
+        }
+
+        return InteractionResult.CONSUME;
     }
 }
