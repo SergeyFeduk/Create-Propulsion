@@ -332,6 +332,7 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
     @Override
     protected void write(CompoundTag tag, boolean clientPacket) {
         super.write(tag, clientPacket);
+        
         tag.put("inventory", itemHandler.serializeNBT());
         tag.putInt("currentTick", currentTick);
         tag.putBoolean("isInverted", isInverted);
@@ -346,10 +347,20 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
     @Override
     public void read(CompoundTag tag, boolean clientPacket) {
         super.read(tag, clientPacket);
+
+        //Backwards-compatible way to restore compass
+        if (tag.contains("CompassItem") && !tag.contains("inventory", 10)) {
+            ItemStack oldCompass = ItemStack.of(tag.getCompound("CompassItem"));
+            itemHandler.setStackInSlot(0, oldCompass);
+            this.compassFacing = Direction.NORTH;
+        } else {
+            itemHandler.deserializeNBT(tag.getCompound("inventory"));
+            this.compassFacing = Direction.byName(tag.getString("compassFacing"));
+        }
+
         itemHandler.deserializeNBT(tag.getCompound("inventory"));
         currentTick = tag.getInt("currentTick");
         isInverted = tag.getBoolean("isInverted");
-        compassFacing = Direction.byName(tag.getString("compassFacing"));
 
         this.POWER_NORTH = tag.getInt("powerNorth");
         this.POWER_EAST = tag.getInt("powerEast");
