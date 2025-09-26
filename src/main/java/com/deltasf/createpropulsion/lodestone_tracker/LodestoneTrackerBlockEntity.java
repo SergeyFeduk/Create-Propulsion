@@ -35,15 +35,15 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 
 @SuppressWarnings("null")
 public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
     //Total of 360 degrees occupied by 32 states, halved to account for angles being centered while segments are not
     private static final float ANGLE_TOLERANCE = 360.0f / 32.0f / 2.0f; 
-    //TODO: Use item handler instead of compass field
-    private final LodestoneTrackerItemHandler itemHandler = new LodestoneTrackerItemHandler(this);
+    private final ItemStackHandler itemHandler = createItemHandler();
     private final LazyOptional<IItemHandler> itemHandlerCap = LazyOptional.of(() -> itemHandler);
-    //Replacing 16^4 blockstates with this
+    //Redstone directional powers
     private int POWER_NORTH = 0;
     private int POWER_EAST = 0;
     private int POWER_SOUTH = 0;
@@ -56,7 +56,6 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
     public boolean IsInverted() {return isInverted; }
 
     //What am I doing with my life
-    private ItemStack compass = ItemStack.EMPTY;
     private int currentTick = 0;
     private float targetAngle;
     private float previousAngle;
@@ -82,8 +81,8 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
     public void tick() {
         super.tick();
         currentTick++;
-        if (!compass.isEmpty()) {
-            targetAngle = getAngleFromCompass(compass);
+        if (!getCompass().isEmpty()) {
+            targetAngle = getAngleFromCompass(getCompass());
         }
         
         updateRedstoneOutput(targetAngle);
@@ -139,7 +138,7 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
         if (!isOutputDirty && isAngleWithinTolerance(previousAngle, angle, ANGLE_TOLERANCE)) return;
         isOutputDirty = false;
         previousAngle = targetAngle;
-        if (compass.isEmpty()) {
+        if (getCompass().isEmpty()) {
             redstoneOutputs.set(0, 0, 0, 0);
         } else {
             calculateRedstoneOutput(angle);
@@ -286,30 +285,27 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
 
     //Compass methods
     public ItemStack getCompass() {
-        return compass;
+        return itemHandler.getStackInSlot(0);
     }
 
     public boolean hasCompass() {
-        return !compass.isEmpty();
+        return !getCompass().isEmpty();
     }
 
     public void setCompass(ItemStack item, Direction compassDirection) {
-        if (item.isEmpty() || item.getItem() == Items.COMPASS) {
-            ItemStack oldCompass = this.compass;
-            this.compass = item.copy();
-            if (this.compass.getCount() > 1) {
-                this.compass.setCount(1); // Enforce max stack size of 1
-            }
+        itemHandler.setStackInSlot(0, item);
+
+        if (!item.isEmpty()) { 
             this.compassFacing = compassDirection;
-            if (!ItemStack.matches(oldCompass, this.compass)) {
-                notifyUpdate();
-            }
+        } else {
+            this.compassFacing = Direction.NORTH;
         }
+        notifyUpdate();
     }
 
     public ItemStack removeCompass() {
-        ItemStack extracted = this.compass.copy();
-        setCompass(ItemStack.EMPTY, Direction.NORTH);
+        ItemStack extracted = getCompass().copy();
+        setCompass(ItemStack.EMPTY, Direction.NORTH); 
         return extracted;
     }
 
@@ -336,7 +332,7 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
     @Override
     protected void write(CompoundTag tag, boolean clientPacket) {
         super.write(tag, clientPacket);
-        tag.put("CompassItem", compass.save(new CompoundTag()));
+        tag.put("inventory", itemHandler.serializeNBT());
         tag.putInt("currentTick", currentTick);
         tag.putBoolean("isInverted", isInverted);
         tag.putString("compassFacing", compassFacing.getName());
@@ -350,7 +346,7 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
     @Override
     public void read(CompoundTag tag, boolean clientPacket) {
         super.read(tag, clientPacket);
-        compass = ItemStack.of(tag.getCompound("CompassItem"));
+        itemHandler.deserializeNBT(tag.getCompound("inventory"));
         currentTick = tag.getInt("currentTick");
         isInverted = tag.getBoolean("isInverted");
         compassFacing = Direction.byName(tag.getString("compassFacing"));
@@ -384,5 +380,25 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
         if (level != null && !level.isClientSide) {
             level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
         }
+    }
+
+    private ItemStackHandler createItemHandler() {
+        return new ItemStackHandler(1) {
+            @Override
+            public boolean isItemValid(int slot, @NotNull ItemStack stack) {
+                return stack.getItem() == Items.COMPASS && super.isItemValid(slot, stack);
+            }
+
+            @Override
+            protected void onContentsChanged(int slot) {
+                isOutputDirty = true;
+                notifyUpdate(); 
+            }
+
+            @Override
+            public int getSlotLimit(int slot) {
+                return 1;
+            } 
+        };
     }
 }
