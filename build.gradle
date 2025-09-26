@@ -14,7 +14,6 @@ base {
     archivesName = mod_id
 }
 
-// Mojang ships Java 17 to end users in 1.18+, so your mod should target Java 17.
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 minecraft {
@@ -22,7 +21,6 @@ minecraft {
     copyIdeResources = true
 
     mixin {
-        // This is needed for MixinSquared as well.
         add sourceSets.main, "${mod_id}.refmap.json"
         config "${mod_id}.mixins.json"
     }
