@@ -57,6 +57,7 @@ public class PropulsionCreativeTab {
                 //From 0.3
                 output.accept(PropulsionBlocks.ENVELOPE_BLOCK);
                 output.accept(PropulsionBlocks.HAI_BLOCK);
+                output.accept(PropulsionBlocks.SOLID_BURNER);
             }
         }
 }

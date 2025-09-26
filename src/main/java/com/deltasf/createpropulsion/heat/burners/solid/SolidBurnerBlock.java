@@ -11,20 +11,31 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 
 public class SolidBurnerBlock extends AbstractBurnerBlock {
+    public static final BooleanProperty LIT = BooleanProperty.create("lit");
     public SolidBurnerBlock(Properties properties) {
         super(properties);
+        this.registerDefaultState(this.stateDefinition.any()
+            .setValue(LIT, false));
     }
 
     @Override
     public BlockEntity newBlockEntity(@Nonnull BlockPos pos, @Nonnull BlockState state) {
         return new SolidBurnerBlockEntity(PropulsionBlockEntities.SOLID_BURNER_BLOCK_ENTITY.get(), pos, state);
+    }
+
+    @Override
+    protected void createBlockStateDefinition(@Nonnull StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(FACING, HEAT, LIT);
     }
 
     @Override
@@ -48,6 +59,6 @@ public class SolidBurnerBlock extends AbstractBurnerBlock {
             if (behaviour.handlePlayerInteraction(player, hand)) return InteractionResult.SUCCESS;
         }
 
-        return InteractionResult.CONSUME;
+        return InteractionResult.PASS;
     }
 }
