@@ -7,6 +7,7 @@ import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntityTicker;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -60,5 +61,18 @@ public class SolidBurnerBlock extends AbstractBurnerBlock {
         }
 
         return InteractionResult.PASS;
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public void onRemove(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull BlockState newState, boolean isMoving) {
+        if (!state.is(newState.getBlock())) {
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof SolidBurnerBlockEntity burnerBlockEntity) {
+                Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), burnerBlockEntity.getFuelStack());
+            }
+            level.removeBlockEntity(pos);
+        }
+        super.onRemove(state, level, pos, newState, isMoving);
     }
 }
