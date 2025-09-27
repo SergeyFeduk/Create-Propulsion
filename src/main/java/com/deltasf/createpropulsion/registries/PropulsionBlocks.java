@@ -78,6 +78,11 @@ public class PropulsionBlocks {
         .register();
 
     public static final BlockEntry<SolidBurnerBlock> SOLID_BURNER = REGISTRATE.block("solid_burner", SolidBurnerBlock::new)
+        .properties(p -> p.mapColor(MapColor.STONE))
+        .properties(p -> p.sound(SoundType.METAL))
+        .properties(p -> p.requiresCorrectToolForDrops())
+        .properties(p -> p.strength(2.5F, 2.0F))
+        .properties(p -> p.lightLevel(state -> state.getValue(SolidBurnerBlock.LIT) ? 13 : 0))
         .simpleItem()
         .register();
 }
