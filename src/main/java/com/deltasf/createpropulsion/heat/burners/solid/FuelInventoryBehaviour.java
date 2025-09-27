@@ -8,6 +8,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
@@ -31,6 +33,16 @@ public class FuelInventoryBehaviour extends BlockEntityBehaviour {
             return this.capability.cast();
         }
         return LazyOptional.empty();
+    }
+
+    public boolean tryConsumeFuel() {
+        int burnTime = ForgeHooks.getBurnTime(fuelStack, RecipeType.SMELTING);
+        if (burnTime > 0 && blockEntity instanceof SolidBurnerBlockEntity solidBurner) {
+            solidBurner.setBurnTime(burnTime);
+            this.fuelStack.shrink(1);
+            return true;
+        }
+        return false;
     }
 
     public boolean handlePlayerInteraction(Player player, InteractionHand hand) {

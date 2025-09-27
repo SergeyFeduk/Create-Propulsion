@@ -31,6 +31,7 @@ public class HeatBuffer implements IHeatSource, INBTSerializable<CompoundTag> {
         return capacity;
     }
 
+    @Override
     public void generateHeat(int amount) {
         heat = Math.min(capacity, heat + amount);
     }
