@@ -1,10 +1,34 @@
 {
-    "variants": {
-        "facing=north": { "model": "createpropulsion:block/solid_burner" },
-        "facing=south": { "model": "createpropulsion:block/solid_burner", "y": 180 },
-        "facing=west":  { "model": "createpropulsion:block/solid_burner", "y": 270 },
-        "facing=east":  { "model": "createpropulsion:block/solid_burner", "y": 90 },
-        "facing=up":    { "model": "createpropulsion:block/solid_burner", "x": 270 },
-        "facing=down":  { "model": "createpropulsion:block/solid_burner", "x": 90 }
+  "variants": {
+    "facing=north,lit=false": {
+      "model": "createpropulsion:block/solid_burner"
+    },
+    "facing=east,lit=false": {
+      "model": "createpropulsion:block/solid_burner",
+      "y": 90
+    },
+    "facing=south,lit=false": {
+      "model": "createpropulsion:block/solid_burner",
+      "y": 180
+    },
+    "facing=west,lit=false": {
+      "model": "createpropulsion:block/solid_burner",
+      "y": 270
+    },
+    "facing=north,lit=true": {
+      "model": "createpropulsion:block/solid_burner_on"
+    },
+    "facing=east,lit=true": {
+      "model": "createpropulsion:block/solid_burner_on",
+      "y": 90
+    },
+    "facing=south,lit=true": {
+      "model": "createpropulsion:block/solid_burner_on",
+      "y": 180
+    },
+    "facing=west,lit=true": {
+      "model": "createpropulsion:block/solid_burner_on",
+      "y": 270
     }
+  }
 }

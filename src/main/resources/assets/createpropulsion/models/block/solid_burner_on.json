@@ -1,0 +1,6 @@
+{
+  "parent": "createpropulsion:block/solid_burner",
+  "textures": {
+    "north": "createpropulsion:block/solid_burner_front_on"
+  }
+}
