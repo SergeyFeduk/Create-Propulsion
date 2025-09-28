@@ -10,6 +10,7 @@ import com.deltasf.createpropulsion.heat.IHeatSource;
 import com.deltasf.createpropulsion.heat.HeatMapper.HeatLevelString;
 import com.deltasf.createpropulsion.heat.burners.AbstractBurnerBlock;
 import com.deltasf.createpropulsion.heat.burners.AbstractBurnerBlockEntity;
+import com.deltasf.createpropulsion.heat.burners.BurnerDamager;
 import com.deltasf.createpropulsion.registries.PropulsionCapabilities;
 import com.simibubi.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
@@ -34,6 +35,7 @@ public class SolidBurnerBlockEntity extends AbstractBurnerBlockEntity {
     private int burnTime = 0;
     private HeatLevelString heatLevelName = HeatLevelString.COLD;
     private boolean isPowered = false;
+    private BurnerDamager damager;
 
     private static final float MAX_HEAT = 400.0f;
     private static final float PASSIVE_LOSS_PER_TICK = 0.05f;
@@ -51,6 +53,9 @@ public class SolidBurnerBlockEntity extends AbstractBurnerBlockEntity {
         super.addBehaviours(behaviours);
         fuelInventory = new FuelInventoryBehaviour(this);
         behaviours.add(fuelInventory);
+        
+        damager = new BurnerDamager(this);
+        behaviours.add(damager);
     }
 
     public ItemStack getFuelStack() {
