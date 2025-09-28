@@ -1,8 +1,8 @@
 package com.deltasf.createpropulsion.events;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
+import com.deltasf.createpropulsion.heat.HeatMapper;
 import com.deltasf.createpropulsion.heat.IHeatConsumer;
-import com.deltasf.createpropulsion.heat.burners.HeatToHeatLevelMapping;
 import com.deltasf.createpropulsion.registries.PropulsionCapabilities;
 import com.simibubi.create.content.fluids.tank.FluidTankBlockEntity;
 import com.simibubi.create.content.kinetics.mixer.MechanicalMixerBlockEntity;
@@ -51,7 +51,7 @@ public class CapabilityEventHandler {
 
         @Override
         public float getOperatingThreshold() {
-            return HeatToHeatLevelMapping.getMinHeatPercent(HeatLevel.FADING);
+            return HeatMapper.getMinHeatPercent(HeatLevel.FADING);
         }
 
         @Override
@@ -88,7 +88,7 @@ public class CapabilityEventHandler {
 
         @Override
         public float getOperatingThreshold() {
-            return HeatToHeatLevelMapping.getMinHeatPercent(HeatLevel.KINDLED);
+            return HeatMapper.getMinHeatPercent(HeatLevel.KINDLED);
         }
 
         @SuppressWarnings("null")

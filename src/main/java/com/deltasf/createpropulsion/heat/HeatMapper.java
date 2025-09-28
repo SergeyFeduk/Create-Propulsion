@@ -1,7 +1,7 @@
-package com.deltasf.createpropulsion.heat.burners;
+package com.deltasf.createpropulsion.heat;
 import com.simibubi.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 
-public class HeatToHeatLevelMapping {
+public class HeatMapper {
     public static float getMinHeatPercent(HeatLevel heatLevel) {
         if (heatLevel == HeatLevel.KINDLED) return 0.6f;
         if (heatLevel == HeatLevel.FADING) return 0.3f;
@@ -12,5 +12,14 @@ public class HeatToHeatLevelMapping {
         if (percentage > 0.6f) return HeatLevel.KINDLED;
         if (percentage > 0.3f) return HeatLevel.FADING;
         return HeatLevel.NONE; 
+    }
+
+    public String getHeatString(float percentage) {
+        //TODO: Use translation keys
+        if (percentage > 0.6f) return "Searing";
+        if (percentage > 0.3f) return "Hot";
+        //Warm does not mean anything for gameplay, used just to notify player that burner is heating up
+        if (percentage > 0.1f) return "Warm"; 
+        return "Cold";
     }
 }

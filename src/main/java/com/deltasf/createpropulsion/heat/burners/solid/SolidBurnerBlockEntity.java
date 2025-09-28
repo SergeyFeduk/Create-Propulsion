@@ -5,10 +5,10 @@ import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import com.deltasf.createpropulsion.heat.HeatMapper;
 import com.deltasf.createpropulsion.heat.IHeatSource;
 import com.deltasf.createpropulsion.heat.burners.AbstractBurnerBlock;
 import com.deltasf.createpropulsion.heat.burners.AbstractBurnerBlockEntity;
-import com.deltasf.createpropulsion.heat.burners.HeatToHeatLevelMapping;
 import com.deltasf.createpropulsion.registries.PropulsionCapabilities;
 import com.simibubi.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
@@ -80,11 +80,8 @@ public class SolidBurnerBlockEntity extends AbstractBurnerBlockEntity {
 
         //Thermostat
         boolean refueled = false;
-        if (burnTime <= 0) {
-            refueled = needsRefuel();
-            if (refueled) {
-                fuelInventory.tryConsumeFuel();
-            }
+        if (burnTime <= 0 && needsRefuel()) {
+            refueled = fuelInventory.tryConsumeFuel();
         }
 
         //Sync and update state
@@ -157,7 +154,7 @@ public class SolidBurnerBlockEntity extends AbstractBurnerBlockEntity {
         return heatSource.getCapability().map(cap -> {
             if (cap.getHeatStored() == 0) return HeatLevel.NONE;
             float percentage = cap.getHeatStored() / cap.getMaxHeatStored();
-            return HeatToHeatLevelMapping.getHeatLevel(percentage);
+            return HeatMapper.getHeatLevel(percentage);
         }).orElse(HeatLevel.NONE);
     }
 
