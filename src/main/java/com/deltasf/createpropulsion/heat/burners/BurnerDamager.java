@@ -25,9 +25,6 @@ import net.minecraft.world.phys.Vec3;
 public class BurnerDamager extends BlockEntityBehaviour {
     public static final BehaviourType<BurnerDamager> TYPE = new BehaviourType<>();
 
-    private static final int DAMAGE_INTERVAL = 5;
-    private int damageCooldown;
-
     public BurnerDamager(SmartBlockEntity be) { super(be); }
 
     @Override
@@ -39,27 +36,19 @@ public class BurnerDamager extends BlockEntityBehaviour {
             return;
         }
 
-        if (damageCooldown > 0) {
-            damageCooldown--;
-            return;
-        }
 
         SolidBurnerBlockEntity burner = (SolidBurnerBlockEntity) blockEntity;
         HeatLevel heatLevel = burner.getBlockState().getValue(AbstractBurnerBlock.HEAT);
 
         if (heatLevel == HeatLevel.KINDLED && level.getBlockState(getPos().above()).isAir()) {
-
             if (PropulsionDebug.isDebug(MainDebugRoute.BURNER)) {
                 debugObb();
             }
-
-            if (applyDamage(level)) {
-                damageCooldown = DAMAGE_INTERVAL;
-            }
+            applyDamage(level);
         }
     }
 
-    private boolean applyDamage(Level level) {
+    private void applyDamage(Level level) {
         Vec3 boxDimensions = new Vec3(0.9, 0.1, 0.9);
         Vec3 boxOffset = new Vec3(0, 0.5, 0);
 
@@ -72,17 +61,13 @@ public class BurnerDamager extends BlockEntityBehaviour {
                 boxOffset
         );
 
-        if (entitiesToDamage.isEmpty()) {
-            return false;
-        }
+        if (entitiesToDamage.isEmpty()) { return; }
         DamageSource fireDamageSource = level.damageSources().hotFloor();
 
         for (LivingEntity entity : entitiesToDamage) {
             if (entity.isRemoved() || entity.fireImmune()) continue;
             entity.hurt(fireDamageSource, 3.0f);
         }
-
-        return true;
     }
 
     @Override
