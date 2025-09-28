@@ -34,7 +34,7 @@ public abstract class AbstractBurnerBlockEntity extends SmartBlockEntity impleme
         behaviours.add(heatSource);
     }
 
-    protected abstract int getBaseHeatCapacity();
+    protected abstract float getBaseHeatCapacity();
 
     protected abstract Direction getHeatCapSide();
 

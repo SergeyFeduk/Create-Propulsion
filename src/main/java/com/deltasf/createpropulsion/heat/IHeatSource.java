@@ -1,11 +1,11 @@
 package com.deltasf.createpropulsion.heat;
 
 public interface IHeatSource {
-    int extractHeat(int amount, boolean simulate);
+    float extractHeat(float amount, boolean simulate);
 
-    void generateHeat(int amount);
+    void generateHeat(float amount);
 
-    int getHeatStored();
+    float getHeatStored();
 
-    int getMaxHeatStored();
+    float getMaxHeatStored();
 }

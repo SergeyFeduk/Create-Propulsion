@@ -5,11 +5,10 @@ import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import com.deltasf.createpropulsion.heat.IHeatSource;
 import com.deltasf.createpropulsion.heat.burners.AbstractBurnerBlock;
 import com.deltasf.createpropulsion.heat.burners.AbstractBurnerBlockEntity;
-import com.simibubi.create.content.fluids.tank.FluidTankBlockEntity;
-import com.simibubi.create.content.kinetics.mixer.MechanicalMixerBlockEntity;
-import com.simibubi.create.content.processing.basin.BasinBlockEntity;
+import com.deltasf.createpropulsion.registries.PropulsionCapabilities;
 import com.simibubi.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.utility.Lang;
@@ -29,10 +28,10 @@ import net.minecraftforge.common.util.LazyOptional;
 public class SolidBurnerBlockEntity extends AbstractBurnerBlockEntity {
     private FuelInventoryBehaviour fuelInventory;
     private int burnTime = 0;
-    private int activeConsumptionRate = 0;
-    private int passiveLossTimer = 0;
 
-    private static final int PASSIVE_LOSS_INTERVAL = 10;
+    private static final float MAX_HEAT = 400.0f;
+    private static final float PASSIVE_LOSS_PER_TICK = 0.05f;
+    private float heatConsumedLastTick = 0;
 
     public SolidBurnerBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
@@ -53,98 +52,93 @@ public class SolidBurnerBlockEntity extends AbstractBurnerBlockEntity {
         return fuelInventory.fuelStack;
     }
 
-    public int getHeatPerTick() { return 1; }
+    public float getHeatPerTick() { return 1; }
 
     @SuppressWarnings("null")
     @Override
     public void tick() {
         super.tick();
 
-        simulateTick();
-        //Client only needs to simulate its own tick to predict the actual state
-        if (level.isClientSide()) {
-            return;
-        }
+        if (level.isClientSide()) return;
 
         //Calculate rates
-        int oldRate = this.activeConsumptionRate;
-        this.activeConsumptionRate = calculateCurrentConsumption();
-        boolean consumptionChanged = oldRate != this.activeConsumptionRate;
+        float heatGeneration = (burnTime > 0) ? getHeatPerTick() : 0;
+        if (burnTime > 0) burnTime--;
 
-        //Refuel if needed
+        heatConsumedLastTick = offerHeatToConsumer();
+        float passiveLoss = 0;
+        if (heatConsumedLastTick == 0) {
+            heatConsumedLastTick = heatSource.getCapability().map(cap -> cap.getHeatStored() > 0 ? PASSIVE_LOSS_PER_TICK : 0f).orElse(0f);
+        }
+
+        //Apply heat changes
+        float netHeatChange = heatGeneration - passiveLoss - heatConsumedLastTick;
+        heatSource.getCapability().ifPresent(cap -> {
+            if (netHeatChange > 0) cap.generateHeat(netHeatChange);
+            else cap.extractHeat(Math.abs(netHeatChange), false);
+        });
+
+        //Thermostat
         boolean refueled = false;
         if (burnTime <= 0) {
-            refueled = heatSource.getCapability().map(cap -> {
-                if (cap.getHeatStored() < cap.getMaxHeatStored()) {
-                    return fuelInventory.tryConsumeFuel();
-                }
-                return false;
-            }).orElse(false);
+            refueled = needsRefuel();
+            if (refueled) {
+                fuelInventory.tryConsumeFuel();
+            }
         }
-        //Sync clients on unexpected state change
-        if (refueled || consumptionChanged) {
+
+        //Sync and update state
+        if (refueled) {
             notifyUpdate();
         }
 
         updateBlockState();
     }
 
-    private void simulateTick() {
-        int heatGeneration = (burnTime > 0) ? getHeatPerTick() : 0;
+    @SuppressWarnings("null")
+    private boolean needsRefuel() {
+        if (level == null) return false;
+        BlockEntity beAbove = level.getBlockEntity(worldPosition.above());
+        if (beAbove == null) return false;
 
-        if (burnTime > 0) {
-            burnTime--;
-        }
-
-        //Passive loss - loses 1 HU every PASSIVE_LOSS_INTERVAL ticks
-        int passiveLoss = 0;
-        if (activeConsumptionRate == 0 && heatSource.getCapability().map(cap -> cap.getHeatStored() > 0).orElse(false)) {
-            passiveLossTimer++;
-            if (passiveLossTimer >= PASSIVE_LOSS_INTERVAL) {
-                passiveLoss = 1;
-                passiveLossTimer = 0;
+        return beAbove.getCapability(PropulsionCapabilities.HEAT_CONSUMER, Direction.DOWN).map(consumer -> {
+            if (!consumer.isActive()) {
+                return false;
             }
-        } else {
-            passiveLossTimer = 0;
-        }
 
-        //Heat change due to generation, consumption or passive loss
-        int netHeatChange = heatGeneration - activeConsumptionRate - passiveLoss;
-        if (netHeatChange == 0) return;
+            //Get minimum heat required by consumer
+            float thresholdPercent = consumer.getOperatingThreshold();
+            float thresholdInHU = MAX_HEAT * thresholdPercent;
 
-        heatSource.getCapability().ifPresent(cap -> {
-            if (netHeatChange > 0) {
-                cap.generateHeat(netHeatChange);
-            } else {
-                cap.extractHeat(Math.abs(netHeatChange), false);
-            }
-        });
+            //Predict heat on next tick
+            float currentHeat = heatSource.getCapability().map(IHeatSource::getHeatStored).orElse(0f);
+            float consumptionNextTick = consumer.consumeHeat(currentHeat, true);
+            float heatNextTick = currentHeat - consumptionNextTick - PASSIVE_LOSS_PER_TICK;
+
+            return heatNextTick < thresholdInHU;
+        }).orElse(false);
     }
 
     @SuppressWarnings("null")
-    private int calculateCurrentConsumption() {
-        //TODO: Get rid of this. We should add HEAT_CONSUMER capability and use it for determining heat consumption instead
-        if (level == null) return 0;
-        BlockPos consumerPos = worldPosition.above();
-        BlockEntity consumerBlockEntity = level.getBlockEntity(consumerPos);
+    private float offerHeatToConsumer() {
+        if (level == null) return 0f;
+        BlockEntity beAbove = level.getBlockEntity(worldPosition.above());
+        if (beAbove == null) return 0f;
 
-        //Boiler check
-        if (consumerBlockEntity instanceof FluidTankBlockEntity tank) {
-            if (tank.boiler.isActive() || tank.boiler.isPassive()) {
-                if (tank.boiler.activeHeat > 0 || tank.boiler.passiveHeat) return 1;
-            }
-            return 0;
-        }
-        //Basin check
-        if (consumerBlockEntity instanceof BasinBlockEntity) {
-            if (level.getBlockEntity(consumerPos.above(2)) instanceof MechanicalMixerBlockEntity mixer) {
-                if (mixer.running) return 1;
-            }
-            return 0;
-        }
+        return beAbove.getCapability(PropulsionCapabilities.HEAT_CONSUMER, Direction.DOWN).map(consumer -> {
+            float availableHeat = heatSource.getCapability().map(IHeatSource::getHeatStored).orElse(0f);
+            if (availableHeat <= 0) return 0f;
 
-        //TODO: Impl hot air pump check
-        return 0;
+            // The consumer decides how much heat to pull
+            float thresholdPercent = consumer.getOperatingThreshold();
+            float thresholdInHU = MAX_HEAT * thresholdPercent;
+
+            if (consumer.isActive() && availableHeat >= thresholdInHU) {
+                return consumer.consumeHeat(availableHeat, false);
+            }
+
+            return 0f;
+        }).orElse(0f);
     }
 
     @SuppressWarnings("null")
@@ -161,10 +155,8 @@ public class SolidBurnerBlockEntity extends AbstractBurnerBlockEntity {
 
     private HeatLevel calculateHeatLevel() {
         return heatSource.getCapability().map(cap -> {
-            int heat = cap.getHeatStored();
-            if (heat == 0) return HeatLevel.NONE;
-            int maxHeat = cap.getMaxHeatStored();
-            float percentage = (float) heat / maxHeat;
+            if (cap.getHeatStored() == 0) return HeatLevel.NONE;
+            float percentage = cap.getHeatStored() / cap.getMaxHeatStored();
             if (percentage > 0.6f) return HeatLevel.KINDLED;
             if (percentage > 0.3f) return HeatLevel.FADING;
             return HeatLevel.NONE; 
@@ -175,12 +167,14 @@ public class SolidBurnerBlockEntity extends AbstractBurnerBlockEntity {
     protected Direction getHeatCapSide() { return Direction.UP; }
 
     @Override
-    protected int getBaseHeatCapacity() {
-        return 400;
+    protected float getBaseHeatCapacity() {
+        return MAX_HEAT;
     }
 
     @Override
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
+        //TODO: Figure out how to make server notify us of update every tick ONLY when we are looking at goggle tooltip
+        //For now I'll just update this when state changes and display "artistic name" for heat level, not actual number
         heatSource.getCapability().ifPresent(cap -> {
             Lang.builder()
                 .text("Heat: ")
@@ -203,7 +197,6 @@ public class SolidBurnerBlockEntity extends AbstractBurnerBlockEntity {
         }
         
         return true;
-
     }
 
     @NotNull
@@ -218,19 +211,11 @@ public class SolidBurnerBlockEntity extends AbstractBurnerBlockEntity {
     protected void write(CompoundTag tag, boolean clientPacket) {
         super.write(tag, clientPacket);
         tag.putInt("burnTime", burnTime);
-        tag.putInt("activeConsumptionRate", activeConsumptionRate);
-        if (!clientPacket) {
-            tag.putInt("passiveLossTimer", passiveLossTimer);
-        }
     }
 
     @Override
     protected void read(CompoundTag tag, boolean clientPacket) {
         super.read(tag, clientPacket);
         burnTime = tag.getInt("burnTime");
-        activeConsumptionRate = tag.getInt("activeConsumptionRate");
-        if (!clientPacket) {
-            passiveLossTimer = tag.getInt("passiveLossTimer");
-        }
     }
 }
