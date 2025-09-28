@@ -2,10 +2,13 @@ package com.deltasf.createpropulsion.events;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.heat.IHeatConsumer;
+import com.deltasf.createpropulsion.heat.burners.HeatToHeatLevelMapping;
 import com.deltasf.createpropulsion.registries.PropulsionCapabilities;
 import com.simibubi.create.content.fluids.tank.FluidTankBlockEntity;
 import com.simibubi.create.content.kinetics.mixer.MechanicalMixerBlockEntity;
 import com.simibubi.create.content.processing.basin.BasinBlockEntity;
+import com.simibubi.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
+
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -48,8 +51,7 @@ public class CapabilityEventHandler {
 
         @Override
         public float getOperatingThreshold() {
-            //TODO: Replace with actual check to connect threshold to state HEAT_LEVEL.FADING;
-            return 0.3f;
+            return HeatToHeatLevelMapping.getMinHeatPercent(HeatLevel.FADING);
         }
 
         @Override
@@ -86,8 +88,7 @@ public class CapabilityEventHandler {
 
         @Override
         public float getOperatingThreshold() {
-            //TODO: Same as boiler, but KINDLED
-            return 0.6f;
+            return HeatToHeatLevelMapping.getMinHeatPercent(HeatLevel.KINDLED);
         }
 
         @SuppressWarnings("null")

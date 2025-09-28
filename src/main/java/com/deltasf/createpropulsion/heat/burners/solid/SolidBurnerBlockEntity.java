@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import com.deltasf.createpropulsion.heat.IHeatSource;
 import com.deltasf.createpropulsion.heat.burners.AbstractBurnerBlock;
 import com.deltasf.createpropulsion.heat.burners.AbstractBurnerBlockEntity;
+import com.deltasf.createpropulsion.heat.burners.HeatToHeatLevelMapping;
 import com.deltasf.createpropulsion.registries.PropulsionCapabilities;
 import com.simibubi.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
@@ -31,7 +32,6 @@ public class SolidBurnerBlockEntity extends AbstractBurnerBlockEntity {
 
     private static final float MAX_HEAT = 400.0f;
     private static final float PASSIVE_LOSS_PER_TICK = 0.05f;
-    private float heatConsumedLastTick = 0;
 
     public SolidBurnerBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
@@ -65,7 +65,7 @@ public class SolidBurnerBlockEntity extends AbstractBurnerBlockEntity {
         float heatGeneration = (burnTime > 0) ? getHeatPerTick() : 0;
         if (burnTime > 0) burnTime--;
 
-        heatConsumedLastTick = offerHeatToConsumer();
+        float heatConsumedLastTick = offerHeatToConsumer();
         float passiveLoss = 0;
         if (heatConsumedLastTick == 0) {
             heatConsumedLastTick = heatSource.getCapability().map(cap -> cap.getHeatStored() > 0 ? PASSIVE_LOSS_PER_TICK : 0f).orElse(0f);
@@ -157,9 +157,7 @@ public class SolidBurnerBlockEntity extends AbstractBurnerBlockEntity {
         return heatSource.getCapability().map(cap -> {
             if (cap.getHeatStored() == 0) return HeatLevel.NONE;
             float percentage = cap.getHeatStored() / cap.getMaxHeatStored();
-            if (percentage > 0.6f) return HeatLevel.KINDLED;
-            if (percentage > 0.3f) return HeatLevel.FADING;
-            return HeatLevel.NONE; 
+            return HeatToHeatLevelMapping.getHeatLevel(percentage);
         }).orElse(HeatLevel.NONE);
     }
 
