@@ -49,7 +49,7 @@ public class FuelInventoryBehaviour extends BlockEntityBehaviour {
         ItemStack stack = player.getItemInHand(hand);
 
         if (stack.isEmpty() && !fuelStack.isEmpty()) {
-            player.setItemInHand(hand, itemHandler.extractItem(0, 64, false));
+            player.getInventory().placeItemBackInInventory(itemHandler.extractItem(0, 64, false));
             blockEntity.notifyUpdate();
             return true;
         }

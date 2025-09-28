@@ -33,6 +33,7 @@ public class SolidBurnerBlockEntity extends AbstractBurnerBlockEntity {
     private FuelInventoryBehaviour fuelInventory;
     private int burnTime = 0;
     private HeatLevelString heatLevelName = HeatLevelString.COLD;
+    private boolean isPowered = false;
 
     private static final float MAX_HEAT = 400.0f;
     private static final float PASSIVE_LOSS_PER_TICK = 0.05f;
@@ -57,6 +58,19 @@ public class SolidBurnerBlockEntity extends AbstractBurnerBlockEntity {
     }
 
     public float getHeatPerTick() { return 1; }
+
+    @SuppressWarnings("null")
+    public void updatePoweredState() {
+        if (level == null || level.isClientSide()) {
+            return;
+        }
+        boolean currentlyPowered = level.getBestNeighborSignal(worldPosition) > 0;
+        if (this.isPowered != currentlyPowered) {
+            this.isPowered = currentlyPowered;
+            notifyUpdate();
+        }
+    }
+
 
     @SuppressWarnings("null")
     @Override
@@ -99,6 +113,10 @@ public class SolidBurnerBlockEntity extends AbstractBurnerBlockEntity {
 
     @SuppressWarnings("null")
     private boolean needsRefuel() {
+        if (isPowered) {
+            return true;
+        }
+
         if (level == null) return false;
         BlockEntity beAbove = level.getBlockEntity(worldPosition.above());
         if (beAbove == null) return false;
@@ -211,6 +229,15 @@ public class SolidBurnerBlockEntity extends AbstractBurnerBlockEntity {
         //Heat level
         Lang.builder().add(Lang.translate("gui.goggles.burner.status")).text(": ").add(Lang.translate(key).style(color)).forGoggles(tooltip);
 
+        //Thermostat on/off
+        Lang.builder()
+            .add(Lang.translate("gui.goggles.burner.thermostat"))
+            .text(": ")
+            .add(Lang.translate(!isPowered ? "gui.goggles.burner.thermostat.on" : "gui.goggles.burner.thermostat.off")
+                .style(!isPowered ? ChatFormatting.GREEN : ChatFormatting.RED))
+            .forGoggles(tooltip);
+
+
         ItemStack fuel = fuelInventory.fuelStack;
         if (!fuel.isEmpty()) {
             LangBuilder fuelName = Lang.builder().add(fuel.getHoverName()).style(ChatFormatting.GRAY);
@@ -235,6 +262,7 @@ public class SolidBurnerBlockEntity extends AbstractBurnerBlockEntity {
         super.write(tag, clientPacket);
         tag.putInt("burnTime", burnTime);
         tag.putString("heatLevelName", heatLevelName.name());
+        tag.putBoolean("isPowered", isPowered); 
     }
 
     @Override
@@ -242,5 +270,6 @@ public class SolidBurnerBlockEntity extends AbstractBurnerBlockEntity {
         super.read(tag, clientPacket);
         burnTime = tag.getInt("burnTime");
         heatLevelName = HeatLevelString.valueOf(tag.getString("heatLevelName"));
+        isPowered = tag.getBoolean("isPowered");
     }
 }

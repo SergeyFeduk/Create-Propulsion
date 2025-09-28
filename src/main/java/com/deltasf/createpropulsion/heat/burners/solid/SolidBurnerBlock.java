@@ -70,6 +70,18 @@ public class SolidBurnerBlock extends AbstractBurnerBlock {
 
     @SuppressWarnings("deprecation")
     @Override
+    public void onPlace(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull BlockState oldState, boolean isMoving) {
+        super.onPlace(state, level, pos, oldState, isMoving);
+        if (level.isClientSide()) {
+            return;
+        }
+        if (level.getBlockEntity(pos) instanceof SolidBurnerBlockEntity burner) {
+            burner.updatePoweredState();
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
     public void onRemove(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull BlockState newState, boolean isMoving) {
         if (!state.is(newState.getBlock())) {
             BlockEntity be = level.getBlockEntity(pos);
@@ -79,6 +91,19 @@ public class SolidBurnerBlock extends AbstractBurnerBlock {
             level.removeBlockEntity(pos);
         }
         super.onRemove(state, level, pos, newState, isMoving);
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public void neighborChanged(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull Block block, @Nonnull BlockPos fromPos, boolean isMoving) {
+        super.neighborChanged(state, level, pos, block, fromPos, isMoving);
+        if (level.isClientSide()) {
+            return;
+        }
+
+        if (level.getBlockEntity(pos) instanceof SolidBurnerBlockEntity burner) {
+            burner.updatePoweredState();
+        }
     }
 
     //Took this from blast furnace
