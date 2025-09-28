@@ -5,7 +5,8 @@ import com.deltasf.createpropulsion.debug.IDebugRoute;
 public enum MainDebugRoute implements IDebugRoute {
     THRUSTER,
     MAGNET,                                  
-    BALLOON(BalloonDebugRoute.values());
+    BALLOON(BalloonDebugRoute.values()),
+    BURNER;
 
     private final IDebugRoute[] children;
     MainDebugRoute(IDebugRoute... children) { this.children = children; }

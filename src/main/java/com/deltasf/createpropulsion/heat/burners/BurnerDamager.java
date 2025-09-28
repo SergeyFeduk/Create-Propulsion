@@ -1,7 +1,14 @@
 package com.deltasf.createpropulsion.heat.burners;
 
+import java.awt.Color;
 import java.util.List;
 
+import org.joml.Quaterniond;
+import org.joml.Quaternionf;
+
+import com.deltasf.createpropulsion.debug.DebugRenderer;
+import com.deltasf.createpropulsion.debug.PropulsionDebug;
+import com.deltasf.createpropulsion.debug.routes.MainDebugRoute;
 import com.deltasf.createpropulsion.heat.burners.solid.SolidBurnerBlockEntity;
 import com.deltasf.createpropulsion.utility.OBBEntityFinder;
 import com.simibubi.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
@@ -40,7 +47,12 @@ public class BurnerDamager extends BlockEntityBehaviour {
         SolidBurnerBlockEntity burner = (SolidBurnerBlockEntity) blockEntity;
         HeatLevel heatLevel = burner.getBlockState().getValue(AbstractBurnerBlock.HEAT);
 
-        if (heatLevel == HeatLevel.KINDLED) {
+        if (heatLevel == HeatLevel.KINDLED && level.getBlockState(getPos().above()).isAir()) {
+
+            if (PropulsionDebug.isDebug(MainDebugRoute.BURNER)) {
+                debugObb();
+            }
+
             if (applyDamage(level)) {
                 damageCooldown = DAMAGE_INTERVAL;
             }
@@ -55,6 +67,7 @@ public class BurnerDamager extends BlockEntityBehaviour {
                 getWorld(),
                 getPos(),
                 Direction.UP,
+                Direction.UP,
                 boxDimensions,
                 boxOffset
         );
@@ -65,6 +78,7 @@ public class BurnerDamager extends BlockEntityBehaviour {
         DamageSource fireDamageSource = level.damageSources().hotFloor();
 
         for (LivingEntity entity : entitiesToDamage) {
+            if (entity.isRemoved() || entity.fireImmune()) continue;
             entity.hurt(fireDamageSource, 3.0f);
         }
 
@@ -74,5 +88,28 @@ public class BurnerDamager extends BlockEntityBehaviour {
     @Override
     public BehaviourType<?> getType() {
         return TYPE;
+    }
+
+    private void debugObb() {
+        Vec3 boxDimensions = new Vec3(0.9, 0.1, 0.9);
+        Vec3 boxOffset = new Vec3(0, 0.5, 0);
+
+        Quaterniond worldOrientation = OBBEntityFinder.calculateWorldOrientation(
+            getWorld(), 
+            getPos(), 
+            Direction.UP, 
+            Direction.UP
+        );
+        Vec3 worldCenter = OBBEntityFinder.calculateWorldCenter(
+            getWorld(), 
+            getPos(), 
+            boxOffset, 
+            worldOrientation
+        );
+        
+        String identifier = "burner_" + blockEntity.hashCode() + "_obb";
+        Quaternionf debugRotation = new Quaternionf((float)worldOrientation.x, (float)worldOrientation.y, (float)worldOrientation.z, (float)worldOrientation.w);
+        
+        DebugRenderer.drawBox(identifier, worldCenter, boxDimensions, debugRotation, Color.RED, false, 2);
     }
 }

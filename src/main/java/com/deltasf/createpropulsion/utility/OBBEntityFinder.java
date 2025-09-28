@@ -20,8 +20,8 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 public class OBBEntityFinder {
-    public static List<LivingEntity> getEntitiesInOrientedBox(Level level, BlockPos pos, Direction localDirection, Vec3 boxDimensions, Vec3 boxOffset) {
-        Quaterniond worldOrientation = calculateWorldOrientation(level, pos, localDirection);
+    public static List<LivingEntity> getEntitiesInOrientedBox(Level level, BlockPos pos, Direction boxPrimaryAxis, Direction localDirection, Vec3 boxDimensions, Vec3 boxOffset) {
+        Quaterniond worldOrientation = calculateWorldOrientation(level, pos, boxPrimaryAxis, localDirection);
         Vec3 worldCenter = calculateWorldCenter(level, pos, boxOffset, worldOrientation);
 
         //Broad phase
@@ -48,8 +48,11 @@ public class OBBEntityFinder {
         return intersectingEntities;
     }
 
-    public static Quaterniond calculateWorldOrientation(Level level, BlockPos pos, Direction localDirection) {
-        Quaterniond localRotation = new Quaterniond().rotateTo(new Vector3d(0, 1, 0), VectorConversionsMCKt.toJOMLD(localDirection.getNormal()));
+    public static Quaterniond calculateWorldOrientation(Level level, BlockPos pos, Direction boxPrimaryAxis, Direction localDirection) {
+        Quaterniond localRotation = new Quaterniond().rotateTo(
+            VectorConversionsMCKt.toJOMLD(boxPrimaryAxis.getNormal()), 
+            VectorConversionsMCKt.toJOMLD(localDirection.getNormal())
+        );
 
         Ship ship = VSGameUtilsKt.getShipManagingPos(level, pos);
         if (ship != null) {
@@ -59,10 +62,10 @@ public class OBBEntityFinder {
         }
     }
 
+
     public static Vec3 calculateWorldCenter(Level level, BlockPos pos, Vec3 localOffset, Quaterniond worldOrientation) {
         Vector3d blockCenterInShip = VectorConversionsMCKt.toJOML(Vec3.atCenterOf(pos));
-        Vector3d localRotatedOffset = new Quaterniond().rotateTo(new Vector3d(0, 1, 0), new Vector3d(0,1,0)).transform(VectorConversionsMCKt.toJOML(localOffset));
-        Vector3d centerInShip = blockCenterInShip.add(localRotatedOffset, new Vector3d());
+        Vector3d centerInShip = blockCenterInShip.add(VectorConversionsMCKt.toJOML(localOffset), new Vector3d());
 
         Ship ship = VSGameUtilsKt.getShipManagingPos(level, pos);
         if (ship != null) {
