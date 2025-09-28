@@ -7,13 +7,16 @@ import org.jetbrains.annotations.Nullable;
 
 import com.deltasf.createpropulsion.heat.HeatMapper;
 import com.deltasf.createpropulsion.heat.IHeatSource;
+import com.deltasf.createpropulsion.heat.HeatMapper.HeatLevelString;
 import com.deltasf.createpropulsion.heat.burners.AbstractBurnerBlock;
 import com.deltasf.createpropulsion.heat.burners.AbstractBurnerBlockEntity;
 import com.deltasf.createpropulsion.registries.PropulsionCapabilities;
 import com.simibubi.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.utility.Lang;
+import com.simibubi.create.foundation.utility.LangBuilder;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -29,6 +32,7 @@ import net.minecraftforge.common.util.LazyOptional;
 public class SolidBurnerBlockEntity extends AbstractBurnerBlockEntity {
     private FuelInventoryBehaviour fuelInventory;
     private int burnTime = 0;
+    private HeatLevelString heatLevelName = HeatLevelString.COLD;
 
     private static final float MAX_HEAT = 400.0f;
     private static final float PASSIVE_LOSS_PER_TICK = 0.05f;
@@ -90,6 +94,7 @@ public class SolidBurnerBlockEntity extends AbstractBurnerBlockEntity {
         }
 
         updateBlockState();
+        updateHeatLevelName();
     }
 
     @SuppressWarnings("null")
@@ -150,6 +155,17 @@ public class SolidBurnerBlockEntity extends AbstractBurnerBlockEntity {
         }
     }
 
+    private void updateHeatLevelName() {
+        HeatLevelString previousName = heatLevelName;
+        float availableHeat = heatSource.getCapability().map(IHeatSource::getHeatStored).orElse(0f);
+        float percentage = availableHeat / getBaseHeatCapacity();
+
+        heatLevelName = HeatMapper.getHeatString(percentage);
+        if (previousName != heatLevelName) {
+            notifyUpdate();
+        }
+    }
+
     private HeatLevel calculateHeatLevel() {
         return heatSource.getCapability().map(cap -> {
             if (cap.getHeatStored() == 0) return HeatLevel.NONE;
@@ -170,25 +186,37 @@ public class SolidBurnerBlockEntity extends AbstractBurnerBlockEntity {
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         //TODO: Figure out how to make server notify us of update every tick ONLY when we are looking at goggle tooltip
         //For now I'll just update this when state changes and display "artistic name" for heat level, not actual number
-        heatSource.getCapability().ifPresent(cap -> {
-            Lang.builder()
-                .text("Heat: ")
-                .add(Lang.number(cap.getHeatStored()))
-                .text(" / ")
-                .add(Lang.number(cap.getMaxHeatStored()))
-                .text(" HU")
-                .forGoggles(tooltip);
-        });
+        ChatFormatting color = null;
+        String key = null;
 
-        if (fuelInventory != null) {
-            ItemStack fuel = fuelInventory.fuelStack;
-            if (!fuel.isEmpty()) {
-                Lang.builder().text("Fuel: ").add(fuel.getDisplayName()).forGoggles(tooltip);
-                String t = "Amount: " + fuel.getCount();
-                Lang.builder().text(t).forGoggles(tooltip);
-            } else {
-                Lang.builder().text("Empty").forGoggles(tooltip);
-            }
+        switch (heatLevelName) {
+            case COLD:
+                color = ChatFormatting.BLUE;
+                key = "gui.goggles.burner.heat.cold";
+                break;
+            case WARM:
+                color = ChatFormatting.GOLD;
+                key = "gui.goggles.burner.heat.warm";
+                break;
+            case HOT:
+                color = ChatFormatting.GOLD;
+                key = "gui.goggles.burner.heat.hot";
+                break;
+            case SEARING:
+                color = ChatFormatting.RED;
+                key = "gui.goggles.burner.heat.searing";
+                break;
+        }
+
+        //Heat level
+        Lang.builder().add(Lang.translate("gui.goggles.burner.status")).text(": ").add(Lang.translate(key).style(color)).forGoggles(tooltip);
+
+        ItemStack fuel = fuelInventory.fuelStack;
+        if (!fuel.isEmpty()) {
+            LangBuilder fuelName = Lang.builder().add(fuel.getHoverName()).style(ChatFormatting.GRAY);
+            LangBuilder fuelCount = Lang.builder().text("x").text(String.valueOf(fuel.getCount())).style(ChatFormatting.GREEN);
+
+            Lang.builder().add(fuelName).space().add(fuelCount).forGoggles(tooltip);
         }
         
         return true;
@@ -206,11 +234,13 @@ public class SolidBurnerBlockEntity extends AbstractBurnerBlockEntity {
     protected void write(CompoundTag tag, boolean clientPacket) {
         super.write(tag, clientPacket);
         tag.putInt("burnTime", burnTime);
+        tag.putString("heatLevelName", heatLevelName.name());
     }
 
     @Override
     protected void read(CompoundTag tag, boolean clientPacket) {
         super.read(tag, clientPacket);
         burnTime = tag.getInt("burnTime");
+        heatLevelName = HeatLevelString.valueOf(tag.getString("heatLevelName"));
     }
 }

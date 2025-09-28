@@ -77,5 +77,11 @@
 
     "createpropulsion.tooltip.holdForRocketFuelSummary": "Hold [%1$s] for Rocket Fuel Summary",
     "createpropulsion.tooltip.thrust": "Thrust",
-    "createpropulsion.tooltip.consumption": "Burn Rate"
+    "createpropulsion.tooltip.consumption": "Burn Rate",
+
+    "create.gui.goggles.burner.status": "Burner Status",
+    "create.gui.goggles.burner.heat.cold": "Cold",
+    "create.gui.goggles.burner.heat.warm": "Warm",
+    "create.gui.goggles.burner.heat.hot": "Hot",
+    "create.gui.goggles.burner.heat.searing": "Searing"
 }
