@@ -258,6 +258,7 @@ public class BalloonUpdater {
             }
 
             //Not adjacent to any balloon - irrelevant
+            //TODO: Actually, not true - we also need to check if we are adjacent to any hole
             if (nearbyBalloons.isEmpty()) {
                 continue;
             }

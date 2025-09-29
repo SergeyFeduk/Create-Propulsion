@@ -57,6 +57,7 @@ public class BalloonStitcher {
 
         // Early Exit 1: No split is possible if the placed block wasn't separating anything.
         if (neighborSeeds.size() <= 1) {
+            validateHoles(originalBalloon);
             return;
         }
 
@@ -89,6 +90,7 @@ public class BalloonStitcher {
 
         // Early Exit 2: All neighbors are still connected, so no split occurred.
         if (rootToSeeds.size() <= 1) {
+            validateHoles(originalBalloon);
             return;
         }
 
@@ -108,6 +110,7 @@ public class BalloonStitcher {
             Set<UUID> newSupportHais = findSupportHaisForVolume(newVolume, owner.hais);
             Balloon newBalloon = owner.createBalloon(newVolume, newSupportHais);
             newBalloon.holes = partitionHoles(newVolume, originalBalloon.holes);
+            validateHoles(newBalloon);
             newBalloon.hotAir = newBalloon.getVolumeSize() * hotAirDensity;
             newBalloons.add(newBalloon);
         }
@@ -153,6 +156,22 @@ public class BalloonStitcher {
             }
         }
         return supporters;
+    }
+
+    //Iterates through all holes to check if they are no longer adjacent to balloon's volume. If so - removes them
+    public static void validateHoles(Balloon balloon) {
+        if (balloon.holes.isEmpty()) {
+            return;
+        }
+
+        balloon.holes.removeIf(holePos -> {
+            for (Direction dir : Direction.values()) {
+                if (balloon.contains(holePos.relative(dir))) {
+                    return false; //Holes is still adjacent to volume
+                }
+            }
+            return true;
+        });
     }
 
     private static Set<BlockPos> partitionHoles(Set<BlockPos> newVolume, Set<BlockPos> originalHoles) {
