@@ -122,7 +122,7 @@ public class BalloonStitcher {
         }
     }
 
-    // helpers
+    // Helpers
 
     public static Set<Balloon> findOverlappingBalloons(DiscoveredVolume dv, HaiGroup owner, Set<Balloon> excludedBalloons) {
         Set<Balloon> overlapping = new HashSet<>();

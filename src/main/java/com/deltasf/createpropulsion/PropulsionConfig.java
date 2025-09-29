@@ -86,7 +86,7 @@ public class PropulsionConfig {
                     .define("BALLOON_HORIZONTAL_DRAG_COEFFICIENT", 100.0);
 
             BALLOON_SURFACE_LEAK_FACTOR = SERVER_BUILDER.comment("BALLOON_SURFACE_LEAK_FACTOR.")
-                    .define("BALLOON_SURFACE_LEAK_FACTOR", 1e-4);
+                    .define("BALLOON_SURFACE_LEAK_FACTOR", 1e-2);
             BALLOON_HOLE_LEAK_FACTOR = SERVER_BUILDER.comment("BALLOON_HOLE_LEAK_FACTOR.")
                     .define("BALLOON_HOLE_LEAK_FACTOR", 0.2);
         SERVER_BUILDER.pop();

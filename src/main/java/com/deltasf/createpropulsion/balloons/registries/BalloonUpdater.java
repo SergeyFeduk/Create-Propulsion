@@ -258,6 +258,8 @@ public class BalloonUpdater {
 
             //Not adjacent to any balloon - irrelevant
             //TODO: Actually, not true - we also need to check if we are adjacent to any hole
+            //Actually the above is not true either. We need to rewrite this method to not filter out such events (if they are placement) 
+            // as they also need to be resolved in handlePlacementSubGroup, which will perform a scan to find new volumes.
             if (nearbyBalloons.isEmpty()) {
                 continue;
             }
