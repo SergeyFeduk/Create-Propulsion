@@ -1,6 +1,7 @@
 package com.deltasf.createpropulsion.balloons.utils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -10,6 +11,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 
+import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.HaiGroup;
 
 import net.minecraft.core.BlockPos;
@@ -20,24 +22,25 @@ public  class BalloonScanner {
     public record DiscoveredVolume(Set<BlockPos> volume, boolean isLeaky) {};
     public static final int VERTICAL_ANOMALY_SCAN_DISTANCE = 32;
 
-    public static List<DiscoveredVolume> scan(Level level, List<BlockPos> seeds, HaiGroup group, List<BlockPos> excludedVolume) {
+    public static List<DiscoveredVolume> scan(Level level, List<BlockPos> seeds, HaiGroup group, Collection<Balloon> excludedBalloons) {
         ScanState state = new ScanState();
         state.group = group;
         state.originalSeeds = seeds;
+        state.excludedBalloons = excludedBalloons;
+
         
         //Fill worklist from given seeds
         for(BlockPos seed : seeds) {
             state.workList.add(new WorkItem(seed));
         }
-        //Fill blockToNodeId from given excludedVolume
-        for(BlockPos pos : excludedVolume) {
-            state.blockToNodeId.put(pos, -1); //Set node as invalid one
-        }
 
         //Phase 1: Scan worklist and construct DAG
         while (!state.workList.isEmpty()) {
             WorkItem currentWork = state.workList.poll();
-            if (state.blockToNodeId.containsKey(currentWork.seed)) continue;
+            if (isExcluded(currentWork.seed, state) || state.blockToNodeId.containsKey(currentWork.seed)) {
+                continue;
+            }
+
             scanAndProcessWorkItem(currentWork.seed, level, state);
         }
 
@@ -143,12 +146,16 @@ public  class BalloonScanner {
             for (Direction dir : Direction.Plane.HORIZONTAL) {
                 BlockPos neighborPos = currentPos.relative(dir);
 
+                if (volume.contains(neighborPos) || state.blockToNodeId.containsKey(neighborPos)) {
+                    continue;
+                }
+
                 if (!state.group.isInsideRleVolume(neighborPos)) {
                     hasLeak = true;
                     continue;
                 }
 
-                if (volume.contains(neighborPos) || state.blockToNodeId.containsKey(neighborPos)) {
+                if (isExcluded(neighborPos, state)) {
                     continue;
                 }
 
@@ -302,11 +309,23 @@ public  class BalloonScanner {
         return discoveredVolumes;
     }
 
+    private static boolean isExcluded(BlockPos pos, ScanState state) {
+        if (state.excludedBalloons == null) return false;
+        for (Balloon balloon : state.excludedBalloons) {
+            if (balloon.contains(pos)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     public static class ScanState {
         
         public PriorityQueue<WorkItem> workList = new PriorityQueue<>((WorkItem a, WorkItem b) -> Integer.compare(b.y, a.y));
         public Map<Integer, BlobNode> graph = new HashMap<>();
         public Map<BlockPos, Integer> blockToNodeId = new HashMap<>();
+        public Collection<Balloon> excludedBalloons;
 
         //Populated during discovery of the anomaly. Used to propagate leakiness through anomalies
         public Map<Integer, Set<BlockPos>> anomalySources = new HashMap<>(); 

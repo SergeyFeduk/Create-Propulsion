@@ -108,12 +108,11 @@ public class BalloonUpdater {
     private void handleRemovalSubGroup(EventSubGroup subGroup, Level level) {
         HaiGroup haiGroup = subGroup.haiGroup();
         List<BlockPos> seeds = new ArrayList<>(subGroup.affectedBalloonsMap().keySet());
-        //TODO: Meh, there should be an easier way with much less performance killed in the process of setting union excluded volume
-        Set<BlockPos> excludedVolume = new HashSet<>();
+
+        //Collect all excluded balloons
+        Set<Balloon> excludedBalloons = new HashSet<>();
         for (Collection<Balloon> bucket : subGroup.affectedBalloonsMap().values()) {
-            for (Balloon b : bucket) {
-                b.addAllTo(excludedVolume);
-            }
+            excludedBalloons.addAll(bucket);
         }
 
         //Perform scan
@@ -121,7 +120,7 @@ public class BalloonUpdater {
             level, 
             seeds, 
             haiGroup, 
-            new ArrayList<>(excludedVolume)
+            excludedBalloons
         );
 
         Set<Balloon> modifiedBalloons = new HashSet<>();
