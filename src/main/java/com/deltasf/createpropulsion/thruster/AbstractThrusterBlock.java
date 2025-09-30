@@ -2,9 +2,6 @@ package com.deltasf.createpropulsion.thruster;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
-
 import com.deltasf.createpropulsion.registries.PropulsionShapes;
 
 import net.minecraft.core.BlockPos;
@@ -80,20 +77,8 @@ public abstract class AbstractThrusterBlock extends DirectionalBlock implements 
     @Override
     public void onPlace(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull BlockState oldState, boolean isMoving) {
         super.onPlace(state, level, pos, oldState, isMoving);
-        if (level.isClientSide()) return;
 
-        ThrusterForceAttachment ship = ThrusterForceAttachment.get(level, pos);
-        BlockEntity blockEntity = level.getBlockEntity(pos);
-        if (blockEntity instanceof AbstractThrusterBlockEntity thrusterBlockEntity) {
-            if (ship != null) {
-                // Initialize thruster data for Valkyrien Skies
-                ThrusterData data = thrusterBlockEntity.getThrusterData();
-                data.setDirection(VectorConversionsMCKt.toJOMLD(state.getValue(FACING).getNormal()));
-                data.setThrust(0);
-                ThrusterForceApplier applier = new ThrusterForceApplier(data);
-                ship.addApplier(pos, applier);
-            }
-            // Trigger an initial check for redstone power and obstruction
+        if (!level.isClientSide()) {
             doRedstoneCheck(level, state, pos);
         }
     }
@@ -115,7 +100,7 @@ public abstract class AbstractThrusterBlock extends DirectionalBlock implements 
         doRedstoneCheck(level, state, pos);
     }
 
-    private void doRedstoneCheck(Level level, BlockState state, BlockPos pos) {
+    public void doRedstoneCheck(Level level, BlockState state, BlockPos pos) {
         int newRedstonePower = level.getBestNeighborSignal(pos);
         int oldRedstonePower = state.getValue(POWER);
         if (newRedstonePower == oldRedstonePower) return;

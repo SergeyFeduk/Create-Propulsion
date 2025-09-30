@@ -72,7 +72,22 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
     public void initialize() {
         super.initialize();
         if (!level.isClientSide) {
-            calculateObstruction(level, worldPosition, getBlockState().getValue(AbstractThrusterBlock.FACING));
+            BlockState state = getBlockState();
+            calculateObstruction(level, worldPosition, state.getValue(AbstractThrusterBlock.FACING));
+            
+            ThrusterForceAttachment ship = ThrusterForceAttachment.get(level, worldPosition);
+            if (ship != null) {
+                ThrusterData data = this.getThrusterData();
+                data.setDirection(VectorConversionsMCKt.toJOMLD(state.getValue(AbstractThrusterBlock.FACING).getNormal()));
+                data.setThrust(0); 
+                ThrusterForceApplier applier = new ThrusterForceApplier(data);
+                ship.addApplier(worldPosition, applier);
+            }
+
+            Block block = getBlockState().getBlock();
+            if (block instanceof AbstractThrusterBlock) {
+                ((AbstractThrusterBlock) block).doRedstoneCheck(level, getBlockState(), worldPosition);
+            }
         }
     }
 
