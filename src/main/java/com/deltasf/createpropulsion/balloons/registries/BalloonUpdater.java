@@ -29,7 +29,7 @@ public class BalloonUpdater {
     private Map<ResourceKey<Level>, Queue<DynamicUpdate>> eventQueues = new HashMap<>();
     private record DynamicUpdate(BlockPos position, boolean isPlacement) {};
     private record EventGroup(List<BlockPos> positions, boolean isPlacement) {};
-    private record EventSubGroup(HaiGroup haiGroup, Map<BlockPos, List<Balloon>> affectedBalloonsMap, boolean isPlacement) {};
+    private record EventSubGroup(HaiGroup haiGroup, Map<BlockPos, Set<Balloon>> affectedBalloonsMap, boolean isPlacement) {};
     
     public void habBlockPlaced(BlockPos pos, Level level) {
         eventQueues.computeIfAbsent(level.dimension(), k -> new LinkedList<>())
@@ -62,7 +62,7 @@ public class BalloonUpdater {
             //Phase 2.2: Perform scan on each subgroup
             for (EventSubGroup subGroup : subGroups) {
                 if (subGroup.isPlacement) {
-                    handlePlacementSubGroup(subGroup);
+                    handlePlacementSubGroup(subGroup, level);
                 } else {
                     handleRemovalSubGroup(subGroup, level);
                 }
@@ -70,34 +70,114 @@ public class BalloonUpdater {
         }
     }
 
-    private void handlePlacementSubGroup(EventSubGroup subGroup) {
+    private void handlePlacementSubGroup(EventSubGroup subGroup, Level level) {
+        HaiGroup haiGroup = subGroup.haiGroup();
+        Map<BlockPos, Set<Balloon>> affectedBalloonsMap = subGroup.affectedBalloonsMap();
         Set<Balloon> modifiedBalloons = new HashSet<>();
-        for (Map.Entry<BlockPos, List<Balloon>> entry : subGroup.affectedBalloonsMap().entrySet()) {
+        Set<BlockPos> handledPlacements = new HashSet<>();
+        List<BlockPos> potentialScanSeeds = new ArrayList<>();
+
+        //Pass 1: Handle adjacency events
+        for (Map.Entry<BlockPos, Set<Balloon>> entry : affectedBalloonsMap.entrySet()) {
             BlockPos pos = entry.getKey();
-            List<Balloon> affectedBalloons = entry.getValue();
+            Set<Balloon> nearbyBalloons = entry.getValue();
 
-            boolean eventHandled = false;
-
-            for (Balloon balloon : affectedBalloons) {
-                if (balloon.holes.contains(pos)) {
-                    BalloonStitcher.removeHole(balloon, pos);
-                    modifiedBalloons.add(balloon);
-                    eventHandled = true;
-                }
-            }
-
-            if (eventHandled) {
+            if (nearbyBalloons.isEmpty()) {
                 continue;
             }
 
-            for (Balloon balloon : affectedBalloons) {
+            //Check if this event plugs a hole
+            boolean wasPlug = false;
+            for (Balloon balloon : nearbyBalloons) {
+                if (balloon.holes.contains(pos)) {
+                    BalloonStitcher.removeHole(balloon, pos);
+                    modifiedBalloons.add(balloon);
+                    wasPlug = true;
+                }
+            }
+
+            if (wasPlug) {
+                handledPlacements.add(pos);
+                continue;
+            }
+
+            //Check if this event splits volume
+            for (Balloon balloon : nearbyBalloons) {
                 if (balloon.contains(pos)) {
                     BalloonStitcher.handleSplit(balloon, pos, subGroup.haiGroup());
+                    handledPlacements.add(pos);
                     modifiedBalloons.add(balloon);
                     break;
                 }
             }
         }
+
+        //Pass 2: Handle non-adjacent events
+        for (BlockPos pos : affectedBalloonsMap.keySet()) {
+            if (!handledPlacements.contains(pos)) {
+                //We will seed from non-hab neighbours
+                for (Direction dir : Direction.values()) {
+                    BlockPos potentialSeed = pos.relative(dir);
+                    if (!HaiGroup.isHab(potentialSeed, level)) {
+                        potentialScanSeeds.add(potentialSeed);
+                    }
+                }
+            }
+        }
+
+        if (!potentialScanSeeds.isEmpty()) {
+            //Perform a scan from seeds
+            Set<Balloon> excludedBalloons = new HashSet<>();
+            for (Collection<Balloon> bucket : subGroup.affectedBalloonsMap().values()) {
+                excludedBalloons.addAll(bucket);
+            }
+            List<DiscoveredVolume> discoveredVolumes = BalloonScanner.scan(level, potentialScanSeeds, haiGroup, excludedBalloons);
+
+            //Process scan results
+            List<DiscoveredVolume> validVolumes = discoveredVolumes.stream().filter(dv -> !dv.isLeaky() && !dv.volume().isEmpty()).toList();
+
+            if (!validVolumes.isEmpty()) {
+                //Build reverse lookup to connect discovered volumes to 
+                Map<BlockPos, DiscoveredVolume> posToDVMap = new HashMap<>();
+                for (DiscoveredVolume dv : validVolumes) {
+                    for (BlockPos pos : dv.volume()) {
+                        posToDVMap.put(pos, dv);
+                    }
+                }
+
+                //Find connections via holes
+                Map<DiscoveredVolume, Set<Balloon>> connections = new HashMap<>();
+                for (Balloon balloon : haiGroup.balloons) {
+                    for (BlockPos hole : balloon.holes) {
+                        DiscoveredVolume connectingDV = posToDVMap.get(hole);
+                        if (connectingDV != null) {
+                            connections.computeIfAbsent(connectingDV, k -> new HashSet<>()).add(balloon);
+                        }
+                    }
+                }
+
+                //TODO: Find connections via bottoms
+
+                //Perform actual merges based on discovered connections
+                for (Map.Entry<DiscoveredVolume, Set<Balloon>> connectionEntry : connections.entrySet()) {
+                    DiscoveredVolume dvToMerge = connectionEntry.getKey();
+                    Set<Balloon> balloonsToMergeInto = connectionEntry.getValue();
+
+                    if (balloonsToMergeInto.isEmpty()) continue;
+                    Balloon primaryBalloon = balloonsToMergeInto.stream().max(java.util.Comparator.comparingInt(Balloon::size)).get();
+
+                    BalloonStitcher.extend(primaryBalloon, dvToMerge);
+                    for (Balloon otherBalloon : balloonsToMergeInto) {
+                        if (otherBalloon != primaryBalloon) {
+                            BalloonStitcher.mergeInto(primaryBalloon, otherBalloon, haiGroup);
+                        }
+                    }
+                    modifiedBalloons.add(primaryBalloon);
+
+                }
+            }
+        }
+
 
         //Resolve balloon's chunks
         for(Balloon balloon : modifiedBalloons) {
@@ -146,7 +226,7 @@ public class BalloonUpdater {
                 for (BlockPos holeSeed : seeds) {
                     if (resultVolume.volume().contains(holeSeed)) {
                         // For each seed, get the balloons that were originally next to it.
-                        List<Balloon> balloonsToGetHole = subGroup.affectedBalloonsMap().get(holeSeed);
+                        Set<Balloon> balloonsToGetHole = subGroup.affectedBalloonsMap().get(holeSeed);
                         for (Balloon balloon : balloonsToGetHole) {
                             //Check if the hole is NOT EXCLUSIEVELY BELOW the balloon. If so - don't create a hole as blocks below balloons volume cannot be holes
                             boolean isNotBelow = balloon.contains(holeSeed.below()) 
@@ -205,7 +285,7 @@ public class BalloonUpdater {
     }
 
     private List<EventSubGroup> prefilterAndSubgroupEvents(EventGroup group) {
-        Map<HaiGroup, Map<BlockPos, List<Balloon>>> subGroupBuilders = new HashMap<>();
+        Map<HaiGroup, Map<BlockPos, Set<Balloon>>> subGroupBuilders = new HashMap<>();
         //Obtain all haiGroups
         //TODO: obtain them all PER SHIP as this will reduce the amount of BalloonRegistry to 1. But note that events may occur on different ships, so its not that simple
         List<HaiGroup> allHaiGroups = BalloonShipRegistry.get().getRegistries().stream()
@@ -260,19 +340,19 @@ public class BalloonUpdater {
             //TODO: Actually, not true - we also need to check if we are adjacent to any hole
             //Actually the above is not true either. We need to rewrite this method to not filter out such events (if they are placement) 
             // as they also need to be resolved in handlePlacementSubGroup, which will perform a scan to find new volumes.
-            if (nearbyBalloons.isEmpty()) {
+            /*if (nearbyBalloons.isEmpty()) {
                 continue;
-            }
+            }*/
 
             //Event is valid, add it to subgroupBuilder
             subGroupBuilders
                 .computeIfAbsent(parentHaiGroup, k -> new HashMap<>())
-                .put(pos, new ArrayList<>(nearbyBalloons));
+                .put(pos, nearbyBalloons);
         }
 
         //Convert builders into final subgroups
         List<EventSubGroup> finalSubGroups = new ArrayList<>();
-        for (Map.Entry<HaiGroup, Map<BlockPos, List<Balloon>>> entry : subGroupBuilders.entrySet()) {
+        for (Map.Entry<HaiGroup, Map<BlockPos, Set<Balloon>>> entry : subGroupBuilders.entrySet()) {
             finalSubGroups.add(new EventSubGroup(
                 entry.getKey(),
                 entry.getValue(),

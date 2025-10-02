@@ -63,7 +63,6 @@ public class Balloon implements Iterable<BlockPos> {
 
         for(long pos : unpackedVolume) {
             this.add(BlockPos.of(pos));
-            //this.volume.add(pos);
         }
 
         rebuildAllCaches();
