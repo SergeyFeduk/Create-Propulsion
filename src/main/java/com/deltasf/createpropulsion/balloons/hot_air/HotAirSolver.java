@@ -11,7 +11,9 @@ import com.deltasf.createpropulsion.balloons.blocks.AbstractHotAirInjectorBlockE
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry;
 import com.deltasf.createpropulsion.balloons.utils.BalloonRegistryUtility;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 
 //"Solver" word is a bit of an overkill, but it sounds cooler this way :D
 public class HotAirSolver {
@@ -46,8 +48,21 @@ public class HotAirSolver {
 
         //Global surface leak
         hotAirChange -= PropulsionConfig.BALLOON_SURFACE_LEAK_FACTOR.get() * catastrophicFailureModifier * surfaceArea * leakAdjustedFullness;
-        //Hole leak
-        hotAirChange -= PropulsionConfig.BALLOON_HOLE_LEAK_FACTOR.get() * Math.pow(balloon.holes.size(), holeFactorExponent) * leakAdjustedFullness;
+        //Hole leak based on y coordinate of each hole. We assume that hot air is evenlt distributed along all y levels
+        AABB bounds = balloon.getAABB();
+        double maxY = bounds.maxY;
+        double height = bounds.maxY - bounds.minY;
+        double pressureFloor = maxY - (height * fullness) + 1e-6;
+
+        double activeHoleCount = 0;
+        for (BlockPos holePos : balloon.holes) {
+            double interpolationValue = (holePos.getY() + 1.0) - pressureFloor;
+            double activityFraction = org.joml.Math.clamp(0.0, 1.0, interpolationValue);
+            activeHoleCount += activityFraction;
+        }
+        if (activeHoleCount > 0) {
+            hotAirChange -= PropulsionConfig.BALLOON_HOLE_LEAK_FACTOR.get() * Math.pow(activeHoleCount, holeFactorExponent) * fullness;
+        }
         
         //Update hotAirAmount
         final double dt = 1 / 20.0; //For now a second will be the unit of time, may change
