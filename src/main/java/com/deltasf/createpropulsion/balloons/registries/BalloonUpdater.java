@@ -24,6 +24,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 
 public class BalloonUpdater {
     private Map<ResourceKey<Level>, Queue<DynamicUpdate>> eventQueues = new HashMap<>();
@@ -152,6 +153,20 @@ public class BalloonUpdater {
                         DiscoveredVolume connectingDV = posToDVMap.get(hole);
                         if (connectingDV != null) {
                             connections.computeIfAbsent(connectingDV, k -> new HashSet<>()).add(balloon);
+                        }
+                    }
+
+                    AABB balloonBounds = balloon.getAABB();
+                    for (DiscoveredVolume dv : validVolumes) {
+                        AABB dvBounds = BalloonStitcher.getAABB(dv);
+                        if (!balloonBounds.intersects(dvBounds.minX, dvBounds.maxY - 1, dvBounds.minZ, dvBounds.maxX, dvBounds.maxY, dvBounds.maxZ)) 
+                            continue;
+
+                        for (BlockPos dvPos : dv.volume()) {
+                            if (balloon.contains(dvPos.above())) {
+                                connections.computeIfAbsent(dv, k -> new HashSet<>()).add(balloon);
+                                break; //Already found a connection
+                            }
                         }
                     }
                 }
