@@ -85,13 +85,16 @@ public abstract class AbstractThrusterBlock extends DirectionalBlock implements 
 
     @Override
     public void onRemove(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull BlockState newState, boolean isMoving) {
-        super.onRemove(state, level, pos, newState, isMoving);
-        if (level.isClientSide()) return;
-
-        ThrusterForceAttachment ship = ThrusterForceAttachment.get(level, pos);
-        if (ship != null) {
-            ship.removeApplier((ServerLevel) level, pos);
+        if (!state.is(newState.getBlock())) {
+            if (!level.isClientSide()) {
+                ThrusterForceAttachment ship = ThrusterForceAttachment.get(level, pos);
+                if (ship != null) {
+                    ship.removeApplier((ServerLevel) level, pos);
+                }
+            }
         }
+
+        super.onRemove(state, level, pos, newState, isMoving);
     }
 
     @Override
