@@ -17,26 +17,23 @@ import org.valkyrienskies.core.api.ships.ShipForcesInducer;
 import org.valkyrienskies.core.impl.game.ships.PhysShipImpl;
 
 import com.deltasf.createpropulsion.PropulsionConfig;
+import com.deltasf.createpropulsion.atmosphere.AtmoshpereHelper;
+import com.deltasf.createpropulsion.atmosphere.AtmosphereData;
+import com.deltasf.createpropulsion.atmosphere.DimensionAtmosphereManager;
 import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.BalloonForceChunk;
 import com.deltasf.createpropulsion.balloons.Balloon.ChunkKey;
-import com.deltasf.createpropulsion.balloons.atmosphere.BalloonDimensionManager;
-import com.deltasf.createpropulsion.balloons.atmosphere.BalloonDimensionManager.AtmosphereProperties;
 import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
 import com.deltasf.createpropulsion.utility.AttachmentUtils;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.chunk.ChunkGenerator;
-import net.minecraft.world.level.levelgen.FlatLevelSource;
 
 //Current model adds some custom drag, both linear and angular. VS 2.5 should handle this for us
 //So after updating to it - get rid of our drag, or at least change default values
 @SuppressWarnings("deprecation")
 public class BalloonAttachment implements ShipForcesInducer {
     public BalloonAttachment() {}
-    private record AtmosphereData(double pressureAtSea, double scaleHeight, double gravity, int seaLevel) {}
     private AtmosphereData atmosphereData;
 
     private static final double epsilon = 1e-5;
@@ -151,7 +148,7 @@ public class BalloonAttachment implements ShipForcesInducer {
             shipToWorld.transformPosition(appShipX, appShipY, appShipZ, tmpWorldPos);
 
             //Calculate force magnitude
-            double externalDensity = calculateExternalAirDensity(tmpWorldPos.y);
+            double externalDensity = AtmoshpereHelper.calculateExternalAirDensity(atmosphereData, tmpWorldPos.y);
             double forceMagnitude = chunk.blockCount * externalDensity * atmosphereData.gravity() * PropulsionConfig.BALLOON_K_COEFFICIENT.get() * fullness;
             forceMagnitude = Math.max(0, forceMagnitude * PropulsionConfig.BALLOON_FORCE_COEFFICIENT.get());
             //Calculate force vector
@@ -162,11 +159,6 @@ public class BalloonAttachment implements ShipForcesInducer {
             leverArmWorld.cross(tmpForce, tmpForce); //tmpForce is reused to hold torque here
             accumulatedTorque.add(tmpForce);
         }
-    }
-
-    private double calculateExternalAirDensity(double worldY) {
-        double altitude = worldY - this.atmosphereData.seaLevel();
-        return this.atmosphereData.pressureAtSea() * Math.exp(-altitude / this.atmosphereData.scaleHeight());
     }
 
     //Buoyant force
@@ -199,26 +191,6 @@ public class BalloonAttachment implements ShipForcesInducer {
     }
 
     public static void updateAtmosphereData(BalloonAttachment attachment, Level level) {
-        AtmosphereProperties atmosphere = BalloonDimensionManager.getProperties(level);
-        //Nuh uh no division by zero for you
-        double scaleHeight = atmosphere.scaleHeight() > epsilon ? atmosphere.scaleHeight() : BalloonDimensionManager.DEFAULT.scaleHeight();
-
-        attachment.atmosphereData = new AtmosphereData(
-            atmosphere.pressureAtSeaLevel(), 
-            scaleHeight, 
-            atmosphere.gravity(),
-            determineSeaLevel(level)
-        );
-    }
-
-    private static int determineSeaLevel(Level level) {
-        if (level instanceof ServerLevel serverLevel) {
-            ChunkGenerator generator = serverLevel.getChunkSource().getGenerator();
-            if (generator instanceof FlatLevelSource) {
-                return -60;
-            }
-        }
-
-        return level.getSeaLevel();
+        attachment.atmosphereData = DimensionAtmosphereManager.getData(level);
     }
 }

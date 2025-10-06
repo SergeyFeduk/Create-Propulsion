@@ -1,4 +1,4 @@
-package com.deltasf.createpropulsion.balloons.atmosphere;
+package com.deltasf.createpropulsion.atmosphere;
 
 import java.util.Optional;
 

@@ -1,4 +1,4 @@
-package com.deltasf.createpropulsion.balloons.atmosphere;
+package com.deltasf.createpropulsion.atmosphere;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,14 +17,16 @@ import com.mojang.serialization.JsonOps;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.ModList;
 
-public class BalloonDimensionManager extends SimpleJsonResourceReloadListener {
+public class DimensionAtmosphereManager extends SimpleJsonResourceReloadListener {
     public record AtmosphereProperties(double pressureAtSeaLevel, double scaleHeight, double gravity) {}
+    private static final double epsilon = 1e-5;
 
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
@@ -33,12 +35,24 @@ public class BalloonDimensionManager extends SimpleJsonResourceReloadListener {
     private static Map<ResourceKey<Level>, AtmosphereProperties> atmosphereMap = new HashMap<>();
     public static final AtmosphereProperties DEFAULT = new AtmosphereProperties(1.225, 200.0, 9.81);
 
-    public BalloonDimensionManager() {
+    public DimensionAtmosphereManager() {
         super(GSON, DIRECTORY);
     }
 
     public static AtmosphereProperties getProperties(Level level) {
         return atmosphereMap.getOrDefault(level.dimension(), DEFAULT);
+    }
+
+    public static AtmosphereData getData(Level level) {
+        AtmosphereProperties properties = getProperties(level);
+        double scaleHeight = properties.scaleHeight() > epsilon ? properties.scaleHeight() : DimensionAtmosphereManager.DEFAULT.scaleHeight();
+
+        return new AtmosphereData(
+            properties.pressureAtSeaLevel(), 
+            scaleHeight, 
+            properties.gravity(),
+            AtmoshpereHelper.determineSeaLevel((ServerLevel)level)
+        );
     }
 
     @Override
