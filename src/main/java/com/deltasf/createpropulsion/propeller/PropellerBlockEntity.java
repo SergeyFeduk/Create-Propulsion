@@ -257,12 +257,10 @@ public class PropellerBlockEntity extends KineticBlockEntity {
                 this.renderedBladeAngles.addAll(newTargetAngles);
                 this.animationStartTime = 0;
 
-                this.visualRPM = this.getTargetRPM();
+                this.visualRPM = getBladeCount() > 0 ? this.getTargetRPM() : 0f;
                 this.visualAngle = (worldPosition.hashCode() * 31) % 360f;
                 
-                if (!newTargetAngles.isEmpty()) {
-                    hasLoadedClientState = true;
-                }
+                hasLoadedClientState = true;
             } else {
                 if (!newTargetAngles.equals(this.targetBladeAngles)) {
                     boolean isRemoval = newTargetAngles.size() < this.targetBladeAngles.size();

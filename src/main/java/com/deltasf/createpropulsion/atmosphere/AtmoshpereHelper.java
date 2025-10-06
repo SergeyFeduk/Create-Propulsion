@@ -14,8 +14,11 @@ public class AtmoshpereHelper {
         return serverLevel.getSeaLevel();
     }
 
-    public static double calculateExternalAirDensity(AtmosphereData atmosphere, double worldY) {
+    public static double calculateExternalAirDensity(AtmosphereData atmosphere, double worldY, boolean clampAtSea) {
         double altitude = worldY - atmosphere.seaLevel();
+        if (clampAtSea) {
+            altitude = Math.max(0, altitude);
+        }
         return atmosphere.pressureAtSea() * Math.exp(-altitude / atmosphere.scaleHeight());
     }
 }

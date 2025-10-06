@@ -47,7 +47,7 @@ public class PropellerForceApplier {
             .sub(shipCenterOfMass);
 
         Vector3d worldPos = transform.getShipToWorld().transformPosition(VectorConversionsMCKt.toJOMLD(pos));
-        double externalAirDensity = AtmoshpereHelper.calculateExternalAirDensity(atmosphere, worldPos.y);
+        double externalAirDensity = AtmoshpereHelper.calculateExternalAirDensity(atmosphere, worldPos.y, true);
 
         transform.getShipToWorld().transformDirection(data.getDirection(), worldForceDirection);
         worldForceDirection.normalize();
