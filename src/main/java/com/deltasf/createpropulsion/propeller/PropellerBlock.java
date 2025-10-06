@@ -15,6 +15,7 @@ import net.minecraft.core.Direction.Axis;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -112,6 +113,17 @@ public class PropellerBlock extends DirectionalKineticBlock implements IBE<Prope
                 if (ship != null) {
                     ship.removeApplier((ServerLevel) level, pos);
                 }
+                //Drop blades
+                BlockEntity be = level.getBlockEntity(pos);
+                if (be instanceof PropellerBlockEntity propellerBlockEntity) {
+                    for (int i = 0; i < propellerBlockEntity.bladeInventory.getSlots(); i++) {
+                        ItemStack stackInSlot = propellerBlockEntity.bladeInventory.getStackInSlot(i);
+                        if (!stackInSlot.isEmpty()) {
+                            Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), stackInSlot);
+                        }
+                    }
+                }
+
             }
         }
         super.onRemove(state, level, pos, newState, isMoving);
