@@ -1,12 +1,12 @@
-package com.deltasf.createpropulsion.optical_sensors.rendering;
+package com.deltasf.createpropulsion.registries;
 
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 
 import net.minecraft.client.renderer.RenderType;
 
-public class OpticalSensorBeamRenderType extends RenderType {
-    private OpticalSensorBeamRenderType(String name, VertexFormat fmt, VertexFormat.Mode mode, int bufSize, boolean affectsCrumbling, boolean sortOnUpload, Runnable setup, Runnable clear) {
+public class PropulsionRenderTypes extends RenderType {
+    private PropulsionRenderTypes(String name, VertexFormat fmt, VertexFormat.Mode mode, int bufSize, boolean affectsCrumbling, boolean sortOnUpload, Runnable setup, Runnable clear) {
         super(name, fmt, mode, bufSize, affectsCrumbling, sortOnUpload, setup, clear);
     }
 
@@ -29,4 +29,24 @@ public class OpticalSensorBeamRenderType extends RenderType {
             .setWriteMaskState(COLOR_WRITE)
             .createCompositeState(false)
     );
+
+    public static final RenderType PROPELLER_BLUR = create(
+        "propeller_blur",
+        DefaultVertexFormat.BLOCK,
+        VertexFormat.Mode.QUADS,
+        256,
+        false,
+        true,
+        CompositeState.builder()
+            .setShaderState(RENDERTYPE_TRANSLUCENT_SHADER)
+            .setTextureState(BLOCK_SHEET_MIPPED)
+            .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+            .setLightmapState(LIGHTMAP)
+            .setOverlayState(OVERLAY)
+            .setCullState(NO_CULL)
+            .setDepthTestState(LEQUAL_DEPTH_TEST)
+            .setWriteMaskState(COLOR_WRITE)
+            .createCompositeState(true)
+    );
+
 }

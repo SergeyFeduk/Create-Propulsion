@@ -9,7 +9,7 @@ import org.joml.Vector4f;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.optical_sensors.rendering.BeamRenderData;
-import com.deltasf.createpropulsion.optical_sensors.rendering.OpticalSensorBeamRenderType;
+import com.deltasf.createpropulsion.registries.PropulsionRenderTypes;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
@@ -58,7 +58,7 @@ public class TranslucentBeamRenderer {
         }
         MultiBufferSource.BufferSource bufferSource = mc.renderBuffers().bufferSource();
 
-        VertexConsumer buffer = bufferSource.getBuffer(OpticalSensorBeamRenderType.SOLID_TRANSLUCENT_BEAM);
+        VertexConsumer buffer = bufferSource.getBuffer(PropulsionRenderTypes.SOLID_TRANSLUCENT_BEAM);
         
         //Render all invoked
         for (BeamRenderData data : RENDER_QUEUE) {
@@ -67,7 +67,7 @@ public class TranslucentBeamRenderer {
             poseStack.popPose();
         }
         //End batch so we do not wait for any more geometry of this type and it does not lag behind at this frame
-        bufferSource.endBatch(OpticalSensorBeamRenderType.SOLID_TRANSLUCENT_BEAM);
+        bufferSource.endBatch(PropulsionRenderTypes.SOLID_TRANSLUCENT_BEAM);
     }
 
     public static void drawBeam(VertexConsumer buffer, BeamRenderData data){

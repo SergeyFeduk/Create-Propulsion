@@ -11,6 +11,8 @@ import com.deltasf.createpropulsion.optical_sensors.OpticalSensorBlockEntity;
 import com.deltasf.createpropulsion.optical_sensors.rendering.OpticalSensorRenderer;
 import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerBlockEntity;
 import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerRenderer;
+import com.deltasf.createpropulsion.propeller.PropellerBlockEntity;
+import com.deltasf.createpropulsion.propeller.PropellerRenderer;
 import com.deltasf.createpropulsion.thruster.thruster.ThrusterBlockEntity;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.BlockEntityEntry;
@@ -61,5 +63,11 @@ public class PropulsionBlockEntities {
     public static final BlockEntityEntry<SolidBurnerBlockEntity> SOLID_BURNER_BLOCK_ENTITY = 
         REGISTRATE.blockEntity("solid_burner_block_entity", SolidBurnerBlockEntity::new)
         .validBlock(PropulsionBlocks.SOLID_BURNER)
+        .register();
+
+    public static final BlockEntityEntry<PropellerBlockEntity> PROPELLER_BLOCK_ENTITY = 
+        REGISTRATE.blockEntity("propeller_block_entity", PropellerBlockEntity::new)
+        .validBlock(PropulsionBlocks.PROPELLER_BLOCK)
+        .renderer(() -> PropellerRenderer::new)
         .register();
 }

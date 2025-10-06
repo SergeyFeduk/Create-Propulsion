@@ -3,6 +3,7 @@ package com.deltasf.createpropulsion.registries;
 import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.optical_sensors.OpticalLensItem;
 import com.deltasf.createpropulsion.physics_assembler.AssemblyGaugeItem;
+import com.deltasf.createpropulsion.propeller.blades.WoodenPropellerBladeItem;
 import com.deltasf.createpropulsion.utility.BurnableItem;
 //import com.deltasf.createpropulsion.design_goggles.DesignGogglesItem;
 import com.simibubi.create.foundation.data.CreateRegistrate;
@@ -24,12 +25,16 @@ public class PropulsionItems {
     public static final ItemEntry<Item> FOCUS_LENS = REGISTRATE.item("focus_lens", Item::new).register();
     public static final ItemEntry<Item> INVISIBILITY_LENS = REGISTRATE.item("invisibility_lens", Item::new).register();
     public static final ItemEntry<Item> UNFINISHED_LENS = REGISTRATE.item("unfinished_lens", Item::new).register();
+    //Propeller blades
+    public static final ItemEntry<WoodenPropellerBladeItem> WOODEN_BLADE = REGISTRATE.item("wooden_blade", WoodenPropellerBladeItem::new).register();
 
     //public static final ItemEntry<DesignGogglesItem> DESIGN_GOGGLES = REGISTRATE.item("design_goggles", DesignGogglesItem::new).register();
     public static final ItemEntry<AssemblyGaugeItem> ASSEMBLY_GAUGE = REGISTRATE.item("assembly_gauge", AssemblyGaugeItem::new)
         .properties(p -> p.stacksTo(1))
         .register();
 
+
+    //Tags
     public static final TagKey<Item> OPTICAL_LENS_TAG = makeTag("optical_lens");
 
     public static TagKey<Item> makeTag(String key) {

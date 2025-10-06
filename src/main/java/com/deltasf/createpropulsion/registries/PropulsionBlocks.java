@@ -9,7 +9,9 @@ import com.deltasf.createpropulsion.magnet.RedstoneMagnetBlock;
 import com.deltasf.createpropulsion.optical_sensors.InlineOpticalSensorBlock;
 import com.deltasf.createpropulsion.optical_sensors.OpticalSensorBlock;
 import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerBlock;
+import com.deltasf.createpropulsion.propeller.PropellerBlock;
 import com.deltasf.createpropulsion.thruster.thruster.ThrusterBlock;
+import com.simibubi.create.content.kinetics.BlockStressDefaults;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.BlockEntry;
 
@@ -83,6 +85,12 @@ public class PropulsionBlocks {
         .properties(p -> p.requiresCorrectToolForDrops())
         .properties(p -> p.strength(2.5F, 2.0F))
         .properties(p -> p.lightLevel(state -> state.getValue(SolidBurnerBlock.LIT) ? 13 : 0))
+        .simpleItem()
+        .register();
+
+    public static final BlockEntry<PropellerBlock> PROPELLER_BLOCK = REGISTRATE.block("propeller", PropellerBlock::new)
+        .properties(p -> p.noOcclusion())
+        .transform(BlockStressDefaults.setImpact(8.0))
         .simpleItem()
         .register();
 }

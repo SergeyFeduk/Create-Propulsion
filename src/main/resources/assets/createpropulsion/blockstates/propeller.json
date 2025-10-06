@@ -1,0 +1,10 @@
+{
+    "variants": {
+        "facing=north": { "model": "createpropulsion:block/propeller_body" },
+        "facing=south": { "model": "createpropulsion:block/propeller_body", "y": 180 },
+        "facing=west":  { "model": "createpropulsion:block/propeller_body", "y": 270 },
+        "facing=east":  { "model": "createpropulsion:block/propeller_body", "y": 90 },
+        "facing=up":    { "model": "createpropulsion:block/propeller_body", "x": 270 },
+        "facing=down":  { "model": "createpropulsion:block/propeller_body", "x": 90 }
+    }
+}

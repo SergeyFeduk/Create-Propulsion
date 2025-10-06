@@ -33,7 +33,9 @@ public class PropulsionConfig {
     public static final ForgeConfigSpec.ConfigValue<Double> BALLOON_VERTICAL_DRAG_COEFFICIENT;
     public static final ForgeConfigSpec.ConfigValue<Double> BALLOON_HORIZONTAL_DRAG_COEFFICIENT;
     public static final ForgeConfigSpec.ConfigValue<Double> BALLOON_SURFACE_LEAK_FACTOR;
-    public static final ForgeConfigSpec.ConfigValue<Double> BALLOON_HOLE_LEAK_FACTOR; 
+    public static final ForgeConfigSpec.ConfigValue<Double> BALLOON_HOLE_LEAK_FACTOR;
+    //Propeller
+    public static final ForgeConfigSpec.ConfigValue<Double> PROPELLER_MAX_SPEED;
 
     static {
         //#region Server
@@ -73,22 +75,27 @@ public class PropulsionConfig {
 
         SERVER_BUILDER.push("Hot air balloons");
             BALLOON_FORCE_COEFFICIENT = SERVER_BUILDER.comment("BALLOON_FORCE_COEFFICIENT.")
-                    .define("BALLOON_FORCE_COEFFICIENT", 1250.0);
+                .define("BALLOON_FORCE_COEFFICIENT", 1250.0);
             BALLOON_K_COEFFICIENT = SERVER_BUILDER.comment("BALLOON_K_COEFFICIENT.")
-                    .define("BALLOON_K_COEFFICIENT", 0.3);
+                .define("BALLOON_K_COEFFICIENT", 0.3);
             BALLOON_ANGULAR_DAMPING = SERVER_BUILDER.comment("BALLOON_ANGULAR_DAMPING.")
-                    .define("BALLOON_ANGULAR_DAMPING", 1.2);
+                .define("BALLOON_ANGULAR_DAMPING", 1.2);
             BALLOON_ALIGNMENT_KP = SERVER_BUILDER.comment("BALLOON_ALIGNMENT_KP.")
-                    .define("BALLOON_ALIGNMENT_KP", 12.5);
+                .define("BALLOON_ALIGNMENT_KP", 12.5);
             BALLOON_VERTICAL_DRAG_COEFFICIENT = SERVER_BUILDER.comment("BALLOON_VERTICAL_DRAG_COEFFICIENT.")
-                    .define("BALLOON_VERTICAL_DRAG_COEFFICIENT", 100.0);
+                .define("BALLOON_VERTICAL_DRAG_COEFFICIENT", 100.0);
             BALLOON_HORIZONTAL_DRAG_COEFFICIENT = SERVER_BUILDER.comment("BALLOON_HORIZONTAL_DRAG_COEFFICIENT.")
-                    .define("BALLOON_HORIZONTAL_DRAG_COEFFICIENT", 100.0);
+                .define("BALLOON_HORIZONTAL_DRAG_COEFFICIENT", 100.0);
 
             BALLOON_SURFACE_LEAK_FACTOR = SERVER_BUILDER.comment("BALLOON_SURFACE_LEAK_FACTOR.")
-                    .define("BALLOON_SURFACE_LEAK_FACTOR", 1e-2);
+                .define("BALLOON_SURFACE_LEAK_FACTOR", 1e-2);
             BALLOON_HOLE_LEAK_FACTOR = SERVER_BUILDER.comment("BALLOON_HOLE_LEAK_FACTOR.")
-                    .define("BALLOON_HOLE_LEAK_FACTOR", 0.2);
+                .define("BALLOON_HOLE_LEAK_FACTOR", 0.2);
+        SERVER_BUILDER.pop();
+
+        SERVER_BUILDER.push("Propeller");
+            PROPELLER_MAX_SPEED = SERVER_BUILDER.comment("PROPELLER_MAX_SPEED")
+                .defineInRange("PROPELLER_MAX_SPEED", 35.0, 10.0, 100.0);
         SERVER_BUILDER.pop();
 
         SERVER_SPEC = SERVER_BUILDER.build();

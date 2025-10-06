@@ -17,6 +17,9 @@
 
     "block.createpropulsion.envelope": "Envelope",
     "block.createpropulsion.solid_burner": "Solid Burner",
+    "block.createpropulsion.propeller": "Propeller",
+
+    "item.createpropulsion.wooden_blade": "Wooden Blade",
 
     "create.gui.goggles.thruster.status": "Thruster Status",
     "create.gui.goggles.thruster.status.no_fuel": "No Fuel",

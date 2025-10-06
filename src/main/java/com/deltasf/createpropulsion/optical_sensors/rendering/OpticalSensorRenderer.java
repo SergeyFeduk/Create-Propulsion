@@ -10,6 +10,7 @@ import com.deltasf.createpropulsion.optical_sensors.AbstractOpticalSensorBlock;
 import com.deltasf.createpropulsion.optical_sensors.AbstractOpticalSensorBlockEntity;
 import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
 import com.deltasf.createpropulsion.registries.PropulsionItems;
+import com.deltasf.createpropulsion.registries.PropulsionRenderTypes;
 import com.deltasf.createpropulsion.utility.TranslucentBeamRenderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -164,7 +165,7 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<AbstractOptic
         //Rendering setup
         //The first pass (behind translucent)
         poseStack.pushPose();
-        VertexConsumer buffer = bufferSource.getBuffer(OpticalSensorBeamRenderType.SOLID_TRANSLUCENT_BEAM);
+        VertexConsumer buffer = bufferSource.getBuffer(PropulsionRenderTypes.SOLID_TRANSLUCENT_BEAM);
         TranslucentBeamRenderer.drawBeam(buffer, beamData);
         poseStack.popPose();
         //Schedule the second 
