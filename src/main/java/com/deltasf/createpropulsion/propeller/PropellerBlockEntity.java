@@ -253,6 +253,9 @@ public class PropellerBlockEntity extends KineticBlockEntity {
                 this.renderedBladeAngles.clear();
                 this.renderedBladeAngles.addAll(newTargetAngles);
                 this.animationStartTime = 0;
+
+                this.visualRPM = this.getTargetRPM();
+                this.visualAngle = (worldPosition.hashCode() * 31) % 360f;
                 
                 if (!newTargetAngles.isEmpty()) {
                     hasLoadedClientState = true;
