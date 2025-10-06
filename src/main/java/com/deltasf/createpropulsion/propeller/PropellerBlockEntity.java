@@ -60,6 +60,9 @@ public class PropellerBlockEntity extends KineticBlockEntity {
         propellerData = new PropellerData();
         bladeInventory = createBladeInventory();
         itemHandler = LazyOptional.of(() -> bladeInventory);
+
+        prevBladeAngles = new ArrayList<>();
+        renderedBladeAngles = new ArrayList<>();
     }
 
     @SuppressWarnings("null")

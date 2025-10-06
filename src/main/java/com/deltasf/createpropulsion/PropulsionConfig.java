@@ -36,6 +36,10 @@ public class PropulsionConfig {
     public static final ForgeConfigSpec.ConfigValue<Double> BALLOON_HOLE_LEAK_FACTOR;
     //Propeller
     public static final ForgeConfigSpec.ConfigValue<Double> PROPELLER_MAX_SPEED;
+    public static final ForgeConfigSpec.ConfigValue<Integer> PROPELLER_BLUR_MAX_INSTANCES;
+    public static final ForgeConfigSpec.ConfigValue<Double> PROPELLER_BLUR_SAMPLE_RATE;
+    public static final ForgeConfigSpec.ConfigValue<Double> PROPELLER_LOD_DISTANCE;
+    public static final ForgeConfigSpec.ConfigValue<Double> PROPELLER_EXPOSURE_TIME;
 
     static {
         //#region Server
@@ -107,6 +111,16 @@ public class PropulsionConfig {
                     .define("Particle velocity offset", 0.15);
             THRUSTER_PARTICLE_COUNT_MULTIPLIER = CLIENT_BUILDER.comment("The higher this number is - the more particles are spawned.")
                     .define("Particle count multiplier", 1.0);
+        CLIENT_BUILDER.pop();
+        CLIENT_BUILDER.push("Propeller");
+            PROPELLER_BLUR_MAX_INSTANCES = CLIENT_BUILDER.comment("PROPELLER_BLUR_MAX_INSTANCES")
+                .define("PROPELLER_BLUR_MAX_INSTANCES", 64); //Set to 32
+            PROPELLER_BLUR_SAMPLE_RATE = CLIENT_BUILDER.comment("PROPELLER_BLUR_SAMPLE_RATE")
+                .define("PROPELLER_BLUR_SAMPLE_RATE", 2.0); //Set to 3
+            PROPELLER_LOD_DISTANCE = CLIENT_BUILDER.comment("PROPELLER_LOD_DISTANCE")
+                .define("PROPELLER_LOD_DISTANCE", 64.0);
+            PROPELLER_EXPOSURE_TIME = CLIENT_BUILDER.comment("PROPELLER_EXPOSURE_TIME")
+                .define("PROPELLER_EXPOSURE_TIME", 1.0/120.0);
         CLIENT_BUILDER.pop();
         CLIENT_SPEC = CLIENT_BUILDER.build();
         //#endregion

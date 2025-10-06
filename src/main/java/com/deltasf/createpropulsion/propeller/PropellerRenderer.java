@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
+import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.propeller.blades.PropellerBladeItem;
 import com.deltasf.createpropulsion.registries.PropulsionPartialModels;
 import com.deltasf.createpropulsion.registries.PropulsionRenderTypes;
@@ -31,10 +32,7 @@ import net.minecraft.world.phys.Vec3;
 
 public class PropellerRenderer extends KineticBlockEntityRenderer<PropellerBlockEntity> {
     //TODO: Make configurable
-    private static final int BLUR_MAX_INSTANCES = 64; //Set to 32 by default
     private static final float MIN_BLUR_DEG = 5.0f;
-    private static final float T_EXP = 1/120f;
-    private static final float BLUR_SAMPLE_RATE = 2.0f; //Set to 3 by default
     private static final float TARGET_OPACITY = 0.65f;
     private static final float HEAD_TARGET_OPACITY = 0.9f;
 
@@ -42,8 +40,6 @@ public class PropellerRenderer extends KineticBlockEntityRenderer<PropellerBlock
     private static final float RPM_MAX_ACCELERATION = 500.0f;
     private static final float RPM_MIN_ACCELERATION = 3.0f;
     private static final float SMOOTHING_FACTOR = 2.0f;
-
-    private static final float LOD_DISTANCE = 64f;
 
     public PropellerRenderer(BlockEntityRendererProvider.Context context) {
         super(context);
@@ -135,16 +131,16 @@ public class PropellerRenderer extends KineticBlockEntityRenderer<PropellerBlock
         }
 
         //Blur m*th
-        float blurRad = (float)Math.PI * be.visualRPM / 30f * T_EXP;
-        float blurDeg = blurRad * (180f / (float)Math.PI);
+        double blurRad = Math.PI * be.visualRPM / 30 * PropulsionConfig.PROPELLER_EXPOSURE_TIME.get();
+        double blurDeg = blurRad * (180.0 / Math.PI);
 
-        boolean shouldBlur = distSqr < (LOD_DISTANCE * LOD_DISTANCE) && blurDeg > MIN_BLUR_DEG;
+        boolean shouldBlur = distSqr < (PropulsionConfig.PROPELLER_LOD_DISTANCE.get() * PropulsionConfig.PROPELLER_LOD_DISTANCE.get()) && blurDeg > MIN_BLUR_DEG;
         if (shouldBlur) {
-            int N = Math.min(BLUR_MAX_INSTANCES, Math.max(2, (int)Math.ceil(blurDeg / BLUR_SAMPLE_RATE)));
+            int N = Math.min(PropulsionConfig.PROPELLER_BLUR_MAX_INSTANCES.get(), Math.max(2, (int)Math.ceil(blurDeg / PropulsionConfig.PROPELLER_BLUR_SAMPLE_RATE.get())));
             //float alpha = 1.0f / (float)N;
             float alpha = (float) (1.0 - Math.pow(1.0 - TARGET_OPACITY, 1.0 / N));
             int alphaInt = (int)(alpha * 255);
-            float angleStep = blurDeg / (float)N;
+            float angleStep = (float)blurDeg / (float)N;
 
             float headAlpha = (float) (1.0 - Math.pow(1.0 - HEAD_TARGET_OPACITY, 1.0 / N));
             int headAlphaInt = (int)(headAlpha * 255);
