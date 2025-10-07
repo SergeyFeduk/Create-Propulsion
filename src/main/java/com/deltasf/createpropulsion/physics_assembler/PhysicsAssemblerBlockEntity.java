@@ -17,9 +17,17 @@ import org.joml.Vector3dc;
 import org.joml.Vector3i;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.properties.ChunkClaim;
+import org.valkyrienskies.core.apigame.ShipTeleportData;
+import org.valkyrienskies.core.apigame.VSCore;
+import org.valkyrienskies.core.apigame.constraints.VSAttachmentConstraint;
+import org.valkyrienskies.core.apigame.constraints.VSConstraint;
+import org.valkyrienskies.core.apigame.world.ServerShipWorldCore;
+import org.valkyrienskies.core.apigame.world.ShipWorldCore;
+import org.valkyrienskies.core.impl.game.ShipTeleportDataImpl;
 import org.valkyrienskies.core.impl.game.ships.ShipDataCommon;
 import org.valkyrienskies.core.impl.game.ships.ShipTransformImpl;
 import org.valkyrienskies.core.impl.networking.simple.SimplePackets;
+import org.valkyrienskies.core.util.VSCoreUtilKt;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -164,10 +172,18 @@ public class PhysicsAssemblerBlockEntity extends SmartBlockEntity {
         Quaterniondc finalShipRotation = new Quaterniond();
         Vector3d finalShipScale = new Vector3d(1, 1, 1);
 
+        /*Vector3d velocity = new Vector3d(0,0,0);
+        Vector3d omega = new Vector3d(0,0,0);*/
+
         if (parentShip != null) {
             finalShipPosInWorld = parentShip.getShipToWorld().transformPosition(shipComInWorld, new Vector3d());
             finalShipRotation = parentShip.getTransform().getShipToWorldRotation();
             finalShipScale.mul(parentShip.getTransform().getShipToWorldScaling());
+
+            /*parentShip.getVelocity().mul(1.0, velocity);
+            parentShip.getOmega().mul(1.0, omega);
+
+            finalShipPosInWorld.add(parentShip.getVelocity().mul(4/60.0, new Vector3d()) );*/
         }
 
         ShipTransformImpl newShipTransform = new ShipTransformImpl(
@@ -177,8 +193,23 @@ public class PhysicsAssemblerBlockEntity extends SmartBlockEntity {
             finalShipScale
         );
 
+        //final String vsDimName = VSGameUtilsKt.getDimensionId(world);
+
+
+        //ShipTeleportData td = new ShipTeleportDataImpl(finalShipPosInWorld, finalShipRotation, velocity, omega, vsDimName, 1.0);
+
+        /*System.out.println(velocity);
+        System.out.println(omega);*/
+
         if (ship instanceof ShipDataCommon shipData) {
             shipData.setTransform(newShipTransform);
+
+            /*ServerShipWorldCore sWorld = (ServerShipWorldCore)VSGameUtilsKt.getShipWorldNullable(world);
+            sWorld.teleportShip(ship, td);*/
+
+            //var constaint = new VSAttachmentConstraint(ship.getId(), parentShip.getId(), 0, new Vector3d(0), new Vector3d(0), 10000000, 10);
+
+            //sWorld.createNewConstraint(constaint);
             //TODO: Inherit linear velocity and angular momentum
         }
 
