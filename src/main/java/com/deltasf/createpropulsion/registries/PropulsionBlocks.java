@@ -4,12 +4,14 @@ import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.balloons.blocks.EnvelopeBlock;
 import com.deltasf.createpropulsion.balloons.blocks.HaiBlock;
 import com.deltasf.createpropulsion.heat.burners.solid.SolidBurnerBlock;
+import com.deltasf.createpropulsion.heat.engine.StirlingEngineBlock;
 import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerBlock;
 import com.deltasf.createpropulsion.magnet.RedstoneMagnetBlock;
 import com.deltasf.createpropulsion.optical_sensors.InlineOpticalSensorBlock;
 import com.deltasf.createpropulsion.optical_sensors.OpticalSensorBlock;
 import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerBlock;
 import com.deltasf.createpropulsion.propeller.PropellerBlock;
+import com.deltasf.createpropulsion.reaction_wheel.ReactionWheelBlock;
 import com.deltasf.createpropulsion.thruster.thruster.ThrusterBlock;
 import com.simibubi.create.content.kinetics.BlockStressDefaults;
 import com.simibubi.create.foundation.data.CreateRegistrate;
@@ -91,6 +93,17 @@ public class PropulsionBlocks {
     public static final BlockEntry<PropellerBlock> PROPELLER_BLOCK = REGISTRATE.block("propeller", PropellerBlock::new)
         .properties(p -> p.noOcclusion())
         .transform(BlockStressDefaults.setImpact(8.0))
+        .simpleItem()
+        .register();
+
+    public static final BlockEntry<ReactionWheelBlock> REACTION_WHEEL_BLOCK = REGISTRATE.block("reaction_wheel", ReactionWheelBlock::new)
+        .properties(p -> p.noOcclusion())    
+        .transform(BlockStressDefaults.setImpact(8.0))
+        .simpleItem()
+        .register();
+
+    public static final BlockEntry<StirlingEngineBlock> STIRLING_ENGINE_BLOCK = REGISTRATE.block("stirling_engine", StirlingEngineBlock::new)
+        .properties(p -> p.noOcclusion())
         .simpleItem()
         .register();
 }

@@ -3,6 +3,8 @@ package com.deltasf.createpropulsion.registries;
 import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.balloons.blocks.HaiBlockEntity;
 import com.deltasf.createpropulsion.heat.burners.solid.SolidBurnerBlockEntity;
+import com.deltasf.createpropulsion.heat.engine.StirlingEngineBlockEntity;
+import com.deltasf.createpropulsion.heat.engine.StirlingEngineRenderer;
 import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerBlockEntity;
 import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerRenderer;
 import com.deltasf.createpropulsion.magnet.RedstoneMagnetBlockEntity;
@@ -12,7 +14,10 @@ import com.deltasf.createpropulsion.optical_sensors.rendering.OpticalSensorRende
 import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerBlockEntity;
 import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerRenderer;
 import com.deltasf.createpropulsion.propeller.PropellerBlockEntity;
+import com.deltasf.createpropulsion.propeller.PropellerRenderInstance;
 import com.deltasf.createpropulsion.propeller.PropellerRenderer;
+import com.deltasf.createpropulsion.reaction_wheel.ReactionWheelBlockEntity;
+import com.deltasf.createpropulsion.reaction_wheel.ReactionWheelRenderer;
 import com.deltasf.createpropulsion.thruster.thruster.ThrusterBlockEntity;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.BlockEntityEntry;
@@ -67,7 +72,20 @@ public class PropulsionBlockEntities {
 
     public static final BlockEntityEntry<PropellerBlockEntity> PROPELLER_BLOCK_ENTITY = 
         REGISTRATE.blockEntity("propeller_block_entity", PropellerBlockEntity::new)
+        .instance(() -> PropellerRenderInstance::new)
         .validBlock(PropulsionBlocks.PROPELLER_BLOCK)
         .renderer(() -> PropellerRenderer::new)
+        .register();
+
+    public static final BlockEntityEntry<ReactionWheelBlockEntity> REACTION_WHEEL_BLOCK_ENTITY = 
+        REGISTRATE.blockEntity("reaction_wheel_block_entity", ReactionWheelBlockEntity::new)
+        .validBlock(PropulsionBlocks.REACTION_WHEEL_BLOCK)
+        .renderer(() -> ReactionWheelRenderer::new)
+        .register();
+
+    public static final BlockEntityEntry<StirlingEngineBlockEntity> STIRLING_ENGINE_BLOCK_ENTITY = 
+        REGISTRATE.blockEntity("stirling_engine_block_entity", StirlingEngineBlockEntity::new)
+        .validBlock(PropulsionBlocks.STIRLING_ENGINE_BLOCK)
+        .renderer(() -> StirlingEngineRenderer::new)
         .register();
 }

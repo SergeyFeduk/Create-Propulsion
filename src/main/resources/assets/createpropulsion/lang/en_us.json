@@ -18,8 +18,11 @@
     "block.createpropulsion.envelope": "Envelope",
     "block.createpropulsion.solid_burner": "Solid Burner",
     "block.createpropulsion.propeller": "Propeller",
+    "block.createpropulsion.reaction_wheel": "Reaction Wheel",
+    "block.createpropulsion.stirling_engine": "Stirling Engine",
 
     "item.createpropulsion.wooden_blade": "Wooden Blade",
+    "item.createpropulsion.copper_blade": "Copper Blade",
 
     "create.gui.goggles.thruster.status": "Thruster Status",
     "create.gui.goggles.thruster.status.no_fuel": "No Fuel",
