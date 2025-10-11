@@ -43,7 +43,7 @@ public class PropulsionRenderTypes extends RenderType {
             .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
             .setLightmapState(LIGHTMAP)
             .setOverlayState(OVERLAY)
-            .setCullState(NO_CULL)
+            .setCullState(CULL) //Either CULL +0.9f target opacity. Or NO_CULL + 0.7f target opacity.
             .setDepthTestState(LEQUAL_DEPTH_TEST)
             .setWriteMaskState(COLOR_WRITE)
             .createCompositeState(true)

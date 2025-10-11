@@ -89,7 +89,7 @@ public class PropulsionConfig {
             BALLOON_VERTICAL_DRAG_COEFFICIENT = SERVER_BUILDER.comment("BALLOON_VERTICAL_DRAG_COEFFICIENT.")
                 .define("BALLOON_VERTICAL_DRAG_COEFFICIENT", 100.0);
             BALLOON_HORIZONTAL_DRAG_COEFFICIENT = SERVER_BUILDER.comment("BALLOON_HORIZONTAL_DRAG_COEFFICIENT.")
-                .define("BALLOON_HORIZONTAL_DRAG_COEFFICIENT", 100.0); //80
+                .define("BALLOON_HORIZONTAL_DRAG_COEFFICIENT", 80.0);
 
             BALLOON_SURFACE_LEAK_FACTOR = SERVER_BUILDER.comment("BALLOON_SURFACE_LEAK_FACTOR.")
                 .define("BALLOON_SURFACE_LEAK_FACTOR", 1e-2);
@@ -99,7 +99,7 @@ public class PropulsionConfig {
 
         SERVER_BUILDER.push("Propeller");
             PROPELLER_MAX_SPEED = SERVER_BUILDER.comment("PROPELLER_MAX_SPEED")
-                .defineInRange("PROPELLER_MAX_SPEED", 35.0, 10.0, 100.0);
+                .defineInRange("PROPELLER_MAX_SPEED", 40.0, 10.0, 100.0);
         SERVER_BUILDER.pop();
 
         SERVER_SPEC = SERVER_BUILDER.build();

@@ -17,17 +17,9 @@ import org.joml.Vector3dc;
 import org.joml.Vector3i;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.properties.ChunkClaim;
-import org.valkyrienskies.core.apigame.ShipTeleportData;
-import org.valkyrienskies.core.apigame.VSCore;
-import org.valkyrienskies.core.apigame.constraints.VSAttachmentConstraint;
-import org.valkyrienskies.core.apigame.constraints.VSConstraint;
-import org.valkyrienskies.core.apigame.world.ServerShipWorldCore;
-import org.valkyrienskies.core.apigame.world.ShipWorldCore;
-import org.valkyrienskies.core.impl.game.ShipTeleportDataImpl;
 import org.valkyrienskies.core.impl.game.ships.ShipDataCommon;
 import org.valkyrienskies.core.impl.game.ships.ShipTransformImpl;
 import org.valkyrienskies.core.impl.networking.simple.SimplePackets;
-import org.valkyrienskies.core.util.VSCoreUtilKt;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

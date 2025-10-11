@@ -5,6 +5,8 @@ import com.deltasf.createpropulsion.propeller.blades.PropellerBladeItem;
 import com.deltasf.createpropulsion.registries.PropulsionPartialModels;
 import com.deltasf.createpropulsion.registries.PropulsionRenderTypes;
 import com.jozufozu.flywheel.api.Instancer;
+import com.jozufozu.flywheel.api.Material;
+import com.jozufozu.flywheel.api.MaterialGroup;
 import com.jozufozu.flywheel.api.MaterialManager;
 import com.jozufozu.flywheel.api.instance.DynamicInstance;
 import com.jozufozu.flywheel.core.Materials;
@@ -47,11 +49,11 @@ public class PropellerRenderInstance extends KineticBlockEntityInstance<Propelle
         shaft = getRotatingMaterial().getModel(AllPartialModels.SHAFT_HALF, blockState, this.facing.getOpposite()).createInstance();
         setup(shaft);
 
-        var cutoutGroup = materialManager.defaultCutout();
-        var blurGroup = materialManager.transparent(PropulsionRenderTypes.PROPELLER_BLUR);
+        MaterialGroup cutoutGroup = materialManager.defaultCutout();
+        MaterialGroup blurGroup = materialManager.transparent(PropulsionRenderTypes.PROPELLER_BLUR);
 
-        var orientedMaterialCutout = cutoutGroup.material(Materials.ORIENTED);
-        var orientedMaterialBlur = blurGroup.material(Materials.ORIENTED);
+        Material<OrientedData> orientedMaterialCutout = cutoutGroup.material(Materials.ORIENTED);
+        Material<OrientedData> orientedMaterialBlur = blurGroup.material(Materials.ORIENTED);
 
         headInstancerCutout = orientedMaterialCutout.getModel(PropulsionPartialModels.PROPELLER_HEAD, blockState);
         headInstancerBlur = orientedMaterialBlur.getModel(PropulsionPartialModels.PROPELLER_HEAD, blockState);
@@ -65,11 +67,11 @@ public class PropellerRenderInstance extends KineticBlockEntityInstance<Propelle
 
         currentBladeModel = getBladeModel();
         if (currentBladeModel != null) {
-            var cutoutGroup = materialManager.defaultCutout();
-            var blurGroup = materialManager.transparent(PropulsionRenderTypes.PROPELLER_BLUR);
+            MaterialGroup cutoutGroup = materialManager.defaultCutout();
+            MaterialGroup blurGroup = materialManager.transparent(PropulsionRenderTypes.PROPELLER_BLUR);
             
-            var orientedMaterialCutout = cutoutGroup.material(Materials.ORIENTED);
-            var orientedMaterialBlur = blurGroup.material(Materials.ORIENTED);
+            Material<OrientedData> orientedMaterialCutout = cutoutGroup.material(Materials.ORIENTED);
+            Material<OrientedData> orientedMaterialBlur = blurGroup.material(Materials.ORIENTED);
 
             bladeInstancerCutout = orientedMaterialCutout.getModel(currentBladeModel, blockState);
             bladeInstancerBlur = orientedMaterialBlur.getModel(currentBladeModel, blockState);
@@ -84,6 +86,16 @@ public class PropellerRenderInstance extends KineticBlockEntityInstance<Propelle
             }
         }
         return null;
+    }
+
+    private boolean canBeBlurred() {
+        if (blockEntity.getBladeCount() > 0) {
+            ItemStack stack = blockEntity.bladeInventory.getStackInSlot(0);
+            if (!stack.isEmpty() && stack.getItem() instanceof PropellerBladeItem item) {
+                return item.canBeBlurred();
+            }
+        }
+        return true;
     }
 
     @Override
@@ -135,8 +147,9 @@ public class PropellerRenderInstance extends KineticBlockEntityInstance<Propelle
         double blurDeg = Math.toDegrees(blurRad);
 
         boolean shouldBlur = distSqr < Math.pow(PropulsionConfig.PROPELLER_LOD_DISTANCE.get(), 2) && blurDeg > PropellerRenderer.MIN_BLUR_DEG;
+        boolean canBeBlurred = canBeBlurred();
 
-        if (shouldBlur) {
+        if (canBeBlurred && shouldBlur) {
             renderBlurred(blurDeg);
         } else {
             renderSharp();

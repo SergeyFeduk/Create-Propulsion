@@ -28,11 +28,11 @@ public class PropellerAttachment implements ShipForcesInducer {
         });
     }
 
-    public void addApplier(BlockPos pos, PropellerForceApplier applier){
+    public void addApplier(BlockPos pos, PropellerForceApplier applier) {
         appliersMapping.put(pos, applier);
     }
 
-    public void removeApplier(ServerLevel level, BlockPos pos){
+    public void removeApplier(ServerLevel level, BlockPos pos) {
         appliersMapping.remove(pos);
         //Remove attachment by using passing null as attachment instance in order to clean up after ourselves
         if (appliersMapping.isEmpty()) {

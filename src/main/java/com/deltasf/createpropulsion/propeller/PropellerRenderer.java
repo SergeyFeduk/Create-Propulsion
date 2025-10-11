@@ -33,7 +33,7 @@ import net.minecraft.world.phys.Vec3;
 
 public class PropellerRenderer extends KineticBlockEntityRenderer<PropellerBlockEntity> {
     public static final float MIN_BLUR_DEG = 5.0f;
-    public static final float TARGET_OPACITY = 0.7f;
+    public static final float TARGET_OPACITY = 0.9f;
     public static final float HEAD_TARGET_OPACITY = 0.9f;
 
     public static final float ANIMATION_DURATION = 0.3f;
@@ -75,10 +75,12 @@ public class PropellerRenderer extends KineticBlockEntityRenderer<PropellerBlock
         //Get models
         SuperByteBuffer headModel = CachedBufferer.partial(PropulsionPartialModels.PROPELLER_HEAD, state);
         SuperByteBuffer bladeModel = null;
+        boolean canBeBlurred = true;
         if (be.getBladeCount() > 0) { 
             ItemStack bladeStack = be.bladeInventory.getStackInSlot(0);
             if (!bladeStack.isEmpty() && bladeStack.getItem() instanceof PropellerBladeItem bladeItem) {
                 PartialModel bladePartialModel = bladeItem.getModel();
+                canBeBlurred = bladeItem.canBeBlurred();
                 if (bladePartialModel != null) {
                     bladeModel = CachedBufferer.partial(bladePartialModel, state);
                 }
@@ -136,7 +138,7 @@ public class PropellerRenderer extends KineticBlockEntityRenderer<PropellerBlock
         double blurDeg = blurRad * (180.0 / Math.PI);
 
         boolean shouldBlur = distSqr < (PropulsionConfig.PROPELLER_LOD_DISTANCE.get() * PropulsionConfig.PROPELLER_LOD_DISTANCE.get()) && blurDeg > MIN_BLUR_DEG;
-        if (shouldBlur) {
+        if (canBeBlurred && shouldBlur) {
             int N = Math.min(PropulsionConfig.PROPELLER_BLUR_MAX_INSTANCES.get(), Math.max(2, (int)Math.ceil(blurDeg / PropulsionConfig.PROPELLER_BLUR_SAMPLE_RATE.get())));
             //float alpha = 1.0f / (float)N;
             float alpha = (float) (1.0 - Math.pow(1.0 - TARGET_OPACITY, 1.0 / N));

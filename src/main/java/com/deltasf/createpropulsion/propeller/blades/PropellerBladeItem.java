@@ -14,4 +14,6 @@ public abstract class PropellerBladeItem extends Item {
     public abstract float getGearRatio();
 
     public abstract PartialModel getModel();
+
+    public abstract boolean canBeBlurred();
 }
