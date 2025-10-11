@@ -3,7 +3,7 @@ package com.deltasf.createpropulsion.propeller.blades;
 import com.deltasf.createpropulsion.registries.PropulsionPartialModels;
 import com.jozufozu.flywheel.core.PartialModel;
 
-public class WoodenPropellerBladeItem extends PropellerBladeItem{
+public class WoodenPropellerBladeItem extends PropellerBladeItem {
     public WoodenPropellerBladeItem(Properties properties) {
         super(properties);
     }

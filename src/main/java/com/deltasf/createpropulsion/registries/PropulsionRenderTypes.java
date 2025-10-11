@@ -48,5 +48,4 @@ public class PropulsionRenderTypes extends RenderType {
             .setWriteMaskState(COLOR_WRITE)
             .createCompositeState(true)
     );
-
 }

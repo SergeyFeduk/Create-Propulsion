@@ -8,6 +8,7 @@ import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.propeller.blades.PropellerBladeItem;
 import com.deltasf.createpropulsion.registries.PropulsionPartialModels;
 import com.deltasf.createpropulsion.registries.PropulsionRenderTypes;
+import com.jozufozu.flywheel.backend.Backend;
 import com.jozufozu.flywheel.core.PartialModel;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -31,15 +32,14 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 public class PropellerRenderer extends KineticBlockEntityRenderer<PropellerBlockEntity> {
-    //TODO: Make configurable
-    private static final float MIN_BLUR_DEG = 5.0f;
-    private static final float TARGET_OPACITY = 0.65f;
-    private static final float HEAD_TARGET_OPACITY = 0.9f;
+    public static final float MIN_BLUR_DEG = 5.0f;
+    public static final float TARGET_OPACITY = 0.7f;
+    public static final float HEAD_TARGET_OPACITY = 0.9f;
 
-    private static final float ANIMATION_DURATION = 0.3f;
-    private static final float RPM_MAX_ACCELERATION = 500.0f;
-    private static final float RPM_MIN_ACCELERATION = 3.0f;
-    private static final float SMOOTHING_FACTOR = 2.0f;
+    public static final float ANIMATION_DURATION = 0.3f;
+    public static final float RPM_MAX_ACCELERATION = 500.0f;
+    public static final float RPM_MIN_ACCELERATION = 3.0f;
+    public static final float SMOOTHING_FACTOR = 2.0f;
 
     public PropellerRenderer(BlockEntityRendererProvider.Context context) {
         super(context);
@@ -48,8 +48,9 @@ public class PropellerRenderer extends KineticBlockEntityRenderer<PropellerBlock
     @SuppressWarnings("null")
     @Override
 	protected void renderSafe(PropellerBlockEntity be, float partialTicks, PoseStack ms, MultiBufferSource buffer, int light, int overlay) {
-        Direction direction = be.getBlockState()
-				.getValue(PropellerBlock.FACING);
+        if (Backend.canUseInstancing(be.getLevel())) return;
+
+        Direction direction = be.getBlockState().getValue(PropellerBlock.FACING);
 		VertexConsumer vb = buffer.getBuffer(RenderType.cutoutMipped());
 
         int lightBehind = LevelRenderer.getLightColor(be.getLevel(), be.getBlockPos().relative(direction.getOpposite()));
