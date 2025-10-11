@@ -6,6 +6,10 @@
         "createpropulsion:optical_sensor",
         "createpropulsion:lodestone_tracker",
         "createpropulsion:redstone_magnet",
-        "createpropulsion:physics_assembler"
+        "createpropulsion:physics_assembler",
+        "createpropulsion:propeller",
+        "createpropulsion:solid_burner",
+        "createpropulsion:reaction_wheel",
+        "createpropulsion:stirling_engine"
     ]
 }

@@ -149,7 +149,7 @@ public class BalloonAttachment implements ShipForcesInducer {
 
             //Calculate force magnitude
             double externalDensity = AtmoshpereHelper.calculateExternalAirDensity(atmosphereData, tmpWorldPos.y, true);
-            double forceMagnitude = chunk.blockCount * externalDensity * atmosphereData.gravity() * PropulsionConfig.BALLOON_K_COEFFICIENT.get() * fullness;
+            double forceMagnitude = chunk.blockCount * externalDensity * atmosphereData.gravity() * fullness;
             forceMagnitude = Math.max(0, forceMagnitude * PropulsionConfig.BALLOON_FORCE_COEFFICIENT.get());
             //Calculate force vector
             tmpForce.set(upWorld).mul(forceMagnitude);

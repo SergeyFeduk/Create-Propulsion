@@ -1,6 +1,8 @@
 {
     "replace": false,
     "values": [
-        "createpropulsion:lodestone_tracker"
+        "createpropulsion:lodestone_tracker",
+        "createpropulsion:propeller",
+        "createpropulsion:reaction_wheel"
     ]
 }

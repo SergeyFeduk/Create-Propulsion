@@ -74,6 +74,10 @@ public class PropulsionBlocks {
         .register();
     
     public static final BlockEntry<EnvelopeBlock> ENVELOPE_BLOCK = REGISTRATE.block("envelope", EnvelopeBlock::new)
+        .properties(p -> p.mapColor(MapColor.SNOW))
+        .properties(p -> p.strength(0.5F))
+        .properties(p -> p.sound(SoundType.WOOL))
+        .properties(p -> p.ignitedByLava())
         .simpleItem()
         .register();
     
@@ -92,6 +96,10 @@ public class PropulsionBlocks {
 
     public static final BlockEntry<PropellerBlock> PROPELLER_BLOCK = REGISTRATE.block("propeller", PropellerBlock::new)
         .properties(p -> p.noOcclusion())
+        .properties(p -> p.mapColor(MapColor.WOOD))
+        .properties(p -> p.sound(SoundType.WOOD))
+        .properties(p -> p.requiresCorrectToolForDrops())
+        .properties(p -> p.strength(1.5F, 1.0F))
         .transform(BlockStressDefaults.setImpact(8.0))
         .simpleItem()
         .register();

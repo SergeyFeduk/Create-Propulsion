@@ -33,5 +33,15 @@
         "block": "createpropulsion:envelope",
         "mass": 10.0,
         "friction": 0.2
+    },
+    {
+        "block": "createpropulsion:solid_burner",
+        "mass": 1200.0,
+        "friction": 0.2
+    },
+    {
+        "block": "createpropulsion:propeller",
+        "mass": 300.0,
+        "friction": 0.2
     }
 ]

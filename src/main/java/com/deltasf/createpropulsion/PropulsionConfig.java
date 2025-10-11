@@ -27,7 +27,6 @@ public class PropulsionConfig {
     public static final ForgeConfigSpec.ConfigValue<Integer> PHYSICS_ASSEMBLER_MAX_MINK_DISTANCE;
     //Balloons
     public static final ForgeConfigSpec.ConfigValue<Double> BALLOON_FORCE_COEFFICIENT;
-    public static final ForgeConfigSpec.ConfigValue<Double> BALLOON_K_COEFFICIENT;
     public static final ForgeConfigSpec.ConfigValue<Double> BALLOON_ANGULAR_DAMPING;
     public static final ForgeConfigSpec.ConfigValue<Double> BALLOON_ALIGNMENT_KP;
     public static final ForgeConfigSpec.ConfigValue<Double> BALLOON_VERTICAL_DRAG_COEFFICIENT;
@@ -78,28 +77,29 @@ public class PropulsionConfig {
         SERVER_BUILDER.pop();
 
         SERVER_BUILDER.push("Hot air balloons");
-            BALLOON_FORCE_COEFFICIENT = SERVER_BUILDER.comment("BALLOON_FORCE_COEFFICIENT.")
-                .define("BALLOON_FORCE_COEFFICIENT", 1250.0);
-            BALLOON_K_COEFFICIENT = SERVER_BUILDER.comment("BALLOON_K_COEFFICIENT.")
-                .define("BALLOON_K_COEFFICIENT", 0.3);
-            BALLOON_ANGULAR_DAMPING = SERVER_BUILDER.comment("BALLOON_ANGULAR_DAMPING.")
-                .define("BALLOON_ANGULAR_DAMPING", 1.2);
-            BALLOON_ALIGNMENT_KP = SERVER_BUILDER.comment("BALLOON_ALIGNMENT_KP.")
-                .define("BALLOON_ALIGNMENT_KP", 12.5);
-            BALLOON_VERTICAL_DRAG_COEFFICIENT = SERVER_BUILDER.comment("BALLOON_VERTICAL_DRAG_COEFFICIENT.")
-                .define("BALLOON_VERTICAL_DRAG_COEFFICIENT", 100.0);
-            BALLOON_HORIZONTAL_DRAG_COEFFICIENT = SERVER_BUILDER.comment("BALLOON_HORIZONTAL_DRAG_COEFFICIENT.")
-                .define("BALLOON_HORIZONTAL_DRAG_COEFFICIENT", 80.0);
-
-            BALLOON_SURFACE_LEAK_FACTOR = SERVER_BUILDER.comment("BALLOON_SURFACE_LEAK_FACTOR.")
-                .define("BALLOON_SURFACE_LEAK_FACTOR", 1e-2);
-            BALLOON_HOLE_LEAK_FACTOR = SERVER_BUILDER.comment("BALLOON_HOLE_LEAK_FACTOR.")
-                .define("BALLOON_HOLE_LEAK_FACTOR", 0.2);
+            
+            SERVER_BUILDER.push("Drag");
+                BALLOON_ANGULAR_DAMPING = SERVER_BUILDER.comment("Angular damping torque is multiplied by this. Higher values slow down rotation of ships with balloons more.")
+                    .define("Angular damping", 1.2);
+                BALLOON_ALIGNMENT_KP = SERVER_BUILDER.comment("Vertical angular alignment torque is multiplied by this.")
+                    .define("Vertical angular alignment", 10.0);
+                BALLOON_VERTICAL_DRAG_COEFFICIENT = SERVER_BUILDER.comment("Vertical linear drag.")
+                    .define("Vertical linear drag", 100.0);
+                BALLOON_HORIZONTAL_DRAG_COEFFICIENT = SERVER_BUILDER.comment("Horizontal linear drag.")
+                    .define("Horizontal linear drag", 80.0);
+            SERVER_BUILDER.pop();
+        
+            BALLOON_FORCE_COEFFICIENT = SERVER_BUILDER.comment("Balloon's buoyant force is multiplied by that.")
+                .define("Balloon force multiplier", 375.0);
+            BALLOON_SURFACE_LEAK_FACTOR = SERVER_BUILDER.comment("The higher this values is - the more hot air leaks out naturally.")
+                .define("Surface leak factor", 1e-2);
+            BALLOON_HOLE_LEAK_FACTOR = SERVER_BUILDER.comment("The higher this values is - the more hot air leaks out of holes in balloon.")
+                .define("Hole leak factor", 0.2);
         SERVER_BUILDER.pop();
 
         SERVER_BUILDER.push("Propeller");
-            PROPELLER_MAX_SPEED = SERVER_BUILDER.comment("PROPELLER_MAX_SPEED")
-                .defineInRange("PROPELLER_MAX_SPEED", 40.0, 10.0, 100.0);
+            PROPELLER_MAX_SPEED = SERVER_BUILDER.comment("Propellers stop accelerating ships upon reaching this speed. Defined in blocks per second")
+                .defineInRange("Max speed", 40.0, 10.0, 100.0);
         SERVER_BUILDER.pop();
 
         SERVER_SPEC = SERVER_BUILDER.build();
@@ -113,14 +113,14 @@ public class PropulsionConfig {
                     .define("Particle count multiplier", 1.0);
         CLIENT_BUILDER.pop();
         CLIENT_BUILDER.push("Propeller");
-            PROPELLER_BLUR_MAX_INSTANCES = CLIENT_BUILDER.comment("PROPELLER_BLUR_MAX_INSTANCES")
-                .define("PROPELLER_BLUR_MAX_INSTANCES", 64); //Set to 32
-            PROPELLER_BLUR_SAMPLE_RATE = CLIENT_BUILDER.comment("PROPELLER_BLUR_SAMPLE_RATE")
-                .define("PROPELLER_BLUR_SAMPLE_RATE", 2.0); //Set to 3
-            PROPELLER_LOD_DISTANCE = CLIENT_BUILDER.comment("PROPELLER_LOD_DISTANCE")
-                .define("PROPELLER_LOD_DISTANCE", 64.0);
-            PROPELLER_EXPOSURE_TIME = CLIENT_BUILDER.comment("PROPELLER_EXPOSURE_TIME")
-                .define("PROPELLER_EXPOSURE_TIME", 1.0/120.0);
+            PROPELLER_BLUR_MAX_INSTANCES = CLIENT_BUILDER.comment("Maximum amount of blurred models rendered. Decrease this value if your fps drops when near a lot of propellers.")
+                .define("Max blur instances", 64); //Set to 32
+            PROPELLER_BLUR_SAMPLE_RATE = CLIENT_BUILDER.comment("How slow propeller blades start to become blurry")
+                .define("Sample rate", 2.0); //Set to 3
+            PROPELLER_LOD_DISTANCE = CLIENT_BUILDER.comment("Distance at which propllers no longer blur")
+                .define("LOD", 64.0);
+            PROPELLER_EXPOSURE_TIME = CLIENT_BUILDER.comment("Simulated exposure time. Set to 1/120 by default")
+                .define("Exposure time", 1.0/120.0);
         CLIENT_BUILDER.pop();
         CLIENT_SPEC = CLIENT_BUILDER.build();
         //#endregion
