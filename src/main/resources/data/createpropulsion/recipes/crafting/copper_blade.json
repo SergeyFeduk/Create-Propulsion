@@ -1,0 +1,19 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "CC ",
+        " C ",
+        " I "
+    ],
+    "key": {
+        "C": {
+            "item": "create:copper_sheet"
+        },
+        "I": {
+            "item": "create:iron_sheet"
+        }
+    },
+    "result": {
+        "item": "createpropulsion:copper_blade"
+    }
+}

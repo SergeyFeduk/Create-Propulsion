@@ -1,0 +1,19 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " P ",
+        " P ",
+        " I "
+    ],
+    "key": {
+        "P": {
+            "tag": "minecraft:planks"
+        },
+        "I": {
+            "item": "create:iron_sheet"
+        }
+    },
+    "result": {
+        "item": "createpropulsion:wooden_blade"
+    }
+}

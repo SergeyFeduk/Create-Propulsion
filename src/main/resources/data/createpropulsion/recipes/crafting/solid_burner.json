@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "CCC",
+        " BT",
+        "   "
+    ],
+    "key": {
+        "C": {
+            "item": "create:copper_sheet"
+        },
+        "B": {
+            "item": "minecraft:blast_furnace"
+        },
+        "T": {
+            "item": "minecraft:redstone_torch"
+        }
+    },
+    "result": {
+        "item": "createpropulsion:solid_burner"
+    }
+}
