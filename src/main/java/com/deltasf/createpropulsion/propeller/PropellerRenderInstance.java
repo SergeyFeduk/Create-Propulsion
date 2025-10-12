@@ -138,7 +138,7 @@ public class PropellerRenderInstance extends KineticBlockEntityInstance<Propelle
         Vec3 blockPosWorld = VSGameUtilsKt.isBlockInShipyard(this.blockEntity.getLevel(), pos) ? VSGameUtilsKt.toWorldCoordinates(this.blockEntity.getLevel(), localPos) : localPos;
         double distSqr = camera.getPosition().distanceToSqr(blockPosWorld);
 
-        double blurRad = Math.PI * blockEntity.visualRPM / 30 * PropulsionConfig.PROPELLER_EXPOSURE_TIME.get();
+        double blurRad = Math.PI * Math.abs(blockEntity.visualRPM) / 30 * PropulsionConfig.PROPELLER_EXPOSURE_TIME.get();
         double blurDeg = Math.toDegrees(blurRad);
 
         boolean shouldBlur = distSqr < Math.pow(PropulsionConfig.PROPELLER_LOD_DISTANCE.get(), 2) && blurDeg > PropellerRenderer.MIN_BLUR_DEG;

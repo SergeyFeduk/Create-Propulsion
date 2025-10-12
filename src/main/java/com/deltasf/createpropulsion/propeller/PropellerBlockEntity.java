@@ -106,12 +106,12 @@ public class PropellerBlockEntity extends KineticBlockEntity {
         }
         //No blades - head rotates
         if (bladeCount == 0) {
-            return Math.abs(getSpeed()) * 8.0f;
+            return getSpeed() * 8.0f;
         }
 
         ItemStack bladeStack = bladeInventory.getStackInSlot(0);
         if (!bladeStack.isEmpty() && bladeStack.getItem() instanceof PropellerBladeItem bladeItem) {
-            return Math.abs(getSpeed()) * bladeItem.getGearRatio();
+            return getSpeed() * bladeItem.getGearRatio();
         }
         return 0f;
     }
