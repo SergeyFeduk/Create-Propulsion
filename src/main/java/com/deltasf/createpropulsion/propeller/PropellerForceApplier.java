@@ -50,7 +50,7 @@ public class PropellerForceApplier {
         double externalAirDensity = AtmoshpereHelper.calculateExternalAirDensity(atmosphere, worldPos.y, true);
 
         transform.getShipToWorld().transformDirection(data.getDirection(), worldForceDirection);
-        worldForceDirection.normalize();
+        worldForceDirection.normalize().mul(data.getInvertDirection() ? -1.0 : 1.0);
         worldForce.set(worldForceDirection).mul(thrust).mul(externalAirDensity);
         final Vector3dc linearVelocity = ship.getPoseVel().getVel();
         if (linearVelocity.lengthSquared() >= maxSpeed * maxSpeed) {

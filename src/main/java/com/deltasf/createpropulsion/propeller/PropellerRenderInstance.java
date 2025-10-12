@@ -20,15 +20,17 @@ import com.simibubi.create.foundation.utility.AngleHelper;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
 import net.minecraft.util.Mth;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
 public class PropellerRenderInstance extends KineticBlockEntityInstance<PropellerBlockEntity> implements DynamicInstance {
     protected final Direction facing;
@@ -40,7 +42,8 @@ public class PropellerRenderInstance extends KineticBlockEntityInstance<Propelle
     protected Instancer<OrientedData> headInstancerBlur;
     protected Instancer<OrientedData> bladeInstancerBlur;
 
-     private final List<OrientedData> transientInstances = new ArrayList<>();
+    private final List<OrientedData> transientInstances = new ArrayList<>();
+    private final Vector3f pivot = new Vector3f(PropellerRenderer.pivotX,PropellerRenderer.pivotY,PropellerRenderer.pivotZ);
 
     public PropellerRenderInstance(MaterialManager materialManager, PropellerBlockEntity blockEntity) {
         super(materialManager, blockEntity);
@@ -79,23 +82,15 @@ public class PropellerRenderInstance extends KineticBlockEntityInstance<Propelle
     }
 
     private PartialModel getBladeModel() {
-        if (blockEntity.getBladeCount() > 0) {
-            ItemStack stack = blockEntity.bladeInventory.getStackInSlot(0);
-            if (!stack.isEmpty() && stack.getItem() instanceof PropellerBladeItem item) {
-                return item.getModel();
-            }
-        }
-        return null;
+        return blockEntity.getBlade()
+            .map(PropellerBladeItem::getModel)
+            .orElse(null);
     }
 
     private boolean canBeBlurred() {
-        if (blockEntity.getBladeCount() > 0) {
-            ItemStack stack = blockEntity.bladeInventory.getStackInSlot(0);
-            if (!stack.isEmpty() && stack.getItem() instanceof PropellerBladeItem item) {
-                return item.canBeBlurred();
-            }
-        }
-        return true;
+        return blockEntity.getBlade()
+                .map(PropellerBladeItem::canBeBlurred)
+                .orElse(true);
     }
 
     @Override
@@ -165,13 +160,13 @@ public class PropellerRenderInstance extends KineticBlockEntityInstance<Propelle
 
     private void renderSharp() {
         OrientedData headData = headInstancerCutout.createInstance();
-        transformInstance(headData, blockEntity.visualAngle, (byte) 255);
+        transformHeadInstance(headData, blockEntity.visualAngle, (byte) 255);
         transientInstances.add(headData); 
 
         if (bladeInstancerCutout != null) {
             for (Float placementAngle : blockEntity.renderedBladeAngles) {
                 OrientedData bladeData = bladeInstancerCutout.createInstance();
-                transformInstance(bladeData, blockEntity.visualAngle + placementAngle, (byte) 255);
+                transformBladeInstance(bladeData, blockEntity.visualAngle + placementAngle, (byte) 255);
                 transientInstances.add(bladeData); 
             }
         }
@@ -194,24 +189,46 @@ public class PropellerRenderInstance extends KineticBlockEntityInstance<Propelle
         for (int i = 0; i < N; i++) {
             float rotationalOffset = -i * angleStep;
             OrientedData headData = headInstancerBlur.createInstance();
-            transformInstance(headData, rotationalOffset + stroboscopicAngle, (byte) headAlphaInt);
+            transformHeadInstance(headData, rotationalOffset + stroboscopicAngle, (byte) headAlphaInt);
             transientInstances.add(headData); 
 
             if (bladeInstancerBlur != null) {
                 for (Float placementAngle : blockEntity.renderedBladeAngles) {
                     OrientedData bladeData = bladeInstancerBlur.createInstance();
-                    transformInstance(bladeData, rotationalOffset + stroboscopicAngle + placementAngle, (byte) alphaInt);
+                    transformBladeInstance(bladeData, rotationalOffset + stroboscopicAngle + placementAngle, (byte) alphaInt);
                     transientInstances.add(bladeData); 
                 }
             }
         }
     }
 
-    private void transformInstance(OrientedData instanceData, float totalAngle, byte alpha) {
+    private void transformHeadInstance(OrientedData instanceData, float totalAngle, byte alpha) {
         Quaternionf rotation = getRotation(totalAngle);
         
         instanceData.setPosition(getInstancePosition())
                 .setRotation(rotation)
+                .setColor((byte) 255, (byte) 255, (byte) 255, alpha);
+
+        relight(pos, instanceData);
+    }
+
+    private void transformBladeInstance(OrientedData instanceData, float totalAngle, byte alpha) {
+        double bladeAngle = PropulsionConfig.PROPELLER_BLADE_ANGLE.get();
+        float pitchAngle = (float)bladeAngle * (blockEntity.isClockwise ? 1.0f : -1.0f);
+        
+        Quaternionf rotation = getRotation(totalAngle);
+        Quaternionf rPitch = Axis.YP.rotationDegrees(pitchAngle);
+        Quaternionf rFinal = new Quaternionf(rotation).mul(rPitch);
+
+        Vector3f pivotRotated = new Vector3f(pivot).rotate(rPitch);
+        Vector3f localOffset = new Vector3f(pivot).sub(pivotRotated);
+        Vector3f worldOffset = localOffset.rotate(rotation);
+
+        Vector3f instancePos = VectorConversionsMCKt.toJOMLF((Vec3i)getInstancePosition());
+        Vector3f finalPos = new Vector3f(instancePos.x, instancePos.y, instancePos.z).add(worldOffset);
+        
+        instanceData.setPosition(finalPos)
+                .setRotation(rFinal)
                 .setColor((byte) 255, (byte) 255, (byte) 255, alpha);
 
         relight(pos, instanceData);

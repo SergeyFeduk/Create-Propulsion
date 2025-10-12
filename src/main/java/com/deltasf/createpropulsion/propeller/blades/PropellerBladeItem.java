@@ -16,4 +16,11 @@ public abstract class PropellerBladeItem extends Item {
     public abstract PartialModel getModel();
 
     public abstract boolean canBeBlurred();
+
+    /**
+     * Set this to true if by default blade implementation should PULL. If false - blade will FUSH
+     **/
+    public boolean isBladeInverted() {
+        return false;
+    }
 }

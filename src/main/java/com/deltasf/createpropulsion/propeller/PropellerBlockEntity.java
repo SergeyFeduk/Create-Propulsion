@@ -2,6 +2,7 @@ package com.deltasf.createpropulsion.propeller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 
@@ -38,6 +39,8 @@ public class PropellerBlockEntity extends KineticBlockEntity {
     private LazyOptional<IItemHandler> itemHandler;
 
     public List<Float> targetBladeAngles = new ArrayList<>();
+    protected boolean isClockwise = true;
+
     //Client-side animation state
     @OnlyIn(Dist.CLIENT)
     public List<Float> prevBladeAngles;
@@ -121,6 +124,12 @@ public class PropellerBlockEntity extends KineticBlockEntity {
         }
 
         float speed = Math.abs(getSpeed());
+        Optional<PropellerBladeItem> blade = getBlade();
+        if (!blade.isPresent()) {
+            propellerData.setThrust(0);
+            return;
+        }
+        boolean invertDirection = (getSpeed() < 0) ^ isClockwise;
         float thrust = 0;
 
         if (speed > 0) {
@@ -130,6 +139,7 @@ public class PropellerBlockEntity extends KineticBlockEntity {
         }
 
         propellerData.setThrust(thrust);
+        propellerData.setInvertDirection(invertDirection);
     }
 
     // Blades
@@ -142,6 +152,22 @@ public class PropellerBlockEntity extends KineticBlockEntity {
             }
         }
         return count;
+    }
+
+    public Optional<PropellerBladeItem> getBlade() {
+        ItemStack bladeStack = bladeInventory.getStackInSlot(0);
+        if (!bladeStack.isEmpty() && bladeStack.getItem() instanceof PropellerBladeItem bladeItem) {
+            return Optional.of(bladeItem);
+        }
+        return Optional.empty();
+    }
+
+    public void flipBladeDirection() {
+        if (getBladeCount() > 0) {
+            this.isClockwise = !this.isClockwise;
+            setChanged();
+            sendData();
+        }
     }
 
     public boolean addBlade(ItemStack bladeStack, Vec3 localHit) {
@@ -162,6 +188,10 @@ public class PropellerBlockEntity extends KineticBlockEntity {
 
         if (!firstBlade.isEmpty() && !firstBlade.is(bladeItem))
             return false;
+
+        if (currentBlades == 0) {
+            isClockwise = bladeItem.isBladeInverted();
+        }
 
         for (int i = 0; i < bladeInventory.getSlots(); i++) {
             if (bladeInventory.getStackInSlot(i).isEmpty()) {
@@ -186,6 +216,10 @@ public class PropellerBlockEntity extends KineticBlockEntity {
             if (!stackInSlot.isEmpty()) {
                 ItemStack removedBlade = stackInSlot.copy();
                 bladeInventory.setStackInSlot(i, ItemStack.EMPTY);
+
+                if (getBladeCount() == 0) {
+                    this.isClockwise = true;
+                }
                 //Animate removal
                 updateTargetAngles(null);
                 sendData();
@@ -225,7 +259,8 @@ public class PropellerBlockEntity extends KineticBlockEntity {
     @Override
     public void write(CompoundTag compound, boolean clientPacket) {
         super.write(compound, clientPacket);
-        compound.put("Blades", bladeInventory.serializeNBT());
+        compound.put("blades", bladeInventory.serializeNBT());
+        compound.putBoolean("isClockwise", isClockwise);
 
         ListTag angleNBT = new ListTag();
         for (Float angle : targetBladeAngles) {
@@ -238,7 +273,8 @@ public class PropellerBlockEntity extends KineticBlockEntity {
     @Override
     public void read(CompoundTag compound, boolean clientPacket) {
         super.read(compound, clientPacket);
-        bladeInventory.deserializeNBT(compound.getCompound("Blades"));
+        bladeInventory.deserializeNBT(compound.getCompound("blades"));
+        isClockwise = compound.contains("isClockwise") ? compound.getBoolean("isClockwise") : true;
 
         ListTag angleNBT = compound.getList("TargetAngles", 5);
         List<Float> newTargetAngles = new ArrayList<>();

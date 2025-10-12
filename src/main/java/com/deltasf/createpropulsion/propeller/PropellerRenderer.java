@@ -5,7 +5,6 @@ import java.util.List;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import com.deltasf.createpropulsion.PropulsionConfig;
-import com.deltasf.createpropulsion.propeller.blades.PropellerBladeItem;
 import com.deltasf.createpropulsion.registries.PropulsionPartialModels;
 import com.deltasf.createpropulsion.registries.PropulsionRenderTypes;
 import com.jozufozu.flywheel.backend.Backend;
@@ -27,7 +26,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
@@ -40,6 +38,11 @@ public class PropellerRenderer extends KineticBlockEntityRenderer<PropellerBlock
     public static final float RPM_MAX_ACCELERATION = 500.0f;
     public static final float RPM_MIN_ACCELERATION = 3.0f;
     public static final float SMOOTHING_FACTOR = 2.0f;
+
+    //Model pivot
+    public static final float pivotX = 0.0f;
+    public static final float pivotY = 0.3125f;
+    public static final float pivotZ = -0.25f;
 
     public PropellerRenderer(BlockEntityRendererProvider.Context context) {
         super(context);
@@ -74,19 +77,16 @@ public class PropellerRenderer extends KineticBlockEntityRenderer<PropellerBlock
 
         //Get models
         SuperByteBuffer headModel = CachedBufferer.partial(PropulsionPartialModels.PROPELLER_HEAD, state);
-        SuperByteBuffer bladeModel = null;
-        boolean canBeBlurred = true;
-        if (be.getBladeCount() > 0) { 
-            ItemStack bladeStack = be.bladeInventory.getStackInSlot(0);
-            if (!bladeStack.isEmpty() && bladeStack.getItem() instanceof PropellerBladeItem bladeItem) {
-                PartialModel bladePartialModel = bladeItem.getModel();
-                canBeBlurred = bladeItem.canBeBlurred();
-                if (bladePartialModel != null) {
-                    bladeModel = CachedBufferer.partial(bladePartialModel, state);
-                }
-            }
-        }
+        final SuperByteBuffer[] bladeModel = { null };
+        final boolean[] canBeBlurred = { true };
 
+        be.getBlade().ifPresent(bladeItem -> {
+            canBeBlurred[0] = bladeItem.canBeBlurred();
+            PartialModel bladePartialModel = bladeItem.getModel();
+            if (bladePartialModel != null) {
+                bladeModel[0] = CachedBufferer.partial(bladePartialModel, state);
+            }
+        });
 
         long timeNow = System.nanoTime();
         if (be.lastRenderTimeNanos == 0) { // First frame
@@ -138,7 +138,7 @@ public class PropellerRenderer extends KineticBlockEntityRenderer<PropellerBlock
         double blurDeg = blurRad * (180.0 / Math.PI);
 
         boolean shouldBlur = distSqr < (PropulsionConfig.PROPELLER_LOD_DISTANCE.get() * PropulsionConfig.PROPELLER_LOD_DISTANCE.get()) && blurDeg > MIN_BLUR_DEG;
-        if (canBeBlurred && shouldBlur) {
+        if (canBeBlurred[0] && shouldBlur) {
             int N = Math.min(PropulsionConfig.PROPELLER_BLUR_MAX_INSTANCES.get(), Math.max(2, (int)Math.ceil(blurDeg / PropulsionConfig.PROPELLER_BLUR_SAMPLE_RATE.get())));
             //float alpha = 1.0f / (float)N;
             float alpha = (float) (1.0 - Math.pow(1.0 - TARGET_OPACITY, 1.0 / N));
@@ -159,12 +159,12 @@ public class PropellerRenderer extends KineticBlockEntityRenderer<PropellerBlock
             for (int i = 0; i < N; i++) {
                 float rotationalAngle = stroboscopicAngle - (i * angleStep);
                 renderHead(ms, translucentVB, light, overlay, headModel, direction, rotationalAngle, headAlphaInt);
-                renderBlades(ms, translucentVB, light, overlay, bladeModel, direction, rotationalAngle, be.renderedBladeAngles, alphaInt);
+                renderBlades(be, ms, translucentVB, light, overlay, bladeModel[0], direction, rotationalAngle, be.renderedBladeAngles, alphaInt);
             }
         } else {
             VertexConsumer cutoutVB = buffer.getBuffer(RenderType.cutoutMipped());
             renderHead(ms, cutoutVB, light, overlay, headModel, direction, be.visualAngle, 255);
-            renderBlades(ms, cutoutVB, light, overlay, bladeModel, direction, be.visualAngle, be.renderedBladeAngles, 255);
+            renderBlades(be, ms, cutoutVB, light, overlay, bladeModel[0], direction, be.visualAngle, be.renderedBladeAngles, 255);
         }
     }
 
@@ -179,8 +179,11 @@ public class PropellerRenderer extends KineticBlockEntityRenderer<PropellerBlock
         ms.popPose();
     }
 
-    private void renderBlades(PoseStack ms, VertexConsumer vb, int light, int overlay, SuperByteBuffer bladeModel, Direction direction, float kineticAngle, List<Float> placementAngles, int alpha) {
+    private void renderBlades(PropellerBlockEntity be, PoseStack ms, VertexConsumer vb, int light, int overlay, SuperByteBuffer bladeModel, Direction direction, float kineticAngle, List<Float> placementAngles, int alpha) {
         if (placementAngles.isEmpty() || bladeModel == null) return;
+        
+        double bladeAngle = PropulsionConfig.PROPELLER_BLADE_ANGLE.get();
+        float pitchAngle = (float)bladeAngle * (be.isClockwise ? 1.0f : -1.0f);
 
         for (float currentAngle : placementAngles) {
             ms.pushPose();
@@ -189,6 +192,15 @@ public class PropellerRenderer extends KineticBlockEntityRenderer<PropellerBlock
             ms.mulPose(Axis.XP.rotationDegrees(90));
             ms.mulPose(Axis.ZP.rotationDegrees(kineticAngle));
             ms.mulPose(Axis.ZP.rotationDegrees(currentAngle));
+
+            ms.translate(pivotX, pivotY, pivotZ);
+            // 2. Rotate around the Y-axis (which is now at the pivot).
+            ms.mulPose(Axis.YP.rotationDegrees(pitchAngle));
+            // 3. Translate back.
+            ms.translate(-pivotX, -pivotY, -pivotZ);
+
+
+
             ms.translate(-0.5, -0.5, -0.5);
             bladeModel.light(light).overlay(overlay).color(255, 255, 255, alpha).renderInto(ms, vb);
             ms.popPose();

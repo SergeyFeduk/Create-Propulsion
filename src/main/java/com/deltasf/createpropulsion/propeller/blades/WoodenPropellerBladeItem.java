@@ -25,4 +25,7 @@ public class WoodenPropellerBladeItem extends PropellerBladeItem {
 
     @Override
     public boolean canBeBlurred() { return true; }
+
+    @Override
+    public boolean isBladeInverted() { return true; }
 }

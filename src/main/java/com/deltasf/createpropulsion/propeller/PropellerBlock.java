@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 import com.deltasf.createpropulsion.propeller.blades.PropellerBladeItem;
 import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
 import com.deltasf.createpropulsion.registries.PropulsionShapes;
+import com.simibubi.create.AllSoundEvents;
 import com.simibubi.create.content.kinetics.base.DirectionalKineticBlock;
 import com.simibubi.create.foundation.block.IBE;
 
@@ -93,11 +94,20 @@ public class PropellerBlock extends DirectionalKineticBlock implements IBE<Prope
                 return InteractionResult.SUCCESS;
             }
         } else if (heldItem.isEmpty() && hand == InteractionHand.MAIN_HAND) {
-            ItemStack removedBlade = propellerBE.removeBlade();
-            if (!removedBlade.isEmpty()) {
-                player.getInventory().placeItemBackInInventory(removedBlade);
-                level.playSound(null, pos, SoundEvents.ARMOR_EQUIP_IRON, SoundSource.BLOCKS, 1.0f, 1.0f);
-                return InteractionResult.SUCCESS;
+
+            if (player.isShiftKeyDown()) {
+                if (propellerBE.getBladeCount() > 0) {
+                    propellerBE.flipBladeDirection();
+                    AllSoundEvents.WRENCH_ROTATE.playOnServer(level, pos, 1, level.random.nextFloat() * .5f + .5f);
+                    return InteractionResult.SUCCESS;
+                }
+            } else {
+                ItemStack removedBlade = propellerBE.removeBlade();
+                if (!removedBlade.isEmpty()) {
+                    player.getInventory().placeItemBackInInventory(removedBlade);
+                    level.playSound(null, pos, SoundEvents.ARMOR_EQUIP_IRON, SoundSource.BLOCKS, 1.0f, 1.0f);
+                    return InteractionResult.SUCCESS;
+                }
             }
         }
 

@@ -39,6 +39,7 @@ public class PropulsionConfig {
     public static final ForgeConfigSpec.ConfigValue<Double> PROPELLER_BLUR_SAMPLE_RATE;
     public static final ForgeConfigSpec.ConfigValue<Double> PROPELLER_LOD_DISTANCE;
     public static final ForgeConfigSpec.ConfigValue<Double> PROPELLER_EXPOSURE_TIME;
+    public static final ForgeConfigSpec.ConfigValue<Double> PROPELLER_BLADE_ANGLE;
 
     static {
         //#region Server
@@ -121,6 +122,8 @@ public class PropulsionConfig {
                 .define("LOD", 64.0);
             PROPELLER_EXPOSURE_TIME = CLIENT_BUILDER.comment("Simulated exposure time. Set to 1/120 by default")
                 .define("Exposure time", 1.0/120.0);
+            PROPELLER_BLADE_ANGLE = CLIENT_BUILDER.comment("Angle of the propeller's blade, in degrees")
+                .define("Blade angle", 10.0);
         CLIENT_BUILDER.pop();
         CLIENT_SPEC = CLIENT_BUILDER.build();
         //#endregion
