@@ -141,6 +141,8 @@ dependencies {
     implementation("org.valkyrienskies.core:api-game:${vs_core_version}")
     implementation("org.valkyrienskies.core:util:${vs_core_version}")
     implementation(fg.deobf("org.valkyrienskies:valkyrienskies-120-forge:${vs2_version}"))
+    //VMod
+    //TODO: compileOnly & use tis for magnet compat https://github.com/SuperSpaceEye/Valkyrien-Ship-Schematics/blob/master/common/src/main/kotlin/net/spaceeye/valkyrien_ship_schematics/interfaces/ICopyableBlock.kt
     //Mixin^2
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
     /*
