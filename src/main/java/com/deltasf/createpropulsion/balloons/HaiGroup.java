@@ -67,7 +67,7 @@ public class HaiGroup {
     public void tickBalloons(Level level, BalloonRegistry registry) {
         final List<Balloon> balloonsToKill = new ArrayList<>();
         for(Balloon balloon : balloons) {
-            if (HotAirSolver.tickBalloon(level, balloon, this, registry)) {
+            if (HotAirSolver.tickBalloon(level, balloon, this, registry, ship)) {
                 balloonsToKill.add(balloon);
             }
         }

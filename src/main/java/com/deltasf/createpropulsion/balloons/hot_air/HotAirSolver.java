@@ -2,6 +2,10 @@ package com.deltasf.createpropulsion.balloons.hot_air;
 
 import java.util.UUID;
 
+import org.joml.Quaterniond;
+import org.joml.Vector3d;
+import org.valkyrienskies.core.api.ships.ServerShip;
+
 import java.lang.Math;
 
 import com.deltasf.createpropulsion.PropulsionConfig;
@@ -23,7 +27,10 @@ public class HotAirSolver {
     static final double holeInvalidationThresholdPercent = 0.25;
     static final double catastrophicLeakFactor = 1000.0;
 
-    public static boolean tickBalloon(Level level, Balloon balloon, HaiGroup group, BalloonRegistry registry) {
+    static final double upsideDownThreshold = -0.2;
+    static final double upsideDownLeakFactor = 10.0;
+
+    public static boolean tickBalloon(Level level, Balloon balloon, HaiGroup group, BalloonRegistry registry, ServerShip ship) {
         if (balloon.isEmpty()) {
             return true; //Dead in a moment
         }
@@ -48,6 +55,20 @@ public class HotAirSolver {
 
         //Global surface leak
         hotAirChange -= PropulsionConfig.BALLOON_SURFACE_LEAK_FACTOR.get() * catastrophicFailureModifier * surfaceArea * leakAdjustedFullness;
+        //Leak caused by ship being upside-down or just angled too much
+        Vector3d up = new Vector3d(0.0, 1.0, 0.0).rotate(ship.getTransform().getShipToWorldRotation().normalize(new Quaterniond()), new Vector3d());
+        double downness = up.dot(0.0, -1.0, 0.0);
+        double leakAmountPercent = downRamp(downness, upsideDownThreshold);
+        if (leakAmountPercent > 0.0) {
+            double allowedRemaining = (1.0 - leakAmountPercent) * volume;
+            if (hotAirAmount > allowedRemaining) {
+                double baseRemoval = leakAmountPercent * hotAirAmount;
+                double upsideDownLeak = baseRemoval * upsideDownLeakFactor;
+                double maxRemovable = hotAirAmount - allowedRemaining;
+                if (upsideDownLeak > maxRemovable) upsideDownLeak = maxRemovable;
+                hotAirChange -= upsideDownLeak;
+            }
+        }
         //Hole leak based on y coordinate of each hole. We assume that hot air is evenlt distributed along all y levels
         AABB bounds = balloon.getAABB();
         double maxY = bounds.maxY;
@@ -81,5 +102,15 @@ public class HotAirSolver {
         }
 
         return false;
+    }
+
+    public static double downRamp(double v, double threshold) {
+        if (v <= threshold) return 0.0;
+        double denom = 1.0 - threshold;
+        if (denom == 0.0) return 1.0;
+        double t = (v - threshold) / denom;
+        if (t <= 0.0) return 0.0;
+        if (t >= 1.0) return 1.0;
+        return t;
     }
 }
