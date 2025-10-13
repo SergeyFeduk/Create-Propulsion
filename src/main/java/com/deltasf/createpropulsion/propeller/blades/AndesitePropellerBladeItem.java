@@ -6,9 +6,14 @@ import com.deltasf.createpropulsion.registries.PropulsionPartialModels;
 import com.jozufozu.flywheel.core.PartialModel;
 
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 public class AndesitePropellerBladeItem extends PropellerBladeItem {
-    private static final AABB damageAABB = new AABB(0,0,0,0,0,0);
+    private static final float size = 0.8f;
+    private static final float thickness = 0.125f;
+    private static final AABB damageAABB = new AABB(-size, -size, -thickness, size, size, thickness);
+    private static final Vec3 damageOffset = new Vec3(0.25, 0, 0);
+
     private static final AABBi hardObstructionRegion = new AABBi(0,0,0,0,0,0);
     private static final AABBi softObstructionRegion = new AABBi(0,0,0,0,0,0);
 
@@ -48,6 +53,9 @@ public class AndesitePropellerBladeItem extends PropellerBladeItem {
 
     @Override
     public AABB getDamageZone() { return damageAABB; }
+
+    @Override
+    public Vec3 getDamageZoneOffset() { return damageOffset; }
 
     @Override
     public float getTorqueFactor() { return 0; }

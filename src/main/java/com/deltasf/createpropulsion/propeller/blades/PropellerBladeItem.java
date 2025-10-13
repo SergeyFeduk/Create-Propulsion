@@ -6,6 +6,7 @@ import com.jozufozu.flywheel.core.PartialModel;
 
 import net.minecraft.world.item.Item;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 public abstract class PropellerBladeItem extends Item {
     public PropellerBladeItem(Properties properties) {
@@ -58,6 +59,8 @@ public abstract class PropellerBladeItem extends Item {
      * Return an AABB relative to north-facing propeller in which entities will be damaged
      **/
     public abstract AABB getDamageZone();
+
+    public abstract Vec3 getDamageZoneOffset();
 
     /**
      * Returns the multiplier for parasitic torque

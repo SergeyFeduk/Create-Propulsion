@@ -12,6 +12,7 @@ import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 import com.deltasf.createpropulsion.atmosphere.DimensionAtmosphereManager;
 import com.deltasf.createpropulsion.propeller.blades.PropellerBladeItem;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
+import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -88,6 +89,12 @@ public class PropellerBlockEntity extends KineticBlockEntity {
             }
             updateThrust();
         }
+    }
+
+    @Override
+    public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
+        super.addBehaviours(behaviours);
+        behaviours.add(new PropellerDamager(this));
     }
 
     @Override

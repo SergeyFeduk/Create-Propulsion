@@ -6,7 +6,8 @@ public enum MainDebugRoute implements IDebugRoute {
     THRUSTER,
     MAGNET,                                  
     BALLOON(BalloonDebugRoute.values()),
-    BURNER;
+    BURNER,
+    PROPELLER;
 
     private final IDebugRoute[] children;
     MainDebugRoute(IDebugRoute... children) { this.children = children; }
