@@ -64,6 +64,7 @@ public class PropulsionCreativeTab {
                 //From 0.3 (items)
                 output.accept(PropulsionItems.WOODEN_BLADE);
                 output.accept(PropulsionItems.COPPER_BLADE);
+                output.accept(PropulsionItems.ANDESITE_BLADE);
             }
         }
 }
