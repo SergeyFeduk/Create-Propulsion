@@ -45,7 +45,6 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
     protected ThrusterData thrusterData;
     protected int emptyBlocks;
     protected boolean isThrustDirty = false;
-    private final ThrusterDamager damager;
 
     // Ticking
     private int currentTick = 0;
@@ -64,7 +63,6 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
         super(typeIn, pos, state);
         thrusterData = new ThrusterData();
         particleType = (ParticleType<PlumeParticleData>) ParticleTypes.getPlumeType();
-        this.damager = new ThrusterDamager(this);
     }
 
     @SuppressWarnings("null")
@@ -96,6 +94,7 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
         if (PropulsionCompatibility.CC_ACTIVE) {
             behaviours.add(computerBehaviour = new ComputerBehaviour(this));
         }
+        behaviours.add(new ThrusterDamager(this));
     }
 
     @SuppressWarnings("null")
@@ -119,7 +118,6 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
             return;
         }
         currentTick++;
-        damager.tick(currentTick);
         int tick_rate = PropulsionConfig.THRUSTER_TICKS_PER_UPDATE.get();
 
         // Periodically recalculate obstruction
