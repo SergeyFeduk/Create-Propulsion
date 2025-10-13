@@ -100,7 +100,7 @@ public class PropulsionBlocks {
         .properties(p -> p.sound(SoundType.WOOD))
         .properties(p -> p.requiresCorrectToolForDrops())
         .properties(p -> p.strength(1.5F, 1.0F))
-        .transform(BlockStressDefaults.setImpact(8.0))
+        .transform(BlockStressDefaults.setNoImpact())
         .simpleItem()
         .register();
 

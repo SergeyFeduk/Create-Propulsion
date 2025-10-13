@@ -4,7 +4,8 @@ import org.joml.primitives.AABBi;
 
 import com.deltasf.createpropulsion.registries.PropulsionPartialModels;
 import com.jozufozu.flywheel.core.PartialModel;
-
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
@@ -14,8 +15,7 @@ public class WoodenPropellerBladeItem extends PropellerBladeItem {
     private static final AABB damageAABB = new AABB(-size, -size, -thickness, size, size, thickness);
     private static final Vec3 damageOffset = new Vec3(0.25, 0, 0);
 
-    private static final AABBi hardObstructionRegion = new AABBi(0,0,0,0,0,0);
-    private static final AABBi softObstructionRegion = new AABBi(0,0,0,0,0,0);
+    private static final AABBi softObstructionRegion = new AABBi(-1,-1,0,1,1,4);
 
     public WoodenPropellerBladeItem(Properties properties) {
         super(properties);
@@ -61,8 +61,9 @@ public class WoodenPropellerBladeItem extends PropellerBladeItem {
     public float getTorqueFactor() { return 1; }
 
     @Override
-    public AABBi getHardObstructionRegion() { return hardObstructionRegion; }
-
-    @Override
     public AABBi getSoftObstructionRegion() { return softObstructionRegion; }
+
+    public ItemStack getBreakDrop() {
+        return new ItemStack(Items.STICK);
+    }
 }

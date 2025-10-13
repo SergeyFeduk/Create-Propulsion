@@ -92,5 +92,4 @@ public abstract class AbstractAreaDamagerBehaviour extends BlockEntityBehaviour 
     public BehaviourType<?> getType() {
         return TYPE;
     }
-
 }

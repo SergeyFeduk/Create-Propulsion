@@ -5,6 +5,7 @@ import org.joml.primitives.AABBi;
 import com.jozufozu.flywheel.core.PartialModel;
 
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
@@ -68,12 +69,13 @@ public abstract class PropellerBladeItem extends Item {
     public abstract float getTorqueFactor();
 
     /**
-     * Returns a region which MUST be free to make propeller function. Defined in blocks
-     */
-    public abstract AABBi getHardObstructionRegion();
-
-    /**
      * Returns a region which should be free to have high efficiency. Defined in blocks
      */
     public abstract AABBi getSoftObstructionRegion();
+
+    public float getStressImpact() {
+        return 8.0f;
+    }
+
+    public abstract ItemStack getBreakDrop();
 }

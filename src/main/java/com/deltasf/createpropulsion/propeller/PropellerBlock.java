@@ -25,6 +25,7 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -81,9 +82,14 @@ public class PropellerBlock extends DirectionalKineticBlock implements IBE<Prope
             }
         }
 
-        //TODO: Different sounds
         ItemStack heldItem = player.getItemInHand(hand);
         if (heldItem.getItem() instanceof PropellerBladeItem) {
+
+            if (!propellerBE.getSpatialHandler().getObstructedBlocks().isEmpty()) {
+                // TODO: Notify player that propeller must not be obstructed
+                return InteractionResult.FAIL;
+            }
+
             Vec3 localHit = hit.getLocation().subtract(Vec3.atCenterOf(pos));
 
             if (propellerBE.addBlade(heldItem, localHit)) {
@@ -137,6 +143,15 @@ public class PropellerBlock extends DirectionalKineticBlock implements IBE<Prope
             }
         }
         super.onRemove(state, level, pos, newState, isMoving);
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public void neighborChanged(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull Block block, @Nonnull BlockPos fromPos, boolean isMoving) {
+        super.neighborChanged(state, level, pos, block, fromPos, isMoving);
+        if (level.isClientSide()) return;
+        
+        withBlockEntityDo(level, pos, (be) -> be.getSpatialHandler().triggerImmediateScan());
     }
 
     @Override

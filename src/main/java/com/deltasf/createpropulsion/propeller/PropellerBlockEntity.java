@@ -38,6 +38,7 @@ public class PropellerBlockEntity extends KineticBlockEntity {
     protected PropellerData propellerData;
     protected final ItemStackHandler bladeInventory;
     private LazyOptional<IItemHandler> itemHandler;
+    private PropellerSpatialHandler spatialHandler;
 
     public List<Float> targetBladeAngles = new ArrayList<>();
     protected boolean isClockwise = true;
@@ -92,10 +93,30 @@ public class PropellerBlockEntity extends KineticBlockEntity {
     }
 
     @Override
+    public float calculateStressApplied() {
+        float stress = 8;
+        if (getBlade().isEmpty()) {
+            this.lastStressApplied = stress;
+            return stress;
+        }
+
+        stress = getBlade().get().getStressImpact();
+        this.lastStressApplied = stress;
+        return stress;
+    }
+
+    @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
         super.addBehaviours(behaviours);
         behaviours.add(new PropellerDamager(this));
+        spatialHandler = new PropellerSpatialHandler(this);
+        behaviours.add(spatialHandler);
     }
+
+    public PropellerSpatialHandler getSpatialHandler() {
+        return spatialHandler;
+    }
+
 
     @Override
     public void onSpeedChanged(float prevSpeed) {
