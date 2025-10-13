@@ -135,7 +135,8 @@ public class PropellerBlockEntity extends KineticBlockEntity {
         if (speed > 0) {
             // Calculate thrust based on speed, up to the max effective speed.
             float speedPercentage = Math.min(speed / (float)MAX_EFFECTIVE_SPEED, 1.0f);
-            thrust = MAX_THRUST * speedPercentage;
+            float bladeCountModifier = (float)getBladeCount() / (float)blade.get().getMaxBlades();
+            thrust = MAX_THRUST * speedPercentage * bladeCountModifier;
         }
 
         propellerData.setThrust(thrust);

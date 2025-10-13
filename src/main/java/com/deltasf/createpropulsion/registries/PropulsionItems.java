@@ -3,6 +3,7 @@ package com.deltasf.createpropulsion.registries;
 import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.optical_sensors.OpticalLensItem;
 import com.deltasf.createpropulsion.physics_assembler.AssemblyGaugeItem;
+import com.deltasf.createpropulsion.propeller.blades.AndesitePropellerBladeItem;
 import com.deltasf.createpropulsion.propeller.blades.CopperPropellerBladeItem;
 import com.deltasf.createpropulsion.propeller.blades.WoodenPropellerBladeItem;
 import com.deltasf.createpropulsion.utility.BurnableItem;
@@ -29,6 +30,7 @@ public class PropulsionItems {
     //Propeller blades
     public static final ItemEntry<WoodenPropellerBladeItem> WOODEN_BLADE = REGISTRATE.item("wooden_blade", WoodenPropellerBladeItem::new).register();
     public static final ItemEntry<CopperPropellerBladeItem> COPPER_BLADE = REGISTRATE.item("copper_blade", CopperPropellerBladeItem::new).register();
+    public static final ItemEntry<AndesitePropellerBladeItem> ANDESITE_BLADE = REGISTRATE.item("andesite_blade", AndesitePropellerBladeItem::new).register();
 
     //public static final ItemEntry<DesignGogglesItem> DESIGN_GOGGLES = REGISTRATE.item("design_goggles", DesignGogglesItem::new).register();
     public static final ItemEntry<AssemblyGaugeItem> ASSEMBLY_GAUGE = REGISTRATE.item("assembly_gauge", AssemblyGaugeItem::new)

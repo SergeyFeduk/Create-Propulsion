@@ -23,6 +23,7 @@
 
     "item.createpropulsion.wooden_blade": "Wooden Blade",
     "item.createpropulsion.copper_blade": "Copper Blade",
+    "item.createpropulsion.andesite_blade": "Andesite Blade",
 
     "create.gui.goggles.thruster.status": "Thruster Status",
     "create.gui.goggles.thruster.status.no_fuel": "No Fuel",

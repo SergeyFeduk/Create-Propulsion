@@ -7,47 +7,50 @@ import com.jozufozu.flywheel.core.PartialModel;
 
 import net.minecraft.world.phys.AABB;
 
-public class CopperPropellerBladeItem extends PropellerBladeItem {
+public class AndesitePropellerBladeItem extends PropellerBladeItem {
     private static final AABB damageAABB = new AABB(0,0,0,0,0,0);
     private static final AABBi hardObstructionRegion = new AABBi(0,0,0,0,0,0);
     private static final AABBi softObstructionRegion = new AABBi(0,0,0,0,0,0);
 
-    public CopperPropellerBladeItem(Properties properties) {
+    public AndesitePropellerBladeItem(Properties properties) {
         super(properties);
     }
 
     @Override
     public int getMaxBlades() {
-        return 3;
+        return 6;
     }
 
     @Override
     public float getGearRatio() {
-        return 0.3f;
+        return 8; //Not sure if 8 is the best value, test
     }
 
     @Override
     public PartialModel getModel() {
-        return PropulsionPartialModels.COPPER_BLADE;
+        return PropulsionPartialModels.ANDESITE_BLADE;
     }
 
     @Override
-    public boolean canBeBlurred() { return false; }
+    public boolean canBeBlurred() { return true; }
 
     @Override
-    public float getFluidEfficiency() { return 1.0f; }
+    public boolean isBladeInverted() { return true; }
 
     @Override
-    public float getAirEfficiency() { return 0.05f; }
+    public float getFluidEfficiency() { return 0.8f; }
 
     @Override
-    public float getDamageModifier() { return 1.0f; }
+    public float getAirEfficiency() { return 0.8f; }
+
+    @Override
+    public float getDamageModifier() { return 1.2f; }
 
     @Override
     public AABB getDamageZone() { return damageAABB; }
 
     @Override
-    public float getTorqueFactor() { return 1; }
+    public float getTorqueFactor() { return 0; }
 
     @Override
     public AABBi getHardObstructionRegion() { return hardObstructionRegion; }

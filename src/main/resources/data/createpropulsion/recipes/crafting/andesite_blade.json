@@ -1,0 +1,19 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " A ",
+        " A ",
+        " I "
+    ],
+    "key": {
+        "A": {
+            "item": "create:andesite_alloy"
+        },
+        "I": {
+            "item": "create:iron_sheet"
+        }
+    },
+    "result": {
+        "item": "createpropulsion:andesite_blade"
+    }
+}
