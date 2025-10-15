@@ -302,6 +302,7 @@ public class BalloonUpdater {
     private List<EventSubGroup> prefilterAndSubgroupEvents(EventGroup group) {
         Map<HaiGroup, Map<BlockPos, Set<Balloon>>> subGroupBuilders = new HashMap<>();
         //Obtain all haiGroups
+        //TODO: Probably use fastQuery when impl'd
         //TODO: obtain them all PER SHIP as this will reduce the amount of BalloonRegistry to 1. But note that events may occur on different ships, so its not that simple
         List<HaiGroup> allHaiGroups = BalloonShipRegistry.get().getRegistries().stream()
                 .map(BalloonRegistry::getHaiGroups)
@@ -350,14 +351,6 @@ public class BalloonUpdater {
                     nearbyBalloons.add(balloon);
                 }
             }
-
-            //Not adjacent to any balloon - irrelevant
-            //TODO: Actually, not true - we also need to check if we are adjacent to any hole
-            //Actually the above is not true either. We need to rewrite this method to not filter out such events (if they are placement) 
-            // as they also need to be resolved in handlePlacementSubGroup, which will perform a scan to find new volumes.
-            /*if (nearbyBalloons.isEmpty()) {
-                continue;
-            }*/
 
             //Event is valid, add it to subgroupBuilder
             subGroupBuilders
