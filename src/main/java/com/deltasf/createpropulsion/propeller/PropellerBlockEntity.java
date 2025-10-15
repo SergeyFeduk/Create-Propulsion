@@ -94,6 +94,7 @@ public class PropellerBlockEntity extends KineticBlockEntity {
 
     @Override
     public float calculateStressApplied() {
+        //TODO: Think. Should blade count impact stress impact
         float stress = 8;
         if (getBlade().isEmpty()) {
             this.lastStressApplied = stress;

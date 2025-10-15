@@ -28,6 +28,7 @@ public class PropellerSpatialHandler extends BlockEntityBehaviour {
 
     private static final AABBi HARD_OBSTRUCTION_REGION = new AABBi(-1, -1, 0, 1, 1, 0);
 
+    //Hard obstruction
     private int scanIndex = 0;
     private final Set<BlockPos> obstructedBlocks = new HashSet<>();
     private static final List<BlockPos> SCAN_POSITIONS;

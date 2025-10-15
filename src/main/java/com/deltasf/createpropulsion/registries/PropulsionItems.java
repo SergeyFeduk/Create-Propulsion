@@ -40,6 +40,7 @@ public class PropulsionItems {
 
     //Tags
     public static final TagKey<Item> OPTICAL_LENS_TAG = makeTag("optical_lens");
+    public static final TagKey<Item> PROPELLER_BLADE_TAG = makeTag("blade");
 
     public static TagKey<Item> makeTag(String key) {
         ResourceLocation resource = new ResourceLocation(CreatePropulsion.ID, key);

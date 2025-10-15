@@ -86,6 +86,11 @@
     "createpropulsion.tooltip.thrust": "Thrust",
     "createpropulsion.tooltip.consumption": "Burn Rate",
 
+    "createpropulsion.tooltip.holdForBladeSummary": "Hold [%1$s] for Blade Summary",
+    "createpropulsion.tooltip.airEfficiency": "Air Efficiency",
+    "createpropulsion.tooltip.waterEfficiency": "Water Efficiency",
+    "createpropulsion.tooltip.noTorque": "No Torque Effect",
+
     "create.gui.goggles.burner.status": "Burner Status",
     "create.gui.goggles.burner.heat.cold": "Cold",
     "create.gui.goggles.burner.heat.warm": "Warm",
