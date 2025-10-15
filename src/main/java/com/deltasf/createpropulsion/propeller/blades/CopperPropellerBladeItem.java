@@ -56,7 +56,7 @@ public class CopperPropellerBladeItem extends PropellerBladeItem {
     public Vec3 getDamageZoneOffset() { return damageOffset; }
 
     @Override
-    public float getTorqueFactor() { return 1; }
+    public float getTorqueFactor() { return 1.2f; }
 
     @Override
     public AABBi getSoftObstructionRegion() { return softObstructionRegion; }

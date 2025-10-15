@@ -44,7 +44,7 @@ public class AndesitePropellerBladeItem extends PropellerBladeItem {
     public boolean isBladeInverted() { return true; }
 
     @Override
-    public float getFluidEfficiency() { return 0.8f; }
+    public float getFluidEfficiency() { return 0.5f; }
 
     @Override
     public float getAirEfficiency() { return 0.8f; }
