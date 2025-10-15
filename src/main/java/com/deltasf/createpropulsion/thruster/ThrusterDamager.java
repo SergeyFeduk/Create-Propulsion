@@ -73,15 +73,13 @@ public class ThrusterDamager {
         nozzleInfo.obbRotationWorldJOML().transform(localPlumeVec);
         Vec3 worldPlumeDirection = VectorConversionsMCKt.toMinecraft(localPlumeVec);
 
-        // Correctly calculate potential plume length in world-space
+        // Calculate potential plume length in world space
         double potentialPlumeLength;
         Ship ship = VSGameUtilsKt.getShipManagingPos(thruster.getLevel(), thruster.getBlockPos());
         if (ship != null) {
             double plumeLengthShip = thruster.getEmptyBlocks() * distanceByPower;
             Vec3i normal = plumeDirection.getNormal();
-            // CORRECTED: Convert Vec3i to Vector3d component-wise
             Vector3d plumeDisplacementShip = new Vector3d(normal.getX(), normal.getY(), normal.getZ()).mul(plumeLengthShip);
-            // transformDirection applies both rotation and scaling
             Vector3d plumeDisplacementWorld = ship.getShipToWorld().transformDirection(plumeDisplacementShip, new Vector3d());
             potentialPlumeLength = plumeDisplacementWorld.length();
         } else {
@@ -89,16 +87,12 @@ public class ThrusterDamager {
         }
 
         double correctedPlumeLength = performRaycastCheck(nozzleInfo.thrusterNozzleWorldPosMC(), worldPlumeDirection, potentialPlumeLength);
-
         if (correctedPlumeLength <= 0.01) return;
-
         ObbCalculationResult obbResult = calculateObb(plumeDirection, correctedPlumeLength, nozzleInfo);
-
         applyDamageToEntities(thruster.getLevel(), damageCandidates, obbResult, visualPowerPercent);
     }
 
     private NozzleInfo calculateNozzleInfo(Direction plumeDirection) {
-        // This quaternion rotates from the thruster's local space (+Z forward) to ship-grid-aligned space
         Quaterniond relativeRotationJOML = new Quaterniond().rotateTo(new Vector3d(0, 0, 1), VectorConversionsMCKt.toJOMLD(plumeDirection.getNormal()));
 
         BlockPos worldPosition = thruster.getBlockPos();
@@ -113,28 +107,20 @@ public class ThrusterDamager {
         if (ship != null) {
             thrusterCenterBlockWorldJOML = ship.getShipToWorld().transformPosition(thrusterCenterBlockShipCoordsJOMLD, new Vector3d());
             obbRotationWorldJOML = ship.getTransform().getShipToWorldRotation().mul(relativeRotationJOML, new Quaterniond());
-            
-            // --- FIX IS HERE ---
-            // 1. Define the 0.5 block offset in the thruster's local space.
             Vector3d nozzleOffsetLocal = new Vector3d(0, 0, 0.5);
-            // 2. Rotate it to be aligned with the ship's grid.
             Vector3d nozzleOffsetShip = relativeRotationJOML.transform(nozzleOffsetLocal, new Vector3d());
-            // 3. Transform it from ship-space to world-space. This correctly applies both rotation AND scaling.
             nozzleOffsetWorld = ship.getShipToWorld().transformDirection(nozzleOffsetShip, new Vector3d());
-            // --- END FIX ---
 
         } else {
             thrusterCenterBlockWorldJOML = thrusterCenterBlockShipCoordsJOMLD;
             obbRotationWorldJOML = relativeRotationJOML;
 
-            // Original logic is fine for unscaled world thrusters
             Vector3d nozzleOffsetLocal = new Vector3d(0, 0, 0.5);
             nozzleOffsetWorld = obbRotationWorldJOML.transform(nozzleOffsetLocal, new Vector3d());
         }
 
         Vector3d thrusterNozzleWorldPos = thrusterCenterBlockWorldJOML.add(nozzleOffsetWorld, new Vector3d());
         Vec3 thrusterNozzleWorldPosMC = VectorConversionsMCKt.toMinecraft(thrusterNozzleWorldPos);
-
         return new NozzleInfo(thrusterNozzleWorldPosMC, obbRotationWorldJOML, thrusterCenterBlockWorldJOML);
     }
 
@@ -214,7 +200,6 @@ public class ThrusterDamager {
         Vector3d startPosShip = VectorConversionsMCKt.toJOML(Vec3.atCenterOf(worldPosition.relative(plumeDirection)));
 
         Vec3i normal = plumeDirection.getNormal();
-        // CORRECTED: Convert Vec3i to Vector3d component-wise
         Vector3d plumeDisplacementShip = new Vector3d(normal.getX(), normal.getY(), normal.getZ()).mul(plumeLengthShipSpace);
         Vector3d endPosShip = startPosShip.add(plumeDisplacementShip, new Vector3d());
 
@@ -254,7 +239,6 @@ public class ThrusterDamager {
         if (ship != null) {
             double plumeLengthShip = thruster.getEmptyBlocks() * distanceByPower;
             Vec3i normal = plumeDirection.getNormal();
-            // CORRECTED: Convert Vec3i to Vector3d component-wise
             Vector3d plumeDisplacementShip = new Vector3d(normal.getX(), normal.getY(), normal.getZ()).mul(plumeLengthShip);
             Vector3d plumeDisplacementWorld = ship.getShipToWorld().transformDirection(plumeDisplacementShip, new Vector3d());
             potentialPlumeLength = plumeDisplacementWorld.length();
