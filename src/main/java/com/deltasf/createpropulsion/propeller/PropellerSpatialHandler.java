@@ -272,10 +272,10 @@ public class PropellerSpatialHandler extends BlockEntityBehaviour {
 
     public static Vector3f rotate(Vector3f vec, Direction targetDirection) {
     return switch (targetDirection) {
-        case NORTH -> new Vector3f(vec.x, vec.y, vec.z).mul(-1);
-        case SOUTH -> new Vector3f(-vec.x, vec.y, -vec.z).mul(-1);
-        case WEST -> new Vector3f(vec.z, -vec.y, vec.x).mul(-1);
-        case EAST -> new Vector3f(-vec.z, vec.y, vec.x).mul(-1);
+        case NORTH -> new Vector3f(-vec.x, -vec.y, -vec.z);
+        case SOUTH -> new Vector3f(vec.x, -vec.y, vec.z);
+        case WEST -> new Vector3f(-vec.z, vec.y, -vec.x);
+        case EAST -> new Vector3f(vec.z, -vec.y, -vec.x);
         case DOWN -> new Vector3f(vec.x, -vec.z, vec.y);
         case UP -> new Vector3f(vec.x, vec.z, -vec.y);
     };

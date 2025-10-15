@@ -13,7 +13,6 @@ import com.deltasf.createpropulsion.atmosphere.DimensionAtmosphereManager;
 import com.deltasf.createpropulsion.propeller.blades.PropellerBladeItem;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import com.simibubi.create.foundation.utility.Lang;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -44,7 +43,7 @@ public class PropellerBlockEntity extends KineticBlockEntity {
 
     public List<Float> targetBladeAngles = new ArrayList<>();
     protected boolean isClockwise = true;
-    private int syncCounter = 0;
+    protected float lastFluidSample = 0;
 
     //Client-side animation state
     @OnlyIn(Dist.CLIENT)
@@ -154,8 +153,8 @@ public class PropellerBlockEntity extends KineticBlockEntity {
         }
 
         float speed = Math.abs(getSpeed());
-        Optional<PropellerBladeItem> blade = getBlade();
-        if (!blade.isPresent()) {
+        Optional<PropellerBladeItem> bladeOptional = getBlade();
+        if (!bladeOptional.isPresent()) {
             propellerData.setThrust(0);
             return;
         }
@@ -163,29 +162,31 @@ public class PropellerBlockEntity extends KineticBlockEntity {
         float thrust = 0;
 
         if (speed > 0) {
+            PropellerBladeItem blade = bladeOptional.get();
             // Calculate thrust based on speed, up to the max effective speed.
             float speedPercentage = Math.min(speed / (float)MAX_EFFECTIVE_SPEED, 1.0f);
-            float bladeCountModifier = (float)getBladeCount() / (float)blade.get().getMaxBlades();
-            thrust = MAX_THRUST * speedPercentage * bladeCountModifier;
+            float bladeCountModifier = (float)getBladeCount() / (float)blade.getMaxBlades();
+            float fluidSample = getSpatialHandler().getSmoothFluidSample();
+            float substanceEfficiency = fluidSample * blade.getFluidEfficiency() + (1 - fluidSample) * blade.getAirEfficiency();
+            thrust = MAX_THRUST * speedPercentage * bladeCountModifier * substanceEfficiency;
         }
 
         propellerData.setThrust(thrust);
         propellerData.setInvertDirection(invertDirection);
     }
 
+    @SuppressWarnings("null")
     @Override
     public void tick() {
         super.tick();
         if (level == null || level.isClientSide)
             return;
 
-
-        //TODO: Remove ts
-        //TODO: Check smoothFluidSample against last remembered value. If difference is more than 0.01 - update thrust. Do not sync clients
-        syncCounter++;
-        if (syncCounter % 1 == 0) {
-            sendData();
-            syncCounter = 0;
+        //Update thrust only if fluid sample changed
+        float fluidSample = getSpatialHandler().getSmoothFluidSample();
+        if (Math.abs(lastFluidSample - fluidSample) > 0.01) {
+            lastFluidSample = fluidSample;
+            updateThrust();
         }
     }
 
@@ -247,9 +248,7 @@ public class PropellerBlockEntity extends KineticBlockEntity {
                 bladeInventory.setStackInSlot(i, newBlade);
 
                 //Animate insertion
-                updateTargetAngles(localHit);
                 sendData();
-                setChanged();
                 return true;
             }
         }
@@ -268,9 +267,7 @@ public class PropellerBlockEntity extends KineticBlockEntity {
                     this.isClockwise = true;
                 }
                 //Animate removal
-                updateTargetAngles(null);
                 sendData();
-                setChanged();
                 return removedBlade;
             }
         }
@@ -282,12 +279,14 @@ public class PropellerBlockEntity extends KineticBlockEntity {
         return new ItemStackHandler(6) {
             @Override
             protected void onContentsChanged(int slot) {
+                updateTargetAngles();
+                updateThrust();
                 setChanged();
             }
         };
     }
 
-    private void updateTargetAngles(@Nullable Vec3 localHit) {
+    private void updateTargetAngles() {
         int bladeCount = getBladeCount();
         if (bladeCount == 0) {
             targetBladeAngles.clear();
@@ -305,10 +304,6 @@ public class PropellerBlockEntity extends KineticBlockEntity {
 
     @Override
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
-
-        float fluidSample = getSpatialHandler().getSmoothFluidSample();
-        Lang.number(fluidSample).forGoggles(tooltip);
-
         super.addToGoggleTooltip(tooltip, isPlayerSneaking);
         return true;
     }
