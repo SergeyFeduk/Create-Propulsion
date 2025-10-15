@@ -36,8 +36,10 @@ public class ThrusterForceApplier {
         if (thrust == 0) return;
 
         final int maxSpeed = PropulsionConfig.THRUSTER_MAX_SPEED.get();
-        //Direction from ship space to world space
         final ShipTransform transform = ship.getTransform();
+        Vector3dc scaling = transform.getShipToWorldScaling();
+        double massScalingFactor = scaling.x() * scaling.y() * scaling.z();
+        //Direction from ship space to world space
         final Vector3dc shipCenterOfMass = transform.getPositionInShip(); 
         relativePos = VectorConversionsMCKt.toJOMLD(pos)
             .add(0.5, 0.5, 0.5)
@@ -45,7 +47,7 @@ public class ThrusterForceApplier {
 
         transform.getShipToWorld().transformDirection(data.getDirection(), worldForceDirection);
         worldForceDirection.normalize();
-        worldForce.set(worldForceDirection).mul(thrust);
+        worldForce.set(worldForceDirection).mul(thrust * massScalingFactor);
         final Vector3dc linearVelocity = ship.getPoseVel().getVel();
         if (linearVelocity.lengthSquared() >= maxSpeed * maxSpeed) {
             double dot = worldForce.dot(linearVelocity);
