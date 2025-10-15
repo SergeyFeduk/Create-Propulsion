@@ -28,7 +28,7 @@ import javax.annotation.Nullable;
 
 public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
     public static final float BASE_FUEL_CONSUMPTION = 2;
-    public static final int BASE_MAX_THRUST = 400000;
+    public static final int BASE_MAX_THRUST = 600000;
     public SmartFluidTankBehaviour tank;
 
     public ThrusterBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
