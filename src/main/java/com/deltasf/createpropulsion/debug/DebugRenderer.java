@@ -13,6 +13,7 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
+import com.deltasf.createpropulsion.registries.PropulsionRenderTypes;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
@@ -165,7 +166,7 @@ public class DebugRenderer {
 
         PoseStack poseStack = event.getPoseStack();
         MultiBufferSource.BufferSource bufferSource = mc.renderBuffers().bufferSource();
-        VertexConsumer vertexConsumer = bufferSource.getBuffer(DebugLineRenderType.DEBUG_LINE);
+        VertexConsumer vertexConsumer = bufferSource.getBuffer(PropulsionRenderTypes.DEBUG_LINE);
         Vec3 cameraPos = mc.gameRenderer.getMainCamera().getPosition();
 
         poseStack.pushPose();

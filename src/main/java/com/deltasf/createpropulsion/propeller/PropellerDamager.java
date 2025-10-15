@@ -3,7 +3,7 @@ package com.deltasf.createpropulsion.propeller;
 import java.util.Optional;
 
 import com.deltasf.createpropulsion.debug.PropulsionDebug;
-import com.deltasf.createpropulsion.debug.routes.MainDebugRoute;
+import com.deltasf.createpropulsion.debug.routes.PropellerDebugRoute;
 import com.deltasf.createpropulsion.propeller.blades.PropellerBladeItem;
 import com.deltasf.createpropulsion.utility.AbstractAreaDamagerBehaviour;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
@@ -94,7 +94,7 @@ public class PropellerDamager extends AbstractAreaDamagerBehaviour {
 
     @Override
     protected boolean shouldDebug() {
-        return PropulsionDebug.isDebug(MainDebugRoute.PROPELLER);
+        return PropulsionDebug.isDebug(PropellerDebugRoute.DAMAGE);
     }
 
     @Override

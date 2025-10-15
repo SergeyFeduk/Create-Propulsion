@@ -1,5 +1,6 @@
 package com.deltasf.createpropulsion.propeller;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -12,6 +13,11 @@ import org.joml.Vector3f;
 import org.joml.primitives.AABBi;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
+
+import com.deltasf.createpropulsion.debug.DebugRenderer;
+import com.deltasf.createpropulsion.debug.PropulsionDebug;
+import com.deltasf.createpropulsion.debug.routes.PropellerDebugRoute;
 import com.deltasf.createpropulsion.propeller.blades.PropellerBladeItem;
 import com.deltasf.createpropulsion.utility.MathUtility;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
@@ -128,17 +134,15 @@ public class PropellerSpatialHandler extends BlockEntityBehaviour {
         Vector3d propellerCenter = new Vector3d(origin.getX() + 0.5, origin.getY() + 0.5, origin.getZ() + 0.5);
         Vector3f rotatedOffset = rotate(relativeSamplePoint, facing);
         Vector3d worldPosVec;
+        Vector3d samplePoint = propellerCenter.add(rotatedOffset.x, rotatedOffset.y, rotatedOffset.z, new Vector3d());
 
         if (ship == null) {
-            worldPosVec = propellerCenter.add(rotatedOffset.x, rotatedOffset.y, rotatedOffset.z, new Vector3d());
+            worldPosVec = samplePoint;
         } else {
-            Vector3d samplePointInShipSpace = propellerCenter.add(rotatedOffset.x, rotatedOffset.y, rotatedOffset.z, new Vector3d());
-            worldPosVec = ship.getTransform().getShipToWorld().transformPosition(samplePointInShipSpace, new Vector3d());
+            worldPosVec = ship.getTransform().getShipToWorld().transformPosition(samplePoint, new Vector3d());
         }
 
         BlockPos currentWorldPos = new BlockPos((int)Math.floor(worldPosVec.x), (int)Math.floor(worldPosVec.y), (int)Math.floor(worldPosVec.z));
-        //DebugRenderer.drawBox(String.valueOf(pbe.hashCode() + relativeSamplePoint.hashCode()), VectorConversionsMCKt.toMinecraft(worldPosVec), new Vec3(0.1,0.1,0.1),20);
-        //DebugRenderer.drawBox(String.valueOf(pbe.hashCode() + relativeSamplePoint.hashCode()), currentWorldPos, 20);
 
         //Update the state
         boolean wasInFluid = isSampleInFluid[scanIndex];
@@ -150,6 +154,12 @@ public class PropellerSpatialHandler extends BlockEntityBehaviour {
         }
 
         isSampleInFluid[scanIndex] = isInFluid;
+
+        //Debug
+        if (PropulsionDebug.isDebug(PropellerDebugRoute.SAMPLE_POINTS)) {
+            String ident = String.valueOf(pbe.hashCode() + scanIndex);
+            DebugRenderer.drawBox(ident, VectorConversionsMCKt.toMinecraft(samplePoint), new Vec3(0.2,0.2,0.2), isInFluid ? Color.GREEN : Color.WHITE, FLUID_SAMPLE_POINTS.size() + 1);
+        }
     }
 
     private void handleObstruction(BlockPos worldCheckPos, PropellerBlockEntity pbe) {

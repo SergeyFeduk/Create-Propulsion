@@ -1,8 +1,11 @@
 package com.deltasf.createpropulsion.registries;
 
+import java.util.OptionalDouble;
+
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 
+import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 
 public class PropulsionRenderTypes extends RenderType {
@@ -47,5 +50,20 @@ public class PropulsionRenderTypes extends RenderType {
             .setDepthTestState(LEQUAL_DEPTH_TEST)
             .setWriteMaskState(COLOR_WRITE)
             .createCompositeState(true)
+    );
+
+    public static final RenderType DEBUG_LINE = create(
+        "debug_line",
+        DefaultVertexFormat.POSITION_COLOR, 
+        VertexFormat.Mode.DEBUG_LINES,
+        256, 
+        false,
+        true,
+        CompositeState.builder()
+            .setShaderState(POSITION_COLOR_SHADER)
+            .setLineState(new RenderStateShard.LineStateShard(OptionalDouble.of(4)))
+            .setTransparencyState(NO_TRANSPARENCY)
+            .setCullState(NO_CULL)
+            .createCompositeState(false)
     );
 }
