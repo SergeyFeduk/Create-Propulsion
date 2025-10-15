@@ -13,12 +13,14 @@ import com.deltasf.createpropulsion.atmosphere.DimensionAtmosphereManager;
 import com.deltasf.createpropulsion.propeller.blades.PropellerBladeItem;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.simibubi.create.foundation.utility.Lang;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.FloatTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -42,6 +44,7 @@ public class PropellerBlockEntity extends KineticBlockEntity {
 
     public List<Float> targetBladeAngles = new ArrayList<>();
     protected boolean isClockwise = true;
+    private int syncCounter = 0;
 
     //Client-side animation state
     @OnlyIn(Dist.CLIENT)
@@ -118,7 +121,6 @@ public class PropellerBlockEntity extends KineticBlockEntity {
         return spatialHandler;
     }
 
-
     @Override
     public void onSpeedChanged(float prevSpeed) {
         super.onSpeedChanged(prevSpeed);
@@ -145,7 +147,6 @@ public class PropellerBlockEntity extends KineticBlockEntity {
         return 0f;
     }
 
-
     @SuppressWarnings("null")
     public void updateThrust() {
         if (level == null || level.isClientSide) {
@@ -170,6 +171,22 @@ public class PropellerBlockEntity extends KineticBlockEntity {
 
         propellerData.setThrust(thrust);
         propellerData.setInvertDirection(invertDirection);
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (level == null || level.isClientSide)
+            return;
+
+
+        //TODO: Remove ts
+        //TODO: Check smoothFluidSample against last remembered value. If difference is more than 0.01 - update thrust. Do not sync clients
+        syncCounter++;
+        if (syncCounter % 1 == 0) {
+            sendData();
+            syncCounter = 0;
+        }
     }
 
     // Blades
@@ -282,6 +299,18 @@ public class PropellerBlockEntity extends KineticBlockEntity {
             finalAngles.add(i * 360f / bladeCount);
         }
         targetBladeAngles = finalAngles;
+    }
+
+    //Goggles
+
+    @Override
+    public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
+
+        float fluidSample = getSpatialHandler().getSmoothFluidSample();
+        Lang.number(fluidSample).forGoggles(tooltip);
+
+        super.addToGoggleTooltip(tooltip, isPlayerSneaking);
+        return true;
     }
 
     //NBT and caps

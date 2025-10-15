@@ -9,6 +9,7 @@ import com.deltasf.createpropulsion.registries.PropulsionShapes;
 import com.simibubi.create.AllSoundEvents;
 import com.simibubi.create.content.kinetics.base.DirectionalKineticBlock;
 import com.simibubi.create.foundation.block.IBE;
+import com.simibubi.create.foundation.blockEntity.SmartBlockEntityTicker;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -27,6 +28,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
@@ -162,6 +164,15 @@ public class PropellerBlock extends DirectionalKineticBlock implements IBE<Prope
         Direction direction = pState.getValue(FACING);
         if (direction == Direction.UP || direction == Direction.DOWN) direction = direction.getOpposite();
         return PropulsionShapes.PROPELLER.get(direction);
+    }
+
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+        if (type == getBlockEntityType()) {
+            return new SmartBlockEntityTicker<>();
+        }
+        return null;
     }
 
     @Override

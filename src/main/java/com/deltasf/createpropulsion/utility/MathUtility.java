@@ -9,7 +9,13 @@ import com.simibubi.create.foundation.collision.Matrix3d;
 
 public class MathUtility {
     
+    //Very cool interpolation function stolen from Freya
+    public static float expDecay(float a, float b, float decay, float dt) {
+        return b + (a - b) * (float) Math.exp(-decay * dt);
+    }
+
     public static Matrix3d createMatrixFromQuaternion(Quaterniond quaternion) {
+        //TODO: Perhaps use accesstransformer for this?
         //I need to do this very ugly thing because create matrix class has its elements private
         double qx = quaternion.x;
         double qy = quaternion.y;
