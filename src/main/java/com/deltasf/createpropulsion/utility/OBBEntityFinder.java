@@ -62,6 +62,19 @@ public class OBBEntityFinder {
         }
     }
 
+    public static Quaterniond calculateWorldOrientation(Ship ship, Direction boxPrimaryAxis, Direction localDirection) {
+        Quaterniond localRotation = new Quaterniond().rotateTo(
+            VectorConversionsMCKt.toJOMLD(boxPrimaryAxis.getNormal()), 
+            VectorConversionsMCKt.toJOMLD(localDirection.getNormal())
+        );
+
+        if (ship != null) {
+            return ship.getTransform().getShipToWorldRotation().mul(localRotation, new Quaterniond());
+        } else {
+            return localRotation;
+        }
+    }
+
 
     public static Vec3 calculateWorldCenter(Level level, BlockPos pos, Vec3 localOffset, Quaterniond worldOrientation) {
         Vector3d blockCenterInShip = VectorConversionsMCKt.toJOML(Vec3.atCenterOf(pos));

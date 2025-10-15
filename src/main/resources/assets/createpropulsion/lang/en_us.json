@@ -62,6 +62,9 @@
     "fluid.createpropulsion.turpentine": "Turpentine",
     "item.createpropulsion.turpentine_bucket": "Turpentine Bucket",
 
+    "item.createpropulsion.design_goggles": "Design Goggles",
+    "createpropulsion.design_goggles.tooltip.summary": "This is a debug item. For now.",
+
     "item.createpropulsion.optical_lens": "Optical Lens",
     "item.createpropulsion.fluid_lens": "Fluid Lens",
     "item.createpropulsion.focus_lens": "Focusing Lens",

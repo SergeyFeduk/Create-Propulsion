@@ -1,6 +1,13 @@
 package com.deltasf.createpropulsion.design_goggles;
 
-/*public class DesignGogglesItem extends Item implements Equipable {
+import com.deltasf.createpropulsion.registries.PropulsionItems;
+
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Equipable;
+import net.minecraft.world.item.Item;
+
+public class DesignGogglesItem extends Item implements Equipable {
 
     public DesignGogglesItem(Properties pProperties) {
         super(pProperties);
@@ -12,8 +19,6 @@ package com.deltasf.createpropulsion.design_goggles;
     }
 
     public static boolean isPlayerWearingGoggles(Player player) {
-        return false;
-        //return PropulsionItems.DESIGN_GOGGLES.isIn(player.getItemBySlot(EquipmentSlot.HEAD));
+        return PropulsionItems.DESIGN_GOGGLES.isIn(player.getItemBySlot(EquipmentSlot.HEAD));
     }
 }
-*/
