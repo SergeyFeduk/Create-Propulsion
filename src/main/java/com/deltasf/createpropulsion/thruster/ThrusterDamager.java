@@ -98,6 +98,7 @@ public class ThrusterDamager {
     }
 
     private NozzleInfo calculateNozzleInfo(Direction plumeDirection) {
+        // This quaternion rotates from the thruster's local space (+Z forward) to ship-grid-aligned space
         Quaterniond relativeRotationJOML = new Quaterniond().rotateTo(new Vector3d(0, 0, 1), VectorConversionsMCKt.toJOMLD(plumeDirection.getNormal()));
 
         BlockPos worldPosition = thruster.getBlockPos();
@@ -106,18 +107,31 @@ public class ThrusterDamager {
 
         Vector3d thrusterCenterBlockWorldJOML;
         Quaterniond obbRotationWorldJOML;
+        Vector3d nozzleOffsetWorld;
 
         Ship ship = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
         if (ship != null) {
             thrusterCenterBlockWorldJOML = ship.getShipToWorld().transformPosition(thrusterCenterBlockShipCoordsJOMLD, new Vector3d());
             obbRotationWorldJOML = ship.getTransform().getShipToWorldRotation().mul(relativeRotationJOML, new Quaterniond());
+            
+            // --- FIX IS HERE ---
+            // 1. Define the 0.5 block offset in the thruster's local space.
+            Vector3d nozzleOffsetLocal = new Vector3d(0, 0, 0.5);
+            // 2. Rotate it to be aligned with the ship's grid.
+            Vector3d nozzleOffsetShip = relativeRotationJOML.transform(nozzleOffsetLocal, new Vector3d());
+            // 3. Transform it from ship-space to world-space. This correctly applies both rotation AND scaling.
+            nozzleOffsetWorld = ship.getShipToWorld().transformDirection(nozzleOffsetShip, new Vector3d());
+            // --- END FIX ---
+
         } else {
             thrusterCenterBlockWorldJOML = thrusterCenterBlockShipCoordsJOMLD;
             obbRotationWorldJOML = relativeRotationJOML;
+
+            // Original logic is fine for unscaled world thrusters
+            Vector3d nozzleOffsetLocal = new Vector3d(0, 0, 0.5);
+            nozzleOffsetWorld = obbRotationWorldJOML.transform(nozzleOffsetLocal, new Vector3d());
         }
 
-        Vector3d nozzleOffsetLocal = new Vector3d(0, 0, 0.5);
-        Vector3d nozzleOffsetWorld = obbRotationWorldJOML.transform(nozzleOffsetLocal, new Vector3d());
         Vector3d thrusterNozzleWorldPos = thrusterCenterBlockWorldJOML.add(nozzleOffsetWorld, new Vector3d());
         Vec3 thrusterNozzleWorldPosMC = VectorConversionsMCKt.toMinecraft(thrusterNozzleWorldPos);
 
