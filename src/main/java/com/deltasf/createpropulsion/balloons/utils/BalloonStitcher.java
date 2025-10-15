@@ -19,6 +19,15 @@ import net.minecraft.world.phys.AABB;
 
 //I'll touch your balloons and you can do nothing about it
 public class BalloonStitcher {
+    private static final Direction[] holeCheckDirections = new Direction[5];
+    static {
+        holeCheckDirections[0] = Direction.DOWN;
+        holeCheckDirections[1] = Direction.EAST;
+        holeCheckDirections[2] = Direction.WEST;
+        holeCheckDirections[3] = Direction.NORTH;
+        holeCheckDirections[4] = Direction.SOUTH;
+    }
+
     public static void createHole(Balloon balloon, BlockPos holePos) {
         balloon.holes.add(holePos);
     }
@@ -165,7 +174,7 @@ public class BalloonStitcher {
         }
 
         balloon.holes.removeIf(holePos -> {
-            for (Direction dir : Direction.values()) {
+            for (Direction dir : holeCheckDirections) {
                 if (balloon.contains(holePos.relative(dir))) {
                     return false; //Holes is still adjacent to volume
                 }
@@ -177,7 +186,7 @@ public class BalloonStitcher {
     private static Set<BlockPos> partitionHoles(Set<BlockPos> newVolume, Set<BlockPos> originalHoles) {
         Set<BlockPos> newHoles = new HashSet<>();
         for (BlockPos hole : originalHoles) {
-            for (Direction dir : Direction.values()) {
+            for (Direction dir : holeCheckDirections) {
                 if (newVolume.contains(hole.relative(dir))) {
                     newHoles.add(hole);
                     break;

@@ -219,4 +219,8 @@ public class HaiGroup {
         AABBic shipAABB = ship.getShipAABB();
         return rleVolume.isInside(pos.getX(), pos.getY(), pos.getZ(), groupAABB, shipAABB);
     }
+
+    public ServerShip getShip() {
+        return ship;
+    }
 }
