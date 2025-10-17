@@ -17,7 +17,7 @@ import net.minecraft.world.phys.Vec3;
 import java.awt.Color;
 
 public class PropellerDamager extends AbstractAreaDamagerBehaviour {
-    private static final float MIN_SPEED_FOR_DAMAGE = 16.0f;
+    private static final float MIN_RPM_FOR_DAMAGE = 80.0f;
 
     public PropellerDamager(SmartBlockEntity be) {
         super(be);
@@ -36,7 +36,7 @@ public class PropellerDamager extends AbstractAreaDamagerBehaviour {
     protected boolean shouldDamage() {
         PropellerBlockEntity propeller = getPropeller();
         return propeller.getBlade().isPresent()
-            && Math.abs(propeller.getSpeed()) > MIN_SPEED_FOR_DAMAGE;
+            && Math.abs(propeller.getInternalRPM()) > MIN_RPM_FOR_DAMAGE;
     }
 
     @Override
@@ -87,8 +87,8 @@ public class PropellerDamager extends AbstractAreaDamagerBehaviour {
     @Override
     protected void applyDamage(LivingEntity entity, DamageSource source, DamageZone zone) {
         PropellerBladeItem blade = getPropeller().getBlade().get();
-        float rpmPercent = Math.abs(getPropeller().getSpeed()) / PropellerBlockEntity.MAX_EFFECTIVE_SPEED;
-        float baseDamage = 2.0f + rpmPercent * 3.0f;
+        float powerPercent = getPropeller().getPowerPercent();
+        float baseDamage = 2.0f + powerPercent * 3.0f;
         entity.hurt(source, baseDamage * blade.getDamageModifier());
     }
 

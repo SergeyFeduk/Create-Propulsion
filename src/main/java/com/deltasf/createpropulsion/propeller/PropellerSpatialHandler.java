@@ -183,7 +183,7 @@ public class PropellerSpatialHandler extends BlockEntityBehaviour {
 
     private void applyObstructionConsequences(PropellerBlockEntity pbe) {
         if (!obstructedBlocks.isEmpty() && pbe.getBladeCount() > 0) {
-            if (Math.abs(pbe.getSpeed()) > 0) {
+            if (Math.abs(pbe.getInternalRPM()) > 20) {
                 breakBlades(pbe);
             } else {
                 dropBlades(pbe);

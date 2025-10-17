@@ -22,6 +22,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.FloatTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -47,6 +48,10 @@ public class PropellerBlockEntity extends KineticBlockEntity {
     public List<Float> targetBladeAngles = new ArrayList<>();
     protected boolean isClockwise = true;
     protected float lastFluidSample = 0;
+
+    //Server-side rpm sim
+    public float internalRPM = 0f;
+    private long lastSystemTimeNanos = 0;
 
     //Client-side animation state
     @OnlyIn(Dist.CLIENT)
@@ -79,6 +84,8 @@ public class PropellerBlockEntity extends KineticBlockEntity {
     @Override
     public void initialize() {
         super.initialize();
+        internalRPM = getTargetRPM();
+
         if (level.isClientSide) {
             if (prevBladeAngles == null) prevBladeAngles = new ArrayList<>();
             if (renderedBladeAngles == null) renderedBladeAngles = new ArrayList<>();
@@ -149,6 +156,20 @@ public class PropellerBlockEntity extends KineticBlockEntity {
         return 0f;
     }
 
+    public float getInternalRPM() {
+        return internalRPM;
+    }
+
+    public float getPowerPercent() {
+        Optional<PropellerBladeItem> bladeOptional = getBlade();
+        if (bladeOptional.isEmpty()) return 0f;
+        
+        float maxTargetRPM = MAX_EFFECTIVE_SPEED * bladeOptional.get().getGearRatio();
+        if (maxTargetRPM == 0) return 0f;
+
+        return Mth.clamp(Math.abs(this.internalRPM) / maxTargetRPM, 0f, 1f);
+    }
+
     @SuppressWarnings("null")
     public void updateThrust() {
         if (level == null || level.isClientSide) {
@@ -200,6 +221,29 @@ public class PropellerBlockEntity extends KineticBlockEntity {
         if (level == null || level.isClientSide)
             return;
 
+        //RPM sim, dt aware
+        if (lastSystemTimeNanos == 0) {
+            lastSystemTimeNanos = System.nanoTime();
+        }
+
+        long timeNow = System.nanoTime();
+        float deltaTimeSeconds = (timeNow - lastSystemTimeNanos) / 1_000_000_000f;
+        lastSystemTimeNanos = timeNow;
+        float targetRPM = getTargetRPM();
+        float diff = targetRPM - internalRPM;
+
+        if (Math.abs(diff) > MathUtility.epsilon) {
+            float proportionalAccel = diff * PropellerRenderer.SMOOTHING_FACTOR;
+            float clampedAcceleration = Mth.clamp(Math.abs(proportionalAccel), PropellerRenderer.RPM_MIN_ACCELERATION, PropellerRenderer.RPM_MAX_ACCELERATION);
+            float deltaRPM = Math.signum(diff) * clampedAcceleration * deltaTimeSeconds;
+
+            if (Math.abs(deltaRPM) > Math.abs(diff)) {
+                internalRPM = targetRPM;
+            } else {
+                internalRPM += deltaRPM;
+            }
+        }
+        
         //Update thrust only if fluid sample changed
         float fluidSample = getSpatialHandler().getSmoothFluidSample();
         if (Math.abs(lastFluidSample - fluidSample) > 0.01) {
@@ -334,6 +378,10 @@ public class PropellerBlockEntity extends KineticBlockEntity {
         compound.put("blades", bladeInventory.serializeNBT());
         compound.putBoolean("isClockwise", isClockwise);
 
+        if (!clientPacket) {
+            compound.putFloat("internalRPM", internalRPM);
+        }
+
         ListTag angleNBT = new ListTag();
         for (Float angle : targetBladeAngles) {
             angleNBT.add(FloatTag.valueOf(angle));
@@ -347,6 +395,10 @@ public class PropellerBlockEntity extends KineticBlockEntity {
         super.read(compound, clientPacket);
         bladeInventory.deserializeNBT(compound.getCompound("blades"));
         isClockwise = compound.contains("isClockwise") ? compound.getBoolean("isClockwise") : true;
+
+        if (!clientPacket) {
+            internalRPM = compound.getFloat("internalRPM");
+        }
 
         ListTag angleNBT = compound.getList("TargetAngles", 5);
         List<Float> newTargetAngles = new ArrayList<>();

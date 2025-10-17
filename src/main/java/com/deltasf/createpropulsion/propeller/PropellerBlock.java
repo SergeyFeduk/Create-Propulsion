@@ -78,7 +78,7 @@ public class PropellerBlock extends DirectionalKineticBlock implements IBE<Prope
 
 
         if (propellerBE.getBladeCount() != 1) {
-            if (Math.abs(propellerBE.getSpeed()) > 2) {
+            if (Math.abs(propellerBE.getInternalRPM()) > 10.0f) {
                 // TODO: Notify player that propeller must be stopped
                 return InteractionResult.FAIL;
             }
