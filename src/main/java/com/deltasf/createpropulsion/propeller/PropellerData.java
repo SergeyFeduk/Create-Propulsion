@@ -6,12 +6,16 @@ import com.deltasf.createpropulsion.atmosphere.AtmosphereData;
 
 public class PropellerData {
     private volatile float thrust;
+    private volatile float torque;
     private volatile Vector3d direction;
     private volatile boolean invertDirection;
     private volatile AtmosphereData atmosphere;
 
     public float getThrust() { return thrust; }
     public void setThrust(float thrust) { this.thrust = thrust; }
+
+    public float getTorque() { return torque; }
+    public void setTorque(float torque) { this.torque = torque; }
     
     public Vector3d getDirection() { return direction; }
     public void setDirection(Vector3d direction) { this.direction = direction; }

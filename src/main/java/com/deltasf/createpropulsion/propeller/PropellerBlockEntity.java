@@ -9,8 +9,10 @@ import javax.annotation.Nullable;
 import org.jetbrains.annotations.NotNull;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
+import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.atmosphere.DimensionAtmosphereManager;
 import com.deltasf.createpropulsion.propeller.blades.PropellerBladeItem;
+import com.deltasf.createpropulsion.utility.MathUtility;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 
@@ -34,6 +36,7 @@ import net.minecraftforge.items.ItemStackHandler;
 
 public class PropellerBlockEntity extends KineticBlockEntity {
     public static final int MAX_THRUST = 20000;
+    public static final int MAX_TORQUE = 10000; //This is quite high, but I want it to be noticeable
     public static final int MAX_EFFECTIVE_SPEED = 256;
 
     protected PropellerData propellerData;
@@ -156,10 +159,12 @@ public class PropellerBlockEntity extends KineticBlockEntity {
         Optional<PropellerBladeItem> bladeOptional = getBlade();
         if (!bladeOptional.isPresent()) {
             propellerData.setThrust(0);
+            propellerData.setTorque(0);
             return;
         }
         boolean invertDirection = (getSpeed() < 0) ^ isClockwise;
         float thrust = 0;
+        float torque = 0;
 
         if (speed > 0) {
             PropellerBladeItem blade = bladeOptional.get();
@@ -168,10 +173,23 @@ public class PropellerBlockEntity extends KineticBlockEntity {
             float bladeCountModifier = (float)getBladeCount() / (float)blade.getMaxBlades();
             float fluidSample = getSpatialHandler().getSmoothFluidSample();
             float substanceEfficiency = fluidSample * blade.getFluidEfficiency() + (1 - fluidSample) * blade.getAirEfficiency();
-            thrust = MAX_THRUST * speedPercentage * bladeCountModifier * substanceEfficiency;
+            double powerMultiplier = PropulsionConfig.PROPELLER_POWER_MULTIPLIER.get();
+            float baseWorkMultiplier = speedPercentage * bladeCountModifier * substanceEfficiency * (float)powerMultiplier;
+
+            //Thrust
+            thrust = MAX_THRUST * baseWorkMultiplier;
+
+            //Torque
+            float torqueFactor = blade.getTorqueFactor();
+            if (torqueFactor > MathUtility.epsilon) {
+                double torqueEffectMultiplier = PropulsionConfig.PROPELLER_TORQUE_EFFECT_MULTIPLIER.get();
+                float torqueMagnitude = MAX_TORQUE * baseWorkMultiplier * torqueFactor * (float)torqueEffectMultiplier;
+                torque = Math.signum(getSpeed()) * torqueMagnitude;
+            }
         }
 
         propellerData.setThrust(thrust);
+        propellerData.setTorque(torque);
         propellerData.setInvertDirection(invertDirection);
     }
 

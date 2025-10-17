@@ -34,7 +34,8 @@ public class PropellerForceApplier {
 
     public void applyForces(BlockPos pos, PhysShipImpl ship) {
         float thrust = data.getThrust();
-        if (thrust == 0) return;
+        float torque = data.getTorque(); 
+        if (thrust == 0 && torque == 0) return;
         AtmosphereData atmosphere = data.getAtmosphere();
         if (atmosphere == null) return;
 
@@ -46,10 +47,17 @@ public class PropellerForceApplier {
             .add(0.5, 0.5, 0.5)
             .sub(shipCenterOfMass);
 
+        //Positioning and density
+        transform.getShipToWorld().transformDirection(data.getDirection(), worldForceDirection);
         Vector3d worldPos = transform.getShipToWorld().transformPosition(VectorConversionsMCKt.toJOMLD(pos));
         double externalAirDensity = AtmoshpereHelper.calculateExternalAirDensity(atmosphere, worldPos.y, true);
+        //Torque calculation and application
+        if (torque != 0) {
+            Vector3d torqueVector = new Vector3d(worldForceDirection).normalize().mul(torque);
+            torqueVector.mul(externalAirDensity);
+            ship.applyInvariantTorque(torqueVector);
+        }        
 
-        transform.getShipToWorld().transformDirection(data.getDirection(), worldForceDirection);
         worldForceDirection.normalize().mul(data.getInvertDirection() ? -1.0 : 1.0);
         worldForce.set(worldForceDirection).mul(thrust).mul(externalAirDensity);
         final Vector3dc linearVelocity = ship.getPoseVel().getVel();

@@ -8,6 +8,7 @@ import org.joml.Vector3d;
 import com.simibubi.create.foundation.collision.Matrix3d;
 
 public class MathUtility {
+    public static final double epsilon = 1e-5;
     
     //Very cool interpolation function stolen from Freya
     public static float expDecay(float a, float b, float decay, float dt) {

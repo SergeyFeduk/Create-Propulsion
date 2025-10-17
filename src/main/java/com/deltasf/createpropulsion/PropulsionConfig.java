@@ -35,6 +35,9 @@ public class PropulsionConfig {
     public static final ForgeConfigSpec.ConfigValue<Double> BALLOON_HOLE_LEAK_FACTOR;
     //Propeller
     public static final ForgeConfigSpec.ConfigValue<Double> PROPELLER_MAX_SPEED;
+    public static final ForgeConfigSpec.ConfigValue<Double> PROPELLER_POWER_MULTIPLIER;
+    public static final ForgeConfigSpec.ConfigValue<Double> PROPELLER_TORQUE_EFFECT_MULTIPLIER;
+
     public static final ForgeConfigSpec.ConfigValue<Integer> PROPELLER_BLUR_MAX_INSTANCES;
     public static final ForgeConfigSpec.ConfigValue<Double> PROPELLER_BLUR_SAMPLE_RATE;
     public static final ForgeConfigSpec.ConfigValue<Double> PROPELLER_LOD_DISTANCE;
@@ -101,6 +104,10 @@ public class PropulsionConfig {
         SERVER_BUILDER.push("Propeller");
             PROPELLER_MAX_SPEED = SERVER_BUILDER.comment("Propellers stop accelerating ships upon reaching this speed. Defined in blocks per second")
                 .defineInRange("Max speed", 40.0, 10.0, 100.0);
+            PROPELLER_POWER_MULTIPLIER = SERVER_BUILDER.comment("Propeller force and torque are multiplied by this number")
+                .defineInRange("Power multiplier", 1.0, 0.01, 100.0);
+            PROPELLER_TORQUE_EFFECT_MULTIPLIER = SERVER_BUILDER.comment("Propeller torque is multiplied by this number")
+                .defineInRange("Torque effect multiplier", 1.0, 0.01, 100.0);
         SERVER_BUILDER.pop();
 
         SERVER_SPEC = SERVER_BUILDER.build();
