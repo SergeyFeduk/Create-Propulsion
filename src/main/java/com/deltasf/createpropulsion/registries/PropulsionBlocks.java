@@ -82,6 +82,7 @@ public class PropulsionBlocks {
         .register();
     
     public static final BlockEntry<HaiBlock> HAI_BLOCK = REGISTRATE.block("hai_block", HaiBlock::new)
+        .properties(p -> p.noOcclusion())
         .simpleItem()
         .register();
 

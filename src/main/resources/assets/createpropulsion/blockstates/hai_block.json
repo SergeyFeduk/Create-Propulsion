@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "createpropulsion:block/hai_block" },
+    "facing=south": { "model": "createpropulsion:block/hai_block", "y": 180 },
+    "facing=west":  { "model": "createpropulsion:block/hai_block", "y": 270 },
+    "facing=east":  { "model": "createpropulsion:block/hai_block", "y": 90 }
+  }
+}
