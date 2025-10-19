@@ -15,7 +15,6 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.HaiGroup;
 import com.deltasf.createpropulsion.balloons.blocks.AbstractHotAirInjectorBlockEntity;
-import com.deltasf.createpropulsion.balloons.blocks.HaiBlockEntity;
 import com.deltasf.createpropulsion.balloons.utils.BalloonRegistryUtility;
 
 import net.minecraft.core.BlockPos;
@@ -127,7 +126,7 @@ public class BalloonRegistry {
     }
 
     public void startScanFor(UUID haiId, Level level, BlockPos pos) {
-        if (level.getBlockEntity(pos) instanceof HaiBlockEntity) {
+        if (level.getBlockEntity(pos) instanceof AbstractHotAirInjectorBlockEntity) {
             registerHai(haiId, level, pos);
         } else {
             unregisterHai(haiId, level);

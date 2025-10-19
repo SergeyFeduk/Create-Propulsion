@@ -6,7 +6,11 @@ import com.jozufozu.flywheel.core.PartialModel;
 import net.minecraft.resources.ResourceLocation;
 
 public class PropulsionPartialModels {
+    //Lodestone
     public static final PartialModel LODESTONE_TRACKER_INDICATOR = block("lodestone_tracker_overlay");
+
+    //Hot air burner
+    public static final PartialModel HOT_AIR_BURNER_LEVER = block("hot_air_burner_lever");
 
     //Propeller
     public static final PartialModel PROPELLER_HEAD = block("propeller_head");

@@ -1,5 +1,5 @@
 package com.deltasf.createpropulsion.balloons.blocks;
-/*
+
 import java.util.List;
 
 import org.valkyrienskies.core.api.ships.Ship;
@@ -7,6 +7,7 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
+import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.utility.Lang;
 
@@ -14,12 +15,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
 
-public class HaiBlockEntity extends AbstractHotAirInjectorBlockEntity implements IHaveGoggleInformation {
-    public HaiBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
+public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity implements IHaveGoggleInformation {
+    public HotAirBurnerBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
     }
+
+    private int leverPosition = 0; // 0-1-2
 
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {}
 
@@ -52,4 +54,3 @@ public class HaiBlockEntity extends AbstractHotAirInjectorBlockEntity implements
         return true;
     }
 }
-*/

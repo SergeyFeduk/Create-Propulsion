@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "createpropulsion:block/hot_air_burner_body" },
+    "facing=south": { "model": "createpropulsion:block/hot_air_burner_body", "y": 180 },
+    "facing=west":  { "model": "createpropulsion:block/hot_air_burner_body", "y": 270 },
+    "facing=east":  { "model": "createpropulsion:block/hot_air_burner_body", "y": 90 }
+  }
+}

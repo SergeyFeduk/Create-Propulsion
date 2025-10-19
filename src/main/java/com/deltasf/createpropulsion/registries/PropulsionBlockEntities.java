@@ -1,7 +1,8 @@
 package com.deltasf.createpropulsion.registries;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
-import com.deltasf.createpropulsion.balloons.blocks.HaiBlockEntity;
+import com.deltasf.createpropulsion.balloons.blocks.HotAirBurnerBlockEntity;
+import com.deltasf.createpropulsion.balloons.blocks.HotAirBurnerRenderer;
 import com.deltasf.createpropulsion.heat.burners.solid.SolidBurnerBlockEntity;
 import com.deltasf.createpropulsion.heat.engine.StirlingEngineBlockEntity;
 import com.deltasf.createpropulsion.heat.engine.StirlingEngineRenderer;
@@ -60,9 +61,10 @@ public class PropulsionBlockEntities {
         .validBlock(PropulsionBlocks.REDSTONE_MAGNET_BLOCK)
         .register();
 
-    public static final BlockEntityEntry<HaiBlockEntity> HAI_BLOCK_ENTITY =
-        REGISTRATE.blockEntity("hai_block_entity", HaiBlockEntity::new)
-        .validBlock(PropulsionBlocks.HAI_BLOCK)
+    public static final BlockEntityEntry<HotAirBurnerBlockEntity> HOT_AIR_BURNER_BLOCK_ENTITY =
+        REGISTRATE.blockEntity("hot_air_burner_block_entity", HotAirBurnerBlockEntity::new)
+        .validBlock(PropulsionBlocks.HOT_AIR_BURNER_BLOCK)
+        .renderer(() -> HotAirBurnerRenderer::new)
         .register();
 
     public static final BlockEntityEntry<SolidBurnerBlockEntity> SOLID_BURNER_BLOCK_ENTITY = 

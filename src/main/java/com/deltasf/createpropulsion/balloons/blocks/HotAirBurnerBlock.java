@@ -1,46 +1,40 @@
 package com.deltasf.createpropulsion.balloons.blocks;
-/*
-import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
+import com.deltasf.createpropulsion.registries.PropulsionShapes;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
-@SuppressWarnings("null")
-public class HaiBlock extends AbstractHotAirInjectorBlock {
+public class HotAirBurnerBlock extends AbstractHotAirInjectorBlock {
     public static final DirectionProperty FACING = DirectionProperty.create("facing");
-    public static final BooleanProperty POWERED = BooleanProperty.create("powered");
+    public static final BooleanProperty LIT = BooleanProperty.create("lit");
 
-    public HaiBlock(Properties properties) {
+    public HotAirBurnerBlock(Properties properties) {
         super(properties);
-        this.registerDefaultState(this.stateDefinition.any().setValue(POWERED, false).setValue(FACING, Direction.NORTH));
+        this.registerDefaultState(this.stateDefinition.any()
+            .setValue(LIT, false)
+            .setValue(FACING, Direction.NORTH));
     }
 
     @Override
     protected void createBlockStateDefinition(@Nonnull StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(POWERED);
+        builder.add(LIT);
         builder.add(FACING);
-    }
-
-    @Override
-    public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
-        return new HaiBlockEntity(PropulsionBlockEntities.HOT_AIR_BURNER_BLOCK_ENTITY.get(), pPos, pState);
-    }
-
-    @Override
-    public RenderShape getRenderShape(BlockState pState) {
-        return RenderShape.MODEL;
     }
 
     @Override
@@ -58,20 +52,16 @@ public class HaiBlock extends AbstractHotAirInjectorBlock {
     }
 
     @Override
-    public void neighborChanged(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull Block block, @Nonnull BlockPos fromPos, boolean isMoving) {
-        if (level.isClientSide()) {
-            return;
+    public VoxelShape getShape(@Nullable BlockState pState, @Nullable BlockGetter pLevel, @Nullable BlockPos pPos, @Nullable CollisionContext pContext) {
+        if (pState == null) {
+            return PropulsionShapes.HOT_AIR_BURNER.get(Direction.NORTH);
         }
+        Direction direction = pState.getValue(FACING);
+        return PropulsionShapes.HOT_AIR_BURNER.get(direction);
+    }
 
-        boolean wasPowered = state.getValue(POWERED);
-        boolean isNowPowered = level.getBestNeighborSignal(pos) > 0;
-
-        if (wasPowered != isNowPowered) {
-            level.setBlock(pos, state.setValue(POWERED, isNowPowered), 3);
-            if (isNowPowered) {
-                triggerScan(level, pos);
-            }
-        }
+    @Override
+    public BlockEntity newBlockEntity(@Nonnull BlockPos pPos, @Nonnull BlockState pState) {
+        return new HotAirBurnerBlockEntity(PropulsionBlockEntities.HOT_AIR_BURNER_BLOCK_ENTITY.get(), pPos, pState);
     }
 }
-*/

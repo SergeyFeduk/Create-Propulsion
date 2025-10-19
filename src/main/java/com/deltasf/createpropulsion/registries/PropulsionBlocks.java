@@ -2,7 +2,7 @@ package com.deltasf.createpropulsion.registries;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.balloons.blocks.EnvelopeBlock;
-import com.deltasf.createpropulsion.balloons.blocks.HaiBlock;
+import com.deltasf.createpropulsion.balloons.blocks.HotAirBurnerBlock;
 import com.deltasf.createpropulsion.heat.burners.solid.SolidBurnerBlock;
 import com.deltasf.createpropulsion.heat.engine.StirlingEngineBlock;
 import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerBlock;
@@ -81,8 +81,13 @@ public class PropulsionBlocks {
         .simpleItem()
         .register();
     
-    public static final BlockEntry<HaiBlock> HAI_BLOCK = REGISTRATE.block("hai_block", HaiBlock::new)
+    public static final BlockEntry<HotAirBurnerBlock> HOT_AIR_BURNER_BLOCK = REGISTRATE.block("hot_air_burner", HotAirBurnerBlock::new)
         .properties(p -> p.noOcclusion())
+        .properties(p -> p.mapColor(MapColor.STONE))
+        .properties(p -> p.sound(SoundType.METAL))
+        .properties(p -> p.requiresCorrectToolForDrops())
+        .properties(p -> p.strength(2.5F, 2.0F))
+        .properties(p -> p.lightLevel(state -> state.getValue(HotAirBurnerBlock.LIT) ? 6 : 0))
         .simpleItem()
         .register();
 

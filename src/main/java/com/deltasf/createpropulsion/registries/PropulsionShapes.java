@@ -44,6 +44,11 @@ public class PropulsionShapes {
         
         PROPELLER = ShapeBuilder.shape()
             .add(Block.box(0, 0, 4, 16, 16, 16))
+            .forDirectional(Direction.NORTH),
+
+        HOT_AIR_BURNER = ShapeBuilder.shape()
+            .add(Block.box(0, 0, 0, 16, 4, 16))
+            .add(Block.box(2, 4, 0, 14, 9, 16))
             .forDirectional(Direction.NORTH);
     
     public static class ShapeBuilder {

@@ -16,6 +16,7 @@
     "block.createpropulsion.physics_assembler": "Physics Assembler",
 
     "block.createpropulsion.envelope": "Envelope",
+    "block.createpropulsion.hot_air_burner": "Hot Air Burner",
     "block.createpropulsion.solid_burner": "Solid Burner",
     "block.createpropulsion.propeller": "Propeller",
     "block.createpropulsion.reaction_wheel": "Reaction Wheel",
