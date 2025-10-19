@@ -30,6 +30,7 @@ import net.minecraftforge.common.util.LazyOptional;
 
 public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity implements IHaveGoggleInformation {
     private HotAirBurnerFuelBehaviour fuelInventory;
+    private int burnTime = 0;
     private int leverPosition = 0; // 0-1-2
 
     public HotAirBurnerBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
@@ -47,7 +48,9 @@ public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity i
         } else {
             leverPosition = Math.min(2, leverPosition + 1);
         }
+
         notifyUpdate();
+        attemptScan();
     }
 
     public int getLeverPosition() {
@@ -60,7 +63,60 @@ public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity i
 
     @Override
     public double getInjectionAmount() {
-        return 1;
+        if (burnTime <= 0) return 0; //Not burning = not producing hot air
+        return (leverPosition + 1) / 3.0;
+    }
+
+    public void setBurnTime(int burnTime) {
+        this.burnTime = burnTime;
+    }
+
+    @SuppressWarnings("null")
+    public void attemptScan() {
+        if (level == null || level.isClientSide()) return;
+        if (fuelInventory.fuelStack.isEmpty()) return; //No fuel - no need to perform scan
+        Ship ship = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
+        if (ship == null) return; //No ship - no balloon possible
+
+        Balloon balloon = BalloonShipRegistry.forShip(ship.getId(), level).getBalloonOf(this.haiId);
+        if (balloon != null) return; //There is a balloon - no need to rescan
+
+        scan();
+    }
+
+    @SuppressWarnings("null")
+    @Override
+    public void tick() {
+        super.tick();
+        if (level.isClientSide()) return;
+
+        if (burnTime > 0) {
+            burnTime--;
+        }
+
+        if (burnTime <= 0) {
+            if (!fuelInventory.fuelStack.isEmpty()) {
+                Ship ship = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
+                if (ship != null) {
+                    Balloon balloon = BalloonShipRegistry.forShip(ship.getId(), level).getBalloonOf(this.haiId);
+                    if (balloon != null) {
+                        if (fuelInventory.tryConsumeFuel()) {
+                            notifyUpdate();
+                        }
+                    }
+                }
+            }
+        }
+        
+        updateBlockState();
+    }
+
+    @SuppressWarnings("null")
+    private void updateBlockState() {
+        boolean isBurning = burnTime > 0;
+        if (getBlockState().getValue(HotAirBurnerBlock.LIT) != isBurning) {
+            level.setBlock(worldPosition, getBlockState().setValue(HotAirBurnerBlock.LIT, isBurning), 3);
+        }
     }
 
     @Override
@@ -95,15 +151,16 @@ public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity i
     }
 
     @Override
-    protected void read(CompoundTag tag, boolean isClient) {
-        super.read(tag, isClient);
-        leverPosition = tag.getInt("leverPosition");
-    }
-
-    @Override
     protected void write(CompoundTag tag, boolean isClient) {
         super.write(tag, isClient);
         tag.putInt("leverPosition", leverPosition);
+        tag.putInt("burnTime", burnTime);
     }
 
+    @Override
+    protected void read(CompoundTag tag, boolean isClient) {
+        super.read(tag, isClient);
+        leverPosition = tag.getInt("leverPosition");
+        burnTime = tag.getInt("burnTime");
+    }
 }

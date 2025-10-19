@@ -8,6 +8,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
@@ -34,12 +36,24 @@ public class HotAirBurnerFuelBehaviour extends BlockEntityBehaviour {
     }
 
     public boolean tryConsumeFuel() {
-        //TODO:
+        if (fuelStack.isEmpty()) return false;
+        
+        int burnTime = ForgeHooks.getBurnTime(fuelStack, RecipeType.SMELTING);
+        if (burnTime > 0 && blockEntity instanceof HotAirBurnerBlockEntity burner) {
+            burner.setBurnTime(burnTime);
+            this.fuelStack.shrink(1);
+            if (this.fuelStack.isEmpty()) {
+                this.fuelStack = ItemStack.EMPTY;
+            }
+            return true;
+        }
         return false;
     }
 
+
     public boolean handlePlayerInteraction(Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
+        if (!(blockEntity instanceof HotAirBurnerBlockEntity hotAirBurnerBlockEntity)) return false;
 
         if (stack.isEmpty() && !fuelStack.isEmpty()) {
             player.getInventory().placeItemBackInInventory(itemHandler.extractItem(0, 64, false));
@@ -52,6 +66,7 @@ public class HotAirBurnerFuelBehaviour extends BlockEntityBehaviour {
             player.setItemInHand(hand, remainder);
             if (remainder.getCount() != stack.getCount()) {
                 blockEntity.notifyUpdate();
+                hotAirBurnerBlockEntity.attemptScan();
                 return true;
             }
         }
