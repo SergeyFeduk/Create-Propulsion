@@ -1,4 +1,4 @@
-package com.deltasf.createpropulsion.balloons.blocks;
+package com.deltasf.createpropulsion.balloons.blocks.hot_air_burner;
 
 import com.deltasf.createpropulsion.registries.PropulsionPartialModels;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -31,10 +31,19 @@ public class HotAirBurnerRenderer extends SmartBlockEntityRenderer<HotAirBurnerB
         VertexConsumer solidVB = buffer.getBuffer(RenderType.cutoutMipped());
         SuperByteBuffer leverModel = CachedBufferer.partial(PropulsionPartialModels.HOT_AIR_BURNER_LEVER, state);
 
-        //Holy hell this is so much easier this way
-        leverModel.centre()
-            .rotateY(AngleHelper.horizontalAngle(direction))
-			.rotateX(AngleHelper.verticalAngle(direction))
-            .unCentre().light(light).overlay(overlay).renderInto(ms, solidVB);
+        //Calculate translation & rotation
+        int leverPosition = be.getLeverPosition();
+
+        float horizontalOffset = leverPosition * horizontalOffsetVoxels / 16.0f;
+        float verticalOffset = leverPosition * verticalOffsetVoxels / 16.0f;
+
+        //Nvm, this is still better
+        ms.pushPose();
+        ms.translate(0.5, 0.5, 0.5);
+        ms.mulPose(Axis.YP.rotationDegrees(AngleHelper.horizontalAngle(direction)));
+        ms.translate(horizontalOffset, verticalOffset, 0);
+        ms.translate(-0.5, -0.5, -0.5);
+        leverModel.light(light).overlay(overlay).renderInto(ms, solidVB);
+        ms.popPose();
     }
 }

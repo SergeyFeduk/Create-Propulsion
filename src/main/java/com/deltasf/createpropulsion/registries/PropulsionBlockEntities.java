@@ -1,8 +1,8 @@
 package com.deltasf.createpropulsion.registries;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
-import com.deltasf.createpropulsion.balloons.blocks.HotAirBurnerBlockEntity;
-import com.deltasf.createpropulsion.balloons.blocks.HotAirBurnerRenderer;
+import com.deltasf.createpropulsion.balloons.blocks.hot_air_burner.HotAirBurnerBlockEntity;
+import com.deltasf.createpropulsion.balloons.blocks.hot_air_burner.HotAirBurnerRenderer;
 import com.deltasf.createpropulsion.heat.burners.solid.SolidBurnerBlockEntity;
 import com.deltasf.createpropulsion.heat.engine.StirlingEngineBlockEntity;
 import com.deltasf.createpropulsion.heat.engine.StirlingEngineRenderer;
