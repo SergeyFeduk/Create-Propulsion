@@ -87,7 +87,7 @@ public class PropulsionBlocks {
         .properties(p -> p.sound(SoundType.METAL))
         .properties(p -> p.requiresCorrectToolForDrops())
         .properties(p -> p.strength(2.5F, 2.0F))
-        .properties(p -> p.lightLevel(state -> state.getValue(HotAirBurnerBlock.LIT) ? 6 : 0))
+        .properties(p -> p.lightLevel(state -> state.getValue(HotAirBurnerBlock.LIT) ? 10 : 0))
         .simpleItem()
         .register();
 

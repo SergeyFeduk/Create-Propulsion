@@ -93,6 +93,7 @@ public class HotAirBurnerBlock extends AbstractHotAirInjectorBlock {
             }
         } else {
             burnerEntity.cycleLever(player.isShiftKeyDown());
+            level.playLocalSound(pos, SoundEvents.LEVER_CLICK, SoundSource.BLOCKS, 1.0F, 1.0F, false);
             return InteractionResult.SUCCESS;
         }
 
@@ -145,7 +146,7 @@ public class HotAirBurnerBlock extends AbstractHotAirInjectorBlock {
             double d1 = (double)pPos.getY();
             double d2 = (double)pPos.getZ() + 0.5D;
             if (pRandom.nextDouble() < 0.1D) {
-            pLevel.playLocalSound(d0, d1, d2, SoundEvents.BLASTFURNACE_FIRE_CRACKLE, SoundSource.BLOCKS, 1.0F, 1.0F, false);
+                pLevel.playLocalSound(d0, d1, d2, SoundEvents.BLASTFURNACE_FIRE_CRACKLE, SoundSource.BLOCKS, 1.0F, 1.0F, false);
             }
 
             Direction direction = pState.getValue(FACING);

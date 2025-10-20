@@ -1,0 +1,6 @@
+{
+  "parent": "createpropulsion:block/hot_air_burner_body",
+  "textures": {
+    "1": "createpropulsion:block/hot_air_burner_front_on"
+  }
+}
