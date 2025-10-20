@@ -3,6 +3,10 @@ package com.deltasf.createpropulsion.balloons.blocks.hot_air_burner;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.joml.Vector3d;
+import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.mod.common.VSGameUtilsKt;
+
 import com.deltasf.createpropulsion.balloons.blocks.AbstractHotAirInjectorBlock;
 import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
 import com.deltasf.createpropulsion.registries.PropulsionShapes;
@@ -72,9 +76,15 @@ public class HotAirBurnerBlock extends AbstractHotAirInjectorBlock {
 
         Direction facing = state.getValue(FACING);
         Vec3 frontNormal = Vec3.atLowerCornerOf(facing.getNormal());
-        //TODO: Fix, does not respect ship orientation atm
-        double dot = player.getLookAngle().dot(frontNormal);
 
+        //Get targeting side
+        Ship ship = VSGameUtilsKt.getShipManagingPos(level, pos);
+        if (ship != null) {
+            Vector3d rotatedNormal = new Vector3d(frontNormal.x(), frontNormal.y(), frontNormal.z());
+            ship.getShipToWorld().transformDirection(rotatedNormal);
+            frontNormal = new Vec3(rotatedNormal.x(), rotatedNormal.y(), rotatedNormal.z());
+        }
+        double dot = player.getLookAngle().dot(frontNormal);
         boolean isTargetingFront = dot < 0;
 
         if ((isHoldingBurnable || hasFuel) && isTargetingFront) {
