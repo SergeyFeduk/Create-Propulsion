@@ -3,10 +3,10 @@ package com.deltasf.createpropulsion.registries;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import net.createmod.catnip.theme.Color;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
-import com.jozufozu.flywheel.util.Color;
 import com.mojang.blaze3d.shaders.FogShape;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.tterrag.registrate.builders.FluidBuilder.FluidTypeFactory;

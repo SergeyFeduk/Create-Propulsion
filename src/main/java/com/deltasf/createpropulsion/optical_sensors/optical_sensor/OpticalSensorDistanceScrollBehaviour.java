@@ -8,7 +8,7 @@ import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueSettingsBoard;
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueSettingsFormatter;
 import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollValueBehaviour;
-import com.simibubi.create.foundation.utility.Lang;
+import com.simibubi.create.foundation.utility.CreateLang;
 
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.BlockHitResult;
@@ -17,12 +17,12 @@ import net.minecraft.network.chat.MutableComponent;
 
 public class OpticalSensorDistanceScrollBehaviour extends ScrollValueBehaviour {
     public OpticalSensorDistanceScrollBehaviour(SmartBlockEntity be) {
-        super(Lang.builder().translate("gui.optical_sensor.distance_behaviour", new Object[0]).component(), be, new OpticalSensorDistanceValueBox());
+        super(CreateLang.builder().translate("gui.optical_sensor.distance_behaviour", new Object[0]).component(), be, new OpticalSensorDistanceValueBox());
     }
 
     @Override
     public ValueSettingsBoard createBoard(Player player, BlockHitResult hitResult) {
-        ImmutableList<Component> row = ImmutableList.of(Lang.builder().text("\u2191").component());
+        ImmutableList<Component> row = ImmutableList.of(CreateLang.builder().text("\u2191").component());
         var be = (AbstractOpticalSensorBlockEntity)getWorld().getBlockEntity(getPos());
         int maxDistance;
         if (be != null) {
@@ -49,8 +49,8 @@ public class OpticalSensorDistanceScrollBehaviour extends ScrollValueBehaviour {
     }
 
     public MutableComponent formatValue(ValueSettings settings) {
-        return Lang.builder()
-            .add(Lang.number(Math.max(1, settings.value())))
+        return CreateLang.builder()
+            .add(CreateLang.number(Math.max(1, settings.value())))
             .text("\u2191")
             .component();
     }

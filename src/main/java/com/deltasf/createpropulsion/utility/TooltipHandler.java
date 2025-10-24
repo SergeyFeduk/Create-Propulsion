@@ -8,6 +8,7 @@ import com.deltasf.createpropulsion.thruster.ThrusterFuelManager;
 import com.deltasf.createpropulsion.thruster.thruster.ThrusterBlockEntity;
 import com.simibubi.create.foundation.item.TooltipHelper;
 
+import net.createmod.catnip.lang.FontHelper.Palette;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
@@ -27,7 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.Function;
 
-import com.simibubi.create.foundation.item.TooltipHelper.Palette;
 
 import net.minecraft.network.chat.Component;
 
