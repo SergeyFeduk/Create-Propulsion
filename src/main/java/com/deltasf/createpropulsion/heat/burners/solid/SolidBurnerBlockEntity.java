@@ -207,8 +207,6 @@ public class SolidBurnerBlockEntity extends AbstractBurnerBlockEntity {
 
     @Override
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
-        //TODO: Figure out how to make server notify us of update every tick ONLY when we are looking at goggle tooltip
-        //For now I'll just update this when state changes and display "artistic name" for heat level, not actual number
         ChatFormatting color = null;
         String key = null;
 

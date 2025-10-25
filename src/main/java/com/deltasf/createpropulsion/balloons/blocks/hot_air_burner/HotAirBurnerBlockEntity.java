@@ -14,7 +14,9 @@ import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
 import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.utility.Lang;
+import com.simibubi.create.foundation.utility.LangBuilder;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -32,6 +34,14 @@ public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity i
     private HotAirBurnerFuelBehaviour fuelInventory;
     private int burnTime = 0;
     private int leverPosition = 0; // 0-1-2
+
+    //Goggle display data
+    private double lastTickBalloonHotAir = -1;
+    private int hotAirTrend = 0;
+    private boolean isBalloonPresent = false;
+    private int balloonHotAir = 0;
+    private int balloonMaxHotAir = 0;
+    private int balloonHotAirPercentage = 0;
 
     public HotAirBurnerBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
@@ -90,20 +100,63 @@ public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity i
         super.tick();
         if (level.isClientSide()) return;
 
+        boolean needsSync = false;
+        //Trend logic
+        int oldTrend = hotAirTrend;
+        Ship ship = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
+
+        Balloon balloon = (ship != null) ? BalloonShipRegistry.forShip(ship.getId()).getBalloonOf(this.haiId) : null;
+        if (balloon != null) {
+            int currentHotAir = (int) balloon.hotAir;
+            int currentMaxHotAir = (int) balloon.getVolumeSize();
+            double percentage = currentMaxHotAir > 0 ? (balloon.hotAir / currentMaxHotAir) : 0;
+            int currentPercentage = (int) (percentage * 100);
+
+            //Update trend
+            if (lastTickBalloonHotAir != -1) {
+                double delta = balloon.hotAir - lastTickBalloonHotAir;
+                if (Math.abs(delta) < 0.001) hotAirTrend = 0;
+                else if (delta > 0) hotAirTrend = 1;
+                else hotAirTrend = -1;
+            } else {
+                hotAirTrend = 0;
+            }
+            lastTickBalloonHotAir = balloon.hotAir;
+
+            //Check if something changed
+            if (!isBalloonPresent || balloonHotAir != currentHotAir || balloonMaxHotAir != currentMaxHotAir 
+                || balloonHotAirPercentage != currentPercentage || hotAirTrend != oldTrend) {
+                needsSync = true;
+            }
+
+            //Update state
+            isBalloonPresent = true;
+            balloonHotAir = currentHotAir;
+            balloonMaxHotAir = currentMaxHotAir;
+            balloonHotAirPercentage = currentPercentage;
+        } else {
+            if (isBalloonPresent) {
+                needsSync = true;
+            }
+
+            isBalloonPresent = false;
+            lastTickBalloonHotAir = -1;
+            hotAirTrend = 0;
+        }
+
+        if (needsSync) {
+            notifyUpdate();
+        }
+
+        //Burning logic
         if (burnTime > 0) {
             burnTime--;
         }
 
         if (burnTime <= 0) {
-            if (!fuelInventory.fuelStack.isEmpty()) {
-                Ship ship = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
-                if (ship != null) {
-                    Balloon balloon = BalloonShipRegistry.forShip(ship.getId(), level).getBalloonOf(this.haiId);
-                    if (balloon != null) {
-                        if (fuelInventory.tryConsumeFuel()) {
-                            notifyUpdate();
-                        }
-                    }
+            if (!fuelInventory.fuelStack.isEmpty() && balloon != null) {
+                if (fuelInventory.tryConsumeFuel()) {
+                    notifyUpdate();
                 }
             }
         }
@@ -121,25 +174,77 @@ public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity i
 
     @Override
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
-        //Temp, for debugging purposes
-        Ship ship = VSGameUtilsKt.getShipManagingPos(getLevel(), worldPosition);
-        if (ship == null) return false;
-        Balloon balloon = BalloonShipRegistry.forShip(ship.getId()).getBalloonOf(this.haiId);
-        if (balloon == null) {
-            Lang.builder().text("Balloon not found, hai is not active").forGoggles(tooltip);
+        boolean hasFuel = !fuelInventory.fuelStack.isEmpty();
+        boolean isBurning = burnTime > 0;
+
+        //Status
+        String key = "";
+        ChatFormatting color = null;
+
+        if (!isBalloonPresent) {
+        key = "gui.goggles.hot_air_burner.status.no_balloon";
+        color = ChatFormatting.DARK_GRAY;
+        } else if (isBurning) {
+            key = "gui.goggles.hot_air_burner.status.on";
+            color = ChatFormatting.GREEN;
+        } else if (hasFuel) {
+            key = "gui.goggles.hot_air_burner.status.ready";
+            color = ChatFormatting.GRAY;
+        } else {
+            key = "gui.goggles.hot_air_burner.status.no_fuel";
+            color = ChatFormatting.GOLD;
+        }
+
+
+        Lang.builder()
+            .add(Lang.translate("gui.goggles.hot_air_burner.status"))
+            .text(": ")
+            .add(Lang.translate(key).style(color))
+            .forGoggles(tooltip);
+
+        //Fuel info
+        ItemStack fuel = fuelInventory.fuelStack;
+        if (hasFuel) {
+            LangBuilder fuelName = Lang.builder().add(fuel.getHoverName()).style(ChatFormatting.GRAY);
+            LangBuilder fuelCount = Lang.builder().text("x").text(String.valueOf(fuel.getCount())).style(ChatFormatting.GREEN);
+
+            Lang.builder().add(fuelName).space().add(fuelCount).forGoggles(tooltip);
+        }
+
+        //Balloon section
+        if (!isBalloonPresent) {
             return true;
         }
 
-        Lang.builder().text("Balloon").forGoggles(tooltip);
-        Lang.builder().text("Hot air: ")
-            .add(Lang.number(balloon.hotAir))
-            .text(" / ")
-            .add(Lang.number(balloon.getVolumeSize())).forGoggles(tooltip);
+        if (hasFuel) {
+            Lang.text("").forGoggles(tooltip);
+        }
         
-        double percentage = balloon.hotAir / balloon.getVolumeSize();
-        Lang.builder().add(Lang.number(percentage * 100)).text("%").forGoggles(tooltip);
+        Lang.builder()
+            .translate("gui.goggles.hot_air_burner.balloon.status")
+            .forGoggles(tooltip);
+
+        Component trendSymbol;
+        switch (hotAirTrend) {
+            case 1 -> trendSymbol = Lang.text("▲").style(ChatFormatting.GREEN).component();
+            case -1 -> trendSymbol = Lang.text("▼").style(ChatFormatting.RED).component();
+            default -> trendSymbol = Lang.text("■").style(ChatFormatting.DARK_GRAY).component();
+        }
+
+        var hotAirBuilder = Lang.builder()
+            .translate("gui.goggles.hot_air_burner.balloon.hot_air")
+            .text(String.format(": %d / %d", balloonHotAir, balloonMaxHotAir));
         
-        Lang.builder().text("Holes: " + balloon.holes.size()).forGoggles(tooltip);
+        if (isPlayerSneaking) {
+            hotAirBuilder.text(String.format(" (%d%%)", balloonHotAirPercentage));
+        }
+
+        hotAirBuilder.text(" ")
+            .add(Lang.text("[").style(ChatFormatting.DARK_GRAY))
+            .add(trendSymbol)
+            .add(Lang.text("]").style(ChatFormatting.DARK_GRAY))
+            .forGoggles(tooltip);
+
         return true;
     }
 
@@ -155,6 +260,14 @@ public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity i
         super.write(tag, isClient);
         tag.putInt("leverPosition", leverPosition);
         tag.putInt("burnTime", burnTime);
+
+        if (isClient) {
+            tag.putInt("hotAirTrend", hotAirTrend);
+            tag.putBoolean("isBalloonPresent", isBalloonPresent);
+            tag.putInt("balloonHotAir", balloonHotAir);
+            tag.putInt("balloonMaxHotAir", balloonMaxHotAir);
+            tag.putInt("balloonHotAirPercentage", balloonHotAirPercentage);
+        }
     }
 
     @Override
@@ -162,5 +275,13 @@ public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity i
         super.read(tag, isClient);
         leverPosition = tag.getInt("leverPosition");
         burnTime = tag.getInt("burnTime");
+
+        if (isClient) {
+            hotAirTrend = tag.getInt("hotAirTrend");
+            isBalloonPresent = tag.getBoolean("isBalloonPresent");
+            balloonHotAir = tag.getInt("balloonHotAir");
+            balloonMaxHotAir = tag.getInt("balloonMaxHotAir");
+            balloonHotAirPercentage = tag.getInt("balloonHotAirPercentage");
+        }
     }
 }
