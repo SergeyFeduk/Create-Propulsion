@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " I ",
+        " BC",
+        "   "
+    ],
+    "key": {
+        "B": {
+            "item": "minecraft:blast_furnace"
+        },
+        "C": {
+            "item": "create:copper_nugget"
+        },
+        "I": {
+            "item": "minecraft:iron_bars"
+        }
+    },
+    "result": {
+        "item": "createpropulsion:hot_air_burner"
+    }
+}

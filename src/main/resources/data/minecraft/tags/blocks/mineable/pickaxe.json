@@ -10,6 +10,7 @@
         "createpropulsion:propeller",
         "createpropulsion:solid_burner",
         "createpropulsion:reaction_wheel",
-        "createpropulsion:stirling_engine"
+        "createpropulsion:stirling_engine",
+        "createpropulsion:hot_air_burner"
     ]
 }
