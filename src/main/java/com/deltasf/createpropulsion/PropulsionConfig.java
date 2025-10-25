@@ -38,6 +38,7 @@ public class PropulsionConfig {
     public static final ForgeConfigSpec.ConfigValue<Double> PROPELLER_POWER_MULTIPLIER;
     public static final ForgeConfigSpec.ConfigValue<Double> PROPELLER_TORQUE_EFFECT_MULTIPLIER;
 
+    public static final ForgeConfigSpec.ConfigValue<Boolean> PROPELLER_ENABLE_BLUR;
     public static final ForgeConfigSpec.ConfigValue<Integer> PROPELLER_BLUR_MAX_INSTANCES;
     public static final ForgeConfigSpec.ConfigValue<Double> PROPELLER_BLUR_SAMPLE_RATE;
     public static final ForgeConfigSpec.ConfigValue<Double> PROPELLER_LOD_DISTANCE;
@@ -121,6 +122,8 @@ public class PropulsionConfig {
                     .define("Particle count multiplier", 1.0);
         CLIENT_BUILDER.pop();
         CLIENT_BUILDER.push("Propeller");
+            PROPELLER_ENABLE_BLUR = CLIENT_BUILDER.comment("Should fast-rotating propeller blades be blurred. Disable this if you experience visual issues with fast-rotating propellers")
+                .define("Enable blur", true);
             PROPELLER_BLUR_MAX_INSTANCES = CLIENT_BUILDER.comment("Maximum amount of blurred models rendered. Decrease this value if your fps drops when near a lot of propellers.")
                 .define("Max blur instances", 64); //Set to 32
             PROPELLER_BLUR_SAMPLE_RATE = CLIENT_BUILDER.comment("How slow propeller blades start to become blurry")

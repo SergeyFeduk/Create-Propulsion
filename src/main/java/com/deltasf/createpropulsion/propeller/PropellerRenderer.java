@@ -138,7 +138,7 @@ public class PropellerRenderer extends KineticBlockEntityRenderer<PropellerBlock
         double blurDeg = blurRad * (180.0 / Math.PI);
 
         boolean shouldBlur = distSqr < (PropulsionConfig.PROPELLER_LOD_DISTANCE.get() * PropulsionConfig.PROPELLER_LOD_DISTANCE.get()) && blurDeg > MIN_BLUR_DEG;
-        if (canBeBlurred[0] && shouldBlur) {
+        if (canBeBlurred[0] && shouldBlur && PropulsionConfig.PROPELLER_ENABLE_BLUR.get()) {
             int N = Math.min(PropulsionConfig.PROPELLER_BLUR_MAX_INSTANCES.get(), Math.max(2, (int)Math.ceil(blurDeg / PropulsionConfig.PROPELLER_BLUR_SAMPLE_RATE.get())));
             //float alpha = 1.0f / (float)N;
             float alpha = (float) (1.0 - Math.pow(1.0 - TARGET_OPACITY, 1.0 / N));

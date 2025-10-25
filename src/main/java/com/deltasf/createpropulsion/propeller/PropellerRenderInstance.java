@@ -144,7 +144,7 @@ public class PropellerRenderInstance extends KineticBlockEntityInstance<Propelle
         boolean shouldBlur = distSqr < Math.pow(PropulsionConfig.PROPELLER_LOD_DISTANCE.get(), 2) && blurDeg > PropellerRenderer.MIN_BLUR_DEG;
         boolean canBeBlurred = canBeBlurred();
 
-        if (canBeBlurred && shouldBlur) {
+        if (canBeBlurred && shouldBlur && PropulsionConfig.PROPELLER_ENABLE_BLUR.get()) {
             renderBlurred(blurDeg);
         } else {
             renderSharp();
