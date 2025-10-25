@@ -33,6 +33,8 @@ public abstract class AbstractHotAirInjectorBlockEntity extends SmartBlockEntity
         tryRegister();
     }
 
+    public void onBalloonLoaded() {}
+
     @SuppressWarnings("null")
     public void tryRegister() {
         if (level == null || level.isClientSide) return;

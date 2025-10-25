@@ -28,8 +28,6 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 
-//2) I need to first just FIGURE OUT when to make this block perform a scan. First of all, let me explain to you, what it is and why it is like that. 
-
 public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity implements IHaveGoggleInformation {
     public static final double TREND_THRESHOLD = 0.001;
 
@@ -96,12 +94,39 @@ public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity i
         scan();
     }
 
+    @Override
+    public void onBalloonLoaded() {
+        updateGoggleData();
+    }
+
     @SuppressWarnings("null")
     @Override
     public void tick() {
         super.tick();
         if (level.isClientSide()) return;
 
+        updateGoggleData();
+
+        //Burning logic
+        if (burnTime > 0) {
+            burnTime--;
+        }
+
+        if (burnTime <= 0) {
+            Ship ship = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
+            Balloon balloon = (ship != null) ? BalloonShipRegistry.forShip(ship.getId()).getBalloonOf(this.haiId) : null;
+            if (!fuelInventory.fuelStack.isEmpty() && balloon != null) {
+                if (fuelInventory.tryConsumeFuel()) {
+                    notifyUpdate();
+                }
+            }
+        }
+        
+        updateBlockState();
+    }
+
+    @SuppressWarnings("null")
+    private void updateGoggleData() {
         boolean needsSync = false;
         //Trend logic
         int oldTrend = hotAirTrend;
@@ -149,21 +174,6 @@ public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity i
         if (needsSync) {
             notifyUpdate();
         }
-
-        //Burning logic
-        if (burnTime > 0) {
-            burnTime--;
-        }
-
-        if (burnTime <= 0) {
-            if (!fuelInventory.fuelStack.isEmpty() && balloon != null) {
-                if (fuelInventory.tryConsumeFuel()) {
-                    notifyUpdate();
-                }
-            }
-        }
-        
-        updateBlockState();
     }
 
     @SuppressWarnings("null")

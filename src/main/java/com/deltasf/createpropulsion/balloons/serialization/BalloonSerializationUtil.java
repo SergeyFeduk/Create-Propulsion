@@ -15,6 +15,7 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.HaiGroup;
+import com.deltasf.createpropulsion.balloons.blocks.AbstractHotAirInjectorBlockEntity;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry;
 import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
 
@@ -106,6 +107,12 @@ public class BalloonSerializationUtil {
             if (balloon == null) {
                  System.out.println("Achtung! Achtung! We havent managed to recreate the balloon. This is bad.");
             }
+
+            for(BlockPos haiPos : supportHaiPositions) {
+                if (level.getBlockEntity(haiPos) instanceof AbstractHotAirInjectorBlockEntity injector) {
+                    injector.onBalloonLoaded();
+                }
+            } 
 
             return balloon;
         }
