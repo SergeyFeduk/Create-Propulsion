@@ -31,6 +31,8 @@ import net.minecraftforge.common.util.LazyOptional;
 //2) I need to first just FIGURE OUT when to make this block perform a scan. First of all, let me explain to you, what it is and why it is like that. 
 
 public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity implements IHaveGoggleInformation {
+    public static final double TREND_THRESHOLD = 0.001;
+
     private HotAirBurnerFuelBehaviour fuelInventory;
     private int burnTime = 0;
     private int leverPosition = 0; // 0-1-2
@@ -115,7 +117,7 @@ public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity i
             //Update trend
             if (lastTickBalloonHotAir != -1) {
                 double delta = balloon.hotAir - lastTickBalloonHotAir;
-                if (Math.abs(delta) < 0.001) hotAirTrend = 0;
+                if (Math.abs(delta) < HotAirBurnerBlockEntity.TREND_THRESHOLD) hotAirTrend = 0;
                 else if (delta > 0) hotAirTrend = 1;
                 else hotAirTrend = -1;
             } else {
