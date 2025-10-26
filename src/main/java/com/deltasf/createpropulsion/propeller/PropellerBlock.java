@@ -66,8 +66,7 @@ public class PropellerBlock extends DirectionalKineticBlock implements IBE<Prope
         
         //Fallback
         Direction baseDirection = context.getNearestLookingDirection();
-        Direction placeDirection = !isSneaking ? baseDirection.getOpposite() : baseDirection;
-        return this.defaultBlockState().setValue(FACING, placeDirection);
+        return this.defaultBlockState().setValue(FACING, baseDirection.getOpposite());
     }
 
     @Override
