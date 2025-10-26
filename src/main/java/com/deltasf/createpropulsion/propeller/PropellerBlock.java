@@ -8,6 +8,7 @@ import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
 import com.deltasf.createpropulsion.registries.PropulsionShapes;
 import com.simibubi.create.AllSoundEvents;
 import com.simibubi.create.content.kinetics.base.DirectionalKineticBlock;
+import com.simibubi.create.content.kinetics.base.IRotate;
 import com.simibubi.create.foundation.block.IBE;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntityTicker;
 
@@ -52,18 +53,20 @@ public class PropellerBlock extends DirectionalKineticBlock implements IBE<Prope
         return state.getValue(FACING).getAxis();
     }
 
-    //TODO: Have shaft-aware placement logic here
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        Direction baseDirection = context.getNearestLookingDirection();
-        Direction placeDirection;
         Player player = context.getPlayer();
-        if (player != null) {
-            placeDirection = !player.isShiftKeyDown() ? baseDirection.getOpposite() : baseDirection;
-        } else {
-            placeDirection = baseDirection;
-        }
+        boolean isSneaking = player != null && player.isShiftKeyDown();
 
+        //Find best direction based on surrounding rotational blocks
+        Direction preferredDirection = getPreferredDirection(context);
+        if (preferredDirection != null && !isSneaking) {
+            return this.defaultBlockState().setValue(FACING, preferredDirection);
+        }
+        
+        //Fallback
+        Direction baseDirection = context.getNearestLookingDirection();
+        Direction placeDirection = !isSneaking ? baseDirection.getOpposite() : baseDirection;
         return this.defaultBlockState().setValue(FACING, placeDirection);
     }
 
@@ -88,7 +91,6 @@ public class PropellerBlock extends DirectionalKineticBlock implements IBE<Prope
         if (heldItem.getItem() instanceof PropellerBladeItem) {
 
             if (!propellerBE.getSpatialHandler().getObstructedBlocks().isEmpty()) {
-                // TODO: Notify player that propeller must not be obstructed
                 return InteractionResult.FAIL;
             }
 
@@ -154,6 +156,26 @@ public class PropellerBlock extends DirectionalKineticBlock implements IBE<Prope
         if (level.isClientSide()) return;
         
         withBlockEntityDo(level, pos, (be) -> be.getSpatialHandler().triggerImmediateScan());
+    }
+
+    public static Direction getPreferredDirection(BlockPlaceContext context) {
+        Direction preferredDirection = null;
+        for (Direction side : Direction.values()) {
+            BlockPos neighborPos = context.getClickedPos().relative(side);
+            BlockState neighborState = context.getLevel().getBlockState(neighborPos);
+
+            if (neighborState.getBlock() instanceof IRotate) {
+                IRotate neighborRotate = (IRotate) neighborState.getBlock();
+                if (neighborRotate.hasShaftTowards(context.getLevel(), neighborPos, neighborState, side.getOpposite())) {
+                    Direction facingDirection = side.getOpposite();
+                    if (preferredDirection != null && preferredDirection != facingDirection) {
+                        return null; //Fallback
+                    }
+                    preferredDirection = facingDirection;
+                }
+            }
+        }
+        return preferredDirection;
     }
 
     @Override
