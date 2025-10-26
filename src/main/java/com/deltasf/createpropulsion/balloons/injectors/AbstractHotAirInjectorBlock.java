@@ -1,4 +1,4 @@
-package com.deltasf.createpropulsion.balloons.blocks;
+package com.deltasf.createpropulsion.balloons.injectors;
 
 import javax.annotation.Nonnull;
 

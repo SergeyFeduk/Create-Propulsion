@@ -15,7 +15,7 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.HaiGroup;
-import com.deltasf.createpropulsion.balloons.blocks.AbstractHotAirInjectorBlockEntity;
+import com.deltasf.createpropulsion.balloons.injectors.AbstractHotAirInjectorBlockEntity;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry;
 import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
 
@@ -105,7 +105,7 @@ public class BalloonSerializationUtil {
             Balloon balloon = group.createManagedBalloonFromSave(hotAir, holes, decompressedVolume, supportHaiPositions, level, registry);
 
             if (balloon == null) {
-                 System.out.println("Achtung! Achtung! We havent managed to recreate the balloon. This is bad.");
+                System.out.println("Achtung! Achtung! We havent managed to recreate the balloon. This is bad.");
             }
 
             for(BlockPos haiPos : supportHaiPositions) {

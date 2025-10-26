@@ -1,4 +1,4 @@
-package com.deltasf.createpropulsion.balloons.blocks;
+package com.deltasf.createpropulsion.balloons.injectors;
 
 import java.util.List;
 import java.util.UUID;

@@ -1,4 +1,4 @@
-package com.deltasf.createpropulsion.balloons.blocks.hot_air_burner;
+package com.deltasf.createpropulsion.balloons.injectors.hot_air_burner;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -7,7 +7,7 @@ import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
-import com.deltasf.createpropulsion.balloons.blocks.AbstractHotAirInjectorBlock;
+import com.deltasf.createpropulsion.balloons.injectors.AbstractHotAirInjectorBlock;
 import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
 import com.deltasf.createpropulsion.registries.PropulsionShapes;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntityTicker;

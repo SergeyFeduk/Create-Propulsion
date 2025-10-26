@@ -1,8 +1,8 @@
 package com.deltasf.createpropulsion.registries;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
-import com.deltasf.createpropulsion.balloons.blocks.EnvelopeBlock;
-import com.deltasf.createpropulsion.balloons.blocks.hot_air_burner.HotAirBurnerBlock;
+import com.deltasf.createpropulsion.balloons.envelopes.EnvelopeBlock;
+import com.deltasf.createpropulsion.balloons.injectors.hot_air_burner.HotAirBurnerBlock;
 import com.deltasf.createpropulsion.heat.burners.solid.SolidBurnerBlock;
 import com.deltasf.createpropulsion.heat.engine.StirlingEngineBlock;
 import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerBlock;

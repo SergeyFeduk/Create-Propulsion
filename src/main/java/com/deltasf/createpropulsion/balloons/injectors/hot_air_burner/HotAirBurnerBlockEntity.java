@@ -1,4 +1,4 @@
-package com.deltasf.createpropulsion.balloons.blocks.hot_air_burner;
+package com.deltasf.createpropulsion.balloons.injectors.hot_air_burner;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import com.deltasf.createpropulsion.balloons.Balloon;
-import com.deltasf.createpropulsion.balloons.blocks.AbstractHotAirInjectorBlockEntity;
+import com.deltasf.createpropulsion.balloons.injectors.AbstractHotAirInjectorBlockEntity;
 import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
 import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
@@ -125,7 +125,6 @@ public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity i
         updateBlockState();
     }
 
-    @SuppressWarnings("null")
     private void updateGoggleData() {
         boolean needsSync = false;
         //Trend logic

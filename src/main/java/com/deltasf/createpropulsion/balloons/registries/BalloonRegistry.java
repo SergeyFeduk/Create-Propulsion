@@ -14,7 +14,7 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.HaiGroup;
-import com.deltasf.createpropulsion.balloons.blocks.AbstractHotAirInjectorBlockEntity;
+import com.deltasf.createpropulsion.balloons.injectors.AbstractHotAirInjectorBlockEntity;
 import com.deltasf.createpropulsion.balloons.utils.BalloonRegistryUtility;
 
 import net.minecraft.core.BlockPos;

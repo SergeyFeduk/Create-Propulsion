@@ -1,4 +1,4 @@
-package com.deltasf.createpropulsion.balloons.blocks.hot_air_burner;
+package com.deltasf.createpropulsion.balloons.injectors.hot_air_burner;
 
 import org.jetbrains.annotations.NotNull;
 

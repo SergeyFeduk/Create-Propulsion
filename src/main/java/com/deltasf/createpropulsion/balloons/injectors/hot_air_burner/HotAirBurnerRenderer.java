@@ -1,4 +1,4 @@
-package com.deltasf.createpropulsion.balloons.blocks.hot_air_burner;
+package com.deltasf.createpropulsion.balloons.injectors.hot_air_burner;
 
 import com.deltasf.createpropulsion.registries.PropulsionPartialModels;
 import com.mojang.blaze3d.vertex.PoseStack;
