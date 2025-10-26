@@ -11,10 +11,14 @@ import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
 import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.atmosphere.DimensionAtmosphereManager;
+import com.deltasf.createpropulsion.physics_assembler.AssemblyUtility;
 import com.deltasf.createpropulsion.propeller.blades.PropellerBladeItem;
 import com.deltasf.createpropulsion.utility.MathUtility;
+import com.simibubi.create.AllSpecialTextures;
+import com.simibubi.create.CreateClient;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.simibubi.create.foundation.outliner.Outline.OutlineParams;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -368,6 +372,15 @@ public class PropellerBlockEntity extends KineticBlockEntity {
     @Override
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         super.addToGoggleTooltip(tooltip, isPlayerSneaking);
+
+        spatialHandler.triggerImmediateScan();
+
+        OutlineParams outline = CreateClient.OUTLINER.showCluster("PropellerObstruction", spatialHandler.getObstructedBlocks());
+        outline.colored(AssemblyUtility.CANCEL_COLOR);
+        outline.lineWidth(1/16f);
+        outline.withFaceTexture(AllSpecialTextures.CHECKERED);
+        outline.disableLineNormals();
+
         return true;
     }
 
