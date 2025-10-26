@@ -10,9 +10,14 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.injectors.AbstractHotAirInjectorBlockEntity;
+import com.deltasf.createpropulsion.balloons.injectors.AirInjectorObstructionBehaviour;
 import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
+import com.deltasf.createpropulsion.physics_assembler.AssemblyUtility;
+import com.simibubi.create.AllSpecialTextures;
+import com.simibubi.create.CreateClient;
 import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.simibubi.create.foundation.outliner.Outline.OutlineParams;
 import com.simibubi.create.foundation.utility.Lang;
 import com.simibubi.create.foundation.utility.LangBuilder;
 
@@ -32,6 +37,7 @@ public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity i
     public static final double TREND_THRESHOLD = 0.001;
 
     private HotAirBurnerFuelBehaviour fuelInventory;
+    private AirInjectorObstructionBehaviour obstructionBehaviour;
     private int burnTime = 0;
     private int leverPosition = 0; // 0-1-2
 
@@ -50,6 +56,8 @@ public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity i
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
         fuelInventory = new HotAirBurnerFuelBehaviour(this);
         behaviours.add(fuelInventory);
+        obstructionBehaviour = new AirInjectorObstructionBehaviour(this);
+        behaviours.add(obstructionBehaviour);
     }
 
     public void cycleLever(boolean isShiftPressed) {
@@ -74,7 +82,19 @@ public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity i
     @Override
     public double getInjectionAmount() {
         if (burnTime <= 0) return 0; //Not burning = not producing hot air
-        return (leverPosition + 1) / 3.0;
+        //Injection amount due to lever position
+        double baseInjection = (leverPosition + 1) / 3.0;
+
+        //Injection penalty due to obstruction
+        int obstructions = obstructionBehaviour.getObstructedBlocks().size();
+        double efficiency;
+        switch (obstructions) {
+            case 0:  efficiency = 1.0; break;
+            case 1:  efficiency = 2.0 / 3.0; break;
+            case 2:  efficiency = 1.0 / 3.0; break;
+            default: efficiency = 0.0; break;
+        }
+        return baseInjection * efficiency;
     }
 
     public void setBurnTime(int burnTime) {
@@ -206,7 +226,6 @@ public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity i
             color = ChatFormatting.GOLD;
         }
 
-
         Lang.builder()
             .add(Lang.translate("gui.goggles.hot_air_burner.status"))
             .text(": ")
@@ -255,6 +274,13 @@ public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity i
             .add(trendSymbol)
             .add(Lang.text("]").style(ChatFormatting.DARK_GRAY))
             .forGoggles(tooltip);
+
+        //Obstruction overlay
+        OutlineParams outline = CreateClient.OUTLINER.showCluster("HotAirBurnerObstruction", obstructionBehaviour.getObstructedBlocks());
+        outline.colored(AssemblyUtility.CANCEL_COLOR);
+        outline.lineWidth(1/16f);
+        outline.withFaceTexture(AllSpecialTextures.CHECKERED);
+        outline.disableLineNormals();
 
         return true;
     }
