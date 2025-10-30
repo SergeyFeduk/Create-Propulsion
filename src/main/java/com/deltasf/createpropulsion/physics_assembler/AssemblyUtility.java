@@ -7,7 +7,6 @@ import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import com.simibubi.create.AllSpecialTextures;
-import com.simibubi.create.CreateClient;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
