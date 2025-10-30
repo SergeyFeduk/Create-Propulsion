@@ -62,8 +62,8 @@ sourceSets.main.resources { srcDirs = ['src/main/resources', 'src/generated/reso
 
 repositories {
 
-    mavenCentral()
     mavenLocal()
+    mavenCentral()
     maven {
         url = "https://modmaven.dev/"
     }
