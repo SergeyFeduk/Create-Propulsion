@@ -7,8 +7,8 @@ import com.deltasf.createpropulsion.thruster.FluidThrusterProperties;
 import com.deltasf.createpropulsion.thruster.ThrusterFuelManager;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour;
-import com.simibubi.create.foundation.utility.Lang;
-import com.simibubi.create.foundation.utility.LangBuilder;
+import com.simibubi.create.foundation.utility.CreateLang;
+import net.createmod.catnip.lang.LangBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -96,15 +96,15 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
     @Override
     protected LangBuilder getGoggleStatus() {
         if (fluidStack().isEmpty()) {
-            return Lang.translate("gui.goggles.thruster.status.no_fuel").style(ChatFormatting.RED);
+            return CreateLang.translate("gui.goggles.thruster.status.no_fuel").style(ChatFormatting.RED);
         } else if (!validFluid()) {
-            return Lang.translate("gui.goggles.thruster.status.wrong_fuel").style(ChatFormatting.RED);
+            return CreateLang.translate("gui.goggles.thruster.status.wrong_fuel").style(ChatFormatting.RED);
         } else if (!isPowered()) {
-            return Lang.translate("gui.goggles.thruster.status.not_powered").style(ChatFormatting.GOLD);
+            return CreateLang.translate("gui.goggles.thruster.status.not_powered").style(ChatFormatting.GOLD);
         } else if (emptyBlocks == 0) {
-            return Lang.translate("gui.goggles.thruster.obstructed").style(ChatFormatting.RED);
+            return CreateLang.translate("gui.goggles.thruster.obstructed").style(ChatFormatting.RED);
         } else {
-            return Lang.translate("gui.goggles.thruster.status.working").style(ChatFormatting.GREEN);
+            return CreateLang.translate("gui.goggles.thruster.status.working").style(ChatFormatting.GREEN);
         }
     }
 

@@ -4,7 +4,7 @@ import java.util.function.Supplier;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
 import com.simibubi.create.foundation.particle.ICustomParticleData;
-import com.simibubi.create.foundation.utility.Lang;
+import com.simibubi.create.foundation.utility.CreateLang;
 
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
@@ -32,7 +32,7 @@ public enum ParticleTypes {
     }
 
     <D extends ParticleOptions> ParticleTypes(Supplier<? extends ICustomParticleData<D>> typeFactory) {
-        String name = Lang.asId(name());
+        String name = CreateLang.asId(name());
         entry = new ParticleEntry<>(name, typeFactory);
     }
 

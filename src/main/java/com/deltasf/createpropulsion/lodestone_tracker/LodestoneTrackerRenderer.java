@@ -6,10 +6,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import com.simibubi.create.foundation.blockEntity.renderer.SafeBlockEntityRenderer;
-import com.simibubi.create.foundation.render.CachedBufferer;
-import com.simibubi.create.foundation.render.SuperByteBuffer;
-import com.simibubi.create.foundation.utility.Color;
 
+import net.createmod.catnip.render.CachedBuffers;
+import net.createmod.catnip.render.SuperByteBuffer;
+import net.createmod.catnip.theme.Color;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -43,7 +43,7 @@ public class LodestoneTrackerRenderer extends SafeBlockEntityRenderer<LodestoneT
         //Render partials
         BlockState blockState = blockEntity.getBlockState();
         VertexConsumer vertexBuffer = bufferSource.getBuffer(RenderType.cutout()); 
-        SuperByteBuffer partialIndicatorModel = CachedBufferer.partial(PropulsionPartialModels.LODESTONE_TRACKER_INDICATOR, blockState);
+        SuperByteBuffer partialIndicatorModel = CachedBuffers.partial(PropulsionPartialModels.LODESTONE_TRACKER_INDICATOR, blockState);
 
         int powers[];
         if (blockEntity.IsInverted()) {

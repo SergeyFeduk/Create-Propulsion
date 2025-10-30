@@ -7,11 +7,11 @@ import com.deltasf.createpropulsion.particles.ParticleTypes;
 import com.deltasf.createpropulsion.particles.PlumeParticleData;
 import com.deltasf.createpropulsion.utility.GoggleUtils;
 import com.simibubi.create.compat.computercraft.AbstractComputerBehaviour;
-import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
+import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import com.simibubi.create.foundation.utility.Lang;
-import com.simibubi.create.foundation.utility.LangBuilder;
+import com.simibubi.create.foundation.utility.CreateLang;
+import net.createmod.catnip.lang.LangBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
@@ -274,17 +274,17 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
         calculateObstruction(getLevel(), worldPosition, getBlockState().getValue(AbstractThrusterBlock.FACING));
         isThrustDirty = wasThrustDirty;
 
-        Lang.translate("gui.goggles.thruster.status", new Object[0]).text(":").space().add(getGoggleStatus()).forGoggles(tooltip);
+        CreateLang.translate("gui.goggles.thruster.status", new Object[0]).text(":").space().add(getGoggleStatus()).forGoggles(tooltip);
 
         float efficiency = 100;
         ChatFormatting tooltipColor = ChatFormatting.GREEN;
         if (emptyBlocks < OBSTRUCTION_LENGTH) {
             efficiency = calculateObstructionEffect() * 100;
             tooltipColor = GoggleUtils.efficiencyColor(efficiency);
-            Lang.builder().add(Lang.translate("gui.goggles.thruster.obstructed", new Object[0])).space().add(Lang.text(GoggleUtils.makeObstructionBar(emptyBlocks, OBSTRUCTION_LENGTH))).style(tooltipColor).forGoggles(tooltip);
+            CreateLang.builder().add(CreateLang.translate("gui.goggles.thruster.obstructed", new Object[0])).space().add(CreateLang.text(GoggleUtils.makeObstructionBar(emptyBlocks, OBSTRUCTION_LENGTH))).style(tooltipColor).forGoggles(tooltip);
         }
 
-        Lang.builder().add(Lang.translate("gui.goggles.thruster.efficiency", new Object[0])).space().add(Lang.number(efficiency)).add(Lang.text("%")).style(tooltipColor).forGoggles(tooltip);
+        CreateLang.builder().add(CreateLang.translate("gui.goggles.thruster.efficiency", new Object[0])).space().add(CreateLang.number(efficiency)).add(CreateLang.text("%")).style(tooltipColor).forGoggles(tooltip);
 
         addSpecificGoggleInfo(tooltip, isPlayerSneaking);
         return true;
