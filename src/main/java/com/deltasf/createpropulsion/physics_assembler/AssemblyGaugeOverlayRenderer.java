@@ -13,6 +13,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
+import com.simibubi.create.AllSpecialTextures;
+import net.createmod.catnip.outliner.Outliner;
 
 public class AssemblyGaugeOverlayRenderer {
     public static final IGuiOverlay OVERLAY = AssemblyGaugeOverlayRenderer::renderOverlay;
@@ -63,7 +65,20 @@ public class AssemblyGaugeOverlayRenderer {
         BlockPos lookingAtPos = null;
         if (result != null && result.getType() == HitResult.Type.BLOCK) {
             BlockHitResult blockHitResult = (BlockHitResult) result;
-            lookingAtPos = AssemblyUtility.getTargetedPosition(blockHitResult.getBlockPos(), blockHitResult.getDirection());
+            lookingAtPos = AssemblyUtility.getTargetedPosition(blockHitResult.getBlockPos(), blockHitResult.getDirection(), player);
+        }
+
+        if (posA == null) {
+            if (lookingAtPos != null) {
+                AABB previewBox = new AABB(lookingAtPos);
+                Outliner.getInstance()
+                    .chaseAABB("gauge_preview", previewBox)
+                    .colored(AssemblyUtility.PASSIVE_COLOR)
+                    .lineWidth(1 / 16f)
+                    .disableLineNormals()
+                    .withFaceTexture(AllSpecialTextures.SELECTION);
+            }
+            return;
         }
 
         boolean selectingSecond = posA != null && posB == null;
@@ -76,7 +91,6 @@ public class AssemblyGaugeOverlayRenderer {
             isTooLarge = AssemblyUtility.isAABBLarger(selectionBox, AssemblyUtility.MAX_ASSEMBLY_SIZE);
         }
 
-        if (posA == null) lastPosA = null;
         if (selectingSecond) {
             if (isTooLarge) {
                 if (selectionBox != null && AssemblyUtility.isAABBLarger(selectionBox, AssemblyUtility.MAX_RENDERED_OUTLINE_SIZE)) {
@@ -87,11 +101,7 @@ public class AssemblyGaugeOverlayRenderer {
             } else if (lastPosA == null) {
                 lastPosA = posA;
             } else {
-                if (player.isShiftKeyDown()) {
-                    statusText = Component.translatable("createpropulsion.gauge.selection.cancel").withStyle(s -> s.withColor(AssemblyUtility.CANCEL_COLOR));
-                } else {
-                    statusText = Component.translatable("createpropulsion.gauge.selection.confirm").withStyle(s -> s.withColor(AssemblyUtility.HIGHLIGHT_COLOR));
-                }
+                statusText = Component.translatable("createpropulsion.gauge.selection.confirm").withStyle(s -> s.withColor(AssemblyUtility.HIGHLIGHT_COLOR));
             }
         }
         if (statusText != null) {
@@ -128,7 +138,7 @@ public class AssemblyGaugeOverlayRenderer {
 
             AssemblyUtility.renderOutline("gauge_selection", currentSelectionBox, AssemblyUtility.PASSIVE_COLOR, lineWidth, isHovering);
         } else {
-            int color = isTooLarge || (player.isShiftKeyDown()) ? AssemblyUtility.CANCEL_COLOR : AssemblyUtility.PASSIVE_COLOR;
+            int color = isTooLarge ? AssemblyUtility.CANCEL_COLOR : AssemblyUtility.PASSIVE_COLOR;
             AssemblyUtility.renderOutline("gauge_selection", currentSelectionBox, color, 1/16f, true);
         }
     }

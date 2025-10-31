@@ -36,9 +36,8 @@ public class AssemblyGaugeItem extends Item {
     @Override
     public InteractionResult useOn(@Nonnull UseOnContext context) {
         Level level = context.getLevel();
-        BlockPos targetedPos = AssemblyUtility.getTargetedPosition(context.getClickedPos(), context.getClickedFace());
-        ItemStack stack = context.getItemInHand();
         Player player = context.getPlayer();
+        ItemStack stack = context.getItemInHand();
 
         if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
@@ -47,17 +46,11 @@ public class AssemblyGaugeItem extends Item {
             return InteractionResult.PASS;
         }
 
+        BlockPos targetedPos = AssemblyUtility.getTargetedPosition(context.getClickedPos(), context.getClickedFace(), player);
+
         CompoundTag nbt = stack.getOrCreateTag();
         boolean hasPosA = nbt.contains(NBT_KEY_POS1);
         boolean hasPosB = nbt.contains(NBT_KEY_POS2);
-
-        if (player.isShiftKeyDown()) {
-            if (hasPosA && !hasPosB) {
-                resetPositions(stack, null);
-                return InteractionResult.SUCCESS;
-            }
-            return InteractionResult.PASS;
-        }
 
         if (hasPosA && hasPosB) {
             resetPositions(stack, null);
