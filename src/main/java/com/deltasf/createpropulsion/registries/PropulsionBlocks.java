@@ -18,8 +18,12 @@ import com.deltasf.createpropulsion.optical_sensors.OpticalSensorBlock;
 import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerBlock;
 import com.deltasf.createpropulsion.propeller.PropellerBlock;
 import com.deltasf.createpropulsion.reaction_wheel.ReactionWheelBlock;
+import com.deltasf.createpropulsion.redstone_transmission.RedstoneTransmissionBlock;
 import com.deltasf.createpropulsion.thruster.creative_thruster.CreativeThrusterBlock;
 import com.deltasf.createpropulsion.thruster.thruster.ThrusterBlock;
+import com.simibubi.create.content.kinetics.BlockStressDefaults;
+import com.simibubi.create.foundation.data.AssetLookup;
+import com.simibubi.create.foundation.data.BlockStateGen;
 import com.deltasf.createpropulsion.tilt_adapter.TiltAdapterBlock;
 import com.deltasf.createpropulsion.wing.CopycatWingBlock;
 import com.deltasf.createpropulsion.wing.CopycatWingItem;
@@ -32,6 +36,7 @@ import com.simibubi.create.content.kinetics.base.RotatedPillarKineticBlock;
 import com.simibubi.create.foundation.block.connected.CTSpriteShiftEntry;
 import com.simibubi.create.foundation.data.BuilderTransformers;
 import com.simibubi.create.foundation.data.CreateRegistrate;
+import com.simibubi.create.foundation.data.SharedProperties;
 import com.tterrag.registrate.providers.DataGenContext;
 import com.tterrag.registrate.providers.ProviderType;
 import com.tterrag.registrate.providers.RegistrateBlockstateProvider;
@@ -41,6 +46,7 @@ import com.tterrag.registrate.providers.RegistrateRecipeProvider;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeCategory;
@@ -64,6 +70,9 @@ import net.minecraftforge.client.model.generators.ConfiguredModel;
 import net.minecraftforge.client.model.generators.ModelFile;
 
 import static com.simibubi.create.foundation.data.CreateRegistrate.connectedTextures;
+
+import static com.simibubi.create.foundation.data.ModelGen.customItemModel;
+import static com.simibubi.create.foundation.data.TagGen.axeOrPickaxe;
 
 public class PropulsionBlocks {
     public static final CreateRegistrate REGISTRATE = CreatePropulsion.registrate();
@@ -161,7 +170,18 @@ public class PropulsionBlocks {
         .item().model(FUCK_OFF_ITEM()).build()
         .setData(ProviderType.LANG, FUCK_OFF_LANG())
         .register();
-    
+
+    public static final BlockEntry<RedstoneTransmissionBlock> REDSTONE_TRANSMISSION_BLOCK = REGISTRATE.block("redstone_transmission", RedstoneTransmissionBlock::new)
+            .initialProperties(SharedProperties::stone)
+            .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
+            .transform(BlockStressDefaults.setNoImpact())
+            .transform(axeOrPickaxe())
+            .addLayer(() -> RenderType::cutoutMipped)
+            .blockstate((c, p) -> BlockStateGen.axisBlock(c, p, AssetLookup.forPowered(c, p)))
+            .item()
+            .transform(customItemModel())
+            .register();
+
     public static final BlockEntry<HotAirBurnerBlock> HOT_AIR_BURNER_BLOCK = REGISTRATE.block("hot_air_burner", HotAirBurnerBlock::new)
         .properties(p -> p.noOcclusion())
         .properties(p -> p.mapColor(MapColor.STONE))
@@ -236,18 +256,18 @@ public class PropulsionBlocks {
         .properties(p -> p.mapColor(MapColor.WOOD))
         .properties(p -> p.sound(SoundType.WOOD))
         .properties(p -> p.requiresCorrectToolForDrops())
-        .properties(p -> p.strength(2.5F, 2.0F))    
+        .properties(p -> p.strength(2.5F, 2.0F))
         .properties(p -> p.noOcclusion())
         .tag(BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.MINEABLE_WITH_AXE)
         .blockstate(FUCK_OFF())
         .item().model(FUCK_OFF_ITEM()).build()
         .setData(ProviderType.LANG, FUCK_OFF_LANG())
         .register();
-    
+
     //All wings
     public static final BlockEntry<WingBlock> WING_BLOCK = registerGenericWing("wing", PropulsionSpriteShifts.WING_TEXTURE);
     public static final BlockEntry<WingBlock> TEMPERED_WING_BLOCK = registerGenericWing("tempered_wing", PropulsionSpriteShifts.TEMPERED_WING_TEXTURE);
-    
+
     public static final BlockEntry<CopycatWingBlock> COPYCAT_WING = registerCopycatWing("copycat_wing", 4);
     public static final BlockEntry<CopycatWingBlock> COPYCAT_WING_8 = registerCopycatWing("copycat_wing_8", 8);
     public static final BlockEntry<CopycatWingBlock> COPYCAT_WING_12 = registerCopycatWing("copycat_wing_12", 12);
@@ -305,7 +325,7 @@ public class PropulsionBlocks {
             this.mapColor = mapColor;
             this.dye = dye;
         }
-        
+
         public String generateId(String base) {
             if (name == null) return base;
             return base + "_" + name;
@@ -328,8 +348,8 @@ public class PropulsionBlocks {
             if (color == EnvelopeColor.WHITE) return;
 
             ItemLike dyeItem = color.getDye();
-            Supplier<ItemLike> baseItemSupplier = () -> isShaft 
-                ? ENVELOPED_SHAFT_BLOCKS.get(EnvelopeColor.WHITE).get() 
+            Supplier<ItemLike> baseItemSupplier = () -> isShaft
+                ? ENVELOPED_SHAFT_BLOCKS.get(EnvelopeColor.WHITE).get()
                 : ENVELOPE_BLOCKS.get(EnvelopeColor.WHITE).get();
 
             ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, ctx.getEntry())
@@ -394,8 +414,8 @@ public class PropulsionBlocks {
                 .properties(p -> p.strength(0.5F))
                 .properties(p -> p.sound(SoundType.WOOL))
                 .properties(p -> p.ignitedByLava())
-                .properties(p -> p.noOcclusion()) 
-                .transform(EncasingRegistry.addVariantTo(AllBlocks.SHAFT)) 
+                .properties(p -> p.noOcclusion())
+                .transform(EncasingRegistry.addVariantTo(AllBlocks.SHAFT))
                 .tag(BlockTags.WOOL, ENVELOPES)
                 .blockstate(createEnvelopedShaftBlockstate(color))
                 .loot((loot, block) -> {

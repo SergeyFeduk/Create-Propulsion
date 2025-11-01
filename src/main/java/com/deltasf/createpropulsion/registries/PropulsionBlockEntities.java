@@ -22,12 +22,15 @@ import com.deltasf.createpropulsion.propeller.rendering.PropellerVisual;
 import com.deltasf.createpropulsion.reaction_wheel.ReactionWheelBlockEntity;
 import com.deltasf.createpropulsion.reaction_wheel.ReactionWheelRenderer;
 import com.deltasf.createpropulsion.thruster.creative_thruster.CreativeThrusterBlockEntity;
+import com.deltasf.createpropulsion.redstone_transmission.RedstoneTransmissionBlockEntity;
 import com.deltasf.createpropulsion.thruster.thruster.ThrusterBlockEntity;
 import com.deltasf.createpropulsion.tilt_adapter.TiltAdapterBlockEntity;
 import com.deltasf.createpropulsion.tilt_adapter.TiltAdapterRenderer;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import com.simibubi.create.content.kinetics.base.ShaftRenderer;
 import com.simibubi.create.content.kinetics.base.SingleAxisRotatingVisual;
+import com.simibubi.create.content.kinetics.transmission.SplitShaftInstance;
+import com.simibubi.create.content.kinetics.transmission.SplitShaftRenderer;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.BlockEntityEntry;
 import com.tterrag.registrate.util.entry.BlockEntry;
@@ -41,7 +44,7 @@ public class PropulsionBlockEntities {
         .validBlocks(PropulsionBlocks.THRUSTER_BLOCK)
         .register();
 
-    public static final BlockEntityEntry<CreativeThrusterBlockEntity> CREATIVE_THRUSTER_BLOCK_ENTITY = 
+    public static final BlockEntityEntry<CreativeThrusterBlockEntity> CREATIVE_THRUSTER_BLOCK_ENTITY =
         REGISTRATE.blockEntity("creative_thruster_block_entity", CreativeThrusterBlockEntity::new)
         .validBlocks(PropulsionBlocks.CREATIVE_THRUSTER_BLOCK)
         .register();
@@ -75,6 +78,13 @@ public class PropulsionBlockEntities {
         .validBlock(PropulsionBlocks.REDSTONE_MAGNET_BLOCK)
         .register();
 
+    public static final BlockEntityEntry<RedstoneTransmissionBlockEntity> REDSTONE_TRANSMISSION_BLOCK_ENTITY =
+            REGISTRATE.blockEntity("redstone_transmission_block_entity", RedstoneTransmissionBlockEntity::new)
+                    .instance(() -> SplitShaftInstance::new, false)
+                    .validBlock(PropulsionBlocks.REDSTONE_TRANSMISSION_BLOCK)
+                    .renderer(() -> SplitShaftRenderer::new)
+                    .register();
+
     public static final BlockEntityEntry<HotAirBurnerBlockEntity> HOT_AIR_BURNER_BLOCK_ENTITY =
         REGISTRATE.blockEntity("hot_air_burner_block_entity", HotAirBurnerBlockEntity::new)
         .validBlock(PropulsionBlocks.HOT_AIR_BURNER_BLOCK)
@@ -84,7 +94,7 @@ public class PropulsionBlockEntities {
     @SuppressWarnings("unchecked")
     public static final BlockEntityEntry<KineticBlockEntity> ENVELOPED_SHAFT = REGISTRATE
         .blockEntity("enveloped_shaft_block_entity", KineticBlockEntity::new)
-        .visual(() -> SingleAxisRotatingVisual::shaft, false) 
+        .visual(() -> SingleAxisRotatingVisual::shaft, false)
         .renderer(() -> ShaftRenderer::new)
         .validBlocks(PropulsionBlocks.ENVELOPED_SHAFT_BLOCKS.values().toArray(new BlockEntry[0]))
         .register();
@@ -94,10 +104,10 @@ public class PropulsionBlockEntities {
         .validBlock(PropulsionBlocks.SOLID_BURNER)
         .register();
 
-    public static final BlockEntityEntry<LiquidBurnerBlockEntity> LIQUID_BURNER_BLOCK_ENTITY = 
+    public static final BlockEntityEntry<LiquidBurnerBlockEntity> LIQUID_BURNER_BLOCK_ENTITY =
         REGISTRATE.blockEntity("liquid_burner_block_entity", LiquidBurnerBlockEntity::new)
         .validBlock(PropulsionBlocks.LIQUID_BURNER)
-        //.renderer(() -> LiquidBurnerRenderer::new) //TODO: 
+        //.renderer(() -> LiquidBurnerRenderer::new) //TODO:
         .register();
 
     public static final BlockEntityEntry<PropellerBlockEntity> PROPELLER_BLOCK_ENTITY = 
@@ -120,7 +130,7 @@ public class PropulsionBlockEntities {
         .renderer(() -> StirlingEngineRenderer::new)
         .register();
 
-    public static final BlockEntityEntry<TiltAdapterBlockEntity> TILT_ADAPTER_BLOCK_ENTITY = 
+    public static final BlockEntityEntry<TiltAdapterBlockEntity> TILT_ADAPTER_BLOCK_ENTITY =
         REGISTRATE.blockEntity("tilt_adapter_block_entity", TiltAdapterBlockEntity::new)
         .validBlock(PropulsionBlocks.TILT_ADAPTER_BLOCK)
         .renderer(() -> TiltAdapterRenderer::new)

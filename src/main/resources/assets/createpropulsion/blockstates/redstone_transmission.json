@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "createpropulsion:block/redstone_transmission"
+    },
+    "facing=east": {
+      "model": "createpropulsion:block/redstone_transmission",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "createpropulsion:block/redstone_transmission",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "createpropulsion:block/redstone_transmission",
+      "y": 270
+    }
+  }
+}

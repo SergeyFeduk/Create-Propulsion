@@ -7,6 +7,9 @@
     "block.createpropulsion.inline_optical_sensor": "Sensor Óptico en linea",
     "item.createpropulsion.inline_optical_sensor": "Sensor Óptico en línea",
 
+    "block.createpropulsion.redstone_transmission": "Redstone Transmisión",
+    "item.createpropulsion.redstone_transmission": "Redstone Transmisión",
+
     "block.createpropulsion.optical_sensor": "Sensor Óptico",
     "item.createpropulsion.optical_sensor": "Sensor Óptico",
     "create.gui.optical_sensor.distance_behaviour": "Longitud de rayo",

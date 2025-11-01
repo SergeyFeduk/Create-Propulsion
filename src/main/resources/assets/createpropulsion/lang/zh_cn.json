@@ -7,6 +7,9 @@
     "block.createpropulsion.inline_optical_sensor": "集成式光学传感器",
     "item.createpropulsion.inline_optical_sensor": "集成式光学传感器",
 
+    "block.createpropulsion.redstone_transmission": "红石变速器",
+    "item.createpropulsion.redstone_transmission": "红石变速器",
+
     "block.createpropulsion.optical_sensor": "光学传感器",
     "item.createpropulsion.optical_sensor": "光学传感器",
     "create.gui.optical_sensor.distance_behaviour": "光线投射距离",

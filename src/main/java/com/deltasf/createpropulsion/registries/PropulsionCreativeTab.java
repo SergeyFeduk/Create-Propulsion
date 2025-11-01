@@ -46,6 +46,7 @@ public class PropulsionCreativeTab {
                 //From 0.2
                 output.accept(PropulsionBlocks.LODESTONE_TRACKER_BLOCK);
                 output.accept(PropulsionBlocks.REDSTONE_MAGNET_BLOCK);
+                output.accept(PropulsionBlocks.REDSTONE_TRANSMISSION_BLOCK);
                 output.accept(PropulsionBlocks.PHYSICS_ASSEMBLER_BLOCK);
                 //From 0.2 (items)
                 output.accept(PropulsionItems.ASSEMBLY_GAUGE);
