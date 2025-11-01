@@ -105,8 +105,28 @@ public class CopycatWingBlock extends CopycatBlock implements WingBlock{
 
     @Override
     public boolean isIgnoredConnectivitySide(BlockAndTintGetter reader, BlockState state, Direction face, @Nullable BlockPos fromPos, @Nullable BlockPos toPos) {
+        if (fromPos == null || toPos == null) return true;
+
+        BlockState toState = reader.getBlockState(toPos);
         Direction facing = state.getValue(FACING);
-        return face == facing || face == facing.getOpposite();
+
+        if (!toState.is(this)) return facing != face.getOpposite();
+
+        Direction toFacing = toState.getValue(FACING);
+        BlockPos diff = toPos.subtract(fromPos);
+
+        //Avoiding over-gap connections
+        if (diff.getX() == 0 && diff.getZ() == 0 && diff.getY() != 0 && facing.getAxis() == Direction.Axis.Y && toFacing.getAxis() == Direction.Axis.Y) {
+            return true;
+        }
+        if (diff.getY() == 0 && diff.getZ() == 0 && diff.getX() != 0 && facing.getAxis() == Direction.Axis.X && toFacing.getAxis() == Direction.Axis.X) {
+            return true;
+        }
+        if (diff.getX() == 0 && diff.getY() == 0 && diff.getZ() != 0 && facing.getAxis() == Direction.Axis.Z && toFacing.getAxis() == Direction.Axis.Z) {
+            return true;
+        }
+
+        return false;
     }
 
     //TODO: perhaps remove?
