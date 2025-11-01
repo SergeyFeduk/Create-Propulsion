@@ -33,5 +33,20 @@
         "block": "createpropulsion:wing",
         "mass": 10.0,
         "friction": 0.75
+    },
+    {
+        "block": "createpropulsion:copycat_wing",
+        "mass": 10.0,
+        "friction": 0.75
+    },
+    {
+        "block": "createpropulsion:copycat_wing_8",
+        "mass": 20.0,
+        "friction": 0.75
+    },
+    {
+        "block": "createpropulsion:copycat_wing_12",
+        "mass": 30.0,
+        "friction": 0.75
     }
 ]

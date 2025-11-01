@@ -4,15 +4,16 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.jetbrains.annotations.NotNull;
+import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.Wing;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
+import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.registries.PropulsionShapes;
 import com.deltasf.createpropulsion.utility.MathUtility;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Vec3i;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -46,9 +47,8 @@ public class WingBlock extends DirectionalBlock implements org.valkyrienskies.mo
 
     @Override
     public Wing getWing(@Nullable Level level, @Nullable BlockPos pos, @NotNull BlockState state) {
-        Vec3i normal = state.getValue(FACING).getNormal();
-        //Should I set wingBreakingForce to 10, like CW does?
-        return new Wing(VectorConversionsMCKt.toJOMLD(MathUtility.AbsComponents(normal)),150, 30, null, 0);
+        Vector3d normal = VectorConversionsMCKt.toJOMLD(MathUtility.AbsComponents(state.getValue(FACING).getNormal()));
+        return new Wing(normal, PropulsionConfig.BASE_WING_LIFT.get(), PropulsionConfig.BASE_WING_DRAG.get(), null, 0);
     }
 
     @Override

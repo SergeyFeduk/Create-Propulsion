@@ -11,6 +11,7 @@ import org.valkyrienskies.core.api.ships.Wing;
 import org.valkyrienskies.mod.common.block.WingBlock;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
+import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.registries.PropulsionShapes;
 import com.deltasf.createpropulsion.utility.MathUtility;
 import com.simibubi.create.AllBlocks;
@@ -76,8 +77,8 @@ public class CopycatWingBlock extends CopycatBlock implements WingBlock{
 
         return new Wing(
             VectorConversionsMCKt.toJOMLD(MathUtility.AbsComponents(normal)),
-            properties.lift(),
-            properties.drag(),
+            PropulsionConfig.BASE_WING_LIFT.get() + properties.lift(),
+            PropulsionConfig.BASE_WING_DRAG.get() + properties.drag(),
             null,
             0
         );
@@ -126,17 +127,6 @@ public class CopycatWingBlock extends CopycatBlock implements WingBlock{
             return true;
         }
 
-        return false;
-    }
-
-    //TODO: perhaps remove?
-    @Override
-    public boolean canFaceBeOccluded(BlockState state, Direction face) {
-        return false;
-    }
-
-    @Override
-    public boolean shouldFaceAlwaysRender(BlockState state, Direction face)  {
         return false;
     }
 }
