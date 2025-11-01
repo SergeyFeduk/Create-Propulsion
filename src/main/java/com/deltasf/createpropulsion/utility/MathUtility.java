@@ -7,6 +7,8 @@ import org.joml.Vector3d;
 
 import com.simibubi.create.foundation.collision.Matrix3d;
 
+import net.minecraft.core.Vec3i;
+
 public class MathUtility {
     
     public static Matrix3d createMatrixFromQuaternion(Quaterniond quaternion) {
@@ -84,4 +86,7 @@ public class MathUtility {
         return new Vector2f(yaw, pitch);
     }
 
+    public static Vec3i AbsComponents(Vec3i value) {
+        return new Vec3i(Math.abs(value.getX()), Math.abs(value.getY()), Math.abs(value.getZ()));
+    }
 }

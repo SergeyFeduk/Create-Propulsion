@@ -7,7 +7,12 @@ import com.deltasf.createpropulsion.optical_sensors.InlineOpticalSensorBlock;
 import com.deltasf.createpropulsion.optical_sensors.OpticalSensorBlock;
 import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerBlock;
 import com.deltasf.createpropulsion.thruster.thruster.ThrusterBlock;
+import com.deltasf.createpropulsion.wing.CopycatWingBlock;
+import com.deltasf.createpropulsion.wing.CopycatWingModel;
+import com.deltasf.createpropulsion.wing.WingBlock;
+import com.simibubi.create.foundation.data.BuilderTransformers;
 import com.simibubi.create.foundation.data.CreateRegistrate;
+import com.simibubi.create.foundation.data.ModelGen;
 import com.tterrag.registrate.util.entry.BlockEntry;
 
 import net.minecraft.world.level.block.SoundType;
@@ -65,12 +70,25 @@ public class PropulsionBlocks {
         .properties(p -> p.noOcclusion())
         .simpleItem()
         .register();
-    
-    /*public static final BlockEntry<TiltSensorBlock> TILT_SENSOR_BLOCK = REGISTRATE.block("tilt_sensor", TiltSensorBlock::new)
-        .properties(p -> p.mapColor(MapColor.COLOR_YELLOW))
-        .properties(p -> p.sound(SoundType.METAL))
-        .properties(p -> p.strength(2.5F, 2.0F))
+
+    public static final BlockEntry<WingBlock> WING_BLOCK = REGISTRATE.block("wing", WingBlock::new)
+        .properties(p -> p.mapColor(MapColor.COLOR_LIGHT_GRAY))
+        .properties(p -> p.strength(2.0F, 2.0F))
         .properties(p -> p.noOcclusion())
         .simpleItem()
-        .register();*/
+        .register();
+    
+    public static final BlockEntry<CopycatWingBlock> COPYCAT_WING = registerCopycatWing("copycat_wing", 4);
+    public static final BlockEntry<CopycatWingBlock> COPYCAT_WING_8 = registerCopycatWing("copycat_wing_8", 8);
+    public static final BlockEntry<CopycatWingBlock> COPYCAT_WING_12 = registerCopycatWing("copycat_wing_12", 12);
+
+    private static BlockEntry<CopycatWingBlock> registerCopycatWing(String name, int width) {
+        return REGISTRATE.block(name, p -> new CopycatWingBlock(p, width, () -> COPYCAT_WING.get().asItem()))
+            .properties(p -> p.strength(2.0F, 2.0F))
+            .transform(BuilderTransformers.copycat())
+            .onRegister(CreateRegistrate.blockModel(() -> bakedModel -> new CopycatWingModel(bakedModel, width)))
+            .item()
+            .transform(ModelGen.customItemModel("copycat_base", "wing_" + width))
+            .register();
+    }
 }

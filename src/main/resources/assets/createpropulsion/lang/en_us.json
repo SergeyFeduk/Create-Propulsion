@@ -14,6 +14,10 @@
     "block.createpropulsion.lodestone_tracker": "Lodestone Tracker",
     "block.createpropulsion.redstone_magnet": "Redstone Magnet",
     "block.createpropulsion.physics_assembler": "Physics Assembler",
+    "block.createpropulsion.wing": "Wing",
+    "block.createpropulsion.copycat_wing": "Copycat Wing",
+    "block.createpropulsion.copycat_wing_8": "Copycat Wing",
+    "block.createpropulsion.copycat_wing_12": "Copycat Wing",
 
     "create.gui.goggles.thruster.status": "Thruster Status",
     "create.gui.goggles.thruster.status.no_fuel": "No Fuel",
@@ -47,6 +51,8 @@
     "createpropulsion.physics_assembler.tooltip.summary": "_Assembles_ blocks into physical entities.",
     "createpropulsion.physics_assembler.tooltip.condition1": "When powered and contains an assembly gauge",
     "createpropulsion.physics_assembler.tooltip.behaviour1": "_Assembles_ blocks in _region_ defined by _assembly gauge_ into a physical entity.",
+
+    "createpropulsion.wing.tooltip.summary": "Produces _lift_ based on _orientation_ and vehicle _speed_.",
 
     "item.createpropulsion.pine_resin": "Pine Resin",
     "fluid.createpropulsion.turpentine": "Turpentine",
