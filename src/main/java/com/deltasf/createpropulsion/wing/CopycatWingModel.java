@@ -21,8 +21,7 @@ import net.minecraftforge.client.model.data.ModelData;
 
 public class CopycatWingModel extends CopycatModel {
     private final int width;
-    protected static final AABB CUBE_AABB = new AABB(0, 0, 0, 1, 1, 1);
-
+    private static final float PIXELS_PER_BLOCK = 16.0f;
 
     public CopycatWingModel(BakedModel originalModel, int width) {
         super(originalModel);
@@ -31,85 +30,50 @@ public class CopycatWingModel extends CopycatModel {
 
     @Override
     protected List<BakedQuad> getCroppedQuads(BlockState state, Direction side, RandomSource rand, BlockState material, ModelData wrappedData, RenderType renderType) {
-        
+        //Figure out facing
         Direction facing = state.getValue(CopycatWingBlock.FACING);
-        if (facing == Direction.UP || facing == Direction.EAST || facing == Direction.SOUTH) facing = facing.getOpposite();
+        if (facing.getAxisDirection() == Direction.AxisDirection.POSITIVE) facing = facing.getOpposite();
         Direction.Axis axis = facing.getAxis();
 
+        //Get model and quads
         BakedModel model = getModelOf(material);
         List<BakedQuad> templateQuads = model.getQuads(material, side, rand, wrappedData, renderType);
-        
         List<BakedQuad> quads = new ArrayList<>();
+
         float halfWidth = width / 2f;
+        float offsetDistance = (PIXELS_PER_BLOCK - width) / (2 * PIXELS_PER_BLOCK);
 
         for (boolean isPositiveSide : Iterate.trueAndFalse) {
+
+            Direction culledFace = isPositiveSide ? facing.getOpposite() : facing;
+            Vec3i placementNormal = culledFace.getNormal();
+            Vec3 placementOffset = new Vec3(
+                placementNormal.getX() * offsetDistance,
+                placementNormal.getY() * offsetDistance,
+                placementNormal.getZ() * offsetDistance
+            );
+
+            float cropExtent = halfWidth / PIXELS_PER_BLOCK;
+            float minX = 0, minY = 0, minZ = 0;
+            float maxX = 1, maxY = 1, maxZ = 1;
             
-            AABB croppingBox;
-            Vec3 placementOffset;
-
-            if (isPositiveSide) {
-                float cropMax = halfWidth / 16f;
-                croppingBox = new AABB(
-                    0, 0, 0,
-                    axis == Direction.Axis.X ? cropMax : 1, axis == Direction.Axis.Y ? cropMax : 1, axis == Direction.Axis.Z ? cropMax : 1
-                );
-                Vec3i n = facing.getNormal().multiply(-1);
-                float offset = 0;
-                switch (width) {
-                    case 4:
-                        offset = 6/16.0f;
-                        break;
-                    case 8:
-                        offset = 4/16.0f;
-                        break;
-                    case 12:
-                        offset = 2/16.0f;
-                        break;
-                    default:
-                        break;
-                }
-
-                placementOffset = new Vec3(n.getX() * offset, n.getY() * offset, n.getZ() * offset);
-
-            } else { 
-                float cropMin = 1f - (halfWidth / 16f);
-                croppingBox = new AABB(
-                    axis == Direction.Axis.X ? cropMin : 0, axis == Direction.Axis.Y ? cropMin : 0, axis == Direction.Axis.Z ? cropMin : 0,
-                    1, 1, 1
-                );
-                
-                Vec3i n = facing.getNormal();
-                float offset = 0;
-                switch (width) {
-                    case 4:
-                        offset = 6/16.0f;
-                        break;
-                    case 8:
-                        offset = 4/16.0f;
-                        break;
-                    case 12:
-                        offset = 2/16.0f;
-                        break;
-                
-                    default:
-                        break;
-                }
-                placementOffset = new Vec3(n.getX() * offset, n.getY() * offset, n.getZ() * offset);
+            //Obtaion crop box
+            switch (axis) {
+                case X -> { if (!isPositiveSide) minX = 1 - cropExtent; else maxX = cropExtent; }
+                case Y -> { if (!isPositiveSide) minY = 1 - cropExtent; else maxY = cropExtent; }
+                case Z -> { if (!isPositiveSide) minZ = 1 - cropExtent; else maxZ = cropExtent; }
             }
+            AABB croppingBox = new AABB(minX, minY, minZ, maxX, maxY, maxZ);
 
             for (BakedQuad quad : templateQuads) {
-                Direction direction = quad.getDirection();
-
-                if (isPositiveSide && direction == facing.getOpposite())
+                if (quad.getDirection() == culledFace) {
                     continue;
-                if (!isPositiveSide && direction == facing)
-                    continue;
+                }
 
                 quads.add(BakedQuadHelper.cloneWithCustomGeometry(quad,
                     BakedModelHelper.cropAndMove(quad.getVertices(), quad.getSprite(), croppingBox, placementOffset)));
             }
         }
-
         return quads;
     }
 }
