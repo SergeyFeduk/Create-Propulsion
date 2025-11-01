@@ -14,7 +14,11 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 import com.simibubi.create.AllSpecialTextures;
+import net.createmod.catnip.outliner.Outline;
 import net.createmod.catnip.outliner.Outliner;
+import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import java.util.Objects;
 
 public class AssemblyGaugeOverlayRenderer {
     public static final IGuiOverlay OVERLAY = AssemblyGaugeOverlayRenderer::renderOverlay;
@@ -27,6 +31,8 @@ public class AssemblyGaugeOverlayRenderer {
     private static BlockPos lastPosA;
     private static double flashStartGameTime = 0.0;
     private static boolean flashQueued = false;
+
+    private static Ship lastHoveredShip;
 
     public static void triggerFlash(AABB selection) {
         flashQueued = true;
@@ -43,6 +49,7 @@ public class AssemblyGaugeOverlayRenderer {
         ItemStack stack = player.getMainHandItem();
         if (!AssemblyUtility.isAssemblyGauge(stack)) {
             flashStartGameTime = 0.0;
+            lastHoveredShip = null;
             return;
         }
 
@@ -68,16 +75,32 @@ public class AssemblyGaugeOverlayRenderer {
             lookingAtPos = AssemblyUtility.getTargetedPosition(blockHitResult.getBlockPos(), blockHitResult.getDirection(), player);
         }
 
+        //This displays preview box when no position is selected
         if (posA == null) {
-            if (lookingAtPos != null) {
-                AABB previewBox = new AABB(lookingAtPos);
-                Outliner.getInstance()
-                    .chaseAABB("gauge_preview", previewBox)
-                    .colored(AssemblyUtility.PASSIVE_COLOR)
-                    .lineWidth(1 / 16f)
-                    .disableLineNormals()
-                    .withFaceTexture(AllSpecialTextures.SELECTION);
+            if (lookingAtPos == null) {
+                lastHoveredShip = null;
+                Outliner.getInstance().remove("gauge_preview");
+                return;
             }
+
+            Ship currentShip = VSGameUtilsKt.getShipManagingPos(mc.level, lookingAtPos);
+            boolean gridChanged = !Objects.equals(currentShip, lastHoveredShip);
+            lastHoveredShip = currentShip;
+
+            if (gridChanged) {
+                Outliner.getInstance().remove("gauge_preview");
+                return;
+            }
+
+            AABB previewBox = new AABB(lookingAtPos);
+            Outline.OutlineParams parameters = Outliner.getInstance().getOutlines().containsKey("gauge_preview")
+                ? Outliner.getInstance().chaseAABB("gauge_preview", previewBox)
+                : Outliner.getInstance().showAABB("gauge_preview", previewBox);
+            parameters.colored(AssemblyUtility.PASSIVE_COLOR)
+                .lineWidth(1 / 16f)
+                .disableLineNormals()
+                .withFaceTexture(AllSpecialTextures.SELECTION);
+
             return;
         }
 
