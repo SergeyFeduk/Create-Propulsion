@@ -8,6 +8,7 @@ import com.deltasf.createpropulsion.optical_sensors.OpticalSensorBlock;
 import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerBlock;
 import com.deltasf.createpropulsion.thruster.thruster.ThrusterBlock;
 import com.deltasf.createpropulsion.wing.CopycatWingBlock;
+import com.deltasf.createpropulsion.wing.CopycatWingItem;
 import com.deltasf.createpropulsion.wing.CopycatWingModel;
 import com.deltasf.createpropulsion.wing.WingBlock;
 import com.simibubi.create.foundation.data.BuilderTransformers;
@@ -87,7 +88,7 @@ public class PropulsionBlocks {
             .properties(p -> p.strength(2.0F, 2.0F))
             .transform(BuilderTransformers.copycat())
             .onRegister(CreateRegistrate.blockModel(() -> bakedModel -> new CopycatWingModel(bakedModel, width)))
-            .item()
+            .item(CopycatWingItem::new)
             .transform(ModelGen.customItemModel("copycat_base", "wing_" + width))
             .register();
     }

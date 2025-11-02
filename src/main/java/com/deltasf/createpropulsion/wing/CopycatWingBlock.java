@@ -1,5 +1,6 @@
 package com.deltasf.createpropulsion.wing;
 
+import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -12,16 +13,23 @@ import org.valkyrienskies.mod.common.block.WingBlock;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
 import com.deltasf.createpropulsion.PropulsionConfig;
+import com.deltasf.createpropulsion.registries.PropulsionBlocks;
 import com.deltasf.createpropulsion.registries.PropulsionShapes;
 import com.deltasf.createpropulsion.utility.MathUtility;
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.content.decoration.copycat.CopycatBlock;
+import com.tterrag.registrate.util.entry.BlockEntry;
 
 import net.createmod.catnip.math.VoxelShaper;
+import net.createmod.catnip.placement.IPlacementHelper;
+import net.createmod.catnip.placement.PlacementHelpers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -33,6 +41,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -41,6 +50,9 @@ public class CopycatWingBlock extends CopycatBlock implements WingBlock{
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
     private final int width;
     private final Supplier<Item> baseItemSupplier;
+
+    private static final List<BlockEntry<?>> entires = List.of(PropulsionBlocks.COPYCAT_WING, PropulsionBlocks.COPYCAT_WING_8, PropulsionBlocks.COPYCAT_WING_12);
+    private static final int placementHelperId = PlacementHelpers.register(new WingPlacementHelper(entires));
 
     private static final Map<Integer, VoxelShaper> wingShapers = Map.of(
         4, PropulsionShapes.WING,
@@ -53,6 +65,10 @@ public class CopycatWingBlock extends CopycatBlock implements WingBlock{
         this.width = width;
         this.baseItemSupplier = baseItemSupplier;
         registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.UP));
+    }
+
+    public int getWidth() {
+        return width;
     }
 
     @Override
@@ -68,6 +84,23 @@ public class CopycatWingBlock extends CopycatBlock implements WingBlock{
     @Override
     public VoxelShape getShape(@Nonnull BlockState state, @Nonnull BlockGetter level, @Nonnull BlockPos pos, @Nonnull CollisionContext context) {
         return wingShapers.get(this.width).get(state.getValue(FACING));
+    }
+
+    @Override
+	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult ray) {
+        ItemStack heldItem = player.getItemInHand(hand);
+        
+        //Placement helper
+        if (!player.isShiftKeyDown() && player.mayBuild()) {
+			IPlacementHelper placementHelper = PlacementHelpers.get(placementHelperId);
+            if (placementHelper.matchesItem(heldItem)) {
+                placementHelper.getOffset(player, world, state, pos, ray)
+					.placeInWorld(world, (BlockItem) heldItem.getItem(), player, hand, ray);
+				return InteractionResult.SUCCESS;
+            }
+        }
+
+        return super.use(state, world, pos, player, hand, ray);
     }
     
     @Override
@@ -128,5 +161,16 @@ public class CopycatWingBlock extends CopycatBlock implements WingBlock{
         }
 
         return false;
+    }
+
+    @Override
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+        if (newState.getBlock() instanceof CopycatWingBlock) {
+            if (state.hasBlockEntity() && state.getBlock() != newState.getBlock()) {
+                level.removeBlockEntity(pos);
+            }
+            return;
+        }
+        super.onRemove(state, level, pos, newState, isMoving);
     }
 }

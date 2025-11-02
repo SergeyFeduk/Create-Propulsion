@@ -69,7 +69,7 @@ public class PropulsionConfig {
             BASE_WING_LIFT = SERVER_BUILDER.comment("Wing's lift force is multiplied by this number.")
                 .define("Base lift", 150.0);
             BASE_WING_DRAG = SERVER_BUILDER.comment("Wing's drag force is multiplied by this number.")
-                .define("Base drag", 30.0);
+                .define("Base drag", 150.0);
         SERVER_BUILDER.pop();
 
         SERVER_SPEC = SERVER_BUILDER.build();
