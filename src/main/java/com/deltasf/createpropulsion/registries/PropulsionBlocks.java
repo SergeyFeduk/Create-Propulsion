@@ -12,6 +12,7 @@ import com.deltasf.createpropulsion.wing.CopycatWingItem;
 import com.deltasf.createpropulsion.wing.CopycatWingModel;
 import com.deltasf.createpropulsion.wing.WingBlock;
 import com.deltasf.createpropulsion.wing.WingCTBehaviour;
+import com.simibubi.create.foundation.block.connected.CTSpriteShiftEntry;
 import com.simibubi.create.foundation.data.BuilderTransformers;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.simibubi.create.foundation.data.ModelGen;
@@ -75,19 +76,24 @@ public class PropulsionBlocks {
         .simpleItem()
         .register();
 
-    public static final BlockEntry<WingBlock> WING_BLOCK = REGISTRATE.block("wing", WingBlock::new)
-        .properties(p -> p.mapColor(MapColor.COLOR_LIGHT_GRAY))
-        .properties(p -> p.sound(SoundType.COPPER))
-        .properties(p -> p.strength(1.5F, 2.0F))
-        .properties(p -> p.noOcclusion())
-        .onRegister(connectedTextures(() -> new WingCTBehaviour(PropulsionSpriteShifts.WING_TEXTURE)))
-        .addLayer(() -> RenderType::cutoutMipped)
-        .simpleItem()
-        .register();
+    public static final BlockEntry<WingBlock> WING_BLOCK = registerGenericWing("wing", PropulsionSpriteShifts.WING_TEXTURE);
+    public static final BlockEntry<WingBlock> TEMPERED_WING_BLOCK = registerGenericWing("tempered_wing", PropulsionSpriteShifts.TEMPERED_WING_TEXTURE);
     
     public static final BlockEntry<CopycatWingBlock> COPYCAT_WING = registerCopycatWing("copycat_wing", 4);
     public static final BlockEntry<CopycatWingBlock> COPYCAT_WING_8 = registerCopycatWing("copycat_wing_8", 8);
     public static final BlockEntry<CopycatWingBlock> COPYCAT_WING_12 = registerCopycatWing("copycat_wing_12", 12);
+
+    private static BlockEntry<WingBlock> registerGenericWing(String name, CTSpriteShiftEntry spriteShift) {
+        return REGISTRATE.block(name, WingBlock::new)
+            .properties(p -> p.mapColor(MapColor.COLOR_LIGHT_GRAY))
+            .properties(p -> p.sound(SoundType.COPPER))
+            .properties(p -> p.strength(1.5F, 2.0F))
+            .properties(p -> p.noOcclusion())
+            .onRegister(connectedTextures(() -> new WingCTBehaviour(spriteShift)))
+            .addLayer(() -> RenderType::cutoutMipped)
+            .simpleItem()
+            .register();
+    }
 
     private static BlockEntry<CopycatWingBlock> registerCopycatWing(String name, int width) {
         return REGISTRATE.block(name, p -> new CopycatWingBlock(p, width, () -> COPYCAT_WING.get().asItem()))

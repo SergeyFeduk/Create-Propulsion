@@ -53,7 +53,7 @@ public class CopycatWingBlock extends CopycatBlock implements WingBlock {
     private final int width;
     private final Supplier<Item> baseItemSupplier;
 
-    private static final List<BlockEntry<?>> entires = List.of(PropulsionBlocks.COPYCAT_WING, PropulsionBlocks.COPYCAT_WING_8, PropulsionBlocks.COPYCAT_WING_12, PropulsionBlocks.WING_BLOCK);
+    private static final List<BlockEntry<?>> entires = List.of(PropulsionBlocks.COPYCAT_WING, PropulsionBlocks.COPYCAT_WING_8, PropulsionBlocks.COPYCAT_WING_12, PropulsionBlocks.WING_BLOCK, PropulsionBlocks.TEMPERED_WING_BLOCK);
     private static final int placementHelperId = PlacementHelpers.register(new WingPlacementHelper(entires));
 
     private static final Map<Integer, VoxelShaper> wingShapers = Map.of(

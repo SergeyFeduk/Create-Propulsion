@@ -15,6 +15,7 @@
     "block.createpropulsion.redstone_magnet": "Redstone Magnet",
     "block.createpropulsion.physics_assembler": "Physics Assembler",
     "block.createpropulsion.wing": "Wing",
+    "block.createpropulsion.tempered_wing": "Tempered Wing",
     "block.createpropulsion.copycat_wing": "Copycat Wing",
     "block.createpropulsion.copycat_wing_8": "Copycat Wing",
     "block.createpropulsion.copycat_wing_12": "Copycat Wing",
@@ -53,6 +54,7 @@
     "createpropulsion.physics_assembler.tooltip.behaviour1": "_Assembles_ blocks in _region_ defined by _assembly gauge_ into a physical entity.",
 
     "createpropulsion.wing.tooltip.summary": "Produces _lift_ based on _orientation_ and vehicle _speed_.",
+    "createpropulsion.tempered_wing.tooltip.summary": "Produces _lift_ based on _orientation_ and vehicle _speed_.",
 
     "createpropulsion.copycat_wing.tooltip.summary": "Converts any _full block_ into a _decorative_ wing. Produces _lift_ based on _orientation_ and vehicle _speed_.",
     "createpropulsion.copycat_wing.tooltip.condition1": "When R-clicked",
