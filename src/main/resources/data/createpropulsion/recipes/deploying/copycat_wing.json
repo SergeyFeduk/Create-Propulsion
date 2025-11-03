@@ -1,0 +1,16 @@
+{
+    "type": "create:deploying",
+    "ingredients": [
+      {
+        "item": "createpropulsion:wing"
+      },
+      {
+        "item": "create:zinc_ingot"
+      }
+    ],
+    "results": [
+      {
+        "item": "createpropulsion:copycat_wing"
+      }
+    ]
+  }

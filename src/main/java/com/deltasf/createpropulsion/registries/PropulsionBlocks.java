@@ -77,7 +77,8 @@ public class PropulsionBlocks {
 
     public static final BlockEntry<WingBlock> WING_BLOCK = REGISTRATE.block("wing", WingBlock::new)
         .properties(p -> p.mapColor(MapColor.COLOR_LIGHT_GRAY))
-        .properties(p -> p.strength(2.0F, 2.0F))
+        .properties(p -> p.sound(SoundType.COPPER))
+        .properties(p -> p.strength(1.5F, 2.0F))
         .properties(p -> p.noOcclusion())
         .onRegister(connectedTextures(() -> new WingCTBehaviour(PropulsionSpriteShifts.WING_TEXTURE)))
         .addLayer(() -> RenderType::cutoutMipped)
@@ -90,7 +91,7 @@ public class PropulsionBlocks {
 
     private static BlockEntry<CopycatWingBlock> registerCopycatWing(String name, int width) {
         return REGISTRATE.block(name, p -> new CopycatWingBlock(p, width, () -> COPYCAT_WING.get().asItem()))
-            .properties(p -> p.strength(2.0F, 2.0F))
+            .properties(p -> p.strength(1.5F, 2.0F))
             .transform(BuilderTransformers.copycat())
             .onRegister(CreateRegistrate.blockModel(() -> bakedModel -> new CopycatWingModel(bakedModel, width)))
             .item(CopycatWingItem::new)

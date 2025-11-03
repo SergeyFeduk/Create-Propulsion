@@ -1,6 +1,9 @@
 {
     "replace": false,
     "values": [
-        "createpropulsion:lodestone_tracker"
+        "createpropulsion:lodestone_tracker",
+        "createpropulsion:copycat_wing",
+        "createpropulsion:copycat_wing_8",
+        "createpropulsion:copycat_wing_12"
     ]
 }
