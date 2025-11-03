@@ -54,7 +54,7 @@
     "createpropulsion.physics_assembler.tooltip.behaviour1": "_Собирает_ блоки в _регионе_ заданном _калибратором сборщика_ в физическую сущность.",
 
     "createpropulsion.wing.tooltip.summary": "Создаёт _подъёмную силу_ в зависимости от _ориентации_ и _скорости_ корабля.",
-    "createpropulsion.copycat_wing.tooltip.summary": "Преобразует любой _полноценный блок_ в _декоративное_ крыло. Создаёт _подъёмную силу_ в зависимости от _ориентации_ и _скорости_ корабля.",
+    "createpropulsion.copycat_wing.tooltip.summary": "Преобразует любой _твёрдый блок_ в _декоративное_ крыло. Создаёт _подъёмную силу_ в зависимости от _ориентации_ и _скорости_ корабля.",
     "createpropulsion.copycat_wing.tooltip.condition1": "ПКМ с блоком в руке",
     "createpropulsion.copycat_wing.tooltip.behaviour1": "Применяет _предмет из руки_ как свой _материал_, если это возможно. _Кликните ещё раз_ чтобы переключить ориентацию или _состояние питания_. Используйте _гаечный ключ_ чтобы сбросить материал.",
     "createpropulsion.copycat_wing.tooltip.condition2": "Shift+ПКМ по другому заполняемому крылу",
