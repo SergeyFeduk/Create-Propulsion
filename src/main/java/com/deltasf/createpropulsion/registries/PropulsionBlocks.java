@@ -11,13 +11,16 @@ import com.deltasf.createpropulsion.wing.CopycatWingBlock;
 import com.deltasf.createpropulsion.wing.CopycatWingItem;
 import com.deltasf.createpropulsion.wing.CopycatWingModel;
 import com.deltasf.createpropulsion.wing.WingBlock;
+import com.deltasf.createpropulsion.wing.WingCTBehaviour;
 import com.simibubi.create.foundation.data.BuilderTransformers;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.simibubi.create.foundation.data.ModelGen;
 import com.tterrag.registrate.util.entry.BlockEntry;
 
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.material.MapColor;
+import static com.simibubi.create.foundation.data.CreateRegistrate.connectedTextures;
 
 public class PropulsionBlocks {
     public static final CreateRegistrate REGISTRATE = CreatePropulsion.registrate();
@@ -76,6 +79,8 @@ public class PropulsionBlocks {
         .properties(p -> p.mapColor(MapColor.COLOR_LIGHT_GRAY))
         .properties(p -> p.strength(2.0F, 2.0F))
         .properties(p -> p.noOcclusion())
+        .onRegister(connectedTextures(() -> new WingCTBehaviour(PropulsionSpriteShifts.WING_TEXTURE)))
+        .addLayer(() -> RenderType::cutoutMipped)
         .simpleItem()
         .register();
     
