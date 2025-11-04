@@ -13,10 +13,11 @@
 - Optical Sensor: Configurable raycast block detector. Set target distance and filter by block type.
 - Physics Assembler: Assembles blocks into physical entities.
 - Lodestone Tracker: Tracks lodestone blocks with compass bound to them.
+- Iron and copycat wings: Provide lift and drag based on their orientation and vehicle velocity.
 
 ## FAQ:
-### When will you add Create 6 support?
-- Soon after Valkyrien Skies updates to support Create 6.
+### Does it support Create 6?
+- Yes. Starting from version 0.2.2 Create: Propulsion supports Create 6
 ### Will Create: Propulsion be ported to Fabric?
 - Yes, not sure when though.
 ### Thrusters are over/underpowered
