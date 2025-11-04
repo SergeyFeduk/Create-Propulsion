@@ -18,6 +18,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.model.data.ModelData;
+import com.tterrag.registrate.util.nullness.NonNullFunction;
 
 public class CopycatWingModel extends CopycatModel {
     private final int width;
@@ -26,6 +27,10 @@ public class CopycatWingModel extends CopycatModel {
     public CopycatWingModel(BakedModel originalModel, int width) {
         super(originalModel);
         this.width = width;
+    }
+
+    public static NonNullFunction<BakedModel, ? extends BakedModel> create(int width) {
+        return bakedModel -> new CopycatWingModel(bakedModel, width);
     }
 
     @Override

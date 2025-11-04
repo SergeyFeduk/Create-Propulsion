@@ -99,7 +99,7 @@ public class PropulsionBlocks {
         return REGISTRATE.block(name, p -> new CopycatWingBlock(p, width, () -> COPYCAT_WING.get().asItem()))
             .properties(p -> p.strength(1.5F, 2.0F))
             .transform(BuilderTransformers.copycat())
-            .onRegister(CreateRegistrate.blockModel(() -> bakedModel -> new CopycatWingModel(bakedModel, width)))
+            .onRegister(CreateRegistrate.blockModel(() -> CopycatWingModel.create(width)))
             .item(CopycatWingItem::new)
             .transform(ModelGen.customItemModel("copycat_base", "wing_" + width))
             .register();
