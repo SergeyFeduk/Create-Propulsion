@@ -10,10 +10,12 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.HaiGroup;
+import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry.HaiData;
 import com.deltasf.createpropulsion.balloons.utils.BalloonRegistryUtility;
 import com.deltasf.createpropulsion.balloons.utils.BalloonScanner;
 import com.deltasf.createpropulsion.balloons.utils.BalloonStitcher;
@@ -25,8 +27,11 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import com.deltasf.createpropulsion.balloons.utils.SliceScanner;
 
 public class BalloonUpdater {
+    private static final double LAYER_REMOVAL_HOLE_THRESHOLD = 0.5;
+
     private Map<ResourceKey<Level>, Queue<DynamicUpdate>> eventQueues = new HashMap<>();
     private record DynamicUpdate(BlockPos position, boolean isPlacement) {};
     private record EventGroup(List<BlockPos> positions, boolean isPlacement) {};
@@ -229,6 +234,7 @@ public class BalloonUpdater {
         }
         //Invoke correct handlers
         Set<DiscoveredVolume> processedVolumes = new HashSet<>();
+        Map<Balloon, Set<BlockPos>> newHolesPerBalloon = new HashMap<>();
         for (BlockPos seed : seeds) {
             DiscoveredVolume resultVolume = blockToVolumeMap.get(seed);
             //Skip processed volume
@@ -252,6 +258,7 @@ public class BalloonUpdater {
                             if (isNotBelow) {
                                 BalloonStitcher.createHole(balloon, holeSeed);
                                 modifiedBalloons.add(balloon);
+                                newHolesPerBalloon.computeIfAbsent(balloon, k -> new HashSet<>()).add(holeSeed);
                             }
                         }
                     }
@@ -292,11 +299,112 @@ public class BalloonUpdater {
                 }
             }
         }
+        //Bottom-layer conditional removal
+        if (!newHolesPerBalloon.isEmpty()) {
+            for (Map.Entry<Balloon, Set<BlockPos>> entry : newHolesPerBalloon.entrySet()) {
+                Balloon balloon = entry.getKey();
+                Set<BlockPos> newHoles = entry.getValue();
+
+                //Generate and group seeds by y level
+                Map<Integer, Set<BlockPos>> seedsByYLevel = new HashMap<>();
+                for (BlockPos hole : newHoles) {
+                    for (Direction dir : Direction.Plane.HORIZONTAL) {
+                        BlockPos neighbor = hole.relative(dir);
+                        if (balloon.contains(neighbor)) {
+                            seedsByYLevel.computeIfAbsent(neighbor.getY(), k -> new HashSet<>()).add(neighbor);
+                        }
+                    }
+                }
+
+                //Scan each affected layer
+                for (Map.Entry<Integer, Set<BlockPos>> layerEntry : seedsByYLevel.entrySet()) {
+                    Set<BlockPos> volumeSeedsOnThisLevel = layerEntry.getValue();
+                    Set<BlockPos> processedVolumeOnThisLayer = new HashSet<>();
+
+                    for (BlockPos seed : volumeSeedsOnThisLevel) {
+                        if (processedVolumeOnThisLayer.contains(seed)) {
+                            continue; 
+                        }
+
+                        SliceScanner.SliceScanResult result = SliceScanner.scan(level, balloon, seed);
+
+                        if (!result.sliceVolume().isEmpty()) {
+                            processedVolumeOnThisLayer.addAll(result.sliceVolume());
+                        }
+
+                        //Remove bottom-most layer
+                        if (result.isBottomMostLayer()) {
+                            handleBottomLayerRemoval(level, balloon, result, haiGroup);
+                            //Balloon is guaranteed to be marked for modification at this point, as it had at least one hole in it
+                        }
+                    }
+                }
+            }
+        }
+
+        //Resolution slop
         for (Balloon balloon : modifiedBalloons) {
             balloon.isInvalid = !BalloonRegistryUtility.isBalloonValid(balloon, haiGroup);
             balloon.resolveDirtyChunks();
         }
 
+    }
+
+    private void handleBottomLayerRemoval(Level level, Balloon balloon, SliceScanner.SliceScanResult result, HaiGroup group) {
+        int holeCount = result.sliceHoles().size();
+        int shellCount = result.sliceShell().size();
+        int denominator = holeCount + shellCount;
+
+        if (denominator == 0) { // lim x->+0 a / x = a bit over 4
+            return;
+        }
+
+        double holePercentage = (double) holeCount / denominator;
+        if (holePercentage < LAYER_REMOVAL_HOLE_THRESHOLD) return;
+
+        for (BlockPos pos : result.sliceVolume()) {
+            balloon.remove(pos);
+        }
+
+        balloon.holes.removeAll(result.sliceHoles());
+
+        //Find and kill orphans
+        List<UUID> supportersToRemove = findOrphanedSupporters(balloon, group.hais);
+        if (!supportersToRemove.isEmpty()) {
+            balloon.supportHais.removeAll(supportersToRemove);
+        }
+    }
+
+    //TODO: Move somewhere
+    private static List<UUID> findOrphanedSupporters(Balloon balloon, List<HaiData> hais) {
+        List<UUID> supportersToRemove = new ArrayList<>();
+        for (UUID haiId : balloon.supportHais) {
+            HaiData haiData = hais.stream()
+                    .filter(h -> h.id().equals(haiId))
+                    .findFirst()
+                    .orElse(null);
+
+            if (haiData == null) {
+                supportersToRemove.add(haiId);
+                continue;
+            }
+
+            //Vertical probe
+            boolean stillConnected = false;
+            for (int d = 1; d <= HaiGroup.HAI_TO_BALLOON_DIST; d++) {
+                BlockPos probePos = haiData.position().above(d);
+                if (balloon.contains(probePos)) {
+                    stillConnected = true;
+                    break;
+                }
+            }
+
+            if (!stillConnected) {
+                supportersToRemove.add(haiId);
+            }
+        }
+        
+        return supportersToRemove;
     }
 
     private List<EventSubGroup> prefilterAndSubgroupEvents(EventGroup group) {
