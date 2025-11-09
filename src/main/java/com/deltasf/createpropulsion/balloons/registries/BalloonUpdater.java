@@ -58,12 +58,16 @@ public class BalloonUpdater {
     }
 
     public void resolveEvents(Queue<DynamicUpdate> eventQueue, Level level) {
-        //Phase 1: Form event groups
+        //Phase 1: Form event groups and collect all hai groups
         List<EventGroup> eventGroups = groupEvents(eventQueue);
+        List<HaiGroup> allHaiGroups = BalloonShipRegistry.get().getRegistries().stream()
+            .map(BalloonRegistry::getHaiGroups)
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList());
         //Phase 2: Resolve all elements in each group
         for(EventGroup group : eventGroups) {
             //Phase 2.1: Produce final subgroups
-            List<EventSubGroup> subGroups = prefilterAndSubgroupEvents(group);
+            List<EventSubGroup> subGroups = prefilterAndSubgroupEvents(group, allHaiGroups);
             
             //Phase 2.2: Perform scan on each subgroup
             for (EventSubGroup subGroup : subGroups) {
@@ -140,7 +144,12 @@ public class BalloonUpdater {
             List<DiscoveredVolume> discoveredVolumes = BalloonScanner.scan(level, potentialScanSeeds, haiGroup, excludedBalloons);
 
             //Process scan results
-            List<DiscoveredVolume> validVolumes = discoveredVolumes.stream().filter(dv -> !dv.isLeaky() && !dv.volume().isEmpty()).toList();
+            List<DiscoveredVolume> validVolumes = new ArrayList<>();
+            for (DiscoveredVolume dv : discoveredVolumes) {
+                if (!dv.isLeaky() && !dv.volume().isEmpty()) {
+                    validVolumes.add(dv);
+                }
+            }
 
             if (!validVolumes.isEmpty()) {
                 //Build reverse lookup to connect discovered volumes to 
@@ -214,7 +223,6 @@ public class BalloonUpdater {
         for (Collection<Balloon> bucket : subGroup.affectedBalloonsMap().values()) {
             excludedBalloons.addAll(bucket);
         }
-
         //Perform scan
         List<DiscoveredVolume> discoveredVolumes = BalloonScanner.scan(
             level, 
@@ -222,6 +230,7 @@ public class BalloonUpdater {
             haiGroup, 
             excludedBalloons
         );
+        
 
         Set<Balloon> modifiedBalloons = new HashSet<>();
 
@@ -265,6 +274,7 @@ public class BalloonUpdater {
                 }
                 continue; // Done with this volume.
             }
+            
             //Handle merge/extend
             Set<Balloon> allOriginalBalloonsForThisVolume = new HashSet<>();
             for (BlockPos s : seeds) {
@@ -301,6 +311,8 @@ public class BalloonUpdater {
         }
         //Bottom-layer conditional removal
         if (!newHolesPerBalloon.isEmpty()) {
+            final SliceScanner.SliceScannerContext scannerContext = new SliceScanner.SliceScannerContext();
+
             for (Map.Entry<Balloon, Set<BlockPos>> entry : newHolesPerBalloon.entrySet()) {
                 Balloon balloon = entry.getKey();
                 Set<BlockPos> newHoles = entry.getValue();
@@ -326,7 +338,7 @@ public class BalloonUpdater {
                             continue; 
                         }
 
-                        SliceScanner.SliceScanResult result = SliceScanner.scan(level, balloon, seed);
+                        SliceScanner.SliceScanResult result = SliceScanner.scan(level, balloon, seed, scannerContext);
 
                         if (!result.sliceVolume().isEmpty()) {
                             processedVolumeOnThisLayer.addAll(result.sliceVolume());
@@ -341,13 +353,12 @@ public class BalloonUpdater {
                 }
             }
         }
-
+        
         //Resolution slop
         for (Balloon balloon : modifiedBalloons) {
             balloon.isInvalid = !BalloonRegistryUtility.isBalloonValid(balloon, haiGroup);
             balloon.resolveDirtyChunks();
         }
-
     }
 
     private void handleBottomLayerRemoval(Level level, Balloon balloon, SliceScanner.SliceScanResult result, HaiGroup group) {
@@ -378,12 +389,13 @@ public class BalloonUpdater {
     //TODO: Move somewhere
     private static List<UUID> findOrphanedSupporters(Balloon balloon, List<HaiData> hais) {
         List<UUID> supportersToRemove = new ArrayList<>();
-        for (UUID haiId : balloon.supportHais) {
-            HaiData haiData = hais.stream()
-                    .filter(h -> h.id().equals(haiId))
-                    .findFirst()
-                    .orElse(null);
+        Map<UUID, HaiData> haiDataMap = new HashMap<>();
+        for (HaiData hai : hais) {
+            haiDataMap.put(hai.id(), hai);
+        }
 
+        for (UUID haiId : balloon.supportHais) {
+            HaiData haiData = haiDataMap.get(haiId);
             if (haiData == null) {
                 supportersToRemove.add(haiId);
                 continue;
@@ -407,15 +419,11 @@ public class BalloonUpdater {
         return supportersToRemove;
     }
 
-    private List<EventSubGroup> prefilterAndSubgroupEvents(EventGroup group) {
+    private List<EventSubGroup> prefilterAndSubgroupEvents(EventGroup group, List<HaiGroup> allHaiGroups) {
         Map<HaiGroup, Map<BlockPos, Set<Balloon>>> subGroupBuilders = new HashMap<>();
         //Obtain all haiGroups
         //TODO: Probably use fastQuery when impl'd
         //TODO: obtain them all PER SHIP as this will reduce the amount of BalloonRegistry to 1. But note that events may occur on different ships, so its not that simple
-        List<HaiGroup> allHaiGroups = BalloonShipRegistry.get().getRegistries().stream()
-                .map(BalloonRegistry::getHaiGroups)
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList());
 
         for (BlockPos pos : group.positions()) {
             //Obtain haiGroup managing the given event position

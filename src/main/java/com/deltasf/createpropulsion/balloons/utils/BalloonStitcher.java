@@ -48,12 +48,12 @@ public class BalloonStitcher {
     }
 
     public static void handleSplit(Balloon originalBalloon, BlockPos splitPos, HaiGroup owner) {
-        //Capture the density of hot air in original volume
+        //Capture the original density
         final double originalHotAir = originalBalloon.hotAir;
         final double originalVolumeSize = originalBalloon.getVolumeSize();
         final double hotAirDensity = (originalVolumeSize > 0) ? originalHotAir / originalVolumeSize : 0;
 
-        // Step 1: Initial State Preparation
+        // Prepare seeds for splitting
         originalBalloon.remove(splitPos);
 
         List<BlockPos> neighborSeeds = new ArrayList<>();
@@ -64,13 +64,13 @@ public class BalloonStitcher {
             }
         }
 
-        // Early Exit 1: No split is possible if the placed block wasn't separating anything.
+        // Early Exit: No split is possible if there is only one seed
         if (neighborSeeds.size() <= 1) {
             validateHoles(originalBalloon);
             return;
         }
 
-        // Step 2: DSU Construction
+        // Construct DSU
         DisjointSetUnion dsu = new DisjointSetUnion();
         Map<BlockPos, Integer> posToId = new HashMap<>();
         List<BlockPos> idToPos = originalBalloon.toList();
@@ -81,7 +81,7 @@ public class BalloonStitcher {
 
         for (BlockPos pos : originalBalloon) {
             int posId = posToId.get(pos);
-            // Check 3 neighbors to avoid redundant checks (East, Up, South)
+            // Check 3 neighbors to avoid redundant checks (mirrored)
             for (Direction dir : new Direction[]{Direction.EAST, Direction.UP, Direction.SOUTH}) {
                 BlockPos neighbor = pos.relative(dir);
                 if (originalBalloon.contains(neighbor)) {
@@ -90,22 +90,21 @@ public class BalloonStitcher {
             }
         }
 
-        // Step 3: Component Identification
+        // Identify component of the seed
         Map<Integer, List<BlockPos>> rootToSeeds = new HashMap<>();
         for (BlockPos seed : neighborSeeds) {
             int rootId = dsu.find(posToId.get(seed));
             rootToSeeds.computeIfAbsent(rootId, k -> new ArrayList<>()).add(seed);
         }
 
-        // Early Exit 2: All neighbors are still connected, so no split occurred.
+        // All neighbors are still connected therefore no split occurred
         if (rootToSeeds.size() <= 1) {
             validateHoles(originalBalloon);
             return;
         }
 
-        // --- A SPLIT HAS DEFINITELY OCCURRED ---
-
-        // Step 4: Rebuild Volumes and Create New Balloons
+        //At this point a split has definitely occured
+        //Rebuild volumes and create new balloons
         Map<Integer, Set<BlockPos>> rootToVolume = new HashMap<>();
         for (int i = 0; i < idToPos.size(); i++) {
             int rootId = dsu.find(i);
@@ -124,8 +123,7 @@ public class BalloonStitcher {
             newBalloons.add(newBalloon);
         }
 
-        // Step 5: Finalization
-
+        //Validate created balloons
         for (Balloon newBalloon : newBalloons) {
             newBalloon.isInvalid = !BalloonRegistryUtility.isBalloonValid(newBalloon, owner);
         }
@@ -212,7 +210,7 @@ public class BalloonStitcher {
     }
 
     public static AABB getAABB(DiscoveredVolume volume) {
-        if (volume.volume().isEmpty()) return new AABB(0,0,0,0,0,0);
+        if (volume.volume().isEmpty()) return new AABB(0, 0, 0, 0, 0, 0);
         int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE;
         int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE, maxZ = Integer.MIN_VALUE;
         for (BlockPos pos : volume.volume()) {
@@ -225,5 +223,4 @@ public class BalloonStitcher {
         }
         return new AABB(minX, minY, minZ, maxX + 1, maxY + 1, maxZ + 1);
     }
-
 }

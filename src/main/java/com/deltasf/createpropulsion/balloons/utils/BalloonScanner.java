@@ -1,10 +1,10 @@
 package com.deltasf.createpropulsion.balloons.utils;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -28,7 +28,6 @@ public  class BalloonScanner {
         state.originalSeeds = seeds;
         state.excludedBalloons = excludedBalloons;
 
-        
         //Fill worklist from given seeds
         for(BlockPos seed : seeds) {
             state.workList.add(new WorkItem(seed));
@@ -134,17 +133,18 @@ public  class BalloonScanner {
 
     private static BlobScanResult discoverBlob(BlockPos origin, Level level, ScanState state) {
         Set<BlockPos> volume = new HashSet<>();
-        List<BlockPos> queue = new ArrayList<>();
+        Queue<BlockPos> queue = new ArrayDeque<>();
+        BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
         boolean hasLeak = false;
 
         queue.add(origin);
         volume.add(origin);
 
-        int head = 0;
-        while (head < queue.size()) {
-            BlockPos currentPos = queue.get(head++);
+        while (!queue.isEmpty()) {
+            BlockPos currentPos = queue.poll();
             for (Direction dir : Direction.Plane.HORIZONTAL) {
-                BlockPos neighborPos = currentPos.relative(dir);
+                mutablePos.set(currentPos).move(dir);
+                BlockPos neighborPos = mutablePos;
 
                 if (volume.contains(neighborPos) || state.blockToNodeId.containsKey(neighborPos)) {
                     continue;
@@ -163,8 +163,9 @@ public  class BalloonScanner {
                     continue;
                 }
 
-                volume.add(neighborPos);
-                queue.add(neighborPos);
+                BlockPos immutableCopy = neighborPos.immutable(); 
+                volume.add(immutableCopy);
+                queue.add(immutableCopy);
             }
         }
 
@@ -184,7 +185,7 @@ public  class BalloonScanner {
 
         //Step 1: Invalidate orphan nodes (ones not reachable from any seeds)
         Set<Integer> connectedToSeed = new HashSet<>();
-        Queue<Integer> toVisitFromSeeds = new LinkedList<>(seedNodeIds);
+        Queue<Integer> toVisitFromSeeds = new ArrayDeque<>(seedNodeIds);
         connectedToSeed.addAll(seedNodeIds);
 
         while (!toVisitFromSeeds.isEmpty()) {
@@ -221,7 +222,7 @@ public  class BalloonScanner {
         }
 
         //Start from already known leaky nodes
-        Queue<Integer> toBackPropagate = new LinkedList<>();
+        Queue<Integer> toBackPropagate = new ArrayDeque<>();
         toBackPropagate.addAll(leakyNodeIds);
         //And add to this all nodes with discovered leaks
         for(BlobNode node : state.graph.values()) {
@@ -246,7 +247,7 @@ public  class BalloonScanner {
         }
 
         //Step 3: Propagate leakiness downwards
-        Queue<Integer> toPruneForward = new LinkedList<>();
+        Queue<Integer> toPruneForward = new ArrayDeque<>();
         for(BlobNode node : state.graph.values()) {
             if (node.hasFatalLeak) {
                 //This is already in leakyNodeIds, but we need to prune forwards (downwards)
@@ -274,7 +275,7 @@ public  class BalloonScanner {
             //Found a new unprocessed volume, start traversal
             Set<BlockPos> currentVolume = new HashSet<>();
             boolean isCurrentVolumeLeaky = leakyNodeIds.contains(startNodeId);
-            Queue<Integer> toVisit = new LinkedList<>();
+            Queue<Integer> toVisit = new ArrayDeque<>();
             toVisit.add(startNodeId);
             visitedNodes.add(startNodeId);
             

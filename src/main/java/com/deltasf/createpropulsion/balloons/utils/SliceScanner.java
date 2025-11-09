@@ -6,9 +6,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 
+import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
@@ -23,55 +23,63 @@ public final class SliceScanner {
         int yLevel
     ) {}
 
-    private static final SliceScanResult EMPTY_RESULT = new SliceScanResult(Collections.emptySet(), Collections.emptySet(), Collections.emptySet(), false, -1);
-
-    public static SliceScanResult scan(Level level, Balloon balloon, BlockPos seed) {
-        if (!balloon.contains(seed)) {
-            return EMPTY_RESULT;
-        }
-
-        final int yLevel = seed.getY();
-        final Queue<BlockPos> queue = new LinkedList<>();
+    public static class SliceScannerContext {
+        final Queue<BlockPos> queue = new ArrayDeque<>();
         final Set<BlockPos> visited = new HashSet<>();
-        
         final Set<BlockPos> sliceVolume = new HashSet<>();
         final Set<BlockPos> sliceHoles = new HashSet<>();
         final Set<BlockPos> sliceShell = new HashSet<>();
 
-        queue.add(seed);
-        visited.add(seed);
+        void clear() {
+            queue.clear();
+            visited.clear();
+            sliceVolume.clear();
+            sliceHoles.clear();
+            sliceShell.clear();
+        }
+    }
 
-        while (!queue.isEmpty()) {
-            BlockPos currentPos = queue.poll();
+    private static final SliceScanResult EMPTY_RESULT = new SliceScanResult(Collections.emptySet(), Collections.emptySet(), Collections.emptySet(), false, -1);
+
+    public static SliceScanResult scan(Level level, Balloon balloon, BlockPos seed, SliceScannerContext context) {
+        if (!balloon.contains(seed)) {
+            return EMPTY_RESULT;
+        }
+        context.clear();
+
+        final int yLevel = seed.getY();
+        context.queue.add(seed);
+        context.visited.add(seed);
+
+        while (!context.queue.isEmpty()) {
+            BlockPos currentPos = context.queue.poll();
             if (balloon.contains(currentPos)) {
-                sliceVolume.add(currentPos);
                 BlockPos below = currentPos.below();
-                //This is NOT a bottom most layer. Early exit
                 if (balloon.contains(below)) {
-                    return new SliceScanResult(sliceVolume, sliceHoles, sliceShell, false, yLevel);
+                    context.sliceVolume.add(currentPos);
+                    return new SliceScanResult(new HashSet<>(context.sliceVolume), new HashSet<>(context.sliceHoles), new HashSet<>(context.sliceShell), false, yLevel);
                 }
+                context.sliceVolume.add(currentPos);
             } else if (balloon.holes.contains(currentPos)) {
-                sliceHoles.add(currentPos);
+                context.sliceHoles.add(currentPos);
             }
 
-            //Expand slice
-            for (Direction dir : Direction.Plane.HORIZONTAL)  {
+            for (Direction dir : Direction.Plane.HORIZONTAL) {
                 BlockPos neighbor = currentPos.relative(dir);
 
-                if (visited.contains(neighbor)) {
+                if (context.visited.contains(neighbor)) {
                     continue;
                 }
 
-                //Category theory
                 if (balloon.contains(neighbor) || balloon.holes.contains(neighbor)) {
-                    visited.add(neighbor);
-                    queue.add(neighbor);
+                    context.visited.add(neighbor);
+                    context.queue.add(neighbor);
                 } else if (HaiGroup.isHab(neighbor, level)) {
-                    visited.add(neighbor);
-                    sliceShell.add(neighbor);
+                    context.visited.add(neighbor);
+                    context.sliceShell.add(neighbor);
                 }
             }
         }
-        return new SliceScanResult(sliceVolume, sliceHoles, sliceShell, true, yLevel);
+        return new SliceScanResult(new HashSet<>(context.sliceVolume), new HashSet<>(context.sliceHoles), new HashSet<>(context.sliceShell), true, yLevel);
     }
 }
