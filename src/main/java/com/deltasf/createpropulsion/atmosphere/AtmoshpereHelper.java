@@ -15,6 +15,8 @@ public class AtmoshpereHelper {
     }
 
     public static double calculateExternalAirDensity(AtmosphereData atmosphere, double worldY, boolean clampAtSea) {
+        if (atmosphere.isAirless() || atmosphere.pressureAtSea() <= 0) return 0.0;
+
         double altitude = worldY - atmosphere.seaLevel();
         if (clampAtSea) {
             altitude = Math.max(0, altitude);

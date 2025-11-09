@@ -9,6 +9,8 @@ import org.valkyrienskies.core.api.ships.ServerShip;
 import java.lang.Math;
 
 import com.deltasf.createpropulsion.PropulsionConfig;
+import com.deltasf.createpropulsion.atmosphere.AtmosphereData;
+import com.deltasf.createpropulsion.atmosphere.DimensionAtmosphereManager;
 import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.HaiGroup;
 import com.deltasf.createpropulsion.balloons.injectors.AbstractHotAirInjectorBlockEntity;
@@ -31,6 +33,12 @@ public class HotAirSolver {
     static final double upsideDownLeakFactor = 10.0;
 
     public static boolean tickBalloon(Level level, Balloon balloon, HaiGroup group, BalloonRegistry registry, ServerShip ship) {
+        if (isInAirlessAtmosphere(level)) {
+            balloon.hotAir = 0.0;
+            balloon.isInvalid = true;
+            return true;
+        }
+
         if (balloon.isEmpty()) {
             return true; //Dead in a moment
         }
@@ -149,7 +157,12 @@ public class HotAirSolver {
         }
     }
 
-    public static double downRamp(double v, double threshold) {
+    private static boolean isInAirlessAtmosphere(Level level) {
+        AtmosphereData atmosphere = DimensionAtmosphereManager.getData(level);
+        return atmosphere.isAirless();
+    }
+
+    private static double downRamp(double v, double threshold) {
         if (v <= threshold) return 0.0;
         double denom = 1.0 - threshold;
         if (denom == 0.0) return 1.0;

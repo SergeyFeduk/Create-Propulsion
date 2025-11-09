@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
+import com.deltasf.createpropulsion.atmosphere.DimensionAtmosphereManager;
 import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.injectors.AbstractHotAirInjectorBlockEntity;
 import com.deltasf.createpropulsion.balloons.injectors.AirInjectorObstructionBehaviour;
@@ -207,14 +208,18 @@ public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity i
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         boolean hasFuel = !fuelInventory.fuelStack.isEmpty();
         boolean isBurning = burnTime > 0;
+        boolean isAirless = level != null && DimensionAtmosphereManager.getData(level).isAirless();
 
         //Status
         String key = "";
         ChatFormatting color = null;
 
-        if (!isBalloonPresent) {
-        key = "gui.goggles.hot_air_burner.status.no_balloon";
-        color = ChatFormatting.DARK_GRAY;
+        if (isAirless) {
+            key = "gui.goggles.hot_air_burner.status.airless";
+            color = ChatFormatting.RED;
+        } else if (!isBalloonPresent) {
+            key = "gui.goggles.hot_air_burner.status.no_balloon";
+            color = ChatFormatting.DARK_GRAY;
         } else if (isBurning) {
             key = "gui.goggles.hot_air_burner.status.on";
             color = ChatFormatting.GREEN;
@@ -242,7 +247,7 @@ public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity i
         }
 
         //Balloon section
-        if (!isBalloonPresent) {
+        if (!isBalloonPresent || isAirless) {
             return true;
         }
 

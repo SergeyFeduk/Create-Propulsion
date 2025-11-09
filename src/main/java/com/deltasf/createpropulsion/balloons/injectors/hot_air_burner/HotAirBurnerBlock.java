@@ -42,7 +42,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.ForgeHooks;
 
 public class HotAirBurnerBlock extends AbstractHotAirInjectorBlock {
-    public static final DirectionProperty FACING = DirectionProperty.create("facing");
+    public static final DirectionProperty FACING = DirectionProperty.create("facing", Direction.Plane.HORIZONTAL);
     public static final BooleanProperty LIT = BooleanProperty.create("lit");
 
     public HotAirBurnerBlock(Properties properties) {

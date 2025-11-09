@@ -25,7 +25,7 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.ModList;
 
 public class DimensionAtmosphereManager extends SimpleJsonResourceReloadListener {
-    public record AtmosphereProperties(double pressureAtSeaLevel, double scaleHeight, double gravity) {}
+    public record AtmosphereProperties(double pressureAtSeaLevel, double scaleHeight, double gravity, boolean isAirless) {}
     private static final double epsilon = 1e-5;
 
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -33,7 +33,7 @@ public class DimensionAtmosphereManager extends SimpleJsonResourceReloadListener
     public static final String DIRECTORY = "atmospheres";
 
     private static Map<ResourceKey<Level>, AtmosphereProperties> atmosphereMap = new HashMap<>();
-    public static final AtmosphereProperties DEFAULT = new AtmosphereProperties(1.225, 200.0, 9.81);
+    public static final AtmosphereProperties DEFAULT = new AtmosphereProperties(1.225, 200.0, 9.81, false);
 
     public DimensionAtmosphereManager() {
         super(GSON, DIRECTORY);
@@ -45,13 +45,19 @@ public class DimensionAtmosphereManager extends SimpleJsonResourceReloadListener
 
     public static AtmosphereData getData(Level level) {
         AtmosphereProperties properties = getProperties(level);
+
+        if (properties.isAirless()) {
+            return new AtmosphereData(0.0, 0.0, properties.gravity(), AtmoshpereHelper.determineSeaLevel((ServerLevel)level), true);
+        }
+
         double scaleHeight = properties.scaleHeight() > epsilon ? properties.scaleHeight() : DimensionAtmosphereManager.DEFAULT.scaleHeight();
 
         return new AtmosphereData(
             properties.pressureAtSeaLevel(), 
             scaleHeight, 
             properties.gravity(),
-            AtmoshpereHelper.determineSeaLevel((ServerLevel)level)
+            AtmoshpereHelper.determineSeaLevel((ServerLevel)level),
+            false
         );
     }
 
@@ -73,12 +79,23 @@ public class DimensionAtmosphereManager extends SimpleJsonResourceReloadListener
                 ResourceLocation dimensionId = new ResourceLocation(file.getPath());
                 ResourceKey<Level> dimensionKey = ResourceKey.create(Registries.DIMENSION, dimensionId);
 
-                AtmosphereProperties properties = new AtmosphereProperties(
-                    definition.pressureAtSeaLevel().orElse(DEFAULT.pressureAtSeaLevel()),
-                    definition.scaleHeight(),
-                    definition.gravity().orElse(DEFAULT.gravity())
-                );
-                newMap.put(dimensionKey, properties);
+                boolean airless = definition.isAirless().orElse(false);
+                if (airless) {
+                    newMap.put(dimensionKey, new AtmosphereProperties(
+                        0.0, 
+                        DEFAULT.scaleHeight(), // Not used, but good to have a value
+                        definition.gravity().orElse(DEFAULT.gravity()),
+                        true
+                    ));
+                } else {
+                    AtmosphereProperties properties = new AtmosphereProperties(
+                        definition.pressureAtSeaLevel().orElse(DEFAULT.pressureAtSeaLevel()),
+                        definition.scaleHeight().get(),
+                        definition.gravity().orElse(DEFAULT.gravity()),
+                        false
+                    );
+                    newMap.put(dimensionKey, properties);
+                }
             });
         }
 
