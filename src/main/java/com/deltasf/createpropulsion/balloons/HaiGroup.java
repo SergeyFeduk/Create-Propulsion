@@ -13,6 +13,7 @@ import org.joml.primitives.AABBic;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
+import com.deltasf.createpropulsion.balloons.envelopes.AbstractEnvelopeBlock;
 import com.deltasf.createpropulsion.balloons.hot_air.HotAirSolver;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry.HaiData;
@@ -21,10 +22,12 @@ import com.deltasf.createpropulsion.balloons.utils.BalloonScanner;
 import com.deltasf.createpropulsion.balloons.utils.ManagedHaiSet;
 import com.deltasf.createpropulsion.balloons.utils.RLEVolume;
 import com.deltasf.createpropulsion.balloons.utils.BalloonScanner.DiscoveredVolume;
-import com.deltasf.createpropulsion.registries.PropulsionBlocks;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.phys.AABB;
 
 public class HaiGroup {
@@ -84,7 +87,12 @@ public class HaiGroup {
     }
 
     public static boolean isHab(BlockPos pos, Level level) {
-        return level.getBlockState(pos).is(PropulsionBlocks.ENVELOPE_BLOCK.get());
+        //Yes I optimized out half of the safety checks
+        LevelChunk chunk = level.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
+        LevelChunkSection section = chunk.getSection(chunk.getSectionIndex(pos.getY()));
+        if (section.hasOnlyAir()) return false;
+        BlockState state = section.getBlockState(pos.getX() & 15, pos.getY() & 15, pos.getZ() & 15);
+        return state.getBlock() instanceof AbstractEnvelopeBlock;
     }
 
     public static BlockPos getSeedFromHai(HaiData data, Level level) {
