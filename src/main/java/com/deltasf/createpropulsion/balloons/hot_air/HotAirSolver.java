@@ -35,73 +35,118 @@ public class HotAirSolver {
             return true; //Dead in a moment
         }
         
-        double hotAirAmount = balloon.hotAir;
-        double hotAirChange = 0;
-        
+        SolverContext ctx = new SolverContext(level, balloon, group, registry, ship);
+
+        calculateInjections(ctx);
+        calculateGlobalLeak(ctx);
+        calculateUpsideDownLeak(ctx);
+        calculateHoleLeak(ctx);
+        updateHotAir(ctx);
+        handleInvalidation(ctx);
+
+        return balloon.isInvalid && balloon.hotAir <= epsilon;
+    }
+
+    private static void calculateInjections(SolverContext ctx) {
         //Hai injections
-        for(UUID id : balloon.supportHais) {
-            AbstractHotAirInjectorBlockEntity hai = registry.getInjector(level, id); 
+        for(UUID id : ctx.balloon.supportHais) {
+            AbstractHotAirInjectorBlockEntity hai = ctx.registry.getInjector(ctx.level, id);
             if (hai == null) continue; //May happen on hai destruction, before it got updated in registry
             double injection = hai.getInjectionAmount();
-            hotAirChange += injection;
+            ctx.hotAirChange += injection;
         }
-        //Current volume and fullness
-        double volume = balloon.getVolumeSize();
-        double fullness = hotAirAmount / volume;
-        double leakAdjustedFullness = Math.max(fullness, 0.1); //Use min here so leak is still significant for almost empty balloons
-        double surfaceArea = surfaceAreaFactor * Math.pow(volume, 2.0/3.0);
-        boolean isStructurallyFailed = balloon.holes.size() >= surfaceArea * holeInvalidationThresholdPercent;
-        double catastrophicFailureModifier = isStructurallyFailed ? catastrophicLeakFactor : 1.0;
+    }
 
+    private static void calculateGlobalLeak(SolverContext ctx) {
         //Global surface leak
-        hotAirChange -= PropulsionConfig.BALLOON_SURFACE_LEAK_FACTOR.get() * catastrophicFailureModifier * surfaceArea * leakAdjustedFullness;
+        ctx.hotAirChange -= PropulsionConfig.BALLOON_SURFACE_LEAK_FACTOR.get() * ctx.catastrophicFailureModifier * ctx.surfaceArea * ctx.leakAdjustedFullness;
+    }
+
+    private static void calculateUpsideDownLeak(SolverContext ctx) {
         //Leak caused by ship being upside-down or just angled too much
-        Vector3d up = new Vector3d(0.0, 1.0, 0.0).rotate(ship.getTransform().getShipToWorldRotation().normalize(new Quaterniond()), new Vector3d());
+        Vector3d up = new Vector3d(0.0, 1.0, 0.0).rotate(ctx.ship.getTransform().getShipToWorldRotation().normalize(new Quaterniond()), new Vector3d());
         double downness = up.dot(0.0, -1.0, 0.0);
         double leakAmountPercent = downRamp(downness, upsideDownThreshold);
         if (leakAmountPercent > 0.0) {
-            double allowedRemaining = (1.0 - leakAmountPercent) * volume;
-            if (hotAirAmount > allowedRemaining) {
-                double baseRemoval = leakAmountPercent * hotAirAmount;
+            double allowedRemaining = (1.0 - leakAmountPercent) * ctx.volume;
+            if (ctx.hotAirAmount > allowedRemaining) {
+                double baseRemoval = leakAmountPercent * ctx.hotAirAmount;
                 double upsideDownLeak = baseRemoval * upsideDownLeakFactor;
-                double maxRemovable = hotAirAmount - allowedRemaining;
+                double maxRemovable = ctx.hotAirAmount - allowedRemaining;
                 if (upsideDownLeak > maxRemovable) upsideDownLeak = maxRemovable;
-                hotAirChange -= upsideDownLeak;
+                ctx.hotAirChange -= upsideDownLeak;
             }
         }
-        //Hole leak based on y coordinate of each hole. We assume that hot air is evenlt distributed along all y levels
-        AABB bounds = balloon.getAABB();
-        double maxY = bounds.maxY;
-        double height = bounds.maxY - bounds.minY;
-        double pressureFloor = maxY - (height * fullness) + 1e-6;
+    }
 
+    private static void calculateHoleLeak(SolverContext ctx) {
+        //Hole leak based on y coordinate of each hole. We assume that hot air is evenlt distributed along all y levels
         double activeHoleCount = 0;
-        for (BlockPos holePos : balloon.holes) {
-            double interpolationValue = (holePos.getY() + 1.0) - pressureFloor;
+        for (BlockPos holePos : ctx.balloon.holes) {
+            double interpolationValue = (holePos.getY() + 1.0) - ctx.pressureFloor;
             double activityFraction = org.joml.Math.clamp(0.0, 1.0, interpolationValue);
             activeHoleCount += activityFraction;
         }
         if (activeHoleCount > 0) {
-            hotAirChange -= PropulsionConfig.BALLOON_HOLE_LEAK_FACTOR.get() * Math.pow(activeHoleCount, holeFactorExponent) * fullness;
+            ctx.hotAirChange -= PropulsionConfig.BALLOON_HOLE_LEAK_FACTOR.get() * Math.pow(activeHoleCount, holeFactorExponent) * ctx.fullness;
         }
-        
+    }
+
+    private static void updateHotAir(SolverContext ctx) {
         //Update hotAirAmount
         final double dt = 1 / 20.0; //For now a second will be the unit of time, may change
-        balloon.hotAir = org.joml.Math.clamp(0, volume, hotAirAmount + hotAirChange * dt);
+        ctx.balloon.hotAir = org.joml.Math.clamp(0, ctx.volume, ctx.hotAirAmount + ctx.hotAirChange * dt);
+    }
 
+    private static void handleInvalidation(SolverContext ctx) {
         //Handle invalidation
-        boolean needsInvalidationCheck = balloon.isInvalid;
-        if (isStructurallyFailed) {
-            balloon.isInvalid = true;
+        boolean needsInvalidationCheck = ctx.balloon.isInvalid;
+        if (ctx.isStructurallyFailed) {
+            ctx.balloon.isInvalid = true;
         } else if (needsInvalidationCheck) {
-            balloon.isInvalid = !BalloonRegistryUtility.isBalloonValid(balloon, group);
+            ctx.balloon.isInvalid = !BalloonRegistryUtility.isBalloonValid(ctx.balloon, ctx.group);
         }
+    }
 
-        if (balloon.isInvalid && balloon.hotAir <= epsilon) {
-            return true;
+    private static class SolverContext {
+        final Level level;
+        final Balloon balloon;
+        final HaiGroup group;
+        final BalloonRegistry registry;
+        final ServerShip ship;
+
+        final double hotAirAmount;
+        double hotAirChange = 0;
+        final double volume;
+        final double fullness;
+        final double leakAdjustedFullness;
+        final double surfaceArea;
+        final boolean isStructurallyFailed;
+        final double catastrophicFailureModifier;
+        final double height;
+        final double pressureFloor;
+
+        SolverContext(Level level, Balloon balloon, HaiGroup group, BalloonRegistry registry, ServerShip ship) {
+            this.level = level;
+            this.balloon = balloon;
+            this.group = group;
+            this.registry = registry;
+            this.ship = ship;
+
+            this.hotAirAmount = balloon.hotAir;
+
+            //Current volume and fullness
+            this.volume = balloon.getVolumeSize();
+            this.fullness = this.hotAirAmount / this.volume;
+            this.leakAdjustedFullness = Math.max(this.fullness, 0.1); //Use max here so leak is still significant for almost empty balloons
+            this.surfaceArea = surfaceAreaFactor * Math.pow(this.volume, 2.0/3.0);
+            this.isStructurallyFailed = balloon.holes.size() >= this.surfaceArea * holeInvalidationThresholdPercent;
+            this.catastrophicFailureModifier = this.isStructurallyFailed ? catastrophicLeakFactor : 1.0;
+
+            AABB bounds = balloon.getAABB();
+            this.height = bounds.maxY - bounds.minY;
+            this.pressureFloor = bounds.maxY - (this.height * this.fullness) + 1e-6;
         }
-
-        return false;
     }
 
     public static double downRamp(double v, double threshold) {

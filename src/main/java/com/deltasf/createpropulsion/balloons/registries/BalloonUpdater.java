@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.HaiGroup;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry.HaiData;
@@ -30,8 +31,6 @@ import net.minecraft.world.phys.AABB;
 import com.deltasf.createpropulsion.balloons.utils.SliceScanner;
 
 public class BalloonUpdater {
-    private static final double LAYER_REMOVAL_HOLE_THRESHOLD = 0.5;
-
     private Map<ResourceKey<Level>, Queue<DynamicUpdate>> eventQueues = new HashMap<>();
     private record DynamicUpdate(BlockPos position, boolean isPlacement) {};
     private record EventGroup(List<BlockPos> positions, boolean isPlacement) {};
@@ -202,11 +201,9 @@ public class BalloonUpdater {
                         }
                     }
                     modifiedBalloons.add(primaryBalloon);
-
                 }
             }
         }
-
 
         //Resolve balloon's chunks
         for(Balloon balloon : modifiedBalloons) {
@@ -230,7 +227,6 @@ public class BalloonUpdater {
             haiGroup, 
             excludedBalloons
         );
-        
 
         Set<Balloon> modifiedBalloons = new HashSet<>();
 
@@ -353,7 +349,7 @@ public class BalloonUpdater {
                 }
             }
         }
-        
+
         //Resolution slop
         for (Balloon balloon : modifiedBalloons) {
             balloon.isInvalid = !BalloonRegistryUtility.isBalloonValid(balloon, haiGroup);
@@ -371,7 +367,7 @@ public class BalloonUpdater {
         }
 
         double holePercentage = (double) holeCount / denominator;
-        if (holePercentage < LAYER_REMOVAL_HOLE_THRESHOLD) return;
+        if (holePercentage < PropulsionConfig.BALLOON_HOLE_LAYER_REMOVAL_THRESHOLD.get()) return;
 
         for (BlockPos pos : result.sliceVolume()) {
             balloon.remove(pos);
@@ -421,7 +417,7 @@ public class BalloonUpdater {
 
     private List<EventSubGroup> prefilterAndSubgroupEvents(EventGroup group, List<HaiGroup> allHaiGroups) {
         Map<HaiGroup, Map<BlockPos, Set<Balloon>>> subGroupBuilders = new HashMap<>();
-        //Obtain all haiGroups
+        //Obtain all haiGroups (now accessed from allHaiGroups field)
         //TODO: Probably use fastQuery when impl'd
         //TODO: obtain them all PER SHIP as this will reduce the amount of BalloonRegistry to 1. But note that events may occur on different ships, so its not that simple
 
@@ -507,6 +503,7 @@ public class BalloonUpdater {
                 currentGroup.positions().add(newGroupStartUpdate.position());
             }
         }
+        
         //Finalize the last group
         if (!currentGroup.positions().isEmpty()) {
             eventGroups.add(currentGroup);

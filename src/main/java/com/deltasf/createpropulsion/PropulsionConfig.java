@@ -33,6 +33,7 @@ public class PropulsionConfig {
     public static final ForgeConfigSpec.ConfigValue<Double> BALLOON_HORIZONTAL_DRAG_COEFFICIENT;
     public static final ForgeConfigSpec.ConfigValue<Double> BALLOON_SURFACE_LEAK_FACTOR;
     public static final ForgeConfigSpec.ConfigValue<Double> BALLOON_HOLE_LEAK_FACTOR;
+    public static final ForgeConfigSpec.ConfigValue<Double> BALLOON_HOLE_LAYER_REMOVAL_THRESHOLD;
     //Propeller
     public static final ForgeConfigSpec.ConfigValue<Double> PROPELLER_MAX_SPEED;
     public static final ForgeConfigSpec.ConfigValue<Double> PROPELLER_POWER_MULTIPLIER;
@@ -100,6 +101,8 @@ public class PropulsionConfig {
                 .define("Surface leak factor", 1e-2);
             BALLOON_HOLE_LEAK_FACTOR = SERVER_BUILDER.comment("The higher this values is - the more hot air leaks out of holes in balloon.")
                 .define("Hole leak factor", 0.2);
+            BALLOON_HOLE_LAYER_REMOVAL_THRESHOLD = SERVER_BUILDER.comment("BALLOON_HOLE_LAYER_REMOVAL_THRESHOLD")
+                .define("BALLOON_HOLE_LAYER_REMOVAL_THRESHOLD", 0.5);
         SERVER_BUILDER.pop();
 
         SERVER_BUILDER.push("Propeller");
