@@ -15,6 +15,7 @@ import org.joml.Vector3dc;
 import org.valkyrienskies.core.api.ships.PhysShip;
 import org.valkyrienskies.core.api.ships.ShipForcesInducer;
 import org.valkyrienskies.core.impl.game.ships.PhysShipImpl;
+import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 
 import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.atmosphere.AtmoshpereHelper;
@@ -48,10 +49,13 @@ public class BalloonAttachment implements ShipForcesInducer {
         accumulatedForce.zero();
         accumulatedTorque.zero();
 
+        var currentServer = ValkyrienSkiesMod.getCurrentServer();
+        long gameTime = currentServer.getTickCount();
+
         for(Balloon balloon : balloons) {
             double fullness = balloon.hotAir / balloon.getVolumeSize();
             if (fullness <= epsilon) continue;
-            calculateForcesForBalloon(shipToWorld, physicShip, balloon, fullness);
+            calculateForcesForBalloon(shipToWorld, physicShip, balloon, fullness, gameTime);
         }
 
         //Angular dampening
@@ -125,7 +129,7 @@ public class BalloonAttachment implements ShipForcesInducer {
         }
     }
 
-    private void calculateForcesForBalloon(Matrix4dc shipToWorld, PhysShip physicShip, Balloon balloon, double fullness) {
+    private void calculateForcesForBalloon(Matrix4dc shipToWorld, PhysShip physicShip, Balloon balloon, double fullness, long gameTime) {
         ConcurrentHashMap<ChunkKey, BalloonForceChunk> chunks = balloon.getChunkMap();
 
         Vector3dc shipCOMInShipSpace = physicShip.getTransform().getPositionInShip();
@@ -148,7 +152,7 @@ public class BalloonAttachment implements ShipForcesInducer {
             shipToWorld.transformPosition(appShipX, appShipY, appShipZ, tmpWorldPos);
 
             //Calculate force magnitude
-            double externalDensity = AtmoshpereHelper.calculateExternalAirDensity(atmosphereData, tmpWorldPos.y, true);
+            double externalDensity = AtmoshpereHelper.calculateVariableExternalAirDensity(atmosphereData, tmpWorldPos.x, tmpWorldPos.y, tmpWorldPos.z, gameTime,true);
             double forceMagnitude = chunk.blockCount * externalDensity * atmosphereData.gravity() * fullness;
             forceMagnitude = Math.max(0, forceMagnitude * PropulsionConfig.BALLOON_FORCE_COEFFICIENT.get());
             //Calculate force vector

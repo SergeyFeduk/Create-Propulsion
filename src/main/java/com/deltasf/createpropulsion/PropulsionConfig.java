@@ -45,6 +45,9 @@ public class PropulsionConfig {
     public static final ForgeConfigSpec.ConfigValue<Double> PROPELLER_LOD_DISTANCE;
     public static final ForgeConfigSpec.ConfigValue<Double> PROPELLER_EXPOSURE_TIME;
     public static final ForgeConfigSpec.ConfigValue<Double> PROPELLER_BLADE_ANGLE;
+    //Atmosphere
+    public static final ForgeConfigSpec.ConfigValue<Double> ATMOSPHERE_NOISE_MAGNITUDE;
+    public static final ForgeConfigSpec.ConfigValue<Double> ATMOSPHERE_NOISE_TIME_FACTOR;
 
     static {
         //#region Server
@@ -112,6 +115,13 @@ public class PropulsionConfig {
                 .defineInRange("Power multiplier", 1.0, 0.01, 100.0);
             PROPELLER_TORQUE_EFFECT_MULTIPLIER = SERVER_BUILDER.comment("Propeller torque is multiplied by this number")
                 .defineInRange("Torque effect multiplier", 1.0, 0.01, 100.0);
+        SERVER_BUILDER.pop();
+
+        SERVER_BUILDER.push("Atmosphere");
+            ATMOSPHERE_NOISE_MAGNITUDE = SERVER_BUILDER.comment("ATMOSPHERE_NOISE_MAGNITUDE")
+                .define("ATMOSPHERE_NOISE_MAGNITUDE", 1.0);
+            ATMOSPHERE_NOISE_TIME_FACTOR = SERVER_BUILDER.comment("ATMOSPHERE_NOISE_TIME_FACTOR")
+                .define("ATMOSPHERE_NOISE_TIME_FACTOR", 1.0);
         SERVER_BUILDER.pop();
 
         SERVER_SPEC = SERVER_BUILDER.build();
