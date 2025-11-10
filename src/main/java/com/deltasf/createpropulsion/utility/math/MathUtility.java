@@ -1,4 +1,4 @@
-package com.deltasf.createpropulsion.utility;
+package com.deltasf.createpropulsion.utility.math;
 
 import org.joml.Quaterniond;
 import org.joml.Quaterniondc;

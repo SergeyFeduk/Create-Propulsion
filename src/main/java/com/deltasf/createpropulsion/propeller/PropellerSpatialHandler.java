@@ -19,7 +19,7 @@ import com.deltasf.createpropulsion.debug.DebugRenderer;
 import com.deltasf.createpropulsion.debug.PropulsionDebug;
 import com.deltasf.createpropulsion.debug.routes.PropellerDebugRoute;
 import com.deltasf.createpropulsion.propeller.blades.PropellerBladeItem;
-import com.deltasf.createpropulsion.utility.MathUtility;
+import com.deltasf.createpropulsion.utility.math.MathUtility;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BehaviourType;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
