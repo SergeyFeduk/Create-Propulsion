@@ -71,7 +71,7 @@ public class HotAirSolver {
     }
 
     private static void calculateUpsideDownLeak(SolverContext ctx) {
-        //Leak caused by ship being upside-down or just angled too much
+        //Leak caused by ship being upside-down
         Vector3d up = new Vector3d(0.0, 1.0, 0.0).rotate(ctx.ship.getTransform().getShipToWorldRotation().normalize(new Quaterniond()), new Vector3d());
         double downness = up.dot(0.0, -1.0, 0.0);
         double leakAmountPercent = downRamp(downness, upsideDownThreshold);

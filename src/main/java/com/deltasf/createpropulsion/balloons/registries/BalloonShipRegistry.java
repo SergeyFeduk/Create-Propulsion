@@ -17,7 +17,7 @@ public class BalloonShipRegistry {
     }
     private BalloonShipRegistry() {}
 
-    public static final int MAX_HORIZONTAL_SCAN = 17;
+    public static final int MAX_HORIZONTAL_SCAN = 127;//17;
 
     private final Long2ObjectOpenHashMap<BalloonRegistry> registries = new Long2ObjectOpenHashMap<>();
     private final Long2ObjectOpenHashMap<ServerLevel> shipIdToLevel = new Long2ObjectOpenHashMap<>();
