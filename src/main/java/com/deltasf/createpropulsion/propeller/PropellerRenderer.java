@@ -117,6 +117,11 @@ public class PropellerRenderer extends KineticBlockEntityRenderer<PropellerBlock
         float angleChange = degreesPerSecond * deltaTimeSeconds;
         be.visualAngle = (be.visualAngle + angleChange) % 360.0f;
 
+        float displayAngle = be.visualAngle;
+        if (direction.getAxisDirection() == Direction.AxisDirection.POSITIVE) {
+            displayAngle *= -1.0f;
+        }
+
         int bladeCount = be.getBladeCount();
         if (be.animationStartTime > 0) {
             long timeSinceChange = timeNow - be.animationStartTime;
@@ -150,7 +155,7 @@ public class PropellerRenderer extends KineticBlockEntityRenderer<PropellerBlock
 
             VertexConsumer translucentVB = buffer.getBuffer(PropulsionRenderTypes.PROPELLER_BLUR);
 
-            float stroboscopicAngle = be.visualAngle;
+            float stroboscopicAngle = displayAngle;
             if (bladeCount > 0) {
                 float sectorAngle = 360f / bladeCount;
                 stroboscopicAngle %= sectorAngle;
@@ -163,8 +168,8 @@ public class PropellerRenderer extends KineticBlockEntityRenderer<PropellerBlock
             }
         } else {
             VertexConsumer cutoutVB = buffer.getBuffer(RenderType.cutoutMipped());
-            renderHead(ms, cutoutVB, light, overlay, headModel, direction, be.visualAngle, 255);
-            renderBlades(be, ms, cutoutVB, light, overlay, bladeModel[0], direction, be.visualAngle, be.renderedBladeAngles, 255);
+            renderHead(ms, cutoutVB, light, overlay, headModel, direction, displayAngle, 255);
+            renderBlades(be, ms, cutoutVB, light, overlay, bladeModel[0], direction, displayAngle, be.renderedBladeAngles, 255);
         }
     }
 

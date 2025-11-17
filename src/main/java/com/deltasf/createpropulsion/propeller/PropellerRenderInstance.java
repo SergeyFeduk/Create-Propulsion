@@ -237,7 +237,8 @@ public class PropellerRenderInstance extends KineticBlockEntityInstance<Propelle
     private Quaternionf getRotation(float angle) {
         Quaternionf q = new Quaternionf(this.facing.getRotation());
         q.mul(Axis.XP.rotationDegrees(90));
-        q.mul(Axis.ZP.rotationDegrees(angle));
+        float axisSign = (this.facing.getAxisDirection() == Direction.AxisDirection.POSITIVE) ? -1.0f : 1.0f;
+        q.mul(Axis.ZP.rotationDegrees(angle * axisSign));
         return q;
     }
 
