@@ -18,6 +18,9 @@ public class PropulsionPartialModels {
     public static final PartialModel COPPER_BLADE = block("copper_blade");
     public static final PartialModel ANDESITE_BLADE = block("andesite_blade");
 
+    //Reaction wheel
+    public static final PartialModel REACTION_WHEEL_CORE = block("reaction_wheel_core");
+
     private static PartialModel block(String path) {
         return new PartialModel(new ResourceLocation(CreatePropulsion.ID, "block/" + path));
     }

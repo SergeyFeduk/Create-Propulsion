@@ -21,7 +21,7 @@ public class ReactionWheelBlock extends DirectionalKineticBlock implements IBE<R
 
     @Override
     public boolean hasShaftTowards(LevelReader world, BlockPos pos, BlockState state, Direction face) {
-        return face == state.getValue(FACING).getOpposite();
+        return face == state.getValue(FACING);
     }
 
     @Override
