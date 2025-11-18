@@ -9,7 +9,6 @@ import javax.annotation.Nullable;
 import org.jetbrains.annotations.NotNull;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
-import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.atmosphere.DimensionAtmosphereManager;
 import com.deltasf.createpropulsion.physics_assembler.AssemblyUtility;
 import com.deltasf.createpropulsion.propeller.blades.PropellerBladeItem;
@@ -199,8 +198,7 @@ public class PropellerBlockEntity extends KineticBlockEntity {
             float bladeCountModifier = (float)getBladeCount() / (float)blade.getMaxBlades();
             float fluidSample = getSpatialHandler().getSmoothFluidSample();
             float substanceEfficiency = fluidSample * blade.getFluidEfficiency() + (1 - fluidSample) * blade.getAirEfficiency();
-            double powerMultiplier = PropulsionConfig.PROPELLER_POWER_MULTIPLIER.get();
-            float baseWorkMultiplier = speedPercentage * bladeCountModifier * substanceEfficiency * (float)powerMultiplier;
+            float baseWorkMultiplier = speedPercentage * bladeCountModifier * substanceEfficiency;
 
             //Thrust
             thrust = MAX_THRUST * baseWorkMultiplier;
@@ -208,8 +206,8 @@ public class PropellerBlockEntity extends KineticBlockEntity {
             //Torque
             float torqueFactor = blade.getTorqueFactor();
             if (torqueFactor > MathUtility.epsilon) {
-                double torqueEffectMultiplier = PropulsionConfig.PROPELLER_TORQUE_EFFECT_MULTIPLIER.get();
-                float torqueMagnitude = MAX_TORQUE * baseWorkMultiplier * torqueFactor * (float)torqueEffectMultiplier;
+                //double torqueEffectMultiplier = ;
+                float torqueMagnitude = MAX_TORQUE * baseWorkMultiplier * torqueFactor;
                 torque = Math.signum(getSpeed()) * torqueMagnitude;
             }
         }

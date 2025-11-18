@@ -40,6 +40,8 @@ public class PropellerForceApplier {
         if (atmosphere == null) return;
 
         final double maxSpeed = PropulsionConfig.PROPELLER_MAX_SPEED.get();
+        final double forceMultiplier = PropulsionConfig.PROPELLER_POWER_MULTIPLIER.get();
+        thrust *= forceMultiplier;
         //Direction from ship space to world space
         final ShipTransform transform = ship.getTransform();
         final Vector3dc shipCenterOfMass = transform.getPositionInShip(); 
@@ -54,7 +56,7 @@ public class PropellerForceApplier {
         //Torque calculation and application
         if (torque != 0) {
             Vector3d torqueVector = new Vector3d(worldForceDirection).normalize().mul(torque);
-            torqueVector.mul(externalAirDensity);
+            torqueVector.mul(externalAirDensity * PropulsionConfig.PROPELLER_TORQUE_EFFECT_MULTIPLIER.get());
             ship.applyInvariantTorque(torqueVector);
         }        
 

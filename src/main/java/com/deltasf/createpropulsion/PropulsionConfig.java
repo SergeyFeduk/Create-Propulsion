@@ -114,7 +114,7 @@ public class PropulsionConfig {
             PROPELLER_POWER_MULTIPLIER = SERVER_BUILDER.comment("Propeller force and torque are multiplied by this number")
                 .defineInRange("Power multiplier", 1.0, 0.01, 100.0);
             PROPELLER_TORQUE_EFFECT_MULTIPLIER = SERVER_BUILDER.comment("Propeller torque is multiplied by this number")
-                .defineInRange("Torque effect multiplier", 1.0, 0.01, 100.0);
+                .defineInRange("Torque effect multiplier", 1.0, 0.0, 100.0);
         SERVER_BUILDER.pop();
 
         SERVER_BUILDER.push("Atmosphere");
