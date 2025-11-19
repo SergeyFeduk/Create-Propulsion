@@ -6,6 +6,8 @@ import com.deltasf.createpropulsion.heat.IHeatConsumer;
 import com.deltasf.createpropulsion.registries.PropulsionCapabilities;
 import com.simibubi.create.content.kinetics.base.GeneratingKineticBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.simibubi.create.foundation.utility.Lang;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -15,11 +17,12 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 
 public class StirlingEngineBlockEntity extends GeneratingKineticBlockEntity implements IHeatConsumer {
-    public static final float GENERATED_RPM = 256.0f;
     public static final float GENERATED_SU = 8.0f;
+    public static final float MAX_GENERATED_RPM = 256.0f;
     public static final float HEAT_CONSUMPTION_RATE = 1.0f; 
 
     private final LazyOptional<IHeatConsumer> heatConsumerCapability;
+    protected StirlingScrollValueBehaviour targetSpeedBehaviour;
     private int activeTicks = 0;
     private boolean firstTick = true;
 
@@ -31,6 +34,11 @@ public class StirlingEngineBlockEntity extends GeneratingKineticBlockEntity impl
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviors) {
         super.addBehaviours(behaviors);
+        targetSpeedBehaviour = new StirlingScrollValueBehaviour(Lang.translate("whenthe").component(), this, new StirlingEngineValueBox());
+        targetSpeedBehaviour.between(-256, 256);
+        targetSpeedBehaviour.value = 0;
+        targetSpeedBehaviour.withCallback(i -> this.updateGeneratedRotation());
+        behaviors.add(targetSpeedBehaviour);
     }
 
     @SuppressWarnings("null")
@@ -84,13 +92,15 @@ public class StirlingEngineBlockEntity extends GeneratingKineticBlockEntity impl
      @Override
     public float getGeneratedSpeed() {
         if (activeTicks <= 0) return 0f;
-        return convertToDirection(GENERATED_RPM, getBlockState().getValue(StirlingEngineBlock.FACING));
+        int generatedRPM = targetSpeedBehaviour.getRPM() * targetSpeedBehaviour.getSign();
+        return convertToDirection(generatedRPM, getBlockState().getValue(StirlingEngineBlock.FACING));
     }
 
     @Override
     public float calculateAddedStressCapacity() {
         if (activeTicks <= 0) return 0f;
-        return GENERATED_SU;
+        float stressFactor = targetSpeedBehaviour.getRPM() / MAX_GENERATED_RPM;
+        return stressFactor * GENERATED_SU;
     }
 
     //Caps
