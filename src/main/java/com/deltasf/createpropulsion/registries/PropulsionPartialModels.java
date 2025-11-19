@@ -7,22 +7,22 @@ import net.minecraft.resources.ResourceLocation;
 
 public class PropulsionPartialModels {
     //Lodestone
-    public static final PartialModel LODESTONE_TRACKER_INDICATOR = block("lodestone_tracker_overlay");
+    public static final PartialModel LODESTONE_TRACKER_INDICATOR = partial("lodestone_tracker_overlay");
 
     //Hot air burner
-    public static final PartialModel HOT_AIR_BURNER_LEVER = block("hot_air_burner_lever");
+    public static final PartialModel HOT_AIR_BURNER_LEVER = partial("hot_air_burner_lever");
 
     //Propeller
-    public static final PartialModel PROPELLER_HEAD = block("propeller_head");
-    public static final PartialModel WOODEN_BLADE = block("wooden_blade");
-    public static final PartialModel COPPER_BLADE = block("copper_blade");
-    public static final PartialModel ANDESITE_BLADE = block("andesite_blade");
+    public static final PartialModel PROPELLER_HEAD = partial("propeller_head");
+    public static final PartialModel WOODEN_BLADE = partial("wooden_blade");
+    public static final PartialModel COPPER_BLADE = partial("copper_blade");
+    public static final PartialModel ANDESITE_BLADE = partial("andesite_blade");
 
     //Reaction wheel
-    public static final PartialModel REACTION_WHEEL_CORE = block("reaction_wheel_core");
+    public static final PartialModel REACTION_WHEEL_CORE = partial("reaction_wheel_core");
 
-    private static PartialModel block(String path) {
-        return new PartialModel(new ResourceLocation(CreatePropulsion.ID, "block/" + path));
+    private static PartialModel partial(String path) {
+        return new PartialModel(new ResourceLocation(CreatePropulsion.ID, "partial/" + path));
     }
 
     public static void register() {}
