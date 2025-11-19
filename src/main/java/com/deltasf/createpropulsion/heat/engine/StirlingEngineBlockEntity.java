@@ -121,12 +121,12 @@ public class StirlingEngineBlockEntity extends GeneratingKineticBlockEntity impl
     @Override
     protected void write(CompoundTag compound, boolean clientPacket) {
         super.write(compound, clientPacket);
-        compound.putInt("ActiveTicks", activeTicks);
+        compound.putInt("activeTicks", activeTicks);
     }
 
     @Override
     protected void read(CompoundTag compound, boolean clientPacket) {
         super.read(compound, clientPacket);
-        activeTicks = compound.getInt("ActiveTicks");
+        activeTicks = compound.getInt("activeTicks");
     }
 }

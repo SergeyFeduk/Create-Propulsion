@@ -12,6 +12,7 @@ import com.simibubi.create.foundation.blockEntity.SmartBlockEntityTicker;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -34,6 +35,8 @@ public class StirlingEngineBlock extends DirectionalKineticBlock implements IBE<
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         Level level = context.getLevel();
         BlockPos pos = context.getClickedPos();
+        Player player = context.getPlayer();
+        boolean isSneaking = player != null && player.isShiftKeyDown();
         Direction preferred = null;
 
         for (Direction side : Direction.Plane.HORIZONTAL) {
@@ -49,10 +52,10 @@ public class StirlingEngineBlock extends DirectionalKineticBlock implements IBE<
             }
         }
 
-        if (preferred != null) {
+        if (preferred != null && !isSneaking) {
             return defaultBlockState().setValue(FACING, preferred);
         }
-
+        
         Direction placedFacing = context.getHorizontalDirection().getOpposite();
         return defaultBlockState().setValue(FACING, placedFacing);
     }
