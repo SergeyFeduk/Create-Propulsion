@@ -2,21 +2,122 @@ package com.deltasf.createpropulsion.heat.engine;
 
 import java.util.List;
 
+import com.deltasf.createpropulsion.heat.IHeatConsumer;
+import com.deltasf.createpropulsion.registries.PropulsionCapabilities;
 import com.simibubi.create.content.kinetics.base.GeneratingKineticBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.LazyOptional;
 
-public class StirlingEngineBlockEntity extends GeneratingKineticBlockEntity {
-    
+public class StirlingEngineBlockEntity extends GeneratingKineticBlockEntity implements IHeatConsumer {
+    public static final float GENERATED_RPM = 256.0f;
+    public static final float GENERATED_SU = 8.0f;
+    public static final float HEAT_CONSUMPTION_RATE = 1.0f; 
+
+    private final LazyOptional<IHeatConsumer> heatConsumerCapability;
+    private int activeTicks = 0;
+    private boolean firstTick = true;
+
     public StirlingEngineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
+        this.heatConsumerCapability = LazyOptional.of(() -> this);
     }
 
     @Override
-    public void addBehaviours(List<BlockEntityBehaviour> behaviors) {}
+    public void addBehaviours(List<BlockEntityBehaviour> behaviors) {
+        super.addBehaviours(behaviors);
+    }
 
-    
+    @SuppressWarnings("null")
+    @Override
+    public void tick() {
+        super.tick();
+        if (level.isClientSide) return;
+
+        if (firstTick) {
+            firstTick = false;
+            if (activeTicks > 0) {
+                reActivateSource = true;
+            }
+        }
+
+        if (activeTicks > 0) {
+            activeTicks--;
+            if (activeTicks == 0) {
+                updateGeneratedRotation();
+            }
+        }
+    }
+
+    @Override
+    public boolean isActive() {
+        return true; 
+    }
+
+    @Override
+    public float getOperatingThreshold() {
+        return 0.1f;
+    }
+
+    @Override
+    public float consumeHeat(float maxAvailable, boolean simulate) {
+        float toConsume = Math.min(HEAT_CONSUMPTION_RATE, maxAvailable);
+
+        if (!simulate && toConsume > 0) {
+            boolean wasInactive = activeTicks == 0;
+            this.activeTicks = 3;
+
+            //We were off, but now we are activate -> update rotation
+            if (wasInactive) {
+                updateGeneratedRotation();
+            }
+        }
+
+        return toConsume;
+    }
+
+     @Override
+    public float getGeneratedSpeed() {
+        if (activeTicks <= 0) return 0f;
+        return convertToDirection(GENERATED_RPM, getBlockState().getValue(StirlingEngineBlock.FACING));
+    }
+
+    @Override
+    public float calculateAddedStressCapacity() {
+        if (activeTicks <= 0) return 0f;
+        return GENERATED_SU;
+    }
+
+    //Caps
+
+    @Override
+    public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
+        if (cap == PropulsionCapabilities.HEAT_CONSUMER && side == Direction.DOWN) {
+            return heatConsumerCapability.cast();
+        }
+        return super.getCapability(cap, side);
+    }
+
+    @Override
+    public void invalidateCaps() {
+        super.invalidateCaps();
+        heatConsumerCapability.invalidate();
+    }
+
+    @Override
+    protected void write(CompoundTag compound, boolean clientPacket) {
+        super.write(compound, clientPacket);
+        compound.putInt("ActiveTicks", activeTicks);
+    }
+
+    @Override
+    protected void read(CompoundTag compound, boolean clientPacket) {
+        super.read(compound, clientPacket);
+        activeTicks = compound.getInt("ActiveTicks");
+    }
 }

@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "createpropulsion:block/stirling_base", "y": 180 },
+    "facing=south": { "model": "createpropulsion:block/stirling_base", "y": 0   },
+    "facing=west" : { "model": "createpropulsion:block/stirling_base", "y": 90  },
+    "facing=east" : { "model": "createpropulsion:block/stirling_base", "y": 270 }
+  }
+}

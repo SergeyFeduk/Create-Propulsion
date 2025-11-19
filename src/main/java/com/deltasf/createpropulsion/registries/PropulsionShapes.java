@@ -49,7 +49,13 @@ public class PropulsionShapes {
         HOT_AIR_BURNER = ShapeBuilder.shape()
             .add(Block.box(0, 0, 0, 16, 4, 16))
             .add(Block.box(2, 4, 0, 14, 9, 16))
-            .forDirectional(Direction.NORTH);
+            .forDirectional(Direction.NORTH),
+
+        STIRLING_ENGINE = ShapeBuilder.shape()
+            .add(Block.box(0, 0, 0, 16, 3, 16))
+            .add(Block.box(0, 3, 0, 16, 5, 14))
+            .add(Block.box(2, 5, 0, 14, 13, 14))
+            .forDirectional(Direction.SOUTH);
     
     public static class ShapeBuilder {
         private VoxelShape shape;
