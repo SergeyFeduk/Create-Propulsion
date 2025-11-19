@@ -36,13 +36,12 @@ public class StirlingEngineBlock extends DirectionalKineticBlock implements IBE<
         BlockPos pos = context.getClickedPos();
         Direction preferred = null;
 
-        // 1. Check horizontal neighbors for existing shafts to connect to
         for (Direction side : Direction.Plane.HORIZONTAL) {
             BlockState neighborState = level.getBlockState(pos.relative(side));
             if (neighborState.getBlock() instanceof IRotate neighborRotate) {
                 if (neighborRotate.hasShaftTowards(level, pos.relative(side), neighborState, side.getOpposite())) {
                     if (preferred != null && preferred != side) {
-                        preferred = null; // Conflict found
+                        preferred = null;
                         break;
                     }
                     preferred = side;
@@ -50,14 +49,10 @@ public class StirlingEngineBlock extends DirectionalKineticBlock implements IBE<
             }
         }
 
-        // 2. If a connection was found, face that way. 
-        // Note: FACING points towards the shaft output. 
-        // If neighbor is East, we face East to connect.
         if (preferred != null) {
             return defaultBlockState().setValue(FACING, preferred);
         }
 
-        // 3. Fallback: Opposite of player placement, but restricted to Horizontal
         Direction placedFacing = context.getHorizontalDirection().getOpposite();
         return defaultBlockState().setValue(FACING, placedFacing);
     }

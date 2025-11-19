@@ -1,7 +1,6 @@
 package com.deltasf.createpropulsion.heat.engine;
 
-import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollValueBehaviour;
-
+import com.deltasf.createpropulsion.utility.value_boxes.DualRowValueBehaviour;
 import com.google.common.collect.ImmutableList;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform;
@@ -15,26 +14,25 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.BlockHitResult;
 
-public class StirlingScrollValueBehaviour extends ScrollValueBehaviour {
-    protected final static int STEP = 64;
-    //-256 -192 -128 -64 | 64 128 192 256
-    // -4   -3   -2   -1 |  1  2   3   4
+public class StirlingScrollValueBehaviour extends DualRowValueBehaviour {
+    protected static final int STEP = 64;
+    protected static final int OPTIONS_PER_ROW = 3;
 
     public StirlingScrollValueBehaviour(Component label, SmartBlockEntity be, ValueBoxTransform slot) {
         super(label, be, slot);
-        this.withFormatter(v -> Integer.toString(getRPM()));
+        this.withFormatter(v -> Integer.toString(getUnsignedRPM()));
     }
 
     public int getRPM() {
-        return Math.abs(getValue() + 1) * STEP;
+        return getValue() * STEP;
     }
 
-    public int getSign() {
-        return getValue() > 0 ? 1 : 0;
+    public int getUnsignedRPM() {
+        return Math.abs(getValue()) * STEP;
     }
 
-    public int getRpmFromBoardValue(int boardValue) {
-        return (boardValue + 1) * STEP;
+    private int getRpmFromBoardIndex(int boardIndex) {
+        return (boardIndex + 1) * STEP;
     }
 
     @Override
@@ -43,30 +41,29 @@ public class StirlingScrollValueBehaviour extends ScrollValueBehaviour {
             Component.literal("\u27f3").withStyle(ChatFormatting.BOLD),
             Component.literal("\u27f2").withStyle(ChatFormatting.BOLD)
         );
-        
         ValueSettingsFormatter formatter = new ValueSettingsFormatter(this::formatSettings);
-        return new ValueSettingsBoard(label, 4, 1, rows, formatter);
+        return new ValueSettingsBoard(label, OPTIONS_PER_ROW, 1, rows, formatter);
     }
 
     @Override
     public void setValueSettings(Player player, ValueSettings valueSetting, boolean ctrlHeld) {
-        int val = Math.max(1, valueSetting.value());
-        System.out.println("setValueSettings");
-        if (!valueSetting.equals(getValueSettings()))
-			playFeedbackSound(this);
-		setValue(valueSetting.row() == 0 ? -val : val);
-        System.out.println(value);
+        int internalValue = valueSetting.value() + 1;
+        int newValue = valueSetting.row() == 0 ? -internalValue : internalValue;
+
+        if (this.getValue() == newValue) return;
+
+        setValue(newValue);
+        playFeedbackSound(this);
     }
 
-    @Override 
+    @Override
     public ValueSettings getValueSettings() {
-        return new ValueSettings(value < 0 ? 0 : 1, Math.abs(value));
+        int row = getValue() < 0 ? 0 : 1;
+        int index = Math.abs(getValue()) - 1;
+        return new ValueSettings(row, index);
     }
 
     public MutableComponent formatSettings(ValueSettings settings) {
-        return Lang.number(getRpmFromBoardValue(settings.value()))
-            .add(Lang.text(settings.row() == 0 ? " \u27f3" : " \u27f2")
-            .style(ChatFormatting.BOLD))
-            .component();
+        return Lang.number(getRpmFromBoardIndex(settings.value())).component();
     }
 }

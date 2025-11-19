@@ -2,11 +2,13 @@ package com.deltasf.createpropulsion.events;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.physics_assembler.AssemblyGaugeItem;
+import com.deltasf.createpropulsion.utility.value_boxes.DualRowValueRenderer;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -27,6 +29,13 @@ public class ForgeClientEvents {
 
         if (wasHandled) {
             event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onClientTick(TickEvent.ClientTickEvent event) {
+        if (event.phase == TickEvent.Phase.END) {
+            DualRowValueRenderer.tick();
         }
     }
 }
