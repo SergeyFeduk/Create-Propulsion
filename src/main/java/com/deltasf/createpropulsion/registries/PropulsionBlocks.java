@@ -93,7 +93,7 @@ public class PropulsionBlocks {
 
     public static final BlockEntry<SolidBurnerBlock> SOLID_BURNER = REGISTRATE.block("solid_burner", SolidBurnerBlock::new)
         .properties(p -> p.mapColor(MapColor.STONE))
-        .properties(p -> p.sound(SoundType.METAL))
+        .properties(p -> p.sound(SoundType.COPPER))
         .properties(p -> p.requiresCorrectToolForDrops())
         .properties(p -> p.strength(2.5F, 2.0F))
         .properties(p -> p.lightLevel(state -> state.getValue(SolidBurnerBlock.LIT) ? 13 : 0))
@@ -111,12 +111,16 @@ public class PropulsionBlocks {
         .register();
 
     public static final BlockEntry<ReactionWheelBlock> REACTION_WHEEL_BLOCK = REGISTRATE.block("reaction_wheel", ReactionWheelBlock::new)
-        .properties(p -> p.noOcclusion())    
+        .properties(p -> p.noOcclusion())
         .transform(BlockStressDefaults.setImpact(8.0))
         .simpleItem()
         .register();
 
     public static final BlockEntry<StirlingEngineBlock> STIRLING_ENGINE_BLOCK = REGISTRATE.block("stirling_engine", StirlingEngineBlock::new)
+        .properties(p -> p.mapColor(MapColor.STONE))
+        .properties(p -> p.sound(SoundType.COPPER))
+        .properties(p -> p.requiresCorrectToolForDrops())
+        .properties(p -> p.strength(2.5F, 2.0F))    
         .properties(p -> p.noOcclusion())
         .simpleItem()
         .register();
