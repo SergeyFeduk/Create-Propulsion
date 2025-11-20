@@ -43,6 +43,7 @@ public class ReactionWheelRenderer extends KineticBlockEntityRenderer<ReactionWh
         SuperByteBuffer coreModel = CachedBufferer.partial(PropulsionPartialModels.REACTION_WHEEL_CORE, state);
         VertexConsumer vb = buffer.getBuffer(RenderType.cutoutMipped());
 
+        //TODO: Very likely that wheel weird shading is caused by its rotation. Maybe try remove disableDiffuse and change rotation (270 or smth like that?)
         ms.pushPose();
         ms.translate(0.5, 0.5, 0.5);
         ms.mulPose(direction.getRotation());
