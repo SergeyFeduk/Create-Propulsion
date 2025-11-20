@@ -17,6 +17,8 @@ import com.simibubi.create.AllPartialModels;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntityInstance;
 import com.simibubi.create.content.kinetics.base.flwdata.RotatingData;
 import com.simibubi.create.foundation.utility.AngleHelper;
+import com.simibubi.create.foundation.utility.AnimationTickHolder;
+
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Direction;
@@ -102,10 +104,13 @@ public class PropellerRenderInstance extends KineticBlockEntityInstance<Propelle
             recreateBladeInstancers();
         }
 
-        long timeNow = System.nanoTime();
-        if (blockEntity.lastRenderTimeNanos == 0) blockEntity.lastRenderTimeNanos = timeNow;
-        float deltaTimeSeconds = (timeNow - blockEntity.lastRenderTimeNanos) / 1.0e9f;
-        blockEntity.lastRenderTimeNanos = timeNow;
+        float time = AnimationTickHolder.getRenderTime(blockEntity.getLevel());
+        float timeSeconds = time / 20.0f;
+
+        if (blockEntity.lastRenderTimeSeconds == 0) blockEntity.lastRenderTimeSeconds = timeSeconds;
+        float deltaTimeSeconds = timeSeconds - blockEntity.lastRenderTimeSeconds;
+        blockEntity.lastRenderTimeSeconds = timeSeconds;
+
 
         float targetRPM = blockEntity.getTargetRPM();
         float diff = targetRPM - blockEntity.visualRPM;
@@ -122,8 +127,8 @@ public class PropellerRenderInstance extends KineticBlockEntityInstance<Propelle
         blockEntity.visualAngle = (blockEntity.visualAngle + angleChange) % 360.0f;
 
         if (blockEntity.animationStartTime > 0) {
-            long timeSinceChange = timeNow - blockEntity.animationStartTime;
-            float progress = Mth.clamp((float)(timeSinceChange / (PropellerRenderer.ANIMATION_DURATION * 1.0e9f)), 0.0f, 1.0f);
+            float timeSinceChange = timeSeconds - blockEntity.animationStartTime;
+            float progress = Mth.clamp(timeSinceChange / PropellerRenderer.ANIMATION_DURATION, 0.0f, 1.0f);
             progress = progress * progress * (3 - 2 * progress);
             for (int i = 0; i < blockEntity.targetBladeAngles.size(); i++) {
                 float startAngle = blockEntity.prevBladeAngles.get(i);

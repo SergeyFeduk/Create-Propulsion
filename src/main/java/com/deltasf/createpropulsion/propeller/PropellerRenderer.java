@@ -17,6 +17,7 @@ import com.simibubi.create.content.kinetics.base.KineticBlockEntityRenderer;
 import com.simibubi.create.foundation.render.CachedBufferer;
 import com.simibubi.create.foundation.render.SuperByteBuffer;
 import com.simibubi.create.foundation.utility.AngleHelper;
+import com.simibubi.create.foundation.utility.AnimationTickHolder;
 
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
@@ -88,12 +89,14 @@ public class PropellerRenderer extends KineticBlockEntityRenderer<PropellerBlock
             }
         });
 
-        long timeNow = System.nanoTime();
-        if (be.lastRenderTimeNanos == 0) { // First frame
-            be.lastRenderTimeNanos = timeNow;
+        float time = AnimationTickHolder.getRenderTime(be.getLevel());
+        float timeSeconds = time / 20.0f;
+
+        if (be.lastRenderTimeSeconds == 0) { // First frame
+            be.lastRenderTimeSeconds = timeSeconds;
         }
-        float deltaTimeSeconds = (timeNow - be.lastRenderTimeNanos) / 1000000000f;
-        be.lastRenderTimeNanos = timeNow;
+        float deltaTimeSeconds = timeSeconds - be.lastRenderTimeSeconds;
+        be.lastRenderTimeSeconds = timeSeconds;
 
         //Interpolate RPM
         float targetRPM = be.getTargetRPM();
@@ -124,8 +127,8 @@ public class PropellerRenderer extends KineticBlockEntityRenderer<PropellerBlock
 
         int bladeCount = be.getBladeCount();
         if (be.animationStartTime > 0) {
-            long timeSinceChange = timeNow - be.animationStartTime;
-            float progress = (float) (timeSinceChange / (ANIMATION_DURATION * 1000000000f));
+            float timeSinceChange = timeSeconds - be.animationStartTime;
+            float progress = timeSinceChange / ANIMATION_DURATION;
             progress = Mth.clamp(progress, 0.0f, 1.0f);
             progress = progress * progress * (3 - 2 * progress);
             for (int i = 0; i < be.targetBladeAngles.size(); i++) {

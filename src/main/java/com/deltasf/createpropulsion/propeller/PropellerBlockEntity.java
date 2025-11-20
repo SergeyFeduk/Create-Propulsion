@@ -18,6 +18,7 @@ import com.simibubi.create.CreateClient;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.outliner.Outline.OutlineParams;
+import com.simibubi.create.foundation.utility.AnimationTickHolder;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -54,7 +55,6 @@ public class PropellerBlockEntity extends KineticBlockEntity {
 
     //Server-side rpm sim
     public float internalRPM = 0f;
-    private long lastSystemTimeNanos = 0;
 
     //Client-side animation state
     @OnlyIn(Dist.CLIENT)
@@ -62,14 +62,14 @@ public class PropellerBlockEntity extends KineticBlockEntity {
     @OnlyIn(Dist.CLIENT)
     public List<Float> renderedBladeAngles;
     @OnlyIn(Dist.CLIENT)
-    public long animationStartTime;
+    public float animationStartTime;
 
     @OnlyIn(Dist.CLIENT)
     public float visualRPM = 0f;
     @OnlyIn(Dist.CLIENT)
     public float visualAngle = 0f;
     @OnlyIn(Dist.CLIENT)
-    public long lastRenderTimeNanos = 0;
+    public float lastRenderTimeSeconds = 0;
     @OnlyIn(Dist.CLIENT)
     private boolean hasLoadedClientState = false;
 
@@ -225,13 +225,7 @@ public class PropellerBlockEntity extends KineticBlockEntity {
             return;
 
         //RPM sim, dt aware
-        if (lastSystemTimeNanos == 0) {
-            lastSystemTimeNanos = System.nanoTime();
-        }
-
-        long timeNow = System.nanoTime();
-        float deltaTimeSeconds = (timeNow - lastSystemTimeNanos) / 1_000_000_000f;
-        lastSystemTimeNanos = timeNow;
+        float deltaTimeSeconds = 0.05f; 
         float targetRPM = getTargetRPM();
         float diff = targetRPM - internalRPM;
 
@@ -448,7 +442,7 @@ public class PropellerBlockEntity extends KineticBlockEntity {
                         int newBladeIndex = this.targetBladeAngles.size() - 1;
                         this.prevBladeAngles.add(this.targetBladeAngles.get(newBladeIndex));
                     }
-                    this.animationStartTime = System.nanoTime();
+                    this.animationStartTime = AnimationTickHolder.getRenderTime(level) / 20.0f;
                 }
             }
         } else {
