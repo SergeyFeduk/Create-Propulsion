@@ -32,6 +32,14 @@ public class StirlingEngineBlockEntity extends GeneratingKineticBlockEntity impl
     }
 
     @Override
+    public void initialize() {
+        super.initialize();
+        if (activeTicks > 0 || getGeneratedSpeed() > getTheoreticalSpeed()) {
+            updateGeneratedRotation();
+        }
+    }
+
+    @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviors) {
         super.addBehaviours(behaviors);
         targetSpeedBehaviour = new StirlingScrollValueBehaviour(Lang.translate("whenthe").component(), this, new StirlingEngineValueBox());
@@ -98,8 +106,14 @@ public class StirlingEngineBlockEntity extends GeneratingKineticBlockEntity impl
     @Override
     public float calculateAddedStressCapacity() {
         if (activeTicks <= 0) return 0f;
-        float stressFactor = MAX_GENERATED_RPM / targetSpeedBehaviour.getUnsignedRPM();
-        return stressFactor * GENERATED_SU;
+        float rpm = targetSpeedBehaviour.getUnsignedRPM();
+        if (rpm == 0) return 0f; 
+
+        float stressFactor = MAX_GENERATED_RPM / rpm;
+        float capacity = stressFactor * GENERATED_SU;
+
+        this.lastCapacityProvided = capacity;
+        return capacity;
     }
 
     //Caps

@@ -21,6 +21,9 @@ public class PropulsionPartialModels {
     //Reaction wheel
     public static final PartialModel REACTION_WHEEL_CORE = partial("reaction_wheel_core");
 
+    //Stirling engine
+    public static final PartialModel STIRLING_ENGINE_PISTON = partial("stirling_piston");
+
     private static PartialModel partial(String path) {
         return new PartialModel(new ResourceLocation(CreatePropulsion.ID, "partial/" + path));
     }
