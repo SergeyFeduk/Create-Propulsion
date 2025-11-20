@@ -45,6 +45,12 @@ public class PropulsionConfig {
     public static final ForgeConfigSpec.ConfigValue<Double> PROPELLER_LOD_DISTANCE;
     public static final ForgeConfigSpec.ConfigValue<Double> PROPELLER_EXPOSURE_TIME;
     public static final ForgeConfigSpec.ConfigValue<Double> PROPELLER_BLADE_ANGLE;
+    //Stirling engine
+    public static final ForgeConfigSpec.ConfigValue<Double> STIRLING_GENERATED_SU;
+
+    public static final ForgeConfigSpec.ConfigValue<Double> STIRLING_REVOLUTION_PERIOD;
+    public static final ForgeConfigSpec.ConfigValue<Double> STIRLING_CRANK_RADIUS;
+    public static final ForgeConfigSpec.ConfigValue<Double> STIRLING_CONROD_LENGTH;
     //Atmosphere
     public static final ForgeConfigSpec.ConfigValue<Double> ATMOSPHERE_NOISE_MAGNITUDE;
     public static final ForgeConfigSpec.ConfigValue<Double> ATMOSPHERE_NOISE_TIME_FACTOR;
@@ -117,6 +123,11 @@ public class PropulsionConfig {
                 .defineInRange("Torque effect multiplier", 1.0, 0.0, 100.0);
         SERVER_BUILDER.pop();
 
+        SERVER_BUILDER.push("Stirling Engine");
+            STIRLING_GENERATED_SU = SERVER_BUILDER.comment("STIRLING_GENERATED_SU")
+                .defineInRange("STIRLING_GENERATED_SU", 8.0, 1.0, 64.0);
+        SERVER_BUILDER.pop();
+
         SERVER_BUILDER.push("Atmosphere");
             ATMOSPHERE_NOISE_MAGNITUDE = SERVER_BUILDER.comment("ATMOSPHERE_NOISE_MAGNITUDE")
                 .define("ATMOSPHERE_NOISE_MAGNITUDE", 1.0);
@@ -147,6 +158,15 @@ public class PropulsionConfig {
                 .define("Exposure time", 1.0/120.0);
             PROPELLER_BLADE_ANGLE = CLIENT_BUILDER.comment("Angle of the propeller's blade, in degrees")
                 .define("Blade angle", 10.0);
+        CLIENT_BUILDER.pop();
+
+        CLIENT_BUILDER.push("Stirling Engine");
+            STIRLING_REVOLUTION_PERIOD = CLIENT_BUILDER.comment("STIRLING_REVOLUTION_PERIOD.")
+                .define("STIRLING_REVOLUTION_PERIOD", 0.2);
+            STIRLING_CRANK_RADIUS = CLIENT_BUILDER.comment("STIRLING_CRANK_RADIUS.")
+                .define("STIRLING_CRANK_RADIUS", 0.125);
+            STIRLING_CONROD_LENGTH = CLIENT_BUILDER.comment("STIRLING_CONROD_LENGTH.")
+                .define("STIRLING_CONROD_LENGTH", 0.5);
         CLIENT_BUILDER.pop();
         CLIENT_SPEC = CLIENT_BUILDER.build();
         //#endregion

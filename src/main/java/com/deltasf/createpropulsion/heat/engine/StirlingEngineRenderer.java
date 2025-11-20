@@ -2,6 +2,7 @@ package com.deltasf.createpropulsion.heat.engine;
 
 import org.joml.Vector4f;
 
+import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.registries.PropulsionPartialModels;
 import com.deltasf.createpropulsion.utility.math.MathUtility;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -20,10 +21,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class StirlingEngineRenderer extends KineticBlockEntityRenderer<StirlingEngineBlockEntity> {
-    private final static float vivaLaRevolutionPeriod = 0.2f;
-    private final static float crankRadius = 0.125f;
-    private final static float conrodLength = 0.5f;
-
     private final static int[] offsetArray = {0, 7, 2, 9};
 
     public StirlingEngineRenderer(BlockEntityRendererProvider.Context context) {
@@ -50,9 +47,12 @@ public class StirlingEngineRenderer extends KineticBlockEntityRenderer<StirlingE
         float timeSeconds = time / 20.0f;
         float effectiveRevolutionPeriod = Float.MAX_VALUE;
         if (speed > MathUtility.epsilon) {
-            effectiveRevolutionPeriod = vivaLaRevolutionPeriod / speed;
+            double revolutionPeriod = PropulsionConfig.STIRLING_REVOLUTION_PERIOD.get();
+            effectiveRevolutionPeriod = (float)revolutionPeriod / speed;
         }
-        Vector4f normalizedExtensions = calculateExtensions(timeSeconds, crankRadius, conrodLength, effectiveRevolutionPeriod);
+        double crankRadius = PropulsionConfig.STIRLING_CRANK_RADIUS.get();
+        double conrodLength = PropulsionConfig.STIRLING_CONROD_LENGTH.get();
+        Vector4f normalizedExtensions = calculateExtensions(timeSeconds, (float)crankRadius, (float)conrodLength, effectiveRevolutionPeriod);
 
         for (int i = 0; i < 4; i++) {
             float normalized;

@@ -2,6 +2,7 @@ package com.deltasf.createpropulsion.heat.engine;
 
 import java.util.List;
 
+import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.heat.IHeatConsumer;
 import com.deltasf.createpropulsion.registries.PropulsionCapabilities;
 import com.simibubi.create.content.kinetics.base.GeneratingKineticBlockEntity;
@@ -17,7 +18,6 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 
 public class StirlingEngineBlockEntity extends GeneratingKineticBlockEntity implements IHeatConsumer {
-    public static final float GENERATED_SU = 8.0f;
     public static final float MAX_GENERATED_RPM = 256.0f;
     public static final float HEAT_CONSUMPTION_RATE = 1.0f; 
 
@@ -110,7 +110,8 @@ public class StirlingEngineBlockEntity extends GeneratingKineticBlockEntity impl
         if (rpm == 0) return 0f; 
 
         float stressFactor = MAX_GENERATED_RPM / rpm;
-        float capacity = stressFactor * GENERATED_SU;
+        double generatedSU = PropulsionConfig.STIRLING_GENERATED_SU.get();
+        float capacity = stressFactor * (float)generatedSU;
 
         this.lastCapacityProvided = capacity;
         return capacity;

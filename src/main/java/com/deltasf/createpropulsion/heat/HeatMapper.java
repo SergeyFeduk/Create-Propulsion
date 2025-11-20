@@ -19,10 +19,8 @@ public class HeatMapper {
     }
 
     public static HeatLevelString getHeatString(float percentage) {
-        //TODO: Use translation keys
         if (percentage > 0.6f) return HeatLevelString.SEARING;
         if (percentage > 0.3f) return HeatLevelString.HOT;
-        //Warm does not mean anything for gameplay, used just to notify player that burner is heating up
         if (percentage > 0.1f) return HeatLevelString.WARM; 
         return HeatLevelString.COLD;
     }

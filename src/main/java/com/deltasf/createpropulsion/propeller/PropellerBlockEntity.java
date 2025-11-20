@@ -224,7 +224,7 @@ public class PropellerBlockEntity extends KineticBlockEntity {
         if (level == null || level.isClientSide)
             return;
 
-        //RPM sim, dt aware
+        //RPM sim
         float deltaTimeSeconds = 0.05f; 
         float targetRPM = getTargetRPM();
         float diff = targetRPM - internalRPM;
