@@ -5,6 +5,7 @@ import org.joml.Vector4f;
 import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.registries.PropulsionPartialModels;
 import com.deltasf.createpropulsion.utility.math.MathUtility;
+import com.jozufozu.flywheel.backend.Backend;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -29,6 +30,8 @@ public class StirlingEngineRenderer extends KineticBlockEntityRenderer<StirlingE
     
     @Override
     public void renderSafe(StirlingEngineBlockEntity blockEntity, float partialTicks, PoseStack ms, MultiBufferSource bufferSource, int light, int overlay) {
+        if (Backend.canUseInstancing(blockEntity.getLevel())) return;
+
         Direction direction = blockEntity.getBlockState().getValue(StirlingEngineBlock.FACING);
         SuperByteBuffer shaft = CachedBufferer.partialFacing(AllPartialModels.SHAFT_HALF, blockEntity.getBlockState(), direction);
         standardKineticRotationTransform(shaft, blockEntity, light).renderInto(ms, bufferSource.getBuffer(RenderType.solid()));
