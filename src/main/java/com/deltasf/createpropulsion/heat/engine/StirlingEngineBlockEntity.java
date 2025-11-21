@@ -7,11 +7,11 @@ import com.deltasf.createpropulsion.heat.IHeatConsumer;
 import com.deltasf.createpropulsion.registries.PropulsionCapabilities;
 import com.simibubi.create.content.kinetics.base.GeneratingKineticBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import com.simibubi.create.foundation.utility.Lang;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
@@ -42,7 +42,7 @@ public class StirlingEngineBlockEntity extends GeneratingKineticBlockEntity impl
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviors) {
         super.addBehaviours(behaviors);
-        targetSpeedBehaviour = new StirlingScrollValueBehaviour(Lang.translate("whenthe").component(), this, new StirlingEngineValueBox());
+        targetSpeedBehaviour = new StirlingScrollValueBehaviour(Component.translatable("createpropulsion.stirling.generated_speed"), this, new StirlingEngineValueBox());
         targetSpeedBehaviour.value = 4;
         targetSpeedBehaviour.withCallback(i -> this.updateGeneratedRotation());
         behaviors.add(targetSpeedBehaviour);

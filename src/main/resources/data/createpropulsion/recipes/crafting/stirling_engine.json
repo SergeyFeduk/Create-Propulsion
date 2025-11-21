@@ -1,0 +1,25 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "ZIZ",
+        "ZGZ",
+        "CCC"
+    ],
+    "key": {
+        "C": {
+            "item": "create:copper_sheet"
+        },
+        "G": {
+            "item": "create:gearshift"
+        },
+        "Z": {
+            "item": "create:zinc_nugget"
+        }, 
+        "I": {
+            "item": "create:iron_sheet"
+        }
+    },
+    "result": {
+        "item": "createpropulsion:stirling_engine"
+    }
+}

@@ -48,5 +48,10 @@
         "block": "createpropulsion:propeller",
         "mass": 300.0,
         "friction": 0.2
+    },
+    {
+        "block": "createpropulsion:stirling_engine",
+        "mass": 800.0,
+        "friction": 0.6
     }
 ]

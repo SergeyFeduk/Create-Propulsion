@@ -64,6 +64,9 @@ public class StirlingScrollValueBehaviour extends DualRowValueBehaviour {
     }
 
     public MutableComponent formatSettings(ValueSettings settings) {
-        return Lang.number(getRpmFromBoardIndex(settings.value())).component();
+        return Lang.number(getRpmFromBoardIndex(settings.value()))
+            .add(Lang.text(settings.row() == 0 ? "\u27f3" : "\u27f2")
+            .style(ChatFormatting.BOLD))
+            .component();
     }
 }
