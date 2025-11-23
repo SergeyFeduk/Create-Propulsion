@@ -30,11 +30,6 @@
         "friction": 0.4
     },
     {
-        "block": "createpropulsion:envelope",
-        "mass": 10.0,
-        "friction": 0.2
-    },
-    {
         "block": "createpropulsion:hot_air_burner",
         "mass": 700.0,
         "friction": 0.4
@@ -53,5 +48,85 @@
         "block": "createpropulsion:stirling_engine",
         "mass": 800.0,
         "friction": 0.6
+    },
+    {
+        "block": "createpropulsion:envelope",
+        "mass": 10.0,
+        "friction": 0.2
+    },
+    {
+        "block": "createpropulsion:envelope_orange",
+        "mass": 10.0,
+        "friction": 0.2
+    },
+    {
+        "block": "createpropulsion:envelope_magenta",
+        "mass": 10.0,
+        "friction": 0.2
+    },
+    {
+        "block": "createpropulsion:envelope_light_blue",
+        "mass": 10.0,
+        "friction": 0.2
+    },
+    {
+        "block": "createpropulsion:envelope_yellow",
+        "mass": 10.0,
+        "friction": 0.2
+    },
+    {
+        "block": "createpropulsion:envelope_lime",
+        "mass": 10.0,
+        "friction": 0.2
+    },
+    {
+        "block": "createpropulsion:envelope_pink",
+        "mass": 10.0,
+        "friction": 0.2
+    },
+    {
+        "block": "createpropulsion:envelope_gray",
+        "mass": 10.0,
+        "friction": 0.2
+    },
+    {
+        "block": "createpropulsion:envelope_light_gray",
+        "mass": 10.0,
+        "friction": 0.2
+    },
+    {
+        "block": "createpropulsion:envelope_cyan",
+        "mass": 10.0,
+        "friction": 0.2
+    },
+    {
+        "block": "createpropulsion:envelope_purple",
+        "mass": 10.0,
+        "friction": 0.2
+    },
+    {
+        "block": "createpropulsion:envelope_blue",
+        "mass": 10.0,
+        "friction": 0.2
+    },
+    {
+        "block": "createpropulsion:envelope_brown",
+        "mass": 10.0,
+        "friction": 0.2
+    },
+    {
+        "block": "createpropulsion:envelope_green",
+        "mass": 10.0,
+        "friction": 0.2
+    },
+    {
+        "block": "createpropulsion:envelope_red",
+        "mass": 10.0,
+        "friction": 0.2
+    },
+    {
+        "block": "createpropulsion:envelope_black",
+        "mass": 10.0,
+        "friction": 0.2
     }
 ]

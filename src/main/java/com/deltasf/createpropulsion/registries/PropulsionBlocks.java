@@ -1,5 +1,8 @@
 package com.deltasf.createpropulsion.registries;
 
+import java.util.EnumMap;
+import java.util.Map;
+
 import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.balloons.envelopes.EnvelopeBlock;
 import com.deltasf.createpropulsion.balloons.injectors.hot_air_burner.HotAirBurnerBlock;
@@ -73,14 +76,6 @@ public class PropulsionBlocks {
         .simpleItem()
         .register();
     
-    public static final BlockEntry<EnvelopeBlock> ENVELOPE_BLOCK = REGISTRATE.block("envelope", EnvelopeBlock::new)
-        .properties(p -> p.mapColor(MapColor.SNOW))
-        .properties(p -> p.strength(0.5F))
-        .properties(p -> p.sound(SoundType.WOOL))
-        .properties(p -> p.ignitedByLava())
-        .simpleItem()
-        .register();
-    
     public static final BlockEntry<HotAirBurnerBlock> HOT_AIR_BURNER_BLOCK = REGISTRATE.block("hot_air_burner", HotAirBurnerBlock::new)
         .properties(p -> p.noOcclusion())
         .properties(p -> p.mapColor(MapColor.STONE))
@@ -124,4 +119,58 @@ public class PropulsionBlocks {
         .properties(p -> p.noOcclusion())
         .simpleItem()
         .register();
+
+    //All envelopes
+
+    public enum EnvelopeColor {
+        WHITE(null, MapColor.SNOW),
+        ORANGE("orange", MapColor.COLOR_ORANGE),
+        MAGENTA("magenta", MapColor.COLOR_MAGENTA),
+        LIGHT_BLUE("light_blue", MapColor.COLOR_LIGHT_BLUE),
+        YELLOW("yellow", MapColor.COLOR_YELLOW),
+        LIME("lime", MapColor.COLOR_LIGHT_GREEN),
+        PINK("pink", MapColor.COLOR_PINK),
+        GRAY("gray", MapColor.COLOR_GRAY),
+        LIGHT_GRAY("light_gray", MapColor.COLOR_LIGHT_GRAY),
+        CYAN("cyan", MapColor.COLOR_CYAN),
+        PURPLE("purple", MapColor.COLOR_PURPLE),
+        BLUE("blue", MapColor.COLOR_BLUE),
+        BROWN("brown", MapColor.COLOR_BROWN),
+        GREEN("green", MapColor.COLOR_GREEN),
+        RED("red", MapColor.COLOR_RED),
+        BLACK("black", MapColor.COLOR_BLACK);
+        
+        private final String name;
+        private final MapColor mapColor;
+
+        EnvelopeColor(String name, MapColor mapColor) {
+            this.name = name;
+            this.mapColor = mapColor;
+        }
+        
+        public MapColor getMapColor() { return mapColor; }
+        public String generateId() {
+            if (name == null) return "envelope";
+            return "envelope_" + name;
+        }
+    }
+
+    private static final Map<EnvelopeColor, BlockEntry<EnvelopeBlock>> ENVELOPE_BLOCKS = new EnumMap<>(EnvelopeColor.class);
+    static {
+        for (EnvelopeColor color : EnvelopeColor.values()) {
+            BlockEntry<EnvelopeBlock> block = REGISTRATE.block(color.generateId(), EnvelopeBlock::new)
+                .properties(p -> p.mapColor(color.getMapColor()))
+                .properties(p -> p.strength(0.5F))
+                .properties(p -> p.sound(SoundType.WOOL))
+                .properties(p -> p.ignitedByLava())
+                .simpleItem()
+                .register();
+            
+            ENVELOPE_BLOCKS.put(color, block);
+        }
+    }
+
+    public static BlockEntry<EnvelopeBlock> getEnvelope(EnvelopeColor color) {
+        return ENVELOPE_BLOCKS.get(color);
+    }
 }

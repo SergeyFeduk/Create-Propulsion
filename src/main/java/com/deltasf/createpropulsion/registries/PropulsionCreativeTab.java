@@ -3,6 +3,7 @@ package com.deltasf.createpropulsion.registries;
 import javax.annotation.Nonnull;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
+import com.deltasf.createpropulsion.registries.PropulsionBlocks.EnvelopeColor;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -55,7 +56,7 @@ public class PropulsionCreativeTab {
                 output.accept(PropulsionItems.FOCUS_LENS);
                 output.accept(PropulsionItems.INVISIBILITY_LENS);
                 //From 0.3
-                output.accept(PropulsionBlocks.ENVELOPE_BLOCK);
+                output.accept(PropulsionBlocks.getEnvelope(EnvelopeColor.WHITE));
                 output.accept(PropulsionBlocks.HOT_AIR_BURNER_BLOCK);
                 output.accept(PropulsionBlocks.SOLID_BURNER);
                 output.accept(PropulsionBlocks.PROPELLER_BLOCK);

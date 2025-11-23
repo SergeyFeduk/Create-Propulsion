@@ -16,6 +16,23 @@
     "block.createpropulsion.physics_assembler": "Physics Assembler",
 
     "block.createpropulsion.envelope": "Envelope",
+    "block.createpropulsion.envelope_orange": "Orange Envelope",
+    "block.createpropulsion.envelope_magenta": "Magenta Envelope",
+    "block.createpropulsion.envelope_light_blue": "Light Blue Envelope",
+    "block.createpropulsion.envelope_yellow": "Yellow Envelope",
+    "block.createpropulsion.envelope_lime": "Lime Envelope",
+    "block.createpropulsion.envelope_pink": "Pink Envelope",
+    "block.createpropulsion.envelope_gray": "Gray Envelope",
+    "block.createpropulsion.envelope_light_gray": "Light Gray Envelope",
+    "block.createpropulsion.envelope_cyan": "Cyan Envelope",
+    "block.createpropulsion.envelope_purple": "Purple Envelope",
+    "block.createpropulsion.envelope_blue": "Blue Envelope",
+    "block.createpropulsion.envelope_brown": "Brown Envelope",
+    "block.createpropulsion.envelope_green": "Green Envelope",
+    "block.createpropulsion.envelope_red": "Red Envelope",
+    "block.createpropulsion.envelope_black": "Black Envelope",
+
+
     "block.createpropulsion.hot_air_burner": "Hot Air Burner",
     "block.createpropulsion.solid_burner": "Solid Burner",
     "block.createpropulsion.propeller": "Propeller",
