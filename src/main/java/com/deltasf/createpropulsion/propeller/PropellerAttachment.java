@@ -18,31 +18,24 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 
 public final class PropellerAttachment implements ShipPhysicsListener {
-    public Map<BlockPos, PropellerForceApplier> appliersMapping = new ConcurrentHashMap<>();
+    public Map<Long, PropellerForceApplier> appliersMapping = new ConcurrentHashMap<>();
     PropellerAttachment() {}
 
     @Override
     public void physTick(@NotNull PhysShip physicShip, @NotNull PhysLevel physLevel) {
         PhysShipImpl ship = (PhysShipImpl)physicShip;
         appliersMapping.forEach((pos, applier) -> {
-            applier.applyForces(pos, ship);
+            applier.applyForces(BlockPos.of(pos), ship);
         });
     }
 
     public void addApplier(BlockPos pos, PropellerForceApplier applier) {
-        appliersMapping.put(pos, applier);
+        appliersMapping.put(pos.asLong(), applier);
     }
 
     public void removeApplier(ServerLevel level, BlockPos pos) {
-        appliersMapping.remove(pos);
+        appliersMapping.remove(pos.asLong());
         //Remove attachment by using passing null as attachment instance in order to clean up after ourselves
-        if (appliersMapping.isEmpty()) {
-            ServerShip ship = AttachmentUtils.getShipAt(level, pos);
-            if (ship != null) {
-                // Remove attachment by passing null as the instance
-                ship.saveAttachment(PropellerAttachment.class, null);
-            }
-        }
     }
 
     //Getters

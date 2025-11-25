@@ -1,5 +1,7 @@
 package com.deltasf.createpropulsion.reaction_wheel;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.impl.game.ships.PhysShipImpl;
 
@@ -7,14 +9,22 @@ import com.deltasf.createpropulsion.reaction_wheel.ReactionWheelData.ReactionWhe
 
 import net.minecraft.core.BlockPos;
 
+@JsonAutoDetect(
+        fieldVisibility = JsonAutoDetect.Visibility.ANY
+)
 public class ReactionWheelForceApplier {
     private ReactionWheelData data;
+    @JsonIgnore
     private static final double TORQUE_STRENGTH = 50000.0;
+    @JsonIgnore
     private static final double MAX_SPEED = 256.0;
 
     public ReactionWheelForceApplier(ReactionWheelData data) {
         this.data = data;
     }
+
+    //Jackson constructor
+    public ReactionWheelForceApplier() {}
 
     public void applyForces(BlockPos pos, PhysShipImpl ship) {
         if (data.rotationSpeed == 0 || data.facing == null) return;

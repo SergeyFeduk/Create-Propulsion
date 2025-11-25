@@ -1,10 +1,17 @@
 package com.deltasf.createpropulsion.propeller;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import org.joml.Vector3d;
 
 import com.deltasf.createpropulsion.atmosphere.AtmosphereData;
 
+@JsonAutoDetect(
+        fieldVisibility = JsonAutoDetect.Visibility.ANY
+)
 public class PropellerData {
+
+    public PropellerData() {}
+
     private volatile float thrust;
     private volatile float torque;
     private volatile Vector3d direction;

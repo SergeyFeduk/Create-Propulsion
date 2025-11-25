@@ -37,6 +37,8 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
     public boolean overridePower = false;
     public int overridenPower;
 
+    private boolean updatedAttachment = false;
+
     public void setPower(int power) {
         if (this.power == power) return;
         this.power = power;
@@ -98,9 +100,21 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
             needsUpdate = false;
         }
 
+        if (!updatedAttachment) {
+            // update attachment level reference
+            var serverShip = VSGameUtilsKt.getShipObjectManagingPos((ServerLevel)level, worldPosition);
+            if (serverShip != null) {
+                var magnetAttachment  = serverShip.getAttachment(MagnetForceAttachment.class);
+                if (magnetAttachment != null && magnetAttachment.level == null) {
+                    magnetAttachment.level = level;
+                }
+                updatedAttachment = true;
+            }
+        }
+
         MagnetData data = MagnetRegistry.forLevel(level).getMagnet(this.magnetId);
         if (data != null && data.shipId != -1) {
-            var serverShip = VSGameUtilsKt.getShipManagingPos((ServerLevel)level, worldPosition);
+            var serverShip = VSGameUtilsKt.getShipObjectManagingPos((ServerLevel)level, worldPosition);
             if (serverShip == null) {
                 MagnetRegistry.forLevel(level).removeAllMagnetsForShip(data.shipId); //Technically we could just remove only this magnet but who cares
             } else {

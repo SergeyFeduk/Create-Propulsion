@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Math;
 import org.joml.Vector3d;
@@ -22,12 +23,16 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 
 public final class MagnetForceAttachment implements ShipPhysicsListener {
+    @JsonIgnore
     public volatile Level level;
     public MagnetForceAttachment() {}
     
     @Override
     public void physTick(@NotNull PhysShip physicShip, @NotNull PhysLevel physLevel) {
         PhysShipImpl ship = (PhysShipImpl) physicShip;
+        if (this.level == null) {
+            return;
+        }
         List<MagnetPair> pairs = MagnetRegistry.forLevel(level).getPairsForShip(ship.getId());
         if (pairs.isEmpty()) {
             return;

@@ -11,33 +11,25 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 
-@SuppressWarnings("deprecation")
 public final class ReactionWheelAttachment implements ShipPhysicsListener {
-    public Map<BlockPos, ReactionWheelForceApplier> appliersMapping = new ConcurrentHashMap<>();
+    public Map<Long, ReactionWheelForceApplier> appliersMapping = new ConcurrentHashMap<>();
     ReactionWheelAttachment() {}
 
     @Override
     public void physTick(@NotNull PhysShip physicShip, @NotNull PhysLevel physLevel) {
         PhysShipImpl ship = (PhysShipImpl) physicShip;
         appliersMapping.forEach((pos, applier) -> {
-            applier.applyForces(pos, ship);
+            applier.applyForces(BlockPos.of(pos), ship);
         });
     }
 
     public void addApplier(BlockPos pos, ReactionWheelForceApplier applier) {
-        appliersMapping.put(pos, applier);
+        appliersMapping.put(pos.asLong(), applier);
     }
 
     public void removeApplier(ServerLevel level, BlockPos pos) {
-        appliersMapping.remove(pos);
+        appliersMapping.remove(pos.asLong());
         // Remove attachment by using passing null as attachment instance in order to clean up after ourselves
-        if (appliersMapping.isEmpty()) {
-            ServerShip ship = AttachmentUtils.getShipAt(level, pos);
-            if (ship != null) {
-                // Remove attachment by passing null as the instance
-                ship.saveAttachment(ReactionWheelAttachment.class, null);
-            }
-        }
     }
 
     // Getters

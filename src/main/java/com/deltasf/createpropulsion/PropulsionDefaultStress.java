@@ -16,7 +16,7 @@ public class PropulsionDefaultStress {
 
     public static DoubleSupplier getImpact(Block block) {
         ResourceLocation id = CatnipServices.REGISTRIES.getKeyOrThrow(block);
-        double value = DEFAULT_IMPACTS.get(id);
+        double value = DEFAULT_IMPACTS.getOrDefault(id, 0.0);
         return () -> value;
     }
 

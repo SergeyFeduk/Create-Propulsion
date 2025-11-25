@@ -87,6 +87,8 @@ public class CreatePropulsion {
         //TODO: Move this in correct place
         //Query ships for deserialization with balloons
         ValkyrienSkies.api().getShipLoadEvent().on((e) -> {
+            //time to commit a war crime
+
             BalloonSerializationHandler.queryShipLoad(new Query(e.getShip().getId(), e.getShip().getChunkClaimDimension()));
         });
 

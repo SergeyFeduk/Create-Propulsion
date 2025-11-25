@@ -1,5 +1,6 @@
 package com.deltasf.createpropulsion.thruster;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.valkyrienskies.core.api.ships.properties.ShipTransform;
@@ -12,12 +13,18 @@ import net.minecraft.core.BlockPos;
 import com.deltasf.createpropulsion.PropulsionConfig;
 
 //Thruster math is no longer taken from any other mod and obfuscated to look like i did this myself
+@JsonAutoDetect(
+        fieldVisibility = JsonAutoDetect.Visibility.ANY
+)
 public class ThrusterForceApplier {
     private ThrusterData data;
 
     public ThrusterForceApplier(ThrusterData data){
         this.data = data;
     }
+
+    // Jackson constructor
+    public ThrusterForceApplier() {}
 
     //Cached vectors to reduce allocations on physics thread
     private Vector3d relativePos = new Vector3d();

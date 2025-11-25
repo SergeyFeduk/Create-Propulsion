@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Nonnull;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Math;
 import org.joml.Matrix3dc;
@@ -34,6 +35,9 @@ import net.minecraft.world.level.Level;
 
 //Current model adds some custom drag, both linear and angular. VS 2.5 should handle this for us
 //So after updating to it - get rid of our drag, or at least change default values
+@JsonAutoDetect(
+    fieldVisibility = JsonAutoDetect.Visibility.ANY
+)
 public final class BalloonAttachment implements ShipPhysicsListener {
     public BalloonAttachment() {}
     private AtmosphereData atmosphereData;

@@ -1,5 +1,7 @@
 package com.deltasf.createpropulsion.propeller;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.valkyrienskies.core.api.ships.properties.ShipTransform;
@@ -14,6 +16,9 @@ import com.deltasf.createpropulsion.atmosphere.AtmosphereData;
 
 import net.minecraft.core.BlockPos;
 
+@JsonAutoDetect(
+    fieldVisibility = JsonAutoDetect.Visibility.ANY
+)
 public class PropellerForceApplier {
     private PropellerData data;
 
@@ -24,13 +29,19 @@ public class PropellerForceApplier {
     private final Vector3d perpendicularForce = new Vector3d();
     private Vector3d velocityDirection = new Vector3d();
 
+    @JsonIgnore
     private static final Vector3d scaledForce_temp1 = new Vector3d();
+    @JsonIgnore
     private static final Vector3d scaledForce_temp2 = new Vector3d();
+    @JsonIgnore
     private static final Vector3d scaledForce_temp3 = new Vector3d();
 
     public PropellerForceApplier(PropellerData data){
         this.data = data;
     }
+
+    // Jackson constructor
+    public PropellerForceApplier() {}
 
     public void applyForces(BlockPos pos, PhysShipImpl ship) {
         float thrust = data.getThrust();
