@@ -75,7 +75,7 @@ public class PropulsionBlockEntities {
 
     public static final BlockEntityEntry<PropellerBlockEntity> PROPELLER_BLOCK_ENTITY = 
         REGISTRATE.blockEntity("propeller_block_entity", PropellerBlockEntity::new)
-        .visual(() -> PropellerRenderInstance::new)
+        //.visual(() -> PropellerRenderInstance::new)
         .validBlock(PropulsionBlocks.PROPELLER_BLOCK)
         .renderer(() -> PropellerRenderer::new)
         .register();
@@ -88,7 +88,7 @@ public class PropulsionBlockEntities {
 
     public static final BlockEntityEntry<StirlingEngineBlockEntity> STIRLING_ENGINE_BLOCK_ENTITY = 
         REGISTRATE.blockEntity("stirling_engine_block_entity", StirlingEngineBlockEntity::new)
-        .instance(() -> StirlingEngineRenderInstance::new)
+        //.instance(() -> StirlingEngineRenderInstance::new)
         .validBlock(PropulsionBlocks.STIRLING_ENGINE_BLOCK)
         .renderer(() -> StirlingEngineRenderer::new)
         .register();
