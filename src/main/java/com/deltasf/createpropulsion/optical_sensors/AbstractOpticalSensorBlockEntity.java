@@ -5,6 +5,8 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
+import com.simibubi.create.foundation.utility.CreateLang;
 import org.joml.Quaterniondc;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.LoadedShip;
@@ -15,10 +17,8 @@ import com.deltasf.createpropulsion.optical_sensors.rendering.BeamRenderData;
 import com.deltasf.createpropulsion.registries.PropulsionItems;
 import com.deltasf.createpropulsion.utility.GoggleUtils;
 import com.mojang.datafixers.util.Pair;
-import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import com.simibubi.create.foundation.utility.Lang;
 
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraft.core.BlockPos;
@@ -279,9 +279,9 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         if (getCurrentLensCount() == 0) return false; // No lenses - no need for goggle info
         //Lenses: 1/2
-        Lang.builder()
-            .add(Lang.translate("gui.goggles.optical_sensor.lenses", new Object[0]))
-            .add(Lang.text(":")).space().add(Lang.number(getCurrentLensCount())).text("/").add(Lang.number(getLensLimit()))
+        CreateLang.builder()
+            .add(CreateLang.translate("gui.goggles.optical_sensor.lenses", new Object[0]))
+            .add(CreateLang.text(":")).space().add(CreateLang.number(getCurrentLensCount())).text("/").add(CreateLang.number(getLensLimit()))
             .forGoggles(tooltip);
         //List all lenses starting from the deepest
         for (ItemStack lensStack : getLenses()) {

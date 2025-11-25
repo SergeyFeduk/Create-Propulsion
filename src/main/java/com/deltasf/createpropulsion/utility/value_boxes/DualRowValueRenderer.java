@@ -6,8 +6,9 @@ import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBox;
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBox.TextValueBox;
-import com.simibubi.create.foundation.utility.Lang;
 
+import com.simibubi.create.foundation.utility.CreateLang;
+import net.createmod.catnip.outliner.Outliner;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
@@ -49,13 +50,13 @@ public class DualRowValueRenderer {
                 continue;
 
             if (!dualRowBehaviour.isActive()) {
-                CreateClient.OUTLINER.remove(pos);
+                Outliner.getInstance().remove(pos);
                 continue;
             }
 
             ItemStack mainhandItem = mc.player.getItemInHand(InteractionHand.MAIN_HAND);
             if (dualRowBehaviour.onlyVisibleWithWrench() && !AllItems.WRENCH.isIn(mainhandItem)) {
-                CreateClient.OUTLINER.remove(pos);
+                Outliner.getInstance().remove(pos);
                 continue;
             }
             
@@ -71,7 +72,7 @@ public class DualRowValueRenderer {
             highlightFound = true;
             List<MutableComponent> tip = new ArrayList<>();
             tip.add(dualRowBehaviour.label.copy());
-            tip.add(Lang.translateDirect("gui.value_settings.hold_to_edit"));
+            tip.add(CreateLang.translateDirect("gui.value_settings.hold_to_edit"));
             CreateClient.VALUE_SETTINGS_HANDLER.showHoverTip(tip);
         }
     }
@@ -87,7 +88,7 @@ public class DualRowValueRenderer {
         box.passive(!highlight)
            .wideOutline();
 
-        CreateClient.OUTLINER.showValueBox(pos, box.transform(behaviour.slotPositioning))
+        Outliner.getInstance().showOutline(pos, box.transform(behaviour.slotPositioning))
 			.highlightFace(face);
     }
 }

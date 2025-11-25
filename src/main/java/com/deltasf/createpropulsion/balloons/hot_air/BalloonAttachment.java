@@ -14,6 +14,8 @@ import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.valkyrienskies.core.api.ships.PhysShip;
 import org.valkyrienskies.core.api.ships.ShipForcesInducer;
+import org.valkyrienskies.core.api.ships.ShipPhysicsListener;
+import org.valkyrienskies.core.api.world.PhysLevel;
 import org.valkyrienskies.core.impl.game.ships.PhysShipImpl;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 
@@ -32,15 +34,14 @@ import net.minecraft.world.level.Level;
 
 //Current model adds some custom drag, both linear and angular. VS 2.5 should handle this for us
 //So after updating to it - get rid of our drag, or at least change default values
-@SuppressWarnings("deprecation")
-public class BalloonAttachment implements ShipForcesInducer {
+public final class BalloonAttachment implements ShipPhysicsListener {
     public BalloonAttachment() {}
     private AtmosphereData atmosphereData;
 
     private static final double epsilon = 1e-5;
 
     @Override
-    public void applyForces(@NotNull PhysShip physicShip) {
+    public void physTick(@NotNull PhysShip physicShip, @NotNull PhysLevel physLevel) {
         if (this.atmosphereData == null) { return; }
 
         List<Balloon> balloons = BalloonShipRegistry.forShip(physicShip.getId()).getBalloons(); 
@@ -77,48 +78,48 @@ public class BalloonAttachment implements ShipForcesInducer {
         
         //D torque dampening
         PhysShipImpl simpl = (PhysShipImpl)physicShip;
-        Vector3dc angVel = simpl.getPoseVel().getOmega();
+        Vector3dc angVel = simpl.getAngularVelocity();
 
         if (angVel != null && angVel.lengthSquared() > 1e-9) {
             Matrix4dc worldToShip = physicShip.getTransform().getWorldToShip();
             Vector3d angVelShipSpace = new Vector3d();
             worldToShip.transformDirection(angVel, angVelShipSpace);
-            Matrix3dc momentOfInertia = simpl.getInertia().getMomentOfInertiaTensor();
+            Matrix3dc momentOfInertia = simpl.getMomentOfInertia();
             momentOfInertia.transform(angVelShipSpace, angMomentumShipSpace);
             dampingTorqueShipSpace.set(angMomentumShipSpace).mul(-PropulsionConfig.BALLOON_ANGULAR_DAMPING.get());
             dampingTorqueShipSpace.y *= 0.2; //Dampen the dampening to make rotation along Y axis actually possible
             shipToWorld.transformDirection(dampingTorqueShipSpace, dampingTorqueWorldSpace);
             accumulatedTorque.add(dampingTorqueWorldSpace);
         }
-
-        //Vertical linear drag based on surface area of all balloons
-        Vector3dc linearVel = simpl.getPoseVel().getVel();
-
-        if (linearVel.lengthSquared() > epsilon * epsilon) {
-            double totalBalloonVolume = 0;
-            for (Balloon balloon : balloons) {
-                if (balloon.hotAir > epsilon) {
-                    totalBalloonVolume += balloon.getVolumeSize();
-                }
-            }
-
-            if (totalBalloonVolume > epsilon) {
-                double approxSurfaceArea = java.lang.Math.pow(totalBalloonVolume, 2.0/3.0);
-                //Vertical and horizontal drag are applied separatelty as I need some fine control over them
-                //Vertical drag
-                double verticalVelocity = linearVel.y();
-                if (Math.abs(verticalVelocity) > epsilon) {
-                    double dragForceY = -verticalVelocity * approxSurfaceArea * PropulsionConfig.BALLOON_VERTICAL_DRAG_COEFFICIENT.get();
-                    accumulatedForce.add(0, dragForceY, 0);
-                }
-                //Horizontal drag
-                Vector3d horizontalVelocity = new Vector3d(linearVel.x(), 0, linearVel.z());
-                if (horizontalVelocity.lengthSquared() > epsilon * epsilon) {
-                    Vector3d horizontalDragForce = horizontalVelocity.mul(-approxSurfaceArea * PropulsionConfig.BALLOON_HORIZONTAL_DRAG_COEFFICIENT.get());
-                    accumulatedForce.add(horizontalDragForce);
-                }
-            }
-        }
+        // Potato Note: Should no longer be necessary with new VS Drag model, but leaving just in case
+//        //Vertical linear drag based on surface area of all balloons
+//        Vector3dc linearVel = simpl.getVelocity();
+//
+//        if (linearVel.lengthSquared() > epsilon * epsilon) {
+//            double totalBalloonVolume = 0;
+//            for (Balloon balloon : balloons) {
+//                if (balloon.hotAir > epsilon) {
+//                    totalBalloonVolume += balloon.getVolumeSize();
+//                }
+//            }
+//
+//            if (totalBalloonVolume > epsilon) {
+//                double approxSurfaceArea = java.lang.Math.pow(totalBalloonVolume, 2.0/3.0);
+//                //Vertical and horizontal drag are applied separatelty as I need some fine control over them
+//                //Vertical drag
+//                double verticalVelocity = linearVel.y();
+//                if (Math.abs(verticalVelocity) > epsilon) {
+//                    double dragForceY = -verticalVelocity * approxSurfaceArea * PropulsionConfig.BALLOON_VERTICAL_DRAG_COEFFICIENT.get();
+//                    accumulatedForce.add(0, dragForceY, 0);
+//                }
+//                //Horizontal drag
+//                Vector3d horizontalVelocity = new Vector3d(linearVel.x(), 0, linearVel.z());
+//                if (horizontalVelocity.lengthSquared() > epsilon * epsilon) {
+//                    Vector3d horizontalDragForce = horizontalVelocity.mul(-approxSurfaceArea * PropulsionConfig.BALLOON_HORIZONTAL_DRAG_COEFFICIENT.get());
+//                    accumulatedForce.add(horizontalDragForce);
+//                }
+//            }
+//        }
 
         //Apply aggregated force and torque
         if (accumulatedForce.lengthSquared() > 1e-9) {
@@ -174,7 +175,7 @@ public class BalloonAttachment implements ShipForcesInducer {
     private final Vector3d upWorld = new Vector3d(0, 1, 0);
     private final Vector3d tmpForce = new Vector3d();
 
-    //Angualr dampening
+    //Angular dampening
     private final Vector3d angMomentumShipSpace = new Vector3d();
     private final Vector3d dampingTorqueShipSpace = new Vector3d();
     private final Vector3d dampingTorqueWorldSpace = new Vector3d();

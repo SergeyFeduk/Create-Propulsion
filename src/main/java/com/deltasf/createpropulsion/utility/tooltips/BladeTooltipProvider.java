@@ -7,10 +7,10 @@ import com.deltasf.createpropulsion.registries.PropulsionItems;
 import com.simibubi.create.content.equipment.goggles.GogglesItem;
 import com.simibubi.create.content.kinetics.base.IRotate.StressImpact;
 import com.simibubi.create.foundation.item.TooltipHelper;
-import com.simibubi.create.foundation.item.TooltipHelper.Palette;
-import com.simibubi.create.foundation.utility.Lang;
-import com.simibubi.create.foundation.utility.LangBuilder;
+import com.simibubi.create.foundation.utility.CreateLang;
+import net.createmod.catnip.lang.FontHelper.Palette;
 
+import net.createmod.catnip.lang.LangBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -52,18 +52,18 @@ public class BladeTooltipProvider implements ITooltipProvider {
             float stressImpact = bladeItem.getStressImpact();
             StressImpact impact = mapStressImpact(stressImpact);
 
-            Component kineticStressLine = Lang.translate("tooltip.stressImpact").style(ChatFormatting.GRAY).component();
+            Component kineticStressLine = CreateLang.translate("tooltip.stressImpact").style(ChatFormatting.GRAY).component();
 
             MutableComponent stressImpactLine = Component.literal(TooltipHelper.makeProgressBar(3, impact.ordinal() + 1))
                 .withStyle(impact.getAbsoluteColor());
 
             if (isWearingGoggles) {
-                LangBuilder rpmUnit = Lang.translate("generic.unit.rpm");
-                stressImpactLine.append(Lang.number(stressImpact).component())
+                LangBuilder rpmUnit = CreateLang.translate("generic.unit.rpm");
+                stressImpactLine.append(CreateLang.number(stressImpact).component())
                     .append(Component.literal("x "))
                     .append(rpmUnit.component());
             } else {
-                stressImpactLine.append(Lang.translate("tooltip.stressImpact." + Lang.asId(impact.name())).
+                stressImpactLine.append(CreateLang.translate("tooltip.stressImpact." + CreateLang.asId(impact.name())).
                     style(impact.getAbsoluteColor())
                     .component());
             }

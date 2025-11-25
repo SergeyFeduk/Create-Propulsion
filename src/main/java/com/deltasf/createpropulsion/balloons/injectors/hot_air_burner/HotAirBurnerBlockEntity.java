@@ -4,6 +4,11 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
+import com.simibubi.create.foundation.utility.CreateLang;
+import net.createmod.catnip.lang.LangBuilder;
+import net.createmod.catnip.outliner.Outline;
+import net.createmod.catnip.outliner.Outliner;
 import org.jetbrains.annotations.NotNull;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
@@ -16,11 +21,7 @@ import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
 import com.deltasf.createpropulsion.physics_assembler.AssemblyUtility;
 import com.simibubi.create.AllSpecialTextures;
 import com.simibubi.create.CreateClient;
-import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import com.simibubi.create.foundation.outliner.Outline.OutlineParams;
-import com.simibubi.create.foundation.utility.Lang;
-import com.simibubi.create.foundation.utility.LangBuilder;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -231,19 +232,19 @@ public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity i
             color = ChatFormatting.GOLD;
         }
 
-        Lang.builder()
-            .add(Lang.translate("gui.goggles.hot_air_burner.status"))
+        CreateLang.builder()
+            .add(CreateLang.translate("gui.goggles.hot_air_burner.status"))
             .text(": ")
-            .add(Lang.translate(key).style(color))
+            .add(CreateLang.translate(key).style(color))
             .forGoggles(tooltip);
 
         //Fuel info
         ItemStack fuel = fuelInventory.fuelStack;
         if (hasFuel) {
-            LangBuilder fuelName = Lang.builder().add(fuel.getHoverName()).style(ChatFormatting.GRAY);
-            LangBuilder fuelCount = Lang.builder().text("x").text(String.valueOf(fuel.getCount())).style(ChatFormatting.GREEN);
+            LangBuilder fuelName = CreateLang.builder().add(fuel.getHoverName()).style(ChatFormatting.GRAY);
+            LangBuilder fuelCount = CreateLang.builder().text("x").text(String.valueOf(fuel.getCount())).style(ChatFormatting.GREEN);
 
-            Lang.builder().add(fuelName).space().add(fuelCount).forGoggles(tooltip);
+            CreateLang.builder().add(fuelName).space().add(fuelCount).forGoggles(tooltip);
         }
 
         //Balloon section
@@ -252,21 +253,21 @@ public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity i
         }
 
         if (hasFuel) {
-            Lang.text("").forGoggles(tooltip);
+            CreateLang.text("").forGoggles(tooltip);
         }
-        
-        Lang.builder()
+
+        CreateLang.builder()
             .translate("gui.goggles.hot_air_burner.balloon.status")
             .forGoggles(tooltip);
 
         Component trendSymbol;
         switch (hotAirTrend) {
-            case 1 -> trendSymbol = Lang.text("▲").style(ChatFormatting.GREEN).component();
-            case -1 -> trendSymbol = Lang.text("▼").style(ChatFormatting.RED).component();
-            default -> trendSymbol = Lang.text("■").style(ChatFormatting.DARK_GRAY).component();
+            case 1 -> trendSymbol = CreateLang.text("▲").style(ChatFormatting.GREEN).component();
+            case -1 -> trendSymbol = CreateLang.text("▼").style(ChatFormatting.RED).component();
+            default -> trendSymbol = CreateLang.text("■").style(ChatFormatting.DARK_GRAY).component();
         }
 
-        var hotAirBuilder = Lang.builder()
+        var hotAirBuilder = CreateLang.builder()
             .translate("gui.goggles.hot_air_burner.balloon.hot_air")
             .text(String.format(": %d / %d", balloonHotAir, balloonMaxHotAir));
         
@@ -275,13 +276,13 @@ public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity i
         }
 
         hotAirBuilder.text(" ")
-            .add(Lang.text("[").style(ChatFormatting.DARK_GRAY))
+            .add(CreateLang.text("[").style(ChatFormatting.DARK_GRAY))
             .add(trendSymbol)
-            .add(Lang.text("]").style(ChatFormatting.DARK_GRAY))
+            .add(CreateLang.text("]").style(ChatFormatting.DARK_GRAY))
             .forGoggles(tooltip);
 
         //Obstruction overlay
-        OutlineParams outline = CreateClient.OUTLINER.showCluster("HotAirBurnerObstruction", obstructionBehaviour.getObstructedBlocks());
+        Outline.OutlineParams outline = Outliner.getInstance().showCluster("HotAirBurnerObstruction", obstructionBehaviour.getObstructedBlocks());
         outline.colored(AssemblyUtility.CANCEL_COLOR);
         outline.lineWidth(1/16f);
         outline.withFaceTexture(AllSpecialTextures.CHECKERED);

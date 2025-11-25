@@ -75,7 +75,7 @@ public class PropulsionBlockEntities {
 
     public static final BlockEntityEntry<PropellerBlockEntity> PROPELLER_BLOCK_ENTITY = 
         REGISTRATE.blockEntity("propeller_block_entity", PropellerBlockEntity::new)
-        .instance(() -> PropellerRenderInstance::new)
+        .visual(() -> PropellerRenderInstance::new)
         .validBlock(PropulsionBlocks.PROPELLER_BLOCK)
         .renderer(() -> PropellerRenderer::new)
         .register();

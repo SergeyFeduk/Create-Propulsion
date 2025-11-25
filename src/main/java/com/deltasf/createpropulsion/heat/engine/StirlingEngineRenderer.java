@@ -1,19 +1,18 @@
 package com.deltasf.createpropulsion.heat.engine;
 
+import net.createmod.catnip.animation.AnimationTickHolder;
+import net.createmod.catnip.render.CachedBuffers;
+import net.createmod.catnip.render.SuperByteBuffer;
 import org.joml.Vector4f;
 
 import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.registries.PropulsionPartialModels;
 import com.deltasf.createpropulsion.utility.math.MathUtility;
-import com.jozufozu.flywheel.backend.Backend;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import com.simibubi.create.AllPartialModels;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntityRenderer;
-import com.simibubi.create.foundation.render.CachedBufferer;
-import com.simibubi.create.foundation.render.SuperByteBuffer;
-import com.simibubi.create.foundation.utility.AnimationTickHolder;
 
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -30,10 +29,10 @@ public class StirlingEngineRenderer extends KineticBlockEntityRenderer<StirlingE
     
     @Override
     public void renderSafe(StirlingEngineBlockEntity blockEntity, float partialTicks, PoseStack ms, MultiBufferSource bufferSource, int light, int overlay) {
-        if (Backend.canUseInstancing(blockEntity.getLevel())) return;
+        //if (Backend.canUseInstancing(blockEntity.getLevel())) return;
 
         Direction direction = blockEntity.getBlockState().getValue(StirlingEngineBlock.FACING);
-        SuperByteBuffer shaft = CachedBufferer.partialFacing(AllPartialModels.SHAFT_HALF, blockEntity.getBlockState(), direction);
+        SuperByteBuffer shaft = CachedBuffers.partialFacing(AllPartialModels.SHAFT_HALF, blockEntity.getBlockState(), direction);
         standardKineticRotationTransform(shaft, blockEntity, light).renderInto(ms, bufferSource.getBuffer(RenderType.solid()));
 
         float speed = blockEntity.getSpeed() / StirlingEngineBlockEntity.MAX_GENERATED_RPM;
@@ -45,7 +44,7 @@ public class StirlingEngineRenderer extends KineticBlockEntityRenderer<StirlingE
         VertexConsumer cutoutVB = bufferSource.getBuffer(RenderType.cutoutMipped());
         float time = AnimationTickHolder.getRenderTime(blockEntity.getLevel());
 
-        SuperByteBuffer pistonModel = CachedBufferer.partial(PropulsionPartialModels.STIRLING_ENGINE_PISTON, state);
+        SuperByteBuffer pistonModel = CachedBuffers.partial(PropulsionPartialModels.STIRLING_ENGINE_PISTON, state);
 
         float timeSeconds = time / 20.0f;
         float effectiveRevolutionPeriod = Float.MAX_VALUE;

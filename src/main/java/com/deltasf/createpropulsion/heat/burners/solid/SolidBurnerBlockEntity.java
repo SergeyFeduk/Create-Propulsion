@@ -2,6 +2,8 @@ package com.deltasf.createpropulsion.heat.burners.solid;
 
 import java.util.List;
 
+import com.simibubi.create.foundation.utility.CreateLang;
+import net.createmod.catnip.lang.LangBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,8 +16,6 @@ import com.deltasf.createpropulsion.heat.burners.BurnerDamager;
 import com.deltasf.createpropulsion.registries.PropulsionCapabilities;
 import com.simibubi.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import com.simibubi.create.foundation.utility.Lang;
-import com.simibubi.create.foundation.utility.LangBuilder;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -230,23 +230,23 @@ public class SolidBurnerBlockEntity extends AbstractBurnerBlockEntity {
         }
 
         //Heat level
-        Lang.builder().add(Lang.translate("gui.goggles.burner.status")).text(": ").add(Lang.translate(key).style(color)).forGoggles(tooltip);
+        CreateLang.builder().add(CreateLang.translate("gui.goggles.burner.status")).text(": ").add(CreateLang.translate(key).style(color)).forGoggles(tooltip);
 
         //Thermostat on/off
-        Lang.builder()
-            .add(Lang.translate("gui.goggles.burner.thermostat"))
+        CreateLang.builder()
+            .add(CreateLang.translate("gui.goggles.burner.thermostat"))
             .text(": ")
-            .add(Lang.translate(!isPowered ? "gui.goggles.burner.thermostat.on" : "gui.goggles.burner.thermostat.off")
+            .add(CreateLang.translate(!isPowered ? "gui.goggles.burner.thermostat.on" : "gui.goggles.burner.thermostat.off")
                 .style(!isPowered ? ChatFormatting.GREEN : ChatFormatting.RED))
             .forGoggles(tooltip);
 
 
         ItemStack fuel = fuelInventory.fuelStack;
         if (!fuel.isEmpty()) {
-            LangBuilder fuelName = Lang.builder().add(fuel.getHoverName()).style(ChatFormatting.GRAY);
-            LangBuilder fuelCount = Lang.builder().text("x").text(String.valueOf(fuel.getCount())).style(ChatFormatting.GREEN);
+            LangBuilder fuelName = CreateLang.builder().add(fuel.getHoverName()).style(ChatFormatting.GRAY);
+            LangBuilder fuelCount = CreateLang.builder().text("x").text(String.valueOf(fuel.getCount())).style(ChatFormatting.GREEN);
 
-            Lang.builder().add(fuelName).space().add(fuelCount).forGoggles(tooltip);
+            CreateLang.builder().add(fuelName).space().add(fuelCount).forGoggles(tooltip);
         }
         
         return true;

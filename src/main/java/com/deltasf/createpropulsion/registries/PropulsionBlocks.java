@@ -4,6 +4,7 @@ import java.util.EnumMap;
 import java.util.Map;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
+import com.deltasf.createpropulsion.PropulsionDefaultStress;
 import com.deltasf.createpropulsion.balloons.envelopes.EnvelopeBlock;
 import com.deltasf.createpropulsion.balloons.injectors.hot_air_burner.HotAirBurnerBlock;
 import com.deltasf.createpropulsion.heat.burners.solid.SolidBurnerBlock;
@@ -16,7 +17,6 @@ import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerBlock;
 import com.deltasf.createpropulsion.propeller.PropellerBlock;
 import com.deltasf.createpropulsion.reaction_wheel.ReactionWheelBlock;
 import com.deltasf.createpropulsion.thruster.thruster.ThrusterBlock;
-import com.simibubi.create.content.kinetics.BlockStressDefaults;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.BlockEntry;
 
@@ -101,13 +101,13 @@ public class PropulsionBlocks {
         .properties(p -> p.sound(SoundType.WOOD))
         .properties(p -> p.requiresCorrectToolForDrops())
         .properties(p -> p.strength(1.5F, 1.0F))
-        .transform(BlockStressDefaults.setNoImpact())
+        .transform(PropulsionDefaultStress.setNoImpact())
         .simpleItem()
         .register();
 
     public static final BlockEntry<ReactionWheelBlock> REACTION_WHEEL_BLOCK = REGISTRATE.block("reaction_wheel", ReactionWheelBlock::new)
         .properties(p -> p.noOcclusion())
-        .transform(BlockStressDefaults.setImpact(8.0))
+        .transform(PropulsionDefaultStress.setImpact(8.0))
         .simpleItem()
         .register();
 

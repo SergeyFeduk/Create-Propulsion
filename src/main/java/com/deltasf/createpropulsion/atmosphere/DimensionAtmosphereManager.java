@@ -27,6 +27,7 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.ModList;
 
+// Potato note: Should probably switch this over to VS's main atmo system at some point, but I don't want to break things so I'll leave it as is for now.
 public class DimensionAtmosphereManager extends SimpleJsonResourceReloadListener {
     public record AtmosphereProperties(double pressureAtSeaLevel, double scaleHeight, double gravity, boolean isAirless, VarianceNoiseProperties varianceNoise) {}
     private static final double epsilon = 1e-5;

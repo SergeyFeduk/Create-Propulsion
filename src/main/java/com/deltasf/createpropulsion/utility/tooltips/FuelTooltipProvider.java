@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.deltasf.createpropulsion.thruster.FluidThrusterProperties;
 import com.deltasf.createpropulsion.thruster.ThrusterFuelManager;
-import com.simibubi.create.foundation.item.TooltipHelper.Palette;
+import net.createmod.catnip.lang.FontHelper.Palette;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;

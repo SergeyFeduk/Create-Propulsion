@@ -6,9 +6,9 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import com.simibubi.create.AllPartialModels;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntityRenderer;
-import com.simibubi.create.foundation.render.CachedBufferer;
-import com.simibubi.create.foundation.render.SuperByteBuffer;
 
+import net.createmod.catnip.render.CachedBuffers;
+import net.createmod.catnip.render.SuperByteBuffer;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -28,7 +28,7 @@ public class ReactionWheelRenderer extends KineticBlockEntityRenderer<ReactionWh
         Direction direction = be.getBlockState().getValue(ReactionWheelBlock.FACING);
         VertexConsumer vb = buffer.getBuffer(RenderType.cutoutMipped());
         int lightBehind = LevelRenderer.getLightColor(be.getLevel(), be.getBlockPos().relative(direction));
-        SuperByteBuffer shaftHalf = CachedBufferer.partialFacing(AllPartialModels.SHAFT_HALF, be.getBlockState(), direction);
+        SuperByteBuffer shaftHalf = CachedBuffers.partialFacing(AllPartialModels.SHAFT_HALF, be.getBlockState(), direction);
 
         //Shaft
         standardKineticRotationTransform(shaftHalf, be, lightBehind).renderInto(ms, vb);
@@ -40,7 +40,7 @@ public class ReactionWheelRenderer extends KineticBlockEntityRenderer<ReactionWh
         BlockState state = be.getBlockState();
         Direction direction = state.getValue(ReactionWheelBlock.FACING);
 
-        SuperByteBuffer coreModel = CachedBufferer.partial(PropulsionPartialModels.REACTION_WHEEL_CORE, state);
+        SuperByteBuffer coreModel = CachedBuffers.partial(PropulsionPartialModels.REACTION_WHEEL_CORE, state);
         VertexConsumer vb = buffer.getBuffer(RenderType.cutoutMipped());
 
         //TODO: Very likely that wheel weird shading is caused by its rotation. Maybe try remove disableDiffuse and change rotation (270 or smth like that?)

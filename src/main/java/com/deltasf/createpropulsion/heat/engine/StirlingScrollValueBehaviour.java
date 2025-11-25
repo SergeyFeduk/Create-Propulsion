@@ -6,7 +6,7 @@ import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform;
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueSettingsBoard;
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueSettingsFormatter;
-import com.simibubi.create.foundation.utility.Lang;
+import com.simibubi.create.foundation.utility.CreateLang;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -64,8 +64,8 @@ public class StirlingScrollValueBehaviour extends DualRowValueBehaviour {
     }
 
     public MutableComponent formatSettings(ValueSettings settings) {
-        return Lang.number(getRpmFromBoardIndex(settings.value()))
-            .add(Lang.text(settings.row() == 0 ? "\u27f3" : "\u27f2")
+        return CreateLang.number(getRpmFromBoardIndex(settings.value()))
+            .add(CreateLang.text(settings.row() == 0 ? "\u27f3" : "\u27f2")
             .style(ChatFormatting.BOLD))
             .component();
     }

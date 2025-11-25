@@ -2,16 +2,16 @@ package com.deltasf.createpropulsion.heat.burners;
 
 import java.util.List;
 
+import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
+import com.simibubi.create.foundation.utility.CreateLang;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import com.deltasf.createpropulsion.heat.HeatSourceBehavior;
 import com.deltasf.createpropulsion.heat.IHeatSource;
 import com.deltasf.createpropulsion.registries.PropulsionCapabilities;
-import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import com.simibubi.create.foundation.utility.Lang;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -58,10 +58,10 @@ public abstract class AbstractBurnerBlockEntity extends SmartBlockEntity impleme
         if (heatSourceCap == null) return false;
 
 
-        Lang.builder()
-            .add(Lang.number(heatSourceCap.getHeatStored()))
+        CreateLang.builder()
+            .add(CreateLang.number(heatSourceCap.getHeatStored()))
             .text(" / ")
-            .add(Lang.number(heatSourceCap.getMaxHeatStored())).forGoggles(tooltip);
+            .add(CreateLang.number(heatSourceCap.getMaxHeatStored())).forGoggles(tooltip);
 
         return true;
     }

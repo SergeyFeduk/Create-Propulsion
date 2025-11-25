@@ -15,11 +15,12 @@ import org.joml.Vector2i;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.joml.Vector3i;
+import org.valkyrienskies.core.api.bodies.properties.BodyKinematics;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.properties.ChunkClaim;
+import org.valkyrienskies.core.impl.bodies.properties.BodyKinematicsImpl;
 import org.valkyrienskies.core.impl.game.ships.ShipDataCommon;
 import org.valkyrienskies.core.impl.game.ships.ShipTransformImpl;
-import org.valkyrienskies.core.impl.networking.simple.SimplePackets;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -44,7 +45,10 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 
+import org.valkyrienskies.core.impl.networking.simple.SimplePacketNetworking;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import org.valkyrienskies.mod.common.networking.PacketRestartChunkUpdates;
 import org.valkyrienskies.mod.common.networking.PacketStopChunkUpdates;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
@@ -131,7 +135,7 @@ public class PhysicsAssemblerBlockEntity extends SmartBlockEntity {
             destchunkPoses.add(new Vector2i(pos.x, pos.z));
         }
         //Send packets to stop updating chunks 
-        SimplePackets.sendToAllClients(new PacketStopChunkUpdates(chunkPoses));
+        ValkyrienSkiesMod.getVsCore().getSimplePacketNetworking().sendToAllClients(new PacketStopChunkUpdates(chunkPoses));
         //Copy blocks from region to shipyard
         for (BlockPos pos : region.blockPositions) {
             BlockPos relative = pos.subtract(creationAnchorPos);
@@ -178,11 +182,13 @@ public class PhysicsAssemblerBlockEntity extends SmartBlockEntity {
             finalShipPosInWorld.add(parentShip.getVelocity().mul(4/60.0, new Vector3d()) );*/
         }
 
-        ShipTransformImpl newShipTransform = new ShipTransformImpl(
+        BodyKinematics newShipTransform = ValkyrienSkies.api().newBodyKinematics(
+            new Vector3d(),
+            new Vector3d(),
             finalShipPosInWorld,
-            finalShipPosInShipyard,
             finalShipRotation,
-            finalShipScale
+            finalShipScale,
+            finalShipPosInShipyard
         );
 
         //final String vsDimName = VSGameUtilsKt.getDimensionId(world);
@@ -194,7 +200,7 @@ public class PhysicsAssemblerBlockEntity extends SmartBlockEntity {
         System.out.println(omega);*/
 
         if (ship instanceof ShipDataCommon shipData) {
-            shipData.setTransform(newShipTransform);
+            shipData.setKinematics(newShipTransform);
 
             /*ServerShipWorldCore sWorld = (ServerShipWorldCore)VSGameUtilsKt.getShipWorldNullable(world);
             sWorld.teleportShip(ship, td);*/
@@ -209,7 +215,7 @@ public class PhysicsAssemblerBlockEntity extends SmartBlockEntity {
         VSGameUtilsKt.executeIf(level.getServer(), 
             () -> destchunkPoses.stream().allMatch(chunkPos -> VSGameUtilsKt.isTickingChunk(level, chunkPos.x, chunkPos.y)), 
             () -> {
-                SimplePackets.sendToAllClients(new PacketRestartChunkUpdates(chunkPoses));
+                ValkyrienSkiesMod.getVsCore().getSimplePacketNetworking().sendToAllClients(new PacketRestartChunkUpdates(chunkPoses));
                 chunkPoses.clear();
             }
         );

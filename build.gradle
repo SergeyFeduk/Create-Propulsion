@@ -125,12 +125,14 @@ repositories {
 dependencies {
     compileOnly fg.deobf("com.tterrag.registrate:Registrate:MC1.20-1.3.3")
     //Create
-    implementation fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_version}:all")
-    compileOnly fg.deobf("com.jozufozu.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}")
+    implementation fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false }
+    compileOnly fg.deobf("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}")
+    compileOnly fg.deobf("curse.maven:vanillin-965702:6446560")
+    compileOnly fg.deobf("dev.engine-room.flywheel:flywheel-forge-api-${minecraft_version}:${flywheel_version}")
     //CDG
-    implementation fg.deobf("curse.maven:createdieselgenerators-869316:5401010")
+    implementation fg.deobf("curse.maven:createdieselgenerators-869316:6920093")
     //TFMG
-    implementation fg.deobf("curse.maven:createindustry-693815:5811638") 
+    implementation fg.deobf("curse.maven:createindustry-693815:7236535")
     //CC
     implementation fg.deobf("cc.tweaked:cc-tweaked-${minecraft_version}-forge:${cc_version}")
     //JEI
@@ -138,7 +140,7 @@ dependencies {
     //VS2
     implementation("org.valkyrienskies.core:api:${vs_core_version}")
     implementation("org.valkyrienskies.core:impl:${vs_core_version}")
-    implementation("org.valkyrienskies.core:api-game:${vs_core_version}")
+    implementation("org.valkyrienskies.core:internal:${vs_core_version}")
     implementation("org.valkyrienskies.core:util:${vs_core_version}")
     implementation(fg.deobf("org.valkyrienskies:valkyrienskies-120-forge:${vs2_version}"))
     //VMod

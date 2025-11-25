@@ -1,8 +1,8 @@
 package com.deltasf.createpropulsion.registries;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
-import com.jozufozu.flywheel.core.PartialModel;
 
+import dev.engine_room.flywheel.lib.model.baked.PartialModel;
 import net.minecraft.resources.ResourceLocation;
 
 public class PropulsionPartialModels {
@@ -25,7 +25,7 @@ public class PropulsionPartialModels {
     public static final PartialModel STIRLING_ENGINE_PISTON = partial("stirling_piston");
 
     private static PartialModel partial(String path) {
-        return new PartialModel(new ResourceLocation(CreatePropulsion.ID, "partial/" + path));
+        return PartialModel.of(new ResourceLocation(CreatePropulsion.ID, "partial/" + path));
     }
 
     public static void register() {}

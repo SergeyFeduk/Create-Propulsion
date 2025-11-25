@@ -6,6 +6,9 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
+import net.createmod.catnip.animation.AnimationTickHolder;
+import net.createmod.catnip.outliner.Outline;
+import net.createmod.catnip.outliner.Outliner;
 import org.jetbrains.annotations.NotNull;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
@@ -17,8 +20,6 @@ import com.simibubi.create.AllSpecialTextures;
 import com.simibubi.create.CreateClient;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import com.simibubi.create.foundation.outliner.Outline.OutlineParams;
-import com.simibubi.create.foundation.utility.AnimationTickHolder;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -367,7 +368,7 @@ public class PropellerBlockEntity extends KineticBlockEntity {
 
         spatialHandler.triggerImmediateScan();
 
-        OutlineParams outline = CreateClient.OUTLINER.showCluster("PropellerObstruction", spatialHandler.getObstructedBlocks());
+        Outline.OutlineParams outline = Outliner.getInstance().showCluster("PropellerObstruction", spatialHandler.getObstructedBlocks());
         outline.colored(AssemblyUtility.CANCEL_COLOR);
         outline.lineWidth(1/16f);
         outline.withFaceTexture(AllSpecialTextures.CHECKERED);

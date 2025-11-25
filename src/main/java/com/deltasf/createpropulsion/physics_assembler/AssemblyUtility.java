@@ -1,5 +1,6 @@
 package com.deltasf.createpropulsion.physics_assembler;
 
+import net.createmod.catnip.outliner.Outliner;
 import org.joml.Matrix4dc;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.Ship;
@@ -32,7 +33,7 @@ public class AssemblyUtility {
             return; 
         }
 
-        var outline = CreateClient.OUTLINER.showAABB(key, boundingBox)
+        var outline = Outliner.getInstance().showAABB(key, boundingBox)
             .colored(color)
             .lineWidth(lineWidth)
             .disableLineNormals();

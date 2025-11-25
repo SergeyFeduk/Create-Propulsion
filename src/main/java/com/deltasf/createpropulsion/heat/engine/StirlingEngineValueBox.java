@@ -1,12 +1,14 @@
 package com.deltasf.createpropulsion.heat.engine;
 
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform;
-import com.simibubi.create.foundation.utility.AngleHelper;
-import com.simibubi.create.foundation.utility.VecHelper;
 import com.mojang.blaze3d.vertex.PoseStack;
 
+import net.createmod.catnip.math.AngleHelper;
+import net.createmod.catnip.math.VecHelper;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
@@ -18,7 +20,7 @@ public class StirlingEngineValueBox extends ValueBoxTransform.Sided {
     }
 
     @Override
-    public Vec3 getLocalOffset(BlockState state) {
+    public Vec3 getLocalOffset(LevelAccessor level, BlockPos pos, BlockState state) {
         Direction facing = state.getValue(StirlingEngineBlock.FACING);
         Vec3 location = getSouthLocation();
         location = VecHelper.rotateCentered(location, AngleHelper.horizontalAngle(facing), Axis.Y);
@@ -27,7 +29,7 @@ public class StirlingEngineValueBox extends ValueBoxTransform.Sided {
     }
 
     @Override
-    public void rotate(BlockState state, PoseStack ms) {
+    public void rotate(LevelAccessor level, BlockPos pos, BlockState state, PoseStack ms) {
         Direction facing = state.getValue(StirlingEngineBlock.FACING);
         float yRot = AngleHelper.horizontalAngle(facing);
         ms.mulPose(com.mojang.math.Axis.YP.rotationDegrees(yRot));

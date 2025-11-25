@@ -62,7 +62,7 @@ public class PropellerForceApplier {
 
         worldForceDirection.normalize().mul(data.getInvertDirection() ? -1.0 : 1.0);
         worldForce.set(worldForceDirection).mul(thrust).mul(externalAirDensity);
-        final Vector3dc linearVelocity = ship.getPoseVel().getVel();
+        final Vector3dc linearVelocity = ship.getVelocity();
         if (linearVelocity.lengthSquared() >= maxSpeed * maxSpeed) {
             double dot = worldForce.dot(linearVelocity);
             if (dot > 0) {
@@ -89,7 +89,7 @@ public class PropellerForceApplier {
         double physTps = pipeline.computePhysTps();
         if (physTps <= 0) return;
         double deltaTime = 1.0 / physTps;
-        double mass = ship.getInertia().getShipMass();
+        double mass = ship.getMass();
         if (mass <= 0) return;
 
         forceToScale.mul(deltaTime / mass, scaledForce_temp1);

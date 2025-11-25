@@ -4,9 +4,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.jetbrains.annotations.NotNull;
+import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.PhysShip;
 import org.valkyrienskies.core.api.ships.ServerShip;
-import org.valkyrienskies.core.api.ships.ShipForcesInducer;
+import org.valkyrienskies.core.api.ships.ShipPhysicsListener;
+import org.valkyrienskies.core.api.world.PhysLevel;
 import org.valkyrienskies.core.impl.game.ships.PhysShipImpl;
 
 import com.deltasf.createpropulsion.utility.AttachmentUtils;
@@ -15,13 +17,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 
-@SuppressWarnings("deprecation")
-public class PropellerAttachment implements ShipForcesInducer {
+public final class PropellerAttachment implements ShipPhysicsListener {
     public Map<BlockPos, PropellerForceApplier> appliersMapping = new ConcurrentHashMap<>();
     PropellerAttachment() {}
 
     @Override
-    public void applyForces(@NotNull PhysShip physicShip) {
+    public void physTick(@NotNull PhysShip physicShip, @NotNull PhysLevel physLevel) {
         PhysShipImpl ship = (PhysShipImpl)physicShip;
         appliersMapping.forEach((pos, applier) -> {
             applier.applyForces(pos, ship);
@@ -45,7 +46,7 @@ public class PropellerAttachment implements ShipForcesInducer {
     }
 
     //Getters
-    public static PropellerAttachment getOrCreateAsAttachment(ServerShip ship) {
+    public static PropellerAttachment getOrCreateAsAttachment(LoadedServerShip ship) {
         return AttachmentUtils.getOrCreate(ship, PropellerAttachment.class, PropellerAttachment::new);
     }
 

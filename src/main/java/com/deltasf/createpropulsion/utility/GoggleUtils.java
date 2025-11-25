@@ -1,9 +1,9 @@
 package com.deltasf.createpropulsion.utility;
 
-import com.simibubi.create.foundation.utility.Lang;
-import com.simibubi.create.foundation.utility.LangBuilder;
 import java.util.List;
 
+import com.simibubi.create.foundation.utility.CreateLang;
+import net.createmod.catnip.lang.LangBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.network.chat.Component;
@@ -40,8 +40,8 @@ public class GoggleUtils {
 
     public static LangBuilder LensTooltip(ItemStack lensStack, List<Component> tooltip) {
         //- {Lensname}
-        return Lang.builder()
+        return CreateLang.builder()
             .text("- ")
-            .add(Lang.itemName(lensStack).style(ChatFormatting.GOLD));
+            .add(CreateLang.itemName(lensStack).style(ChatFormatting.GOLD));
     }
 }

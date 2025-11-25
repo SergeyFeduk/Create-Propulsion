@@ -5,10 +5,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import com.simibubi.create.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
-import com.simibubi.create.foundation.render.CachedBufferer;
-import com.simibubi.create.foundation.render.SuperByteBuffer;
-import com.simibubi.create.foundation.utility.AngleHelper;
 
+import net.createmod.catnip.math.AngleHelper;
+import net.createmod.catnip.render.CachedBuffers;
+import net.createmod.catnip.render.SuperByteBuffer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -29,7 +29,7 @@ public class HotAirBurnerRenderer extends SmartBlockEntityRenderer<HotAirBurnerB
         Direction direction = state.getValue(HotAirBurnerBlock.FACING).getOpposite();
 
         VertexConsumer solidVB = buffer.getBuffer(RenderType.cutoutMipped());
-        SuperByteBuffer leverModel = CachedBufferer.partial(PropulsionPartialModels.HOT_AIR_BURNER_LEVER, state);
+        SuperByteBuffer leverModel = CachedBuffers.partial(PropulsionPartialModels.HOT_AIR_BURNER_LEVER, state);
 
         //Calculate translation & rotation
         int leverPosition = be.getLeverPosition();

@@ -9,11 +9,9 @@ import org.joml.Math;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.joml.Vector3ic;
-import org.valkyrienskies.core.api.ships.LoadedShip;
-import org.valkyrienskies.core.api.ships.PhysShip;
-import org.valkyrienskies.core.api.ships.ServerShip;
-import org.valkyrienskies.core.api.ships.ShipForcesInducer;
+import org.valkyrienskies.core.api.ships.*;
 import org.valkyrienskies.core.api.ships.properties.ShipTransform;
+import org.valkyrienskies.core.api.world.PhysLevel;
 import org.valkyrienskies.core.impl.game.ships.PhysShipImpl;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
@@ -23,13 +21,12 @@ import com.deltasf.createpropulsion.utility.AttachmentUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 
-@SuppressWarnings("deprecation")
-public class MagnetForceAttachment implements ShipForcesInducer {
+public final class MagnetForceAttachment implements ShipPhysicsListener {
     public volatile Level level;
     public MagnetForceAttachment() {}
     
     @Override
-    public void applyForces(@NotNull PhysShip physicShip) {
+    public void physTick(@NotNull PhysShip physicShip, @NotNull PhysLevel physLevel) {
         PhysShipImpl ship = (PhysShipImpl) physicShip;
         List<MagnetPair> pairs = MagnetRegistry.forLevel(level).getPairsForShip(ship.getId());
         if (pairs.isEmpty()) {
@@ -240,7 +237,7 @@ public class MagnetForceAttachment implements ShipForcesInducer {
     // This would require having a centralized cache and a way to subsribe to the start of physics tick, which I did not figure out yet
     // Or, instead of physics tick start - check if all pairs were cached - and clean up after (tho this is less desirable)
 
-    public static MagnetForceAttachment getOrCreateAsAttachment(Level level, ServerShip ship){
+    public static MagnetForceAttachment getOrCreateAsAttachment(Level level, LoadedServerShip ship){
         return AttachmentUtils.getOrCreate(ship, MagnetForceAttachment.class, () -> {
             MagnetForceAttachment attachment = new MagnetForceAttachment();
             attachment.level = level;

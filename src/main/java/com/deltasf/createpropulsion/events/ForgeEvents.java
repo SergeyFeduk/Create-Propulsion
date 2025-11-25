@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
@@ -80,9 +81,9 @@ public class ForgeEvents {
 
         final String PREFIX = "minecraft:dimension:";
 
-        var allShips = VSGameUtilsKt.getAllShips(overworld);
+        var allShips = VSGameUtilsKt.getShipObjectWorld(overworld).getLoadedShips();
         for (Ship ship : allShips) {
-            if (ship instanceof ServerShip serverShip) {
+            if (ship instanceof LoadedServerShip serverShip) {
                 String shipDimensionId = serverShip.getChunkClaimDimension();
                 if (shipDimensionId != null && shipDimensionId.startsWith(PREFIX)) {
                     String resourceLocationString = shipDimensionId.substring(PREFIX.length());

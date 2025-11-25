@@ -9,8 +9,8 @@ import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.registries.PropulsionBlocks;
 import com.deltasf.createpropulsion.thruster.thruster.ThrusterBlockEntity;
 import com.simibubi.create.foundation.item.TooltipHelper;
-import com.simibubi.create.foundation.item.TooltipHelper.Palette;
 
+import net.createmod.catnip.lang.FontHelper.Palette;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.ForgeRegistries;

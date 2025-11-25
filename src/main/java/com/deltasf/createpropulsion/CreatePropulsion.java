@@ -1,5 +1,14 @@
 package com.deltasf.createpropulsion;
 
+import com.deltasf.createpropulsion.balloons.hot_air.BalloonAttachment;
+import com.deltasf.createpropulsion.magnet.MagnetForceAttachment;
+import com.deltasf.createpropulsion.propeller.PropellerAttachment;
+import com.deltasf.createpropulsion.reaction_wheel.ReactionWheelAttachment;
+import com.deltasf.createpropulsion.thruster.ThrusterForceAttachment;
+import com.simibubi.create.api.boiler.BoilerHeater;
+import com.simibubi.create.api.stress.BlockStressValues;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import org.valkyrienskies.core.impl.hooks.VSEvents;
 
 import com.deltasf.createpropulsion.balloons.serialization.BalloonSerializationHandler;
@@ -25,6 +34,7 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.ModLoadingContext;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 
 @Mod(CreatePropulsion.ID)
 public class CreatePropulsion {
@@ -43,6 +53,29 @@ public class CreatePropulsion {
         PropulsionPartialModels.register();
         PropulsionCreativeTab.register(modBus);
         PropulsionPackets.register();
+
+        // VS Init
+        ValkyrienSkies.api().registerAttachment(ValkyrienSkies.api().newAttachmentRegistrationBuilder(ThrusterForceAttachment.class)
+                .useLegacySerializer()
+                .build()
+        );
+        ValkyrienSkies.api().registerAttachment(ValkyrienSkies.api().newAttachmentRegistrationBuilder(BalloonAttachment.class)
+                .useLegacySerializer()
+                .build()
+        );
+        ValkyrienSkies.api().registerAttachment(ValkyrienSkies.api().newAttachmentRegistrationBuilder(MagnetForceAttachment.class)
+                .useLegacySerializer()
+                .build()
+        );
+        ValkyrienSkies.api().registerAttachment(ValkyrienSkies.api().newAttachmentRegistrationBuilder(PropellerAttachment.class)
+                .useLegacySerializer()
+                .build()
+        );
+        ValkyrienSkies.api().registerAttachment(ValkyrienSkies.api().newAttachmentRegistrationBuilder(ReactionWheelAttachment.class)
+                .useLegacySerializer()
+                .build()
+        );
+
         //Compat
         Mods.COMPUTERCRAFT.executeIfInstalled(() -> CCProxy::register);
         //Config
@@ -53,9 +86,12 @@ public class CreatePropulsion {
 
         //TODO: Move this in correct place
         //Query ships for deserialization with balloons
-        VSEvents.ShipLoadEvent.Companion.on((e) -> {
+        ValkyrienSkies.api().getShipLoadEvent().on((e) -> {
             BalloonSerializationHandler.queryShipLoad(new Query(e.getShip().getId(), e.getShip().getChunkClaimDimension()));
         });
+
+        //TODO: make stress values configurable
+        BlockStressValues.IMPACTS.registerProvider(PropulsionDefaultStress::getImpact);
 
         modBus.addListener(CreatePropulsion::init);
     }
@@ -64,7 +100,7 @@ public class CreatePropulsion {
         //TODO: Move this in correct place
         //Registers solid burner as heater
         event.enqueueWork(() -> {
-            BoilerHeaters.registerHeater(PropulsionBlocks.SOLID_BURNER.get(), (level,pos,state) -> {
+            BoilerHeater.REGISTRY.register(PropulsionBlocks.SOLID_BURNER.get(), (level, pos, state) -> {
                 HeatLevel value = state.getValue(AbstractBurnerBlock.HEAT);
                 if (value == HeatLevel.NONE) {
                     return -1;

@@ -46,7 +46,7 @@ public class ThrusterForceApplier {
         transform.getShipToWorld().transformDirection(data.getDirection(), worldForceDirection);
         worldForceDirection.normalize();
         worldForce.set(worldForceDirection).mul(thrust);
-        final Vector3dc linearVelocity = ship.getPoseVel().getVel();
+        final Vector3dc linearVelocity = ship.getVelocity();
         if (linearVelocity.lengthSquared() >= maxSpeed * maxSpeed) {
             double dot = worldForce.dot(linearVelocity);
             if (dot > 0) {
@@ -73,7 +73,7 @@ public class ThrusterForceApplier {
         double physTps = pipeline.computePhysTps();
         if (physTps <= 0) return; // Sometimes physics runs backwards and this results in timeline splitting, we try to avoid that with this line
         double deltaTime = 1.0 / physTps;
-        double mass = ship.getInertia().getShipMass();
+        double mass = ship.getMass();
         if (mass <= 0) return; //Same with tps but in case of negative mass we can accidentally create alcubierre bubble
 
         forceToScale.mul(deltaTime / mass, scaledForce_temp1);

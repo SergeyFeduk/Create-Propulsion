@@ -1,8 +1,8 @@
 package com.deltasf.createpropulsion.propeller.blades;
 
-import org.joml.primitives.AABBi;
+import dev.engine_room.flywheel.lib.model.baked.PartialModel;
 
-import com.jozufozu.flywheel.core.PartialModel;
+import org.joml.primitives.AABBi;
 
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;

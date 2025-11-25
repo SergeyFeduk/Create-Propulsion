@@ -2,22 +2,22 @@ package com.deltasf.createpropulsion.propeller;
 
 import java.util.List;
 
+import dev.engine_room.flywheel.api.backend.Backend;
+import dev.engine_room.flywheel.lib.model.baked.PartialModel;
+import net.createmod.catnip.animation.AnimationTickHolder;
+import net.createmod.catnip.math.AngleHelper;
+import net.createmod.catnip.render.CachedBuffers;
+import net.createmod.catnip.render.SuperByteBuffer;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.registries.PropulsionPartialModels;
 import com.deltasf.createpropulsion.registries.PropulsionRenderTypes;
-import com.jozufozu.flywheel.backend.Backend;
-import com.jozufozu.flywheel.core.PartialModel;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import com.simibubi.create.AllPartialModels;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntityRenderer;
-import com.simibubi.create.foundation.render.CachedBufferer;
-import com.simibubi.create.foundation.render.SuperByteBuffer;
-import com.simibubi.create.foundation.utility.AngleHelper;
-import com.simibubi.create.foundation.utility.AnimationTickHolder;
 
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
@@ -52,14 +52,14 @@ public class PropellerRenderer extends KineticBlockEntityRenderer<PropellerBlock
     @SuppressWarnings("null")
     @Override
 	protected void renderSafe(PropellerBlockEntity be, float partialTicks, PoseStack ms, MultiBufferSource buffer, int light, int overlay) {
-        if (Backend.canUseInstancing(be.getLevel())) return;
+        //if (Backend.canUseInstancing(be.getLevel())) return;
 
         Direction direction = be.getBlockState().getValue(PropellerBlock.FACING);
 		VertexConsumer vb = buffer.getBuffer(RenderType.cutoutMipped());
 
         int lightBehind = LevelRenderer.getLightColor(be.getLevel(), be.getBlockPos().relative(direction.getOpposite()));
 
-        SuperByteBuffer shaftHalf = CachedBufferer.partialFacing(AllPartialModels.SHAFT_HALF, be.getBlockState(), direction.getOpposite());
+        SuperByteBuffer shaftHalf = CachedBuffers.partialFacing(AllPartialModels.SHAFT_HALF, be.getBlockState(), direction.getOpposite());
 
         //Shaft
         standardKineticRotationTransform(shaftHalf, be, lightBehind).renderInto(ms, vb);
@@ -77,7 +77,7 @@ public class PropellerRenderer extends KineticBlockEntityRenderer<PropellerBlock
         Direction direction = state.getValue(PropellerBlock.FACING);
 
         //Get models
-        SuperByteBuffer headModel = CachedBufferer.partial(PropulsionPartialModels.PROPELLER_HEAD, state);
+        SuperByteBuffer headModel = CachedBuffers.partial(PropulsionPartialModels.PROPELLER_HEAD, state);
         final SuperByteBuffer[] bladeModel = { null };
         final boolean[] canBeBlurred = { true };
 
@@ -85,7 +85,7 @@ public class PropellerRenderer extends KineticBlockEntityRenderer<PropellerBlock
             canBeBlurred[0] = bladeItem.canBeBlurred();
             PartialModel bladePartialModel = bladeItem.getModel();
             if (bladePartialModel != null) {
-                bladeModel[0] = CachedBufferer.partial(bladePartialModel, state);
+                bladeModel[0] = CachedBuffers.partial(bladePartialModel, state);
             }
         });
 

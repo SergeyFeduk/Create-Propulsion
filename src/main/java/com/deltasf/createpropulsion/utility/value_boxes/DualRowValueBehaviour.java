@@ -13,10 +13,9 @@ import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform;
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueSettingsBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueSettingsBoard;
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueSettingsFormatter;
-import com.simibubi.create.foundation.utility.Components;
-import com.simibubi.create.foundation.utility.Lang;
-import com.simibubi.create.foundation.utility.VecHelper;
 
+import com.simibubi.create.foundation.utility.CreateLang;
+import net.createmod.catnip.math.VecHelper;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -119,13 +118,13 @@ public class DualRowValueBehaviour extends BlockEntityBehaviour implements Value
 
 	@Override
 	public ValueSettingsBoard createBoard(Player player, BlockHitResult hitResult) {
-		List<Component> rowLabels = ImmutableList.of(Components.literal("-"), Components.literal("+"));
+		List<Component> rowLabels = ImmutableList.of(Component.literal("-"), Component.literal("+"));
 
 		ValueSettingsFormatter boardFormatter = new ValueSettingsFormatter((settings) -> {
 			if (settings.row() == 0) {
-				return Lang.number(-(settings.value() + 1)).component();
+				return CreateLang.number(-(settings.value() + 1)).component();
 			}
-			return Lang.number(settings.value() + 1).component();
+			return CreateLang.number(settings.value() + 1).component();
 		});
 
 		return new ValueSettingsBoard(label, MAX_ABSOLUTE_VALUE, 1, rowLabels, boardFormatter);
@@ -177,11 +176,11 @@ public class DualRowValueBehaviour extends BlockEntityBehaviour implements Value
 	public boolean testHit(Vec3 hit) {
 		BlockState state = blockEntity.getBlockState();
 		Vec3 localHit = hit.subtract(Vec3.atLowerCornerOf(blockEntity.getBlockPos()));
-		return slotPositioning.testHit(state, localHit);
+		return slotPositioning.testHit(blockEntity.getLevel(), blockEntity.getBlockPos(), state, localHit);
 	}
 
 	@Override
-	public void onShortInteract(Player player, InteractionHand hand, Direction side) {
+	public void onShortInteract(Player player, InteractionHand hand, Direction side, BlockHitResult hitResult) {
 		if (player instanceof FakePlayer)
 			blockEntity.getBlockState()
 				.use(getWorld(), player, hand,

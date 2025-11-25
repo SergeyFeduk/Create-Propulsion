@@ -141,7 +141,7 @@ public class LodestoneTrackerBlock extends Block implements EntityBlock, IWrench
             if (trackerBlockEntity.IsInverted()) {
                 level.playSound(null, context.getClickedPos(), SoundEvents.STONE_BUTTON_CLICK_OFF, SoundSource.BLOCKS, 0.7f, 0.8f);
             } else {
-                playRotateSound(level, context.getClickedPos());
+                IWrenchable.playRotateSound(level, context.getClickedPos());
             }
         }
         

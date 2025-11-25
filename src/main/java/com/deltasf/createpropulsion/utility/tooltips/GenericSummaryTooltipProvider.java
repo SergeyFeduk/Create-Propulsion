@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
 import com.simibubi.create.foundation.item.TooltipHelper;
-import com.simibubi.create.foundation.item.TooltipHelper.Palette;
+import net.createmod.catnip.lang.FontHelper.Palette;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.resources.language.I18n;

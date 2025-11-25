@@ -3,6 +3,7 @@ package com.deltasf.createpropulsion.design_goggles;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.createmod.catnip.outliner.Outliner;
 import org.joml.Quaterniond;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
@@ -79,7 +80,7 @@ public class DesignGogglesOverlayRenderer {
             holesPoses.addAll(balloon.holes);
         }
         
-        var f = CreateClient.OUTLINER.showCluster("DesignHoles", holesPoses);
+        var f = Outliner.getInstance().showCluster("DesignHoles", holesPoses);
         f.colored(AssemblyUtility.CANCEL_COLOR);
         f.lineWidth(1/16f);
         f.withFaceTexture(AllSpecialTextures.CHECKERED);
