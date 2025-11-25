@@ -149,16 +149,17 @@ public class PropulsionBlocks {
         }
         
         public MapColor getMapColor() { return mapColor; }
-        public String generateId() {
-            if (name == null) return "envelope";
-            return "envelope_" + name;
+        public String generateId(String base) {
+            if (name == null) return base;
+            return base + "_" + name;
         }
     }
 
     private static final Map<EnvelopeColor, BlockEntry<EnvelopeBlock>> ENVELOPE_BLOCKS = new EnumMap<>(EnvelopeColor.class);
+    private static final Map<EnvelopeColor, BlockEntry<EnvelopeBlock>> ENVELOPED_SHAFT_BLOCKS = new EnumMap<>(EnvelopeColor.class);
     static {
         for (EnvelopeColor color : EnvelopeColor.values()) {
-            BlockEntry<EnvelopeBlock> block = REGISTRATE.block(color.generateId(), EnvelopeBlock::new)
+            BlockEntry<EnvelopeBlock> envelope = REGISTRATE.block(color.generateId("envelope"), EnvelopeBlock::new)
                 .properties(p -> p.mapColor(color.getMapColor()))
                 .properties(p -> p.strength(0.5F))
                 .properties(p -> p.sound(SoundType.WOOL))
@@ -166,11 +167,25 @@ public class PropulsionBlocks {
                 .simpleItem()
                 .register();
             
-            ENVELOPE_BLOCKS.put(color, block);
+            ENVELOPE_BLOCKS.put(color, envelope);
+
+            BlockEntry<EnvelopeBlock> envelopedShaft = REGISTRATE.block(color.generateId("enveloped_shaft"), EnvelopeBlock::new)
+                .properties(p -> p.mapColor(color.getMapColor()))
+                .properties(p -> p.strength(0.5F))
+                .properties(p -> p.sound(SoundType.WOOL))
+                .properties(p -> p.ignitedByLava())
+                .simpleItem()
+                .register();
+            
+            ENVELOPED_SHAFT_BLOCKS.put(color, envelopedShaft);
         }
     }
 
     public static BlockEntry<EnvelopeBlock> getEnvelope(EnvelopeColor color) {
         return ENVELOPE_BLOCKS.get(color);
+    }
+
+    public static BlockEntry<EnvelopeBlock> getEnvelopedShaft(EnvelopeColor color) {
+        return ENVELOPED_SHAFT_BLOCKS.get(color);
     }
 }

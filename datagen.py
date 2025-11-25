@@ -3,9 +3,8 @@
 import os
 import json
 
-def generate_files():
+def generate_block_files(base_name, colors):
     base_path = os.path.join("src", "generated", "resources")
-    colors = ["white", "orange", "magenta", "light_blue", "yellow", "lime", "pink", "gray", "light_gray", "cyan", "purple", "blue", "brown", "green", "red", "black"]
     
     directories = [
         os.path.join(base_path, "assets", "createpropulsion", "blockstates"),
@@ -18,13 +17,13 @@ def generate_files():
     
     for color in colors:
         if color == "white":
-            filename = "envelope.json"
-            model_path = "createpropulsion:block/envelope/envelope"
-            bs_path = "createpropulsion:block/envelope"
+            filename = f"{base_name}.json"
+            model_path = f"createpropulsion:block/{base_name}/{base_name}"
+            bs_path = f"createpropulsion:block/{base_name}"
         else:
-            filename = f"envelope_{color}.json"
-            model_path = f"createpropulsion:block/envelope/envelope_{color}"
-            bs_path = f"createpropulsion:block/envelope_{color}"
+            filename = f"{base_name}_{color}.json"
+            model_path = f"createpropulsion:block/{base_name}/{base_name}_{color}"
+            bs_path = f"createpropulsion:block/{base_name}_{color}"
         
         blockstate_content = {
             "variants": {
@@ -53,7 +52,9 @@ def generate_files():
         
         with open(item_model_path, 'w') as f:
             json.dump(model_content, f, indent=2)
-    
+
+def generate_recipes(colors):
+    base_path = os.path.join("src", "generated", "resources")
     recipe_dir = os.path.join(base_path, "data", "createpropulsion", "recipes", "crafting")
     os.makedirs(recipe_dir, exist_ok=True)
     
@@ -83,6 +84,15 @@ def generate_files():
         recipe_path = os.path.join(recipe_dir, recipe_filename)
         with open(recipe_path, 'w') as f:
             json.dump(recipe_content, f, indent=2)
+
+def generate_files():
+    colors = ["white", "orange", "magenta", "light_blue", "yellow", "lime", "pink", "gray", "light_gray", "cyan", "purple", "blue", "brown", "green", "red", "black"]
+    base_names = ["envelope", "enveloped_shaft"]
+    
+    for base_name in base_names:
+        generate_block_files(base_name, colors)
+    
+    generate_recipes(colors)
 
 if __name__ == "__main__":
     generate_files()
