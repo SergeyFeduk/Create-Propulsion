@@ -93,7 +93,7 @@ public class HotAirBurnerBlock extends AbstractHotAirInjectorBlock {
             }
         } else {
             burnerEntity.cycleLever(player.isShiftKeyDown());
-            level.playLocalSound(pos, SoundEvents.LEVER_CLICK, SoundSource.BLOCKS, 1.0F, 1.0F, false);
+            level.playLocalSound(pos, SoundEvents.LEVER_CLICK, SoundSource.BLOCKS, 1.0f, 1.0f, false);
             return InteractionResult.SUCCESS;
         }
 

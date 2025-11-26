@@ -20,6 +20,8 @@ import com.simibubi.create.content.kinetics.BlockStressDefaults;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.BlockEntry;
 
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.material.MapColor;
 
@@ -121,44 +123,47 @@ public class PropulsionBlocks {
         .register();
 
     //All envelopes
-
     public enum EnvelopeColor {
-        WHITE(null, MapColor.SNOW),
-        ORANGE("orange", MapColor.COLOR_ORANGE),
-        MAGENTA("magenta", MapColor.COLOR_MAGENTA),
-        LIGHT_BLUE("light_blue", MapColor.COLOR_LIGHT_BLUE),
-        YELLOW("yellow", MapColor.COLOR_YELLOW),
-        LIME("lime", MapColor.COLOR_LIGHT_GREEN),
-        PINK("pink", MapColor.COLOR_PINK),
-        GRAY("gray", MapColor.COLOR_GRAY),
-        LIGHT_GRAY("light_gray", MapColor.COLOR_LIGHT_GRAY),
-        CYAN("cyan", MapColor.COLOR_CYAN),
-        PURPLE("purple", MapColor.COLOR_PURPLE),
-        BLUE("blue", MapColor.COLOR_BLUE),
-        BROWN("brown", MapColor.COLOR_BROWN),
-        GREEN("green", MapColor.COLOR_GREEN),
-        RED("red", MapColor.COLOR_RED),
-        BLACK("black", MapColor.COLOR_BLACK);
+        WHITE(null, MapColor.SNOW, null),
+        ORANGE("orange", MapColor.COLOR_ORANGE, Items.ORANGE_DYE),
+        MAGENTA("magenta", MapColor.COLOR_MAGENTA, Items.MAGENTA_DYE),
+        LIGHT_BLUE("light_blue", MapColor.COLOR_LIGHT_BLUE, Items.LIGHT_BLUE_DYE),
+        YELLOW("yellow", MapColor.COLOR_YELLOW, Items.YELLOW_DYE),
+        LIME("lime", MapColor.COLOR_LIGHT_GREEN, Items.LIME_DYE),
+        PINK("pink", MapColor.COLOR_PINK, Items.PINK_DYE),
+        GRAY("gray", MapColor.COLOR_GRAY, Items.GRAY_DYE),
+        LIGHT_GRAY("light_gray", MapColor.COLOR_LIGHT_GRAY, Items.LIGHT_GRAY_DYE),
+        CYAN("cyan", MapColor.COLOR_CYAN, Items.CYAN_DYE),
+        PURPLE("purple", MapColor.COLOR_PURPLE, Items.PURPLE_DYE),
+        BLUE("blue", MapColor.COLOR_BLUE, Items.BLUE_DYE),
+        BROWN("brown", MapColor.COLOR_BROWN, Items.BROWN_DYE),
+        GREEN("green", MapColor.COLOR_GREEN, Items.GREEN_DYE),
+        RED("red", MapColor.COLOR_RED, Items.RED_DYE),
+        BLACK("black", MapColor.COLOR_BLACK, Items.BLACK_DYE);
         
         private final String name;
         private final MapColor mapColor;
+        private final Item dye;
 
-        EnvelopeColor(String name, MapColor mapColor) {
+        EnvelopeColor(String name, MapColor mapColor, Item dye) {
             this.name = name;
             this.mapColor = mapColor;
+            this.dye = dye;
         }
         
-        public MapColor getMapColor() { return mapColor; }
         public String generateId(String base) {
             if (name == null) return base;
             return base + "_" + name;
         }
+        public MapColor getMapColor() { return mapColor; }
+        public Item getDye() { return dye; }
     }
 
     private static final Map<EnvelopeColor, BlockEntry<EnvelopeBlock>> ENVELOPE_BLOCKS = new EnumMap<>(EnvelopeColor.class);
     private static final Map<EnvelopeColor, BlockEntry<EnvelopeBlock>> ENVELOPED_SHAFT_BLOCKS = new EnumMap<>(EnvelopeColor.class);
     static {
         for (EnvelopeColor color : EnvelopeColor.values()) {
+            //Envelope block
             BlockEntry<EnvelopeBlock> envelope = REGISTRATE.block(color.generateId("envelope"), EnvelopeBlock::new)
                 .properties(p -> p.mapColor(color.getMapColor()))
                 .properties(p -> p.strength(0.5F))
@@ -168,7 +173,8 @@ public class PropulsionBlocks {
                 .register();
             
             ENVELOPE_BLOCKS.put(color, envelope);
-
+            
+            //Enveloped shaft block
             BlockEntry<EnvelopeBlock> envelopedShaft = REGISTRATE.block(color.generateId("enveloped_shaft"), EnvelopeBlock::new)
                 .properties(p -> p.mapColor(color.getMapColor()))
                 .properties(p -> p.strength(0.5F))
