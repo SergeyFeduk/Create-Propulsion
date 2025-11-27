@@ -22,8 +22,9 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nonnull;
 
 public class RedstoneTransmissionBlock extends AbstractEncasedShaftBlock implements IBE<RedstoneTransmissionBlockEntity> {
+    public static final int MAX_VALUE = 255;
     public static final DirectionProperty HORIZONTAL_FACING = BlockStateProperties.HORIZONTAL_FACING;
-    public static final IntegerProperty SHIFT_LEVEL = IntegerProperty.create("shift_level", 0, 128);
+    public static final IntegerProperty SHIFT_LEVEL = IntegerProperty.create("shift_level", 0, 255);
 
     public RedstoneTransmissionBlock(Properties properties) {
         super(properties);

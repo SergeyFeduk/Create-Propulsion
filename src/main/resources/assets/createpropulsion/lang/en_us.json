@@ -134,6 +134,9 @@
     "createpropulsion.assembler.selection.too_far": "Selection is too far away",
 
     "createpropulsion.stirling.generated_speed": "Generated Speed in RPM",
+    "createpropulsion.redstone_transmission.control_mode": "Transmission Control Mode",
+    "create.createpropulsion.redstone_transmission.control_mode.direct": "Direct Control",
+    "create.createpropulsion.redstone_transmission.control_mode.incremental": "Incremental Control",
 
     "createpropulsion.optical_lens.tooltip.summary": "Optical lens that can be _colored_ to tint an _optical sensor_'s beam.",
     "createpropulsion.fluid_lens.tooltip.summary": "Enables an _optical sensor_ to detect _fluids_.",
