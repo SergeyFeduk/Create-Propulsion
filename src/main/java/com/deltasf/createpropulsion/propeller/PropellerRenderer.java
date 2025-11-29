@@ -2,7 +2,6 @@ package com.deltasf.createpropulsion.propeller;
 
 import java.util.List;
 
-import dev.engine_room.flywheel.api.backend.Backend;
 import dev.engine_room.flywheel.lib.model.baked.PartialModel;
 import net.createmod.catnip.animation.AnimationTickHolder;
 import net.createmod.catnip.math.AngleHelper;

@@ -5,7 +5,6 @@ import com.deltasf.createpropulsion.balloons.injectors.hot_air_burner.HotAirBurn
 import com.deltasf.createpropulsion.balloons.injectors.hot_air_burner.HotAirBurnerRenderer;
 import com.deltasf.createpropulsion.heat.burners.solid.SolidBurnerBlockEntity;
 import com.deltasf.createpropulsion.heat.engine.StirlingEngineBlockEntity;
-import com.deltasf.createpropulsion.heat.engine.StirlingEngineRenderInstance;
 import com.deltasf.createpropulsion.heat.engine.StirlingEngineRenderer;
 import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerBlockEntity;
 import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerRenderer;
@@ -16,7 +15,6 @@ import com.deltasf.createpropulsion.optical_sensors.rendering.OpticalSensorRende
 import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerBlockEntity;
 import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerRenderer;
 import com.deltasf.createpropulsion.propeller.PropellerBlockEntity;
-import com.deltasf.createpropulsion.propeller.PropellerRenderInstance;
 import com.deltasf.createpropulsion.propeller.PropellerRenderer;
 import com.deltasf.createpropulsion.reaction_wheel.ReactionWheelBlockEntity;
 import com.deltasf.createpropulsion.reaction_wheel.ReactionWheelRenderer;

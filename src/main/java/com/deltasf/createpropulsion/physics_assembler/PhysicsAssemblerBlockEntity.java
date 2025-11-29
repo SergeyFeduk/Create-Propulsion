@@ -151,7 +151,7 @@ public class PhysicsAssemblerBlockEntity extends SmartBlockEntity {
         }
 
         //Teleport ship to actual location
-        Vector3dc comInShip = ship.getInertiaData().getCenterOfMassInShip();
+        Vector3dc comInShip = ship.getInertiaData().getCenterOfMass();
         Vector3d finalShipPosInShipyard = new Vector3d(comInShip).add(0.5,0.5,0.5);
 
         Vector3d newShipInternalCenterPosVec = VectorConversionsMCKt.toJOMLD(newShipInternalCenterPos);
