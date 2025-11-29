@@ -16,7 +16,6 @@ import com.deltasf.createpropulsion.physics_assembler.AssemblyUtility;
 import com.deltasf.createpropulsion.utility.OBBEntityFinder;
 import com.deltasf.createpropulsion.utility.math.MathUtility;
 import com.simibubi.create.AllSpecialTextures;
-import com.simibubi.create.CreateClient;
 import com.simibubi.create.foundation.collision.Matrix3d;
 import com.simibubi.create.foundation.collision.OrientedBB;
 import net.minecraft.client.Minecraft;

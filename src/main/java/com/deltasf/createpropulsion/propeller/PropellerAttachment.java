@@ -6,7 +6,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.PhysShip;
-import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.ShipPhysicsListener;
 import org.valkyrienskies.core.api.world.PhysLevel;
 import org.valkyrienskies.core.impl.game.ships.PhysShipImpl;
@@ -35,7 +34,6 @@ public final class PropellerAttachment implements ShipPhysicsListener {
 
     public void removeApplier(ServerLevel level, BlockPos pos) {
         appliersMapping.remove(pos.asLong());
-        //Remove attachment by using passing null as attachment instance in order to clean up after ourselves
     }
 
     //Getters

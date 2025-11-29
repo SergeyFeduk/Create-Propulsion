@@ -60,22 +60,11 @@ public final class MagnetForceAttachment implements ShipPhysicsListener {
 
     private double force_distance_factor(double distance) {
         return 1 / (distance * distance * distance * distance);
-        //return smoothDippedBetaDecay(distance, 3, 4.4, 2.6, 0.1, -0.2) / 4;
     }
 
     private double torque_distance_factor(double distance) {
         return 1 / (distance * distance * distance * distance); //Yes, should be x^3, but this feels better
-        //return smoothDippedBetaDecay(distance, 2, 4.4, 2.6, 0.1, -0.2) / 4;
     }
-
-    //TODO: Add a config to select function that will be used for computing distance factor. Use SDBD by default
-
-    /*private double smoothDippedBetaDecay(double distance, double exponent, double strength, double width, double center, double offset) {
-        double q = distance + offset;
-        double base = 1 / java.lang.Math.pow(q, exponent); //JOML has no pow !?
-        double bump = strength * (1 - 1 / (1 + Math.exp(-width * (q - center)))); // Sigmoid
-        return base * (1 - bump);
-    }*/
 
     //Physics not fun
 

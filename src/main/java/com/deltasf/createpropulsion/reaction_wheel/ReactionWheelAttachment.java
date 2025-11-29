@@ -29,7 +29,6 @@ public final class ReactionWheelAttachment implements ShipPhysicsListener {
 
     public void removeApplier(ServerLevel level, BlockPos pos) {
         appliersMapping.remove(pos.asLong());
-        // Remove attachment by using passing null as attachment instance in order to clean up after ourselves
     }
 
     // Getters

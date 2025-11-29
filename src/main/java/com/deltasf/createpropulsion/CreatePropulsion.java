@@ -7,9 +7,6 @@ import com.deltasf.createpropulsion.reaction_wheel.ReactionWheelAttachment;
 import com.deltasf.createpropulsion.thruster.ThrusterForceAttachment;
 import com.simibubi.create.api.boiler.BoilerHeater;
 import com.simibubi.create.api.stress.BlockStressValues;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
-import org.valkyrienskies.core.impl.hooks.VSEvents;
 
 import com.deltasf.createpropulsion.balloons.serialization.BalloonSerializationHandler;
 import com.deltasf.createpropulsion.balloons.serialization.BalloonSerializationHandler.Query;
@@ -24,7 +21,6 @@ import com.deltasf.createpropulsion.registries.PropulsionFluids;
 import com.deltasf.createpropulsion.registries.PropulsionItems;
 import com.deltasf.createpropulsion.registries.PropulsionPartialModels;
 import com.simibubi.create.compat.Mods;
-import com.simibubi.create.content.fluids.tank.BoilerHeaters;
 import com.simibubi.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 

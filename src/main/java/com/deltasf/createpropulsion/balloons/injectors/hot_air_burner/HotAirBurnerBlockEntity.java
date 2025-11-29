@@ -20,7 +20,6 @@ import com.deltasf.createpropulsion.balloons.injectors.AirInjectorObstructionBeh
 import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
 import com.deltasf.createpropulsion.physics_assembler.AssemblyUtility;
 import com.simibubi.create.AllSpecialTextures;
-import com.simibubi.create.CreateClient;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 
 import net.minecraft.ChatFormatting;

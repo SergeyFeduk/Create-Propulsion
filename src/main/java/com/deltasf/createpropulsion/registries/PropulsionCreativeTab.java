@@ -60,7 +60,7 @@ public class PropulsionCreativeTab {
                 output.accept(PropulsionBlocks.HOT_AIR_BURNER_BLOCK);
                 output.accept(PropulsionBlocks.SOLID_BURNER);
                 output.accept(PropulsionBlocks.PROPELLER_BLOCK);
-                output.accept(PropulsionBlocks.REACTION_WHEEL_BLOCK);
+                //output.accept(PropulsionBlocks.REACTION_WHEEL_BLOCK);
                 output.accept(PropulsionBlocks.STIRLING_ENGINE_BLOCK);
                 //From 0.3 (items)
                 output.accept(PropulsionItems.WOODEN_BLADE);

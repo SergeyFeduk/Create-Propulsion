@@ -18,9 +18,7 @@ import org.joml.Vector3i;
 import org.valkyrienskies.core.api.bodies.properties.BodyKinematics;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.properties.ChunkClaim;
-import org.valkyrienskies.core.impl.bodies.properties.BodyKinematicsImpl;
 import org.valkyrienskies.core.impl.game.ships.ShipDataCommon;
-import org.valkyrienskies.core.impl.game.ships.ShipTransformImpl;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -45,7 +43,6 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 
-import org.valkyrienskies.core.impl.networking.simple.SimplePacketNetworking;
 import org.valkyrienskies.mod.api.ValkyrienSkies;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;

@@ -227,6 +227,9 @@ public class SolidBurnerBlockEntity extends AbstractBurnerBlockEntity {
                 color = ChatFormatting.RED;
                 key = "gui.goggles.burner.heat.searing";
                 break;
+            default:
+                color = ChatFormatting.BLUE;
+                break;
         }
 
         //Heat level

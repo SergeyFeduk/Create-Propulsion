@@ -16,9 +16,6 @@ import org.valkyrienskies.core.impl.game.ships.PhysShipImpl;
 
 import com.deltasf.createpropulsion.utility.AttachmentUtils;
 
-import static org.valkyrienskies.mod.common.util.VectorConversionsMCKt.toBlockPos;
-import static org.valkyrienskies.mod.common.util.VectorConversionsMCKt.toJOML;
-
 @JsonAutoDetect(
         fieldVisibility = JsonAutoDetect.Visibility.ANY
 )
@@ -40,15 +37,6 @@ public final class ThrusterForceAttachment implements ShipPhysicsListener {
 
     public void removeApplier(ServerLevel level, BlockPos pos){
         appliersMapping.remove(pos.asLong());
-        //Remove attachment by using passing null as attachment instance in order to clean up after ourselves
-        // Potato note: actually, don't do this anymore
-//        if (appliersMapping.isEmpty()) {
-//            ServerShip ship = AttachmentUtils.getShipAt(level, pos);
-//            if (ship instanceof LoadedServerShip loadedShip) {
-//                // Remove attachment by passing null as the instance
-//                loadedShip.setAttachment(ThrusterForceAttachment.class, null);
-//            }
-//        }
     }
 
     //Getters

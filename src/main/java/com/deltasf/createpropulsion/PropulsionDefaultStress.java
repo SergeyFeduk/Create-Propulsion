@@ -5,7 +5,6 @@ import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
 import net.createmod.catnip.platform.CatnipServices;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.util.HashMap;
 import java.util.Map;

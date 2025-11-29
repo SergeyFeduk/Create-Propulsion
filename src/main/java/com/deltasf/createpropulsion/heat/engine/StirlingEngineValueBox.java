@@ -16,7 +16,7 @@ public class StirlingEngineValueBox extends ValueBoxTransform.Sided {
 
     @Override
     protected Vec3 getSouthLocation() {
-        return VecHelper.voxelSpace(8, 12.5, 7);
+        return VecHelper.voxelSpace(8, 12.51, 7);
     }
 
     @Override
