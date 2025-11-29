@@ -4,7 +4,6 @@ import java.util.EnumMap;
 import java.util.Map;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
-import com.deltasf.createpropulsion.PropulsionDefaultStress;
 import com.deltasf.createpropulsion.balloons.envelopes.EnvelopeBlock;
 import com.deltasf.createpropulsion.balloons.injectors.hot_air_burner.HotAirBurnerBlock;
 import com.deltasf.createpropulsion.heat.burners.solid.SolidBurnerBlock;
@@ -17,6 +16,7 @@ import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerBlock;
 import com.deltasf.createpropulsion.propeller.PropellerBlock;
 import com.deltasf.createpropulsion.reaction_wheel.ReactionWheelBlock;
 import com.deltasf.createpropulsion.thruster.thruster.ThrusterBlock;
+import com.deltasf.createpropulsion.utility.PropulsionDefaultStress;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.BlockEntry;
 
