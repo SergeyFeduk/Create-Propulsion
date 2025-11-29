@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
@@ -18,15 +19,16 @@ import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = CreatePropulsion.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class BalloonSerializationHandler {
-    public record Query(long id, String di) {};
+    public record Query(long id, String di) {
+        public static Query of(LoadedServerShip ship) {
+            return new Query(ship.getId(), ship.getChunkClaimDimension());
+        }
+    };
     private static final Set<Query> pendingQueries = ConcurrentHashMap.newKeySet();
     private static final Set<Long> readyShips = ConcurrentHashMap.newKeySet();
-    //TODO: A problem, we query ALL ships. Not all ships are balloon ships. We probably should check if the ship has a balloon attachment
-
 
     public static void queryShipLoad(Query query) {
         pendingQueries.add(query);
-
     }
 
     public static void onHaiReady(Ship ship, Level level) {

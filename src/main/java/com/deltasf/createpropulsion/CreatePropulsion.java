@@ -30,6 +30,8 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.ModLoadingContext;
+
+import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.mod.api.ValkyrienSkies;
 
 @Mod(CreatePropulsion.ID)
@@ -84,8 +86,10 @@ public class CreatePropulsion {
         //Query ships for deserialization with balloons
         ValkyrienSkies.api().getShipLoadEvent().on((e) -> {
             //time to commit a war crime
-
-            BalloonSerializationHandler.queryShipLoad(new Query(e.getShip().getId(), e.getShip().getChunkClaimDimension()));
+            LoadedServerShip ship = e.getShip();
+            if (ship.getAttachment(BalloonAttachment.class) != null) {
+                BalloonSerializationHandler.queryShipLoad(Query.of(ship));
+            }
         });
 
         //TODO: make stress values configurable

@@ -18,6 +18,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class StirlingEngineRenderer extends KineticBlockEntityRenderer<StirlingEngineBlockEntity> {
@@ -35,14 +36,16 @@ public class StirlingEngineRenderer extends KineticBlockEntityRenderer<StirlingE
         SuperByteBuffer shaft = CachedBuffers.partialFacing(AllPartialModels.SHAFT_HALF, blockEntity.getBlockState(), direction);
         standardKineticRotationTransform(shaft, blockEntity, light).renderInto(ms, bufferSource.getBuffer(RenderType.solid()));
 
-        float speed = blockEntity.getSpeed() / StirlingEngineBlockEntity.MAX_GENERATED_RPM;
+        float speed = Math.abs(blockEntity.getSpeed() / StirlingEngineBlockEntity.MAX_GENERATED_RPM);
         renderPistons(blockEntity, partialTicks, ms, bufferSource, light, overlay, direction, speed);
     }
 
     private void renderPistons(StirlingEngineBlockEntity blockEntity, float partialTicks, PoseStack ms, MultiBufferSource bufferSource, int light, int overlay, Direction direction, float speed) {
         BlockState state = blockEntity.getBlockState();
         VertexConsumer cutoutVB = bufferSource.getBuffer(RenderType.cutoutMipped());
-        float time = AnimationTickHolder.getRenderTime(blockEntity.getLevel());
+        Level level = blockEntity.getLevel();
+        if (level == null) return;
+        float time = AnimationTickHolder.getRenderTime(level);
 
         SuperByteBuffer pistonModel = CachedBuffers.partial(PropulsionPartialModels.STIRLING_ENGINE_PISTON, state);
 
