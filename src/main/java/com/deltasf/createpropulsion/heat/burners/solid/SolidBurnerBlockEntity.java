@@ -14,6 +14,8 @@ import com.deltasf.createpropulsion.heat.burners.AbstractBurnerBlock;
 import com.deltasf.createpropulsion.heat.burners.AbstractBurnerBlockEntity;
 import com.deltasf.createpropulsion.heat.burners.BurnerDamager;
 import com.deltasf.createpropulsion.registries.PropulsionCapabilities;
+import com.deltasf.createpropulsion.utility.burners.BurnerFuelBehaviour;
+import com.deltasf.createpropulsion.utility.burners.IBurner;
 import com.simibubi.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 
@@ -30,8 +32,8 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 
-public class SolidBurnerBlockEntity extends AbstractBurnerBlockEntity {
-    private FuelInventoryBehaviour fuelInventory;
+public class SolidBurnerBlockEntity extends AbstractBurnerBlockEntity implements IBurner {
+    private BurnerFuelBehaviour fuelInventory;
     private int burnTime = 0;
     private HeatLevelString heatLevelName = HeatLevelString.COLD;
     private boolean isPowered = false;
@@ -44,6 +46,7 @@ public class SolidBurnerBlockEntity extends AbstractBurnerBlockEntity {
         super(typeIn, pos, state);
     }
 
+    @Override
     public void setBurnTime(int burnTime) {
         this.burnTime = burnTime;
     }
@@ -51,7 +54,7 @@ public class SolidBurnerBlockEntity extends AbstractBurnerBlockEntity {
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
         super.addBehaviours(behaviours);
-        fuelInventory = new FuelInventoryBehaviour(this);
+        fuelInventory = new BurnerFuelBehaviour(this, () -> {});
         behaviours.add(fuelInventory);
         
         damager = new BurnerDamager(this);

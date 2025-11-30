@@ -4,6 +4,7 @@ import javax.annotation.Nonnull;
 
 import com.deltasf.createpropulsion.heat.burners.AbstractBurnerBlock;
 import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
+import com.deltasf.createpropulsion.utility.burners.BurnerFuelBehaviour;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntityTicker;
 
 import net.minecraft.core.BlockPos;
@@ -53,16 +54,21 @@ public class SolidBurnerBlock extends AbstractBurnerBlock {
     }
 
     @Override
-    public InteractionResult use(@Nonnull BlockState state, @Nonnull Level world, @Nonnull BlockPos pos, @Nonnull Player player, @Nonnull InteractionHand hand, @Nonnull BlockHitResult hit) { 
+    public InteractionResult use(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull Player player, @Nonnull InteractionHand hand, @Nonnull BlockHitResult hit) { 
         if (player.isSpectator() || player.isShiftKeyDown()) {
             return InteractionResult.PASS;
         }
 
-        if (world.getBlockEntity(pos) instanceof SolidBurnerBlockEntity blockEntity) {
-            FuelInventoryBehaviour behaviour = blockEntity.getBehaviour(FuelInventoryBehaviour.TYPE);
+        if (level.isClientSide())
+            return InteractionResult.SUCCESS;
+
+        if (level.getBlockEntity(pos) instanceof SolidBurnerBlockEntity blockEntity) {
+            BurnerFuelBehaviour behaviour = blockEntity.getBehaviour(BurnerFuelBehaviour.TYPE);
             if (behaviour == null) return InteractionResult.PASS;
 
-            if (behaviour.handlePlayerInteraction(player, hand)) return InteractionResult.SUCCESS;
+            if (behaviour.handlePlayerInteraction(player, hand)) {
+                return InteractionResult.SUCCESS;
+            }
         }
 
         return InteractionResult.PASS;

@@ -19,6 +19,8 @@ import com.deltasf.createpropulsion.balloons.injectors.AbstractHotAirInjectorBlo
 import com.deltasf.createpropulsion.balloons.injectors.AirInjectorObstructionBehaviour;
 import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
 import com.deltasf.createpropulsion.physics_assembler.AssemblyUtility;
+import com.deltasf.createpropulsion.utility.burners.BurnerFuelBehaviour;
+import com.deltasf.createpropulsion.utility.burners.IBurner;
 import com.simibubi.create.AllSpecialTextures;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 
@@ -34,10 +36,10 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 
-public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity implements IHaveGoggleInformation {
+public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity implements IHaveGoggleInformation, IBurner {
     public static final double TREND_THRESHOLD = 0.001;
 
-    private HotAirBurnerFuelBehaviour fuelInventory;
+    private BurnerFuelBehaviour fuelInventory;
     private AirInjectorObstructionBehaviour obstructionBehaviour;
     private int burnTime = 0;
     private int leverPosition = 0; // 0-1-2
@@ -55,7 +57,7 @@ public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity i
     }
 
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
-        fuelInventory = new HotAirBurnerFuelBehaviour(this);
+        fuelInventory = new BurnerFuelBehaviour(this, () -> attemptScan());
         behaviours.add(fuelInventory);
         obstructionBehaviour = new AirInjectorObstructionBehaviour(this);
         behaviours.add(obstructionBehaviour);
@@ -98,6 +100,7 @@ public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity i
         return baseInjection * efficiency;
     }
 
+    @Override
     public void setBurnTime(int burnTime) {
         this.burnTime = burnTime;
     }

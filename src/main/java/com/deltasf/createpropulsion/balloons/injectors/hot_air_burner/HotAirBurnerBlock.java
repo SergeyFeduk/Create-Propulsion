@@ -10,6 +10,7 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import com.deltasf.createpropulsion.balloons.injectors.AbstractHotAirInjectorBlock;
 import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
 import com.deltasf.createpropulsion.registries.PropulsionShapes;
+import com.deltasf.createpropulsion.utility.burners.BurnerFuelBehaviour;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntityTicker;
 
 import net.minecraft.core.BlockPos;
@@ -70,7 +71,7 @@ public class HotAirBurnerBlock extends AbstractHotAirInjectorBlock {
             return InteractionResult.SUCCESS;
 
         ItemStack heldItem = player.getItemInHand(hand);
-        HotAirBurnerFuelBehaviour fuelBehaviour = burnerEntity.getBehaviour(HotAirBurnerFuelBehaviour.TYPE);
+        BurnerFuelBehaviour fuelBehaviour = burnerEntity.getBehaviour(BurnerFuelBehaviour.TYPE);
         boolean hasFuel = !fuelBehaviour.fuelStack.isEmpty();
         boolean isHoldingBurnable = ForgeHooks.getBurnTime(heldItem, RecipeType.SMELTING) > 0;
 

@@ -1,4 +1,4 @@
-package com.deltasf.createpropulsion.balloons.injectors.hot_air_burner;
+package com.deltasf.createpropulsion.utility.burners;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -8,10 +8,10 @@ import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
 
-public class HotAirBurnerFuelItemHandler extends ItemStackHandler {
-    private final HotAirBurnerFuelBehaviour behaviour;
+public class BurnerFuelItemHandler extends ItemStackHandler {
+    private final BurnerFuelBehaviour behaviour;
 
-    public HotAirBurnerFuelItemHandler(HotAirBurnerFuelBehaviour behaviour) {
+    public BurnerFuelItemHandler(BurnerFuelBehaviour behaviour) {
         super(1);
         this.behaviour = behaviour;
     }

@@ -1,4 +1,4 @@
-package com.deltasf.createpropulsion.balloons.injectors.hot_air_burner;
+package com.deltasf.createpropulsion.utility.burners;
 
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BehaviourType;
@@ -15,17 +15,19 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 
-public class HotAirBurnerFuelBehaviour extends BlockEntityBehaviour {
-    public static final BehaviourType<HotAirBurnerFuelBehaviour> TYPE = new BehaviourType<>();
+public class BurnerFuelBehaviour extends BlockEntityBehaviour {
+    public static final BehaviourType<BurnerFuelBehaviour> TYPE = new BehaviourType<>();
 
-    private HotAirBurnerFuelItemHandler itemHandler;
+    private BurnerFuelItemHandler itemHandler;
     private LazyOptional<IItemHandler> capability;
     public ItemStack fuelStack = ItemStack.EMPTY;
+    private final Runnable onInsertion;
 
-    public HotAirBurnerFuelBehaviour(SmartBlockEntity be) {
+    public BurnerFuelBehaviour(SmartBlockEntity be, Runnable onInsertion) {
         super(be);
-        this.itemHandler = new HotAirBurnerFuelItemHandler(this);
+        this.itemHandler = new BurnerFuelItemHandler(this);
         this.capability = LazyOptional.of(() -> this.itemHandler);
+        this.onInsertion = onInsertion;
     }
 
     public <T> LazyOptional<T> getCapability(Capability<T> cap) {
@@ -39,11 +41,11 @@ public class HotAirBurnerFuelBehaviour extends BlockEntityBehaviour {
         if (fuelStack.isEmpty()) return false;
         
         int burnTime = ForgeHooks.getBurnTime(fuelStack, RecipeType.SMELTING);
-        if (burnTime > 0 && blockEntity instanceof HotAirBurnerBlockEntity burner) {
+        if (burnTime > 0 && blockEntity instanceof IBurner burner) {
             burner.setBurnTime(burnTime);
-            this.fuelStack.shrink(1);
-            if (this.fuelStack.isEmpty()) {
-                this.fuelStack = ItemStack.EMPTY;
+            fuelStack.shrink(1);
+            if (fuelStack.isEmpty()) {
+                fuelStack = ItemStack.EMPTY;
             }
             return true;
         }
@@ -53,7 +55,7 @@ public class HotAirBurnerFuelBehaviour extends BlockEntityBehaviour {
 
     public boolean handlePlayerInteraction(Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
-        if (!(blockEntity instanceof HotAirBurnerBlockEntity hotAirBurnerBlockEntity)) return false;
+        if (!(blockEntity instanceof IBurner)) return false;
 
         if (stack.isEmpty() && !fuelStack.isEmpty()) {
             player.getInventory().placeItemBackInInventory(itemHandler.extractItem(0, 64, false));
@@ -66,7 +68,7 @@ public class HotAirBurnerFuelBehaviour extends BlockEntityBehaviour {
             player.setItemInHand(hand, remainder);
             if (remainder.getCount() != stack.getCount()) {
                 blockEntity.notifyUpdate();
-                hotAirBurnerBlockEntity.attemptScan();
+                if (onInsertion != null) onInsertion.run();
                 return true;
             }
         }
@@ -98,5 +100,4 @@ public class HotAirBurnerFuelBehaviour extends BlockEntityBehaviour {
     public BehaviourType<?> getType() {
         return TYPE;
     }
-
 }
