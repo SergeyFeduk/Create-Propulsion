@@ -11,6 +11,11 @@
         "createpropulsion:solid_burner",
         "createpropulsion:reaction_wheel",
         "createpropulsion:stirling_engine",
-        "createpropulsion:hot_air_burner"
+        "createpropulsion:hot_air_burner",
+         "createpropulsion:wing",
+        "createpropulsion:tempered_wing",
+        "createpropulsion:copycat_wing",
+        "createpropulsion:copycat_wing_8",
+        "createpropulsion:copycat_wing_12"
     ]
 }

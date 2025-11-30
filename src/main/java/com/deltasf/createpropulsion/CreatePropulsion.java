@@ -5,7 +5,6 @@ import com.deltasf.createpropulsion.magnet.MagnetForceAttachment;
 import com.deltasf.createpropulsion.propeller.PropellerAttachment;
 import com.deltasf.createpropulsion.reaction_wheel.ReactionWheelAttachment;
 import com.deltasf.createpropulsion.thruster.ThrusterForceAttachment;
-import com.deltasf.createpropulsion.utility.PropulsionDefaultStress;
 import com.simibubi.create.api.boiler.BoilerHeater;
 import com.simibubi.create.api.stress.BlockStressValues;
 
@@ -18,6 +17,7 @@ import com.deltasf.createpropulsion.particles.ParticleTypes;
 import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
 import com.deltasf.createpropulsion.registries.PropulsionBlocks;
 import com.deltasf.createpropulsion.registries.PropulsionCreativeTab;
+import com.deltasf.createpropulsion.registries.PropulsionDefaultStress;
 import com.deltasf.createpropulsion.registries.PropulsionFluids;
 import com.deltasf.createpropulsion.registries.PropulsionItems;
 import com.deltasf.createpropulsion.registries.PropulsionPartialModels;

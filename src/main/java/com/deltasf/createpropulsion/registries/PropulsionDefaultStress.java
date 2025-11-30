@@ -1,4 +1,4 @@
-package com.deltasf.createpropulsion.utility;
+package com.deltasf.createpropulsion.registries;
 
 import com.tterrag.registrate.builders.BlockBuilder;
 import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;

@@ -1,0 +1,16 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "II ",
+        "   ",
+        "   "
+    ],
+    "key": {
+        "I": {
+            "item": "create:iron_sheet"
+        }
+    },
+    "result": {
+        "item": "createpropulsion:wing"
+    }
+}

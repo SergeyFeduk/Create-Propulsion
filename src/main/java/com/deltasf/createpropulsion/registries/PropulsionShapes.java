@@ -55,7 +55,19 @@ public class PropulsionShapes {
             .add(Block.box(0, 0, 0, 16, 3, 16))
             .add(Block.box(0, 3, 0, 16, 5, 14))
             .add(Block.box(2, 5, 0, 14, 13, 14))
-            .forDirectional(Direction.SOUTH);
+            .forDirectional(Direction.SOUTH),
+
+        WING = getWingShape(4),
+        WING_8 = getWingShape(8),
+        WING_12 = getWingShape(12);
+
+    public static VoxelShaper getWingShape(int width) {
+        if (width % 2 != 0) throw new IllegalArgumentException("Humble odd width exception");
+        int halfWidth = width / 2;
+        return ShapeBuilder.shape()
+            .add(Block.box(0, 8 - halfWidth, 0, 16, 8 + halfWidth, 16))
+            .forDirectional(Direction.UP);
+    }
     
     public static class ShapeBuilder {
         private VoxelShape shape;

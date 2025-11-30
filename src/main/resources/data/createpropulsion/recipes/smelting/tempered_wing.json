@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smelting",
+  "ingredient": {
+    "item": "createpropulsion:wing"
+  },
+  "result": "createpropulsion:tempered_wing",
+  "experience": 0.0,
+  "cookingtime": 200
+}

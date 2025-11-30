@@ -55,6 +55,9 @@ public class PropulsionCreativeTab {
                 output.accept(PropulsionItems.FLUID_LENS);
                 output.accept(PropulsionItems.FOCUS_LENS);
                 output.accept(PropulsionItems.INVISIBILITY_LENS);
+                //From 0.2.2
+                output.accept(PropulsionBlocks.WING_BLOCK);
+                output.accept(PropulsionBlocks.COPYCAT_WING);
                 //From 0.3
                 output.accept(PropulsionBlocks.getEnvelope(EnvelopeColor.WHITE));
                 output.accept(PropulsionBlocks.HOT_AIR_BURNER_BLOCK);

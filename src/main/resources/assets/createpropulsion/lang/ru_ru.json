@@ -14,6 +14,11 @@
     "block.createpropulsion.lodestone_tracker": "Трекер магнетита",
     "block.createpropulsion.redstone_magnet": "Редстоун магнит",
     "block.createpropulsion.physics_assembler": "Физический сборщик",
+     "block.createpropulsion.wing": "Крыло",
+    "block.createpropulsion.tempered_wing": "Закалённое крыло",
+    "block.createpropulsion.copycat_wing": "Заполняемое крыло",
+    "block.createpropulsion.copycat_wing_8": "Заполняемое крыло",
+    "block.createpropulsion.copycat_wing_12": "Заполняемое крыло",
 
     "create.gui.goggles.thruster.status": "Статус реактивного двигателя",
     "create.gui.goggles.thruster.status.no_fuel": "Нет топлива",
@@ -47,6 +52,15 @@
     "createpropulsion.physics_assembler.tooltip.summary": "_Собирает_ блоки в физические сущности.",
     "createpropulsion.physics_assembler.tooltip.condition1": "Когда установлен Калибратор и подан редстоун-сигнал",
     "createpropulsion.physics_assembler.tooltip.behaviour1": "_Собирает_ блоки в _регионе_ заданном _калибратором сборщика_ в физическую сущность.",
+
+    "createpropulsion.wing.tooltip.summary": "Создаёт _подъёмную силу_ в зависимости от _ориентации_ и _скорости_ корабля.",
+    "createpropulsion.tempered_wing.tooltip.summary": "Создаёт _подъёмную силу_ в зависимости от _ориентации_ и _скорости_ корабля.",
+
+    "createpropulsion.copycat_wing.tooltip.summary": "Преобразует любой _твёрдый блок_ в _декоративное_ крыло. Создаёт _подъёмную силу_ в зависимости от _ориентации_ и _скорости_ корабля.",
+    "createpropulsion.copycat_wing.tooltip.condition1": "ПКМ с блоком в руке",
+    "createpropulsion.copycat_wing.tooltip.behaviour1": "Применяет _предмет из руки_ как свой _материал_, если это возможно. _Кликните ещё раз_ чтобы переключить ориентацию или _состояние питания_. Используйте _гаечный ключ_ чтобы сбросить материал.",
+    "createpropulsion.copycat_wing.tooltip.condition2": "Shift+ПКМ по другому заполняемому крылу",
+    "createpropulsion.copycat_wing.tooltip.behaviour2": "Увеличивает _ширину_ крыла. _Ширина_ влияет на _вес_ и _аэродинамику_.",
 
     "item.createpropulsion.pine_resin": "Еловая смола",
     "fluid.createpropulsion.turpentine": "Скипидар",

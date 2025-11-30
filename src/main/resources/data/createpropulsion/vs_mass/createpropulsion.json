@@ -30,6 +30,31 @@
         "friction": 0.4
     },
     {
+        "block": "createpropulsion:wing",
+        "mass": 10.0,
+        "friction": 0.75
+    },
+    {
+        "block": "createpropulsion:tempered_wing",
+        "mass": 10.0,
+        "friction": 0.75
+    },
+    {
+        "block": "createpropulsion:copycat_wing",
+        "mass": 10.0,
+        "friction": 0.75
+    },
+    {
+        "block": "createpropulsion:copycat_wing_8",
+        "mass": 20.0,
+        "friction": 0.75
+    },
+    {
+        "block": "createpropulsion:copycat_wing_12",
+        "mass": 30.0,
+        "friction": 0.75
+    },
+    {
         "block": "createpropulsion:hot_air_burner",
         "mass": 700.0,
         "friction": 0.4

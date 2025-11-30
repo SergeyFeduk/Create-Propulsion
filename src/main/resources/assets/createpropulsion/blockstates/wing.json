@@ -1,0 +1,30 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "createpropulsion:block/wing",
+      "x": 180
+    },
+    "facing=up": {
+      "model": "createpropulsion:block/wing"
+    },
+    "facing=north": {
+      "model": "createpropulsion:block/wing",
+      "x": 90
+    },
+    "facing=south": {
+      "model": "createpropulsion:block/wing",
+      "x": 90,
+      "y": 180
+    },
+    "facing=west": {
+      "model": "createpropulsion:block/wing",
+      "x": 90,
+      "y": 270
+    },
+    "facing=east": {
+      "model": "createpropulsion:block/wing",
+      "x": 90,
+      "y": 90
+    }
+  }
+}

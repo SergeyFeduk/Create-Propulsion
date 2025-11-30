@@ -16,14 +16,23 @@ import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerBlock;
 import com.deltasf.createpropulsion.propeller.PropellerBlock;
 import com.deltasf.createpropulsion.reaction_wheel.ReactionWheelBlock;
 import com.deltasf.createpropulsion.thruster.thruster.ThrusterBlock;
-import com.deltasf.createpropulsion.utility.PropulsionDefaultStress;
+import com.deltasf.createpropulsion.wing.CopycatWingBlock;
+import com.deltasf.createpropulsion.wing.CopycatWingItem;
+import com.deltasf.createpropulsion.wing.CopycatWingModel;
+import com.deltasf.createpropulsion.wing.WingBlock;
+import com.deltasf.createpropulsion.wing.WingCTBehaviour;
+import com.simibubi.create.foundation.block.connected.CTSpriteShiftEntry;
+import com.simibubi.create.foundation.data.BuilderTransformers;
 import com.simibubi.create.foundation.data.CreateRegistrate;
+import com.simibubi.create.foundation.data.ModelGen;
 import com.tterrag.registrate.util.entry.BlockEntry;
 
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.material.MapColor;
+import static com.simibubi.create.foundation.data.CreateRegistrate.connectedTextures;
 
 public class PropulsionBlocks {
     public static final CreateRegistrate REGISTRATE = CreatePropulsion.registrate();
@@ -121,6 +130,36 @@ public class PropulsionBlocks {
         .properties(p -> p.noOcclusion())
         .simpleItem()
         .register();
+
+    //All wings
+    public static final BlockEntry<WingBlock> WING_BLOCK = registerGenericWing("wing", PropulsionSpriteShifts.WING_TEXTURE);
+    public static final BlockEntry<WingBlock> TEMPERED_WING_BLOCK = registerGenericWing("tempered_wing", PropulsionSpriteShifts.TEMPERED_WING_TEXTURE);
+    
+    public static final BlockEntry<CopycatWingBlock> COPYCAT_WING = registerCopycatWing("copycat_wing", 4);
+    public static final BlockEntry<CopycatWingBlock> COPYCAT_WING_8 = registerCopycatWing("copycat_wing_8", 8);
+    public static final BlockEntry<CopycatWingBlock> COPYCAT_WING_12 = registerCopycatWing("copycat_wing_12", 12);
+
+    private static BlockEntry<WingBlock> registerGenericWing(String name, CTSpriteShiftEntry spriteShift) {
+        return REGISTRATE.block(name, WingBlock::new)
+            .properties(p -> p.mapColor(MapColor.COLOR_LIGHT_GRAY))
+            .properties(p -> p.sound(SoundType.COPPER))
+            .properties(p -> p.strength(1.5F, 2.0F))
+            .properties(p -> p.noOcclusion())
+            .onRegister(connectedTextures(() -> new WingCTBehaviour(spriteShift)))
+            .addLayer(() -> RenderType::cutoutMipped)
+            .simpleItem()
+            .register();
+    }
+
+    private static BlockEntry<CopycatWingBlock> registerCopycatWing(String name, int width) {
+        return REGISTRATE.block(name, p -> new CopycatWingBlock(p, width, () -> COPYCAT_WING.get().asItem()))
+            .properties(p -> p.strength(1.5F, 2.0F))
+            .transform(BuilderTransformers.copycat())
+            .onRegister(CreateRegistrate.blockModel(() -> CopycatWingModel.create(width)))
+            .item(CopycatWingItem::new)
+            .transform(ModelGen.customItemModel("copycat_base", "wing_" + width))
+            .register();
+    }
 
     //All envelopes
     public enum EnvelopeColor {

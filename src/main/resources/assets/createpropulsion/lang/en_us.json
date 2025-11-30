@@ -14,6 +14,11 @@
     "block.createpropulsion.lodestone_tracker": "Lodestone Tracker",
     "block.createpropulsion.redstone_magnet": "Redstone Magnet",
     "block.createpropulsion.physics_assembler": "Physics Assembler",
+    "block.createpropulsion.wing": "Wing",
+    "block.createpropulsion.tempered_wing": "Tempered Wing",
+    "block.createpropulsion.copycat_wing": "Copycat Wing",
+    "block.createpropulsion.copycat_wing_8": "Copycat Wing",
+    "block.createpropulsion.copycat_wing_12": "Copycat Wing",
 
     "block.createpropulsion.envelope": "Envelope",
     "block.createpropulsion.envelope_orange": "Orange Envelope",
@@ -91,6 +96,15 @@
     "createpropulsion.physics_assembler.tooltip.summary": "_Assembles_ blocks into physical entities.",
     "createpropulsion.physics_assembler.tooltip.condition1": "When powered and contains an assembly gauge",
     "createpropulsion.physics_assembler.tooltip.behaviour1": "_Assembles_ blocks in _region_ defined by _assembly gauge_ into a physical entity.",
+
+    "createpropulsion.wing.tooltip.summary": "Produces _lift_ based on _orientation_ and vehicle _speed_.",
+    "createpropulsion.tempered_wing.tooltip.summary": "Produces _lift_ based on _orientation_ and vehicle _speed_.",
+
+    "createpropulsion.copycat_wing.tooltip.summary": "Converts any _full block_ into a _decorative_ wing. Produces _lift_ based on _orientation_ and vehicle _speed_.",
+    "createpropulsion.copycat_wing.tooltip.condition1": "When R-clicked",
+    "createpropulsion.copycat_wing.tooltip.behaviour1": "Applies _held item_ as its _material_ if possible. _Click again_ to cycle orientation or _powered_ state. Use a _Wrench_ to reset the material.",
+    "createpropulsion.copycat_wing.tooltip.condition2": "When Shift R-clicked with another copycat wing",
+    "createpropulsion.copycat_wing.tooltip.behaviour2": "Increases the wing's _width_. _Width_ affects both _weight_ and _aerodynamics_.",
 
     "item.createpropulsion.pine_resin": "Pine Resin",
     "fluid.createpropulsion.turpentine": "Turpentine",
