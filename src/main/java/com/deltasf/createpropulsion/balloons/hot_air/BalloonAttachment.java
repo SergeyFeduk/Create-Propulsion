@@ -28,20 +28,21 @@ import com.deltasf.createpropulsion.balloons.BalloonForceChunk;
 import com.deltasf.createpropulsion.balloons.Balloon.ChunkKey;
 import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
 import com.deltasf.createpropulsion.utility.AttachmentUtils;
+import com.deltasf.createpropulsion.utility.math.MathUtility;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 
 //Current model adds some custom drag, both linear and angular. VS 2.5 should handle this for us
 //So after updating to it - get rid of our drag, or at least change default values
+//Upd: Nvm, 2.4 drag is negligible
 @JsonAutoDetect(
     fieldVisibility = JsonAutoDetect.Visibility.ANY
 )
 public final class BalloonAttachment implements ShipPhysicsListener {
     public BalloonAttachment() {}
     private AtmosphereData atmosphereData;
-
-    private static final double epsilon = 1e-5;
+    final static double epsilon = MathUtility.epsilon;
 
     @Override
     public void physTick(@NotNull PhysShip physicShip, @NotNull PhysLevel physLevel) {
@@ -95,34 +96,35 @@ public final class BalloonAttachment implements ShipPhysicsListener {
             accumulatedTorque.add(dampingTorqueWorldSpace);
         }
         // Potato Note: Should no longer be necessary with new VS Drag model, but leaving just in case
-//        //Vertical linear drag based on surface area of all balloons
-//        Vector3dc linearVel = simpl.getVelocity();
-//
-//        if (linearVel.lengthSquared() > epsilon * epsilon) {
-//            double totalBalloonVolume = 0;
-//            for (Balloon balloon : balloons) {
-//                if (balloon.hotAir > epsilon) {
-//                    totalBalloonVolume += balloon.getVolumeSize();
-//                }
-//            }
-//
-//            if (totalBalloonVolume > epsilon) {
-//                double approxSurfaceArea = java.lang.Math.pow(totalBalloonVolume, 2.0/3.0);
-//                //Vertical and horizontal drag are applied separatelty as I need some fine control over them
-//                //Vertical drag
-//                double verticalVelocity = linearVel.y();
-//                if (Math.abs(verticalVelocity) > epsilon) {
-//                    double dragForceY = -verticalVelocity * approxSurfaceArea * PropulsionConfig.BALLOON_VERTICAL_DRAG_COEFFICIENT.get();
-//                    accumulatedForce.add(0, dragForceY, 0);
-//                }
-//                //Horizontal drag
-//                Vector3d horizontalVelocity = new Vector3d(linearVel.x(), 0, linearVel.z());
-//                if (horizontalVelocity.lengthSquared() > epsilon * epsilon) {
-//                    Vector3d horizontalDragForce = horizontalVelocity.mul(-approxSurfaceArea * PropulsionConfig.BALLOON_HORIZONTAL_DRAG_COEFFICIENT.get());
-//                    accumulatedForce.add(horizontalDragForce);
-//                }
-//            }
-//        }
+        // Delta Note: ^ VS drag is too weak, will keep this for the time being
+        //Vertical linear drag based on surface area of all balloons
+        Vector3dc linearVel = simpl.getVelocity();
+
+        if (linearVel.lengthSquared() > epsilon * epsilon) {
+            double totalBalloonVolume = 0;
+            for (Balloon balloon : balloons) {
+                if (balloon.hotAir > epsilon) {
+                    totalBalloonVolume += balloon.getVolumeSize();
+                }
+            }
+
+            if (totalBalloonVolume > epsilon) {
+                double approxSurfaceArea = java.lang.Math.pow(totalBalloonVolume, 2.0/3.0);
+                //Vertical and horizontal drag are applied separatelty as I need some fine control over them
+                //Vertical drag
+                double verticalVelocity = linearVel.y();
+                if (Math.abs(verticalVelocity) > epsilon) {
+                    double dragForceY = -verticalVelocity * approxSurfaceArea * PropulsionConfig.BALLOON_VERTICAL_DRAG_COEFFICIENT.get();
+                    accumulatedForce.add(0, dragForceY, 0);
+                }
+                //Horizontal drag
+                Vector3d horizontalVelocity = new Vector3d(linearVel.x(), 0, linearVel.z());
+                if (horizontalVelocity.lengthSquared() > epsilon * epsilon) {
+                    Vector3d horizontalDragForce = horizontalVelocity.mul(-approxSurfaceArea * PropulsionConfig.BALLOON_HORIZONTAL_DRAG_COEFFICIENT.get());
+                    accumulatedForce.add(horizontalDragForce);
+                }
+            }
+        }
 
         //Apply aggregated force and torque
         if (accumulatedForce.lengthSquared() > 1e-9) {
