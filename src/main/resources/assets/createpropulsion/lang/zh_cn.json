@@ -14,6 +14,11 @@
     "block.createpropulsion.lodestone_tracker": "磁石追踪器",
     "block.createpropulsion.redstone_magnet": "红石磁铁",
     "block.createpropulsion.physics_assembler": "物理结构组装器",
+    "block.createpropulsion.wing": "机翼",
+    "block.createpropulsion.tempered_wing": "强化机翼",
+    "block.createpropulsion.copycat_wing": "伪装机翼",
+    "block.createpropulsion.copycat_wing_8": "伪装机翼",
+    "block.createpropulsion.copycat_wing_12": "伪装机翼",
 
     "create.gui.goggles.thruster.status": "推进器状态",
     "create.gui.goggles.thruster.status.no_fuel": "燃料耗尽",
@@ -47,6 +52,15 @@
     "createpropulsion.physics_assembler.tooltip.summary": "将方块组装成物理结构。",
     "createpropulsion.physics_assembler.tooltip.condition1": "当被充能且安装了组装测量仪时",
     "createpropulsion.physics_assembler.tooltip.behaviour1": "将_组装测量仪_所定义_区域_内的方块_组装_成一个物理结构。",
+
+    "createpropulsion.wing.tooltip.summary": "可根据物理结构的_方向_与_速度_提供_升力_。",
+    "createpropulsion.tempered_wing.tooltip.summary": "可根据物理结构的_方向_与_速度_提供_升力_。",
+
+    "createpropulsion.copycat_wing.tooltip.summary": "能将任意_完整方块_转变为_装饰_机翼。可根据物理结构的_方向_与_速度_提供_升力_。",
+    "createpropulsion.copycat_wing.tooltip.condition1": "右击时",
+    "createpropulsion.copycat_wing.tooltip.behaviour1": "若条件满足，将根据_手持物品_改变_材质_。同一物品_再次点击_将循环切换_方向_或_充能_状态材质。_扳手_右击以清空。",
+    "createpropulsion.copycat_wing.tooltip.condition2": "手持伪装机翼潜行并右击时",
+    "createpropulsion.copycat_wing.tooltip.behaviour2": "增加机翼的_宽度_。_宽度_会同时影响_重量_与_空气动力构型_。",
 
     "item.createpropulsion.pine_resin": "松脂",
     "fluid.createpropulsion.turpentine": "松节油",
