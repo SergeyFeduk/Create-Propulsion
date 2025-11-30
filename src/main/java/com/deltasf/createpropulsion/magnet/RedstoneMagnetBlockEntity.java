@@ -100,6 +100,7 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
             needsUpdate = false;
         }
 
+        //TODO: Uhh, this should already be handled by ForgeEvents::onServerStart
         if (!updatedAttachment) {
             // update attachment level reference
             var serverShip = VSGameUtilsKt.getShipObjectManagingPos((ServerLevel)level, worldPosition);

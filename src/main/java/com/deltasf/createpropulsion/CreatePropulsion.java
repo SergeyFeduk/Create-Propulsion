@@ -34,6 +34,7 @@ import net.minecraftforge.fml.ModLoadingContext;
 
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.mod.api.ValkyrienSkies;
+import org.valkyrienskies.mod.api.VsApi;
 
 @Mod(CreatePropulsion.ID)
 public class CreatePropulsion {
@@ -54,25 +55,26 @@ public class CreatePropulsion {
         PropulsionPackets.register();
 
         // VS Init
-        ValkyrienSkies.api().registerAttachment(ValkyrienSkies.api().newAttachmentRegistrationBuilder(ThrusterForceAttachment.class)
-                .useLegacySerializer()
-                .build()
+        VsApi api = ValkyrienSkies.api();
+        api.registerAttachment(api.newAttachmentRegistrationBuilder(ThrusterForceAttachment.class)
+            .useLegacySerializer()
+            .build()
         );
-        ValkyrienSkies.api().registerAttachment(ValkyrienSkies.api().newAttachmentRegistrationBuilder(BalloonAttachment.class)
-                .useLegacySerializer()
-                .build()
+        api.registerAttachment(api.newAttachmentRegistrationBuilder(BalloonAttachment.class)
+            .useLegacySerializer()
+            .build()
         );
-        ValkyrienSkies.api().registerAttachment(ValkyrienSkies.api().newAttachmentRegistrationBuilder(MagnetForceAttachment.class)
-                .useLegacySerializer()
-                .build()
+        api.registerAttachment(api.newAttachmentRegistrationBuilder(MagnetForceAttachment.class)
+            .useLegacySerializer()
+            .build()
         );
-        ValkyrienSkies.api().registerAttachment(ValkyrienSkies.api().newAttachmentRegistrationBuilder(PropellerAttachment.class)
-                .useLegacySerializer()
-                .build()
+        api.registerAttachment(api.newAttachmentRegistrationBuilder(PropellerAttachment.class)
+            .useLegacySerializer()
+            .build()
         );
-        ValkyrienSkies.api().registerAttachment(ValkyrienSkies.api().newAttachmentRegistrationBuilder(ReactionWheelAttachment.class)
-                .useLegacySerializer()
-                .build()
+        api.registerAttachment(api.newAttachmentRegistrationBuilder(ReactionWheelAttachment.class)
+            .useLegacySerializer()
+            .build()
         );
 
         //Compat
