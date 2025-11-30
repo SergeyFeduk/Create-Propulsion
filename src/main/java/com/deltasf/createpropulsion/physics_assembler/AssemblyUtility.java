@@ -9,6 +9,7 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import com.simibubi.create.AllSpecialTextures;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.player.Player;
@@ -53,7 +54,11 @@ public class AssemblyUtility {
         return !stack.isEmpty() && stack.getItem() instanceof AssemblyGaugeItem;
     }
 
-    public static BlockPos getTargetedPosition(BlockPos pos, net.minecraft.core.Direction face) {
+    public static BlockPos getTargetedPosition(BlockPos pos, Direction face, Player player) {
+        if (player.isShiftKeyDown()) {
+            return pos;
+        }
+
         return pos.relative(face);
     }
 
