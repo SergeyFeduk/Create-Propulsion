@@ -26,6 +26,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
@@ -69,7 +70,10 @@ public class PropellerRenderer extends KineticBlockEntityRenderer<PropellerBlock
     private void renderHeadAndBlades(PropellerBlockEntity be, float partialTicks, PoseStack ms, MultiBufferSource buffer, int light, int overlay) {
         Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
         Vec3 localPos = Vec3.atCenterOf(be.getBlockPos());
-        Vec3 blockPosWorld = VSGameUtilsKt.isBlockInShipyard(be.getLevel(), be.getBlockPos()) ? VSGameUtilsKt.toWorldCoordinates(be.getLevel(), localPos) : localPos;
+        Level level = be.getLevel();
+        if (level == null) return;
+
+        Vec3 blockPosWorld = VSGameUtilsKt.isBlockInShipyard(level, be.getBlockPos()) ? VSGameUtilsKt.toWorldCoordinates(be.getLevel(), localPos) : localPos;
         double distSqr = camera.getPosition().distanceToSqr(blockPosWorld);
 
         BlockState state = be.getBlockState();
@@ -88,7 +92,7 @@ public class PropellerRenderer extends KineticBlockEntityRenderer<PropellerBlock
             }
         });
 
-        float time = AnimationTickHolder.getRenderTime(be.getLevel());
+        float time = AnimationTickHolder.getRenderTime(level);
         float timeSeconds = time / 20.0f;
 
         if (be.lastRenderTimeSeconds == 0) { // First frame
