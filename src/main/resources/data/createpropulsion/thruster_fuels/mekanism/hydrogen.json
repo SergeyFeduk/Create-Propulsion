@@ -1,0 +1,6 @@
+{
+    "fluid": "mekanism:hydrogen",
+    "thrust_multiplier": 1.2,
+    "consumption_multiplier": 1,
+    "required_mod": "mekanism"
+}
