@@ -19,7 +19,7 @@ import java.util.*;
 public class AssemblyBlacklistManager extends SimpleJsonResourceReloadListener {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-    public static final String DIRECTORY = "assembly_blocklist";
+    public static final String DIRECTORY = "assembly_blacklist";
     
     private static final Set<Block> BLACKLIST = new HashSet<>();
 
