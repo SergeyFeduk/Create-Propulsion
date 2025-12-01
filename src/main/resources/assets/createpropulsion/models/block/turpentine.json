@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:block/liquid",
-  "textures": {
-    "particle": "createpropulsion:block/fluid/turpentine_still"
-  }
-}
