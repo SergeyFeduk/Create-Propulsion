@@ -20,12 +20,15 @@ import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.properties.ChunkClaim;
 import org.valkyrienskies.core.impl.game.ships.ShipDataCommon;
 
+import net.createmod.catnip.math.VecHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -36,6 +39,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.ticks.ScheduledTick;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
@@ -53,6 +57,8 @@ import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.compat.PropulsionCompatibility;
 import com.deltasf.createpropulsion.compat.computercraft.ComputerBehaviour;
+import com.deltasf.createpropulsion.network.PropulsionPackets;
+import com.deltasf.createpropulsion.physics_assembler.packets.AssemblyFailedPacket;
 import com.simibubi.create.compat.computercraft.AbstractComputerBehaviour;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
@@ -76,11 +82,8 @@ public class PhysicsAssemblerBlockEntity extends SmartBlockEntity {
     //Super secret logic that converts objects spatially restricted to world grid into independent ship entities
     //I spent like two evenings on this
     public void shipify() {
-        //Check if everything is valid
         Level world = getLevel();
-        if (!(world instanceof ServerLevel)) return;
-        ServerLevel level = (ServerLevel) world;
-
+        if (!(world instanceof ServerLevel level)) return;
         //Obtain pos from stack
         ItemStack gaugeStack = itemHandler.getStackInSlot(0);
         if (gaugeStack == null) return;
@@ -94,8 +97,15 @@ public class PhysicsAssemblerBlockEntity extends SmartBlockEntity {
         }
 
         //Get region
-        SelectedRegion region = getGeometricCenterOfBlocksInRegion(level, posA, posB);
+        SelectedRegion region = getGeometricCenterOfBlocksInRegion(world, posA, posB);
         if (!region.hasBlocks) return; //No blocks -> Nothing to convert into ship
+        //Cancel assembly if there are blacklisted blocks
+        for(BlockPos pos : region.blockPositions) {
+            if (AssemblyBlacklistManager.isBlacklisted(world.getBlockState(pos).getBlock())) {
+                PropulsionPackets.sendToTracking(new AssemblyFailedPacket(worldPosition), world.getChunkAt(worldPosition));
+                return;
+            }
+        }
 
         //Create ship
         var parentShip = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
@@ -440,6 +450,21 @@ public class PhysicsAssemblerBlockEntity extends SmartBlockEntity {
         }
 
         return 90.0f;
+    }
+
+    //Stolen from https://github.com/Creators-of-Create/Create/blob/mc1.21.1/dev/src/main/java/com/simibubi/create/content/kinetics/base/KineticEffectHandler.java
+    public void spawnEffect(ParticleOptions particle, float maxMotion, int amount) {
+        Level world = getLevel();
+        if (world == null)
+            return;
+        if (!world.isClientSide)
+            return;
+        RandomSource r = world.random;
+        for (int i = 0; i < amount; i++) {
+            Vec3 motion = VecHelper.offsetRandomly(Vec3.ZERO, r, maxMotion);
+            Vec3 position = VecHelper.getCenterOf(getBlockPos());
+            world.addParticle(particle, position.x, position.y, position.z, motion.x, motion.y, motion.z);
+        }
     }
 
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {

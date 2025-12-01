@@ -17,6 +17,7 @@ import com.deltasf.createpropulsion.magnet.MagnetForceAttachment;
 import com.deltasf.createpropulsion.magnet.MagnetRegistry;
 import com.deltasf.createpropulsion.network.PropulsionPackets;
 import com.deltasf.createpropulsion.network.SyncThrusterFuelsPacket;
+import com.deltasf.createpropulsion.physics_assembler.AssemblyBlacklistManager;
 import com.deltasf.createpropulsion.registries.PropulsionCommands;
 import com.deltasf.createpropulsion.registries.PropulsionFluids;
 import com.deltasf.createpropulsion.thruster.ThrusterFuelManager;
@@ -48,6 +49,7 @@ public class ForgeEvents {
     @SubscribeEvent
     public static void onAddReloadListeners(AddReloadListenerEvent event) {
         event.addListener(new ThrusterFuelManager());
+        event.addListener(new AssemblyBlacklistManager());
     }
 
     //Sync thruster fuels for goggles & particles on client side

@@ -1,12 +1,14 @@
 package com.deltasf.createpropulsion.network;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
+import com.deltasf.createpropulsion.physics_assembler.packets.AssemblyFailedPacket;
 import com.deltasf.createpropulsion.physics_assembler.packets.GaugeInsertionErrorPacket;
 import com.deltasf.createpropulsion.physics_assembler.packets.GaugeUsedPacket;
 import com.deltasf.createpropulsion.physics_assembler.packets.ResetGaugePacket;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
@@ -49,6 +51,12 @@ public class PropulsionPackets {
             .decoder(GaugeInsertionErrorPacket::new)
             .consumerMainThread(GaugeInsertionErrorPacket::handle)
             .add();
+
+        INSTANCE.messageBuilder(AssemblyFailedPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+            .encoder(AssemblyFailedPacket::encode)
+            .decoder(AssemblyFailedPacket::new)
+            .consumerMainThread(AssemblyFailedPacket::handle)
+            .add();
     }
 
     public static <MSG> void sendToPlayer(MSG message, ServerPlayer player) {
@@ -58,6 +66,11 @@ public class PropulsionPackets {
     public static <MSG> void sendToAll(MSG message) {
         INSTANCE.send(PacketDistributor.ALL.noArg(), message);
     }
+
+    public static <MSG> void sendToTracking(MSG message, LevelChunk chunk) {
+        INSTANCE.send(PacketDistributor.TRACKING_CHUNK.with(() -> chunk), message);
+    }
+
 
     public static <MSG> void sendToServer(MSG message) {
         INSTANCE.sendToServer(message);

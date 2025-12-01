@@ -16,7 +16,11 @@ import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
 import net.minecraftforge.fml.loading.FMLLoader;
 
+import com.mojang.logging.LogUtils;
+import org.slf4j.Logger;
+
 public class PropulsionMixinPlugin implements IMixinConfigPlugin {
+    private static final Logger LOGGER = LogUtils.getLogger();
     private static final Map<String, Supplier<Boolean>> CONDITIONS = new HashMap<>();
 
     static {
@@ -37,7 +41,7 @@ public class PropulsionMixinPlugin implements IMixinConfigPlugin {
             if (conditionSupplier == null) {
                 throw new RuntimeException("Unknown mixin condition '" + condition + "' for mixin " + mixinClassName);
             }
-            System.out.println("Mixin " + mixinClassName + "is " + (conditionSupplier.get() ? "applied" : "not applied"));
+            LOGGER.info("Mixin " + mixinClassName + "is " + (conditionSupplier.get() ? "applied" : "not applied"));
             return conditionSupplier.get();
         } catch (IOException e) {
             throw new RuntimeException("Could not read mixin class " + mixinClassName, e);
