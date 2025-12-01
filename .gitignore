@@ -26,6 +26,7 @@ run
 forge*changelog.txt
 
 #Super secret stuff no one is allowed to see
+run-data
 TODO
 bcl.bat
 changelog.md

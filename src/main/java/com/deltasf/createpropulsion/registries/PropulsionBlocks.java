@@ -2,6 +2,7 @@ package com.deltasf.createpropulsion.registries;
 
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.balloons.envelopes.EnvelopeBlock;
@@ -21,22 +22,53 @@ import com.deltasf.createpropulsion.wing.CopycatWingItem;
 import com.deltasf.createpropulsion.wing.CopycatWingModel;
 import com.deltasf.createpropulsion.wing.WingBlock;
 import com.deltasf.createpropulsion.wing.WingCTBehaviour;
+import com.simibubi.create.AllBlocks;
 import com.simibubi.create.foundation.block.connected.CTSpriteShiftEntry;
 import com.simibubi.create.foundation.data.BuilderTransformers;
 import com.simibubi.create.foundation.data.CreateRegistrate;
-import com.simibubi.create.foundation.data.ModelGen;
+import com.tterrag.registrate.providers.DataGenContext;
+import com.tterrag.registrate.providers.ProviderType;
+import com.tterrag.registrate.providers.RegistrateBlockstateProvider;
+import com.tterrag.registrate.providers.RegistrateItemModelProvider;
+import com.tterrag.registrate.providers.RegistrateLangProvider;
+import com.tterrag.registrate.providers.RegistrateRecipeProvider;
 import com.tterrag.registrate.util.entry.BlockEntry;
+import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.data.recipes.RecipeCategory;
+import net.minecraft.data.recipes.ShapelessRecipeBuilder;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.storage.loot.LootPool;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.entries.LootItem;
+import net.minecraft.world.level.storage.loot.predicates.ExplosionCondition;
+import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
+import net.minecraftforge.client.model.generators.ModelFile;
+
 import static com.simibubi.create.foundation.data.CreateRegistrate.connectedTextures;
 
 public class PropulsionBlocks {
     public static final CreateRegistrate REGISTRATE = CreatePropulsion.registrate();
     public static void register() {} //Loads this class
+
+    //Datagen
+    private static <T extends Block> NonNullBiConsumer<DataGenContext<Block, T>, RegistrateBlockstateProvider> FUCK_OFF() {
+        return (ctx, prov) -> {};
+    }
+
+    private static <I extends Item> NonNullBiConsumer<DataGenContext<Item, I>, RegistrateItemModelProvider> FUCK_OFF_ITEM() {
+        return (ctx, prov) -> {};
+    }
+
+    private static <R, T extends R> NonNullBiConsumer<DataGenContext<R, T>, RegistrateLangProvider> FUCK_OFF_LANG() {
+        return (ctx, prov) -> {};
+    }
 
     public static final BlockEntry<ThrusterBlock> THRUSTER_BLOCK = REGISTRATE.block("thruster", ThrusterBlock::new)
         .properties(p -> p.mapColor(MapColor.METAL))
@@ -44,7 +76,10 @@ public class PropulsionBlocks {
         .properties(p -> p.sound(SoundType.METAL))
         .properties(p -> p.strength(5.5f, 4.0f))
         .properties(p -> p.noOcclusion())
-        .simpleItem()
+        .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+        .blockstate(FUCK_OFF())
+        .item().model(FUCK_OFF_ITEM()).build()
+        .setData(ProviderType.LANG, FUCK_OFF_LANG())
         .register();
 
     public static final BlockEntry<InlineOpticalSensorBlock> INLINE_OPTICAL_SENSOR_BLOCK = REGISTRATE.block("inline_optical_sensor", InlineOpticalSensorBlock::new)
@@ -52,7 +87,10 @@ public class PropulsionBlocks {
         .properties(p -> p.sound(SoundType.METAL))
         .properties(p -> p.strength(1.5F, 1.0F))
         .properties(p -> p.noOcclusion())
-        .simpleItem()
+        .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+        .blockstate(FUCK_OFF())
+        .item().model(FUCK_OFF_ITEM()).build()
+        .setData(ProviderType.LANG, FUCK_OFF_LANG())
         .register();
 
     public static final BlockEntry<OpticalSensorBlock> OPTICAL_SENSOR_BLOCK = REGISTRATE.block("optical_sensor", OpticalSensorBlock::new)
@@ -60,7 +98,10 @@ public class PropulsionBlocks {
         .properties(p -> p.sound(SoundType.METAL))
         .properties(p -> p.strength(2.5F, 2.0F))
         .properties(p -> p.noOcclusion())
-        .simpleItem()
+        .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+        .blockstate(FUCK_OFF())
+        .item().model(FUCK_OFF_ITEM()).build()
+        .setData(ProviderType.LANG, FUCK_OFF_LANG())
         .register();
 
     public static final BlockEntry<PhysicsAssemblerBlock> PHYSICS_ASSEMBLER_BLOCK = REGISTRATE.block("physics_assembler", PhysicsAssemblerBlock::new)
@@ -68,7 +109,10 @@ public class PropulsionBlocks {
         .properties(p -> p.sound(SoundType.METAL))
         .properties(p -> p.strength(2.5F, 2.0F))
         .properties(p -> p.noOcclusion())
-        .simpleItem()
+        .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+        .blockstate(FUCK_OFF())
+        .item().model(FUCK_OFF_ITEM()).build()
+        .setData(ProviderType.LANG, FUCK_OFF_LANG())
         .register();
 
     public static final BlockEntry<LodestoneTrackerBlock> LODESTONE_TRACKER_BLOCK = REGISTRATE.block("lodestone_tracker", LodestoneTrackerBlock::new)
@@ -76,7 +120,11 @@ public class PropulsionBlocks {
         .properties(p -> p.sound(SoundType.METAL))
         .properties(p -> p.strength(2.5F, 2.0F))
         .properties(p -> p.noOcclusion())
-        .simpleItem()
+        .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+        .tag(BlockTags.MINEABLE_WITH_AXE)
+        .blockstate(FUCK_OFF())
+        .item().model(FUCK_OFF_ITEM()).build()
+        .setData(ProviderType.LANG, FUCK_OFF_LANG())
         .register();
 
     public static final BlockEntry<RedstoneMagnetBlock> REDSTONE_MAGNET_BLOCK = REGISTRATE.block("redstone_magnet", RedstoneMagnetBlock::new)
@@ -84,7 +132,10 @@ public class PropulsionBlocks {
         .properties(p -> p.sound(SoundType.METAL))
         .properties(p -> p.strength(2.5F, 2.0F))
         .properties(p -> p.noOcclusion())
-        .simpleItem()
+        .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+        .blockstate(FUCK_OFF())
+        .item().model(FUCK_OFF_ITEM()).build()
+        .setData(ProviderType.LANG, FUCK_OFF_LANG())
         .register();
     
     public static final BlockEntry<HotAirBurnerBlock> HOT_AIR_BURNER_BLOCK = REGISTRATE.block("hot_air_burner", HotAirBurnerBlock::new)
@@ -94,7 +145,10 @@ public class PropulsionBlocks {
         .properties(p -> p.requiresCorrectToolForDrops())
         .properties(p -> p.strength(2.5F, 2.0F))
         .properties(p -> p.lightLevel(state -> state.getValue(HotAirBurnerBlock.LIT) ? 10 : 0))
-        .simpleItem()
+        .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+        .blockstate(FUCK_OFF())
+        .item().model(FUCK_OFF_ITEM()).build()
+        .setData(ProviderType.LANG, FUCK_OFF_LANG())
         .register();
 
     public static final BlockEntry<SolidBurnerBlock> SOLID_BURNER = REGISTRATE.block("solid_burner", SolidBurnerBlock::new)
@@ -103,7 +157,10 @@ public class PropulsionBlocks {
         .properties(p -> p.requiresCorrectToolForDrops())
         .properties(p -> p.strength(2.5F, 2.0F))
         .properties(p -> p.lightLevel(state -> state.getValue(SolidBurnerBlock.LIT) ? 13 : 0))
-        .simpleItem()
+        .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+        .blockstate(FUCK_OFF())
+        .item().model(FUCK_OFF_ITEM()).build()
+        .setData(ProviderType.LANG, FUCK_OFF_LANG())
         .register();
 
     public static final BlockEntry<PropellerBlock> PROPELLER_BLOCK = REGISTRATE.block("propeller", PropellerBlock::new)
@@ -113,13 +170,20 @@ public class PropulsionBlocks {
         .properties(p -> p.requiresCorrectToolForDrops())
         .properties(p -> p.strength(1.5F, 1.0F))
         .transform(PropulsionDefaultStress.setNoImpact())
-        .simpleItem()
+        .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+        .tag(BlockTags.MINEABLE_WITH_AXE)
+        .blockstate(FUCK_OFF())
+        .item().model(FUCK_OFF_ITEM()).build()
+        .setData(ProviderType.LANG, FUCK_OFF_LANG())
         .register();
 
     public static final BlockEntry<ReactionWheelBlock> REACTION_WHEEL_BLOCK = REGISTRATE.block("reaction_wheel", ReactionWheelBlock::new)
         .properties(p -> p.noOcclusion())
         .transform(PropulsionDefaultStress.setImpact(8.0))
-        .simpleItem()
+        .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+        .blockstate(FUCK_OFF())
+        .item().model(FUCK_OFF_ITEM()).build()
+        .setData(ProviderType.LANG, FUCK_OFF_LANG())
         .register();
 
     public static final BlockEntry<StirlingEngineBlock> STIRLING_ENGINE_BLOCK = REGISTRATE.block("stirling_engine", StirlingEngineBlock::new)
@@ -128,7 +192,10 @@ public class PropulsionBlocks {
         .properties(p -> p.requiresCorrectToolForDrops())
         .properties(p -> p.strength(2.5F, 2.0F))    
         .properties(p -> p.noOcclusion())
-        .simpleItem()
+        .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+        .blockstate(FUCK_OFF())
+        .item().model(FUCK_OFF_ITEM()).build()
+        .setData(ProviderType.LANG, FUCK_OFF_LANG())
         .register();
 
     //All wings
@@ -146,8 +213,11 @@ public class PropulsionBlocks {
             .properties(p -> p.strength(1.5F, 2.0F))
             .properties(p -> p.noOcclusion())
             .onRegister(connectedTextures(() -> new WingCTBehaviour(spriteShift)))
-            .addLayer(() -> RenderType::cutoutMipped)
-            .simpleItem()
+            //.addLayer(() -> RenderType::cutoutMipped)
+            .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+            .blockstate(FUCK_OFF())
+            .item().model(FUCK_OFF_ITEM()).build()
+            .setData(ProviderType.LANG, FUCK_OFF_LANG())
             .register();
     }
 
@@ -156,8 +226,9 @@ public class PropulsionBlocks {
             .properties(p -> p.strength(1.5F, 2.0F))
             .transform(BuilderTransformers.copycat())
             .onRegister(CreateRegistrate.blockModel(() -> CopycatWingModel.create(width)))
-            .item(CopycatWingItem::new)
-            .transform(ModelGen.customItemModel("copycat_base", "wing_" + width))
+            .blockstate(FUCK_OFF())
+            .item(CopycatWingItem::new).build()
+            .setData(ProviderType.LANG, FUCK_OFF_LANG())
             .register();
     }
 
@@ -198,6 +269,32 @@ public class PropulsionBlocks {
         public Item getDye() { return dye; }
     }
 
+    private static <T extends Block> NonNullBiConsumer<DataGenContext<Block, T>, RegistrateBlockstateProvider> createEnvelopeBlockstate(String folderName, EnvelopeColor color) {
+        return (ctx, prov) -> {
+            String textureName = color == EnvelopeColor.WHITE ? folderName : folderName + "_" + color.name().toLowerCase();
+            String texturePath = "block/" + folderName + "/" + textureName;
+            ModelFile model = prov.models().cubeAll(ctx.getName(), prov.modLoc(texturePath));
+            prov.simpleBlock(ctx.getEntry(), model);
+        };
+    }
+
+    private static <T extends Block> NonNullBiConsumer<DataGenContext<Block, T>, RegistrateRecipeProvider> createDyeingRecipe(EnvelopeColor color, boolean isShaft) {
+        return (ctx, prov) -> {
+            if (color == EnvelopeColor.WHITE) return;
+
+            ItemLike dyeItem = color.getDye();
+            Supplier<ItemLike> baseItemSupplier = () -> isShaft 
+                ? ENVELOPED_SHAFT_BLOCKS.get(EnvelopeColor.WHITE).get() 
+                : ENVELOPE_BLOCKS.get(EnvelopeColor.WHITE).get();
+
+            ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, ctx.getEntry())
+                .requires(baseItemSupplier.get())
+                .requires(dyeItem)
+                .unlockedBy("has_base", RegistrateRecipeProvider.has(baseItemSupplier.get()))
+                .save(prov);
+        };
+    }
+
     private static final Map<EnvelopeColor, BlockEntry<EnvelopeBlock>> ENVELOPE_BLOCKS = new EnumMap<>(EnvelopeColor.class);
     private static final Map<EnvelopeColor, BlockEntry<EnvelopeBlock>> ENVELOPED_SHAFT_BLOCKS = new EnumMap<>(EnvelopeColor.class);
     static {
@@ -208,18 +305,38 @@ public class PropulsionBlocks {
                 .properties(p -> p.strength(0.5F))
                 .properties(p -> p.sound(SoundType.WOOL))
                 .properties(p -> p.ignitedByLava())
+                .tag(BlockTags.WOOL)
+                .blockstate(createEnvelopeBlockstate("envelope", color))
+                .recipe(createDyeingRecipe(color, false))
+                .loot((loot, block) -> loot.add(block, loot.createSingleItemTable(block)))
                 .simpleItem()
+                .setData(ProviderType.LANG, FUCK_OFF_LANG())
                 .register();
             
             ENVELOPE_BLOCKS.put(color, envelope);
-            
+
             //Enveloped shaft block
             BlockEntry<EnvelopeBlock> envelopedShaft = REGISTRATE.block(color.generateId("enveloped_shaft"), EnvelopeBlock::new)
                 .properties(p -> p.mapColor(color.getMapColor()))
                 .properties(p -> p.strength(0.5F))
                 .properties(p -> p.sound(SoundType.WOOL))
                 .properties(p -> p.ignitedByLava())
+                .tag(BlockTags.WOOL)
+                .blockstate(createEnvelopeBlockstate("enveloped_shaft", color))
+                .loot((loot, block) -> {
+                    loot.add(block, LootTable.lootTable()
+                        .withPool(LootPool.lootPool()
+                            .setRolls(ConstantValue.exactly(1))
+                            .add(LootItem.lootTableItem(envelope))
+                            .when(ExplosionCondition.survivesExplosion()))
+                        .withPool(LootPool.lootPool()
+                            .setRolls(ConstantValue.exactly(1))
+                            .add(LootItem.lootTableItem(AllBlocks.SHAFT))
+                            .when(ExplosionCondition.survivesExplosion()))
+                    );
+                })
                 .simpleItem()
+                .setData(ProviderType.LANG, FUCK_OFF_LANG())
                 .register();
             
             ENVELOPED_SHAFT_BLOCKS.put(color, envelopedShaft);
