@@ -46,7 +46,7 @@ public class PropulsionMassProvider implements DataProvider {
             .resolve("data")
             .resolve(CreatePropulsion.ID)
             .resolve("vs_mass")
-            .resolve("envelopes.json");
+            .resolve("envelope.json");
         return DataProvider.saveStable(cache, jsonArray, path);
     }
 
