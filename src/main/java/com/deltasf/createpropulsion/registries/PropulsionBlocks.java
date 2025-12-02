@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.balloons.envelopes.EnvelopeBlock;
+import com.deltasf.createpropulsion.balloons.envelopes.EnvelopedShaftBlock;
 import com.deltasf.createpropulsion.balloons.injectors.hot_air_burner.HotAirBurnerBlock;
 import com.deltasf.createpropulsion.heat.burners.solid.SolidBurnerBlock;
 import com.deltasf.createpropulsion.heat.engine.StirlingEngineBlock;
@@ -23,6 +24,7 @@ import com.deltasf.createpropulsion.wing.CopycatWingModel;
 import com.deltasf.createpropulsion.wing.WingBlock;
 import com.deltasf.createpropulsion.wing.WingCTBehaviour;
 import com.simibubi.create.AllBlocks;
+import com.simibubi.create.content.decoration.encasing.EncasingRegistry;
 import com.simibubi.create.foundation.block.connected.CTSpriteShiftEntry;
 import com.simibubi.create.foundation.data.BuilderTransformers;
 import com.simibubi.create.foundation.data.CreateRegistrate;
@@ -301,7 +303,7 @@ public class PropulsionBlocks {
     public static final TagKey<Block> ENVELOPES = TagKey.create(Registries.BLOCK, new ResourceLocation(CreatePropulsion.ID, "envelopes"));
 
     private static final Map<EnvelopeColor, BlockEntry<EnvelopeBlock>> ENVELOPE_BLOCKS = new EnumMap<>(EnvelopeColor.class);
-    private static final Map<EnvelopeColor, BlockEntry<EnvelopeBlock>> ENVELOPED_SHAFT_BLOCKS = new EnumMap<>(EnvelopeColor.class);
+    public static final Map<EnvelopeColor, BlockEntry<EnvelopedShaftBlock>> ENVELOPED_SHAFT_BLOCKS = new EnumMap<>(EnvelopeColor.class);
     static {
         for (EnvelopeColor color : EnvelopeColor.values()) {
             //Envelope block
@@ -321,13 +323,14 @@ public class PropulsionBlocks {
             ENVELOPE_BLOCKS.put(color, envelope);
 
             //Enveloped shaft block
-            BlockEntry<EnvelopeBlock> envelopedShaft = REGISTRATE.block(color.generateId("enveloped_shaft"), EnvelopeBlock::new)
+            BlockEntry<EnvelopedShaftBlock> envelopedShaft = REGISTRATE.block(color.generateId("enveloped_shaft"), p -> new EnvelopedShaftBlock(p, envelope::get))
                 .properties(p -> p.mapColor(color.getMapColor()))
                 .properties(p -> p.strength(0.5F))
                 .properties(p -> p.sound(SoundType.WOOL))
                 .properties(p -> p.ignitedByLava())
+                .transform(EncasingRegistry.addVariantTo(AllBlocks.SHAFT)) 
                 .tag(BlockTags.WOOL, ENVELOPES)
-                .blockstate(createEnvelopeBlockstate("enveloped_shaft", color))
+                .blockstate(createEnvelopeBlockstate("enveloped_shaft", color)) //TODO: 
                 .loot((loot, block) -> {
                     loot.add(block, LootTable.lootTable()
                         .withPool(LootPool.lootPool()
@@ -340,7 +343,7 @@ public class PropulsionBlocks {
                             .when(ExplosionCondition.survivesExplosion()))
                     );
                 })
-                .simpleItem()
+                //.simpleItem()
                 .setData(ProviderType.LANG, FUCK_OFF_LANG())
                 .register();
             
@@ -352,7 +355,7 @@ public class PropulsionBlocks {
         return ENVELOPE_BLOCKS.get(color);
     }
 
-    public static BlockEntry<EnvelopeBlock> getEnvelopedShaft(EnvelopeColor color) {
+    public static BlockEntry<EnvelopedShaftBlock> getEnvelopedShaft(EnvelopeColor color) {
         return ENVELOPED_SHAFT_BLOCKS.get(color);
     }
 }

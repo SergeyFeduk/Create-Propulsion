@@ -19,8 +19,11 @@ import com.deltasf.createpropulsion.propeller.PropellerRenderer;
 import com.deltasf.createpropulsion.reaction_wheel.ReactionWheelBlockEntity;
 import com.deltasf.createpropulsion.reaction_wheel.ReactionWheelRenderer;
 import com.deltasf.createpropulsion.thruster.thruster.ThrusterBlockEntity;
+import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
+import com.simibubi.create.content.kinetics.base.ShaftRenderer;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.BlockEntityEntry;
+import com.tterrag.registrate.util.entry.BlockEntry;
 
 public class PropulsionBlockEntities {
     public static final CreateRegistrate REGISTRATE = CreatePropulsion.registrate();
@@ -64,6 +67,13 @@ public class PropulsionBlockEntities {
         REGISTRATE.blockEntity("hot_air_burner_block_entity", HotAirBurnerBlockEntity::new)
         .validBlock(PropulsionBlocks.HOT_AIR_BURNER_BLOCK)
         .renderer(() -> HotAirBurnerRenderer::new)
+        .register();
+
+    @SuppressWarnings("unchecked")
+    public static final BlockEntityEntry<KineticBlockEntity> ENVELOPED_SHAFT = REGISTRATE
+        .blockEntity("enveloped_shaft_block_entity", KineticBlockEntity::new)
+        .renderer(() -> ShaftRenderer::new)
+        .validBlocks(PropulsionBlocks.ENVELOPED_SHAFT_BLOCKS.values().toArray(new BlockEntry[0]))
         .register();
 
     public static final BlockEntityEntry<SolidBurnerBlockEntity> SOLID_BURNER_BLOCK_ENTITY = 

@@ -36,5 +36,6 @@ public abstract class AbstractEnvelopeBlock extends Block implements IEnvelope {
         super.onRemove(state, level, pos, newState, isMoving);
     }
 
+    @Override
     public boolean isEnvelope() { return true; }
 }
