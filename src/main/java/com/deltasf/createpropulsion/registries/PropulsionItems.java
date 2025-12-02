@@ -33,6 +33,10 @@ public class PropulsionItems {
         return (ctx, prov) -> {};
     }
 
+    //Tags
+    public static final TagKey<Item> OPTICAL_LENS_TAG = makeTag("optical_lens");
+    public static final TagKey<Item> PROPELLER_BLADE_TAG = makeTag("blade");
+
     public static final ItemEntry<BurnableItem> PINE_RESIN = REGISTRATE.item("pine_resin", p -> new BurnableItem(p, 1200))
         .model(FUCK_OFF_ITEM())
         .setData(ProviderType.LANG, FUCK_OFF_LANG())
@@ -40,35 +44,43 @@ public class PropulsionItems {
     //Lenses
     public static final ItemEntry<OpticalLensItem> OPTICAL_LENS = REGISTRATE.item("optical_lens", OpticalLensItem::new)
         .model(FUCK_OFF_ITEM())
+        .tag(OPTICAL_LENS_TAG)
         .setData(ProviderType.LANG, FUCK_OFF_LANG())
         .register();
     public static final ItemEntry<Item> FLUID_LENS = REGISTRATE.item("fluid_lens", Item::new)
         .model(FUCK_OFF_ITEM())
+        .tag(OPTICAL_LENS_TAG)
         .setData(ProviderType.LANG, FUCK_OFF_LANG())
         .register();
     public static final ItemEntry<Item> FOCUS_LENS = REGISTRATE.item("focus_lens", Item::new)
         .model(FUCK_OFF_ITEM())
+        .tag(OPTICAL_LENS_TAG)
         .setData(ProviderType.LANG, FUCK_OFF_LANG())
         .register();
     public static final ItemEntry<Item> INVISIBILITY_LENS = REGISTRATE.item("invisibility_lens", Item::new)
         .model(FUCK_OFF_ITEM())
+        .tag(OPTICAL_LENS_TAG)
         .setData(ProviderType.LANG, FUCK_OFF_LANG())
         .register();
     public static final ItemEntry<Item> UNFINISHED_LENS = REGISTRATE.item("unfinished_lens", Item::new)
         .model(FUCK_OFF_ITEM())
+        .tag(OPTICAL_LENS_TAG)
         .setData(ProviderType.LANG, FUCK_OFF_LANG())
         .register();
     //Propeller blades
     public static final ItemEntry<WoodenPropellerBladeItem> WOODEN_BLADE = REGISTRATE.item("wooden_blade", WoodenPropellerBladeItem::new)
         .model(FUCK_OFF_ITEM())
+        .tag(PROPELLER_BLADE_TAG)
         .setData(ProviderType.LANG, FUCK_OFF_LANG())
         .register();
     public static final ItemEntry<CopperPropellerBladeItem> COPPER_BLADE = REGISTRATE.item("copper_blade", CopperPropellerBladeItem::new)
         .model(FUCK_OFF_ITEM())
+        .tag(PROPELLER_BLADE_TAG)
         .setData(ProviderType.LANG, FUCK_OFF_LANG())
         .register();
     public static final ItemEntry<AndesitePropellerBladeItem> ANDESITE_BLADE = REGISTRATE.item("andesite_blade", AndesitePropellerBladeItem::new)
         .model(FUCK_OFF_ITEM())
+        .tag(PROPELLER_BLADE_TAG)
         .setData(ProviderType.LANG, FUCK_OFF_LANG())
         .register();
 
@@ -82,15 +94,8 @@ public class PropulsionItems {
         .properties(p -> p.stacksTo(1))
         .register();
 
-
-    //Tags
-    public static final TagKey<Item> OPTICAL_LENS_TAG = makeTag("optical_lens");
-    public static final TagKey<Item> PROPELLER_BLADE_TAG = makeTag("blade");
-
     public static TagKey<Item> makeTag(String key) {
         ResourceLocation resource = new ResourceLocation(CreatePropulsion.ID, key);
-        TagKey<Item> tag = TagKey.create(Registries.ITEM, resource);
-        //No datagen :(
-        return tag;
+        return TagKey.create(Registries.ITEM, resource);
     }
 }

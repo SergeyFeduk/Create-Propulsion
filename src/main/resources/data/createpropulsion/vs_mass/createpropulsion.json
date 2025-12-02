@@ -75,7 +75,7 @@
         "friction": 0.6
     },
     {
-        "tag": "createpropulsion:all_envelopes",
+        "tag": "createpropulsion:envelopes",
         "mass": 10.0,
         "friction": 0.6,
         "priority": 1100

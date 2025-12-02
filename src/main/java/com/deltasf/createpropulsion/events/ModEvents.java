@@ -3,7 +3,6 @@ package com.deltasf.createpropulsion.events;
 import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.registries.PropulsionBlocks;
 import com.deltasf.createpropulsion.registries.PropulsionItems;
-import com.deltasf.createpropulsion.registries.PropulsionMassProvider;
 import com.deltasf.createpropulsion.registries.PropulsionBlocks.EnvelopeColor;
 
 import net.minecraft.core.cauldron.CauldronInteraction;
@@ -15,7 +14,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.level.block.LayeredCauldronBlock;
-import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -52,12 +50,4 @@ public class ModEvents {
         level.playSound(null, blockPos, SoundEvents.GENERIC_SPLASH, SoundSource.BLOCKS, 1.0F, 1.0F);
         return InteractionResult.sidedSuccess(level.isClientSide);
     };
-
-    @SubscribeEvent
-    public static void gatherData(GatherDataEvent event) {
-        event.getGenerator().addProvider(
-            event.includeServer(),
-            new PropulsionMassProvider(event.getGenerator().getPackOutput())
-        );
-    }
 }

@@ -1,8 +1,0 @@
-{
-    "replace": false,
-    "values": [
-      "createpropulsion:wooden_blade",
-      "createpropulsion:copper_blade",
-      "createpropulsion:andesite_blade"
-    ]
-}

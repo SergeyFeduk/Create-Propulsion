@@ -298,7 +298,7 @@ public class PropulsionBlocks {
         };
     }
 
-    public static final TagKey<Block> ALL_ENVELOPES = TagKey.create(Registries.BLOCK, new ResourceLocation(CreatePropulsion.ID, "all_envelopes"));
+    public static final TagKey<Block> ENVELOPES = TagKey.create(Registries.BLOCK, new ResourceLocation(CreatePropulsion.ID, "envelopes"));
 
     private static final Map<EnvelopeColor, BlockEntry<EnvelopeBlock>> ENVELOPE_BLOCKS = new EnumMap<>(EnvelopeColor.class);
     private static final Map<EnvelopeColor, BlockEntry<EnvelopeBlock>> ENVELOPED_SHAFT_BLOCKS = new EnumMap<>(EnvelopeColor.class);
@@ -310,7 +310,7 @@ public class PropulsionBlocks {
                 .properties(p -> p.strength(0.5F))
                 .properties(p -> p.sound(SoundType.WOOL))
                 .properties(p -> p.ignitedByLava())
-                .tag(BlockTags.WOOL, ALL_ENVELOPES)
+                .tag(BlockTags.WOOL, ENVELOPES)
                 .blockstate(createEnvelopeBlockstate("envelope", color))
                 .recipe(createDyeingRecipe(color, false))
                 .loot((loot, block) -> loot.add(block, loot.createSingleItemTable(block)))
@@ -326,7 +326,7 @@ public class PropulsionBlocks {
                 .properties(p -> p.strength(0.5F))
                 .properties(p -> p.sound(SoundType.WOOL))
                 .properties(p -> p.ignitedByLava())
-                .tag(BlockTags.WOOL)
+                .tag(BlockTags.WOOL, ENVELOPES)
                 .blockstate(createEnvelopeBlockstate("enveloped_shaft", color))
                 .loot((loot, block) -> {
                     loot.add(block, LootTable.lootTable()
