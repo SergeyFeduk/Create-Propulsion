@@ -10,7 +10,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
 @SuppressWarnings("deprecation")
-public abstract class AbstractEnvelopeBlock extends Block {
+public abstract class AbstractEnvelopeBlock extends Block implements IEnvelope {
     public AbstractEnvelopeBlock(Properties properties) {
         super(properties);
     }
@@ -35,4 +35,6 @@ public abstract class AbstractEnvelopeBlock extends Block {
         }
         super.onRemove(state, level, pos, newState, isMoving);
     }
+
+    public boolean isEnvelope() { return true; }
 }

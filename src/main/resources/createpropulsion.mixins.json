@@ -6,7 +6,8 @@
     "refmap": "createpropulsion.refmap.json",
     "plugin": "com.deltasf.createpropulsion.mixin.plugin.PropulsionMixinPlugin",
     "mixins": [
-      "CompassItemMixin"
+      "CompassItemMixin",
+      "BlockMixin"
     ],
     "client": [
       "CompassItemPropertyFunctionMixin"

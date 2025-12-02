@@ -13,7 +13,7 @@ import org.joml.primitives.AABBic;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
-import com.deltasf.createpropulsion.balloons.envelopes.AbstractEnvelopeBlock;
+import com.deltasf.createpropulsion.balloons.envelopes.IEnvelope;
 import com.deltasf.createpropulsion.balloons.hot_air.HotAirSolver;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry.HaiData;
@@ -55,7 +55,9 @@ public class HaiGroup {
             }
         }
 
+        long start = System.nanoTime();
         List<DiscoveredVolume> discoveredVolumes = BalloonScanner.scan(level, seeds, this, new ArrayList<>());
+        System.out.println("BalloonScanner scan time: " + (System.nanoTime() - start) / 1000 + " µs");
         generateBalloons(discoveredVolumes);
     }
 
@@ -92,7 +94,7 @@ public class HaiGroup {
         LevelChunkSection section = chunk.getSection(chunk.getSectionIndex(pos.getY()));
         if (section.hasOnlyAir()) return false;
         BlockState state = section.getBlockState(pos.getX() & 15, pos.getY() & 15, pos.getZ() & 15);
-        return state.getBlock() instanceof AbstractEnvelopeBlock;
+        return ((IEnvelope)state.getBlock()).isEnvelope();
     }
 
     public static BlockPos getSeedFromHai(HaiData data, Level level) {
