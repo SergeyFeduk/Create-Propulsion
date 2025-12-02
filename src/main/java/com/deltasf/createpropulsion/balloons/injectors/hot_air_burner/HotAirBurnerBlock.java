@@ -25,7 +25,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -40,7 +39,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.common.ForgeHooks;
 
 public class HotAirBurnerBlock extends AbstractHotAirInjectorBlock {
     public static final DirectionProperty FACING = DirectionProperty.create("facing", Direction.Plane.HORIZONTAL);
@@ -72,8 +70,12 @@ public class HotAirBurnerBlock extends AbstractHotAirInjectorBlock {
 
         ItemStack heldItem = player.getItemInHand(hand);
         BurnerFuelBehaviour fuelBehaviour = burnerEntity.getBehaviour(BurnerFuelBehaviour.TYPE);
-        boolean hasFuel = !fuelBehaviour.fuelStack.isEmpty();
-        boolean isHoldingBurnable = ForgeHooks.getBurnTime(heldItem, RecipeType.SMELTING) > 0;
+
+        if (!heldItem.isEmpty()) {
+            if (fuelBehaviour.handlePlayerInteraction(player, hand)) {
+                return InteractionResult.SUCCESS;
+            }
+        }
 
         Direction facing = state.getValue(FACING);
         Vec3 frontNormal = Vec3.atLowerCornerOf(facing.getNormal());
@@ -88,14 +90,16 @@ public class HotAirBurnerBlock extends AbstractHotAirInjectorBlock {
         double dot = player.getLookAngle().dot(frontNormal);
         boolean isTargetingFront = dot < 0;
 
-        if ((isHoldingBurnable || hasFuel) && isTargetingFront) {
-            if (fuelBehaviour.handlePlayerInteraction(player, hand)) {
-                return InteractionResult.SUCCESS;
-            }
-        } else {
+        if (!isTargetingFront) {
             burnerEntity.cycleLever(player.isShiftKeyDown());
             level.playLocalSound(pos, SoundEvents.LEVER_CLICK, SoundSource.BLOCKS, 1.0f, 1.0f, false);
             return InteractionResult.SUCCESS;
+        }
+
+        if (heldItem.isEmpty()) {
+            if (fuelBehaviour.handlePlayerInteraction(player, hand)) {
+                return InteractionResult.SUCCESS;
+            }
         }
 
         return InteractionResult.PASS;
