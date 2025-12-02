@@ -35,9 +35,12 @@ import com.tterrag.registrate.providers.RegistrateRecipeProvider;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
@@ -295,6 +298,8 @@ public class PropulsionBlocks {
         };
     }
 
+    public static final TagKey<Block> ALL_ENVELOPES = TagKey.create(Registries.BLOCK, new ResourceLocation(CreatePropulsion.ID, "all_envelopes"));
+
     private static final Map<EnvelopeColor, BlockEntry<EnvelopeBlock>> ENVELOPE_BLOCKS = new EnumMap<>(EnvelopeColor.class);
     private static final Map<EnvelopeColor, BlockEntry<EnvelopeBlock>> ENVELOPED_SHAFT_BLOCKS = new EnumMap<>(EnvelopeColor.class);
     static {
@@ -305,7 +310,7 @@ public class PropulsionBlocks {
                 .properties(p -> p.strength(0.5F))
                 .properties(p -> p.sound(SoundType.WOOL))
                 .properties(p -> p.ignitedByLava())
-                .tag(BlockTags.WOOL)
+                .tag(BlockTags.WOOL, ALL_ENVELOPES)
                 .blockstate(createEnvelopeBlockstate("envelope", color))
                 .recipe(createDyeingRecipe(color, false))
                 .loot((loot, block) -> loot.add(block, loot.createSingleItemTable(block)))

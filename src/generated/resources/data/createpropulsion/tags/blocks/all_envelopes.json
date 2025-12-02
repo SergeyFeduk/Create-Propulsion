@@ -1,0 +1,20 @@
+{
+  "values": [
+    "createpropulsion:envelope",
+    "createpropulsion:envelope_orange",
+    "createpropulsion:envelope_magenta",
+    "createpropulsion:envelope_light_blue",
+    "createpropulsion:envelope_yellow",
+    "createpropulsion:envelope_lime",
+    "createpropulsion:envelope_pink",
+    "createpropulsion:envelope_gray",
+    "createpropulsion:envelope_light_gray",
+    "createpropulsion:envelope_cyan",
+    "createpropulsion:envelope_purple",
+    "createpropulsion:envelope_blue",
+    "createpropulsion:envelope_brown",
+    "createpropulsion:envelope_green",
+    "createpropulsion:envelope_red",
+    "createpropulsion:envelope_black"
+  ]
+}
