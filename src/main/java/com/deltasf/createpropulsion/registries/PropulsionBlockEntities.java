@@ -21,6 +21,7 @@ import com.deltasf.createpropulsion.reaction_wheel.ReactionWheelRenderer;
 import com.deltasf.createpropulsion.thruster.thruster.ThrusterBlockEntity;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import com.simibubi.create.content.kinetics.base.ShaftRenderer;
+import com.simibubi.create.content.kinetics.base.SingleAxisRotatingVisual;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.BlockEntityEntry;
 import com.tterrag.registrate.util.entry.BlockEntry;
@@ -72,6 +73,7 @@ public class PropulsionBlockEntities {
     @SuppressWarnings("unchecked")
     public static final BlockEntityEntry<KineticBlockEntity> ENVELOPED_SHAFT = REGISTRATE
         .blockEntity("enveloped_shaft_block_entity", KineticBlockEntity::new)
+        .visual(() -> SingleAxisRotatingVisual::shaft, false) 
         .renderer(() -> ShaftRenderer::new)
         .validBlocks(PropulsionBlocks.ENVELOPED_SHAFT_BLOCKS.values().toArray(new BlockEntry[0]))
         .register();

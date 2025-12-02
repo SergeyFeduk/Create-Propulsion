@@ -25,6 +25,7 @@ import com.deltasf.createpropulsion.wing.WingBlock;
 import com.deltasf.createpropulsion.wing.WingCTBehaviour;
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.content.decoration.encasing.EncasingRegistry;
+import com.simibubi.create.content.kinetics.base.RotatedPillarKineticBlock;
 import com.simibubi.create.foundation.block.connected.CTSpriteShiftEntry;
 import com.simibubi.create.foundation.data.BuilderTransformers;
 import com.simibubi.create.foundation.data.CreateRegistrate;
@@ -37,6 +38,7 @@ import com.tterrag.registrate.providers.RegistrateRecipeProvider;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 
+import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
@@ -54,6 +56,8 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.predicates.ExplosionCondition;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
+import net.minecraftforge.client.model.generators.BlockModelBuilder;
+import net.minecraftforge.client.model.generators.ConfiguredModel;
 import net.minecraftforge.client.model.generators.ModelFile;
 
 import static com.simibubi.create.foundation.data.CreateRegistrate.connectedTextures;
@@ -300,9 +304,35 @@ public class PropulsionBlocks {
         };
     }
 
+    private static <T extends Block> NonNullBiConsumer<DataGenContext<Block, T>, RegistrateBlockstateProvider> createEnvelopedShaftBlockstate(EnvelopeColor color) {
+        return (ctx, prov) -> {
+            String textureBase = "block/envelope/" + (color == EnvelopeColor.WHITE ? "envelope" : "envelope_" + color.name().toLowerCase());
+            String textureShaft = "block/enveloped_shaft/" + (color == EnvelopeColor.WHITE ? "enveloped_shaft" : "enveloped_shaft_" + color.name().toLowerCase());
+
+            BlockModelBuilder builder = prov.models()
+                .withExistingParent(ctx.getName(), prov.modLoc("block/enveloped_shaft_template"))
+                .texture("0", prov.modLoc(textureBase))
+                .texture("1", prov.modLoc(textureShaft))
+                .texture("particle", prov.modLoc(textureBase));
+
+            prov.getVariantBuilder(ctx.getEntry())
+            .forAllStates(state -> {
+                Direction.Axis axis = state.getValue(RotatedPillarKineticBlock.AXIS);
+                if (axis == Direction.Axis.Z) {
+                    return ConfiguredModel.builder().modelFile(builder).build();
+                } else if (axis == Direction.Axis.X) {
+                    return ConfiguredModel.builder().modelFile(builder).rotationY(90).build();
+                } else {
+                    return ConfiguredModel.builder().modelFile(builder).rotationX(90).build();
+                }
+            });
+
+        };
+    }
+
     public static final TagKey<Block> ENVELOPES = TagKey.create(Registries.BLOCK, new ResourceLocation(CreatePropulsion.ID, "envelopes"));
 
-    private static final Map<EnvelopeColor, BlockEntry<EnvelopeBlock>> ENVELOPE_BLOCKS = new EnumMap<>(EnvelopeColor.class);
+    public static final Map<EnvelopeColor, BlockEntry<EnvelopeBlock>> ENVELOPE_BLOCKS = new EnumMap<>(EnvelopeColor.class);
     public static final Map<EnvelopeColor, BlockEntry<EnvelopedShaftBlock>> ENVELOPED_SHAFT_BLOCKS = new EnumMap<>(EnvelopeColor.class);
     static {
         for (EnvelopeColor color : EnvelopeColor.values()) {
@@ -328,9 +358,10 @@ public class PropulsionBlocks {
                 .properties(p -> p.strength(0.5F))
                 .properties(p -> p.sound(SoundType.WOOL))
                 .properties(p -> p.ignitedByLava())
+                .properties(p -> p.noOcclusion()) 
                 .transform(EncasingRegistry.addVariantTo(AllBlocks.SHAFT)) 
                 .tag(BlockTags.WOOL, ENVELOPES)
-                .blockstate(createEnvelopeBlockstate("enveloped_shaft", color)) //TODO: 
+                .blockstate(createEnvelopedShaftBlockstate(color))
                 .loot((loot, block) -> {
                     loot.add(block, LootTable.lootTable()
                         .withPool(LootPool.lootPool()
@@ -343,7 +374,6 @@ public class PropulsionBlocks {
                             .when(ExplosionCondition.survivesExplosion()))
                     );
                 })
-                //.simpleItem()
                 .setData(ProviderType.LANG, FUCK_OFF_LANG())
                 .register();
             

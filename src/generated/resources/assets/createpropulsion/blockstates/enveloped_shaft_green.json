@@ -1,6 +1,14 @@
 {
   "variants": {
-    "": {
+    "axis=x": {
+      "model": "createpropulsion:block/enveloped_shaft_green",
+      "y": 90
+    },
+    "axis=y": {
+      "model": "createpropulsion:block/enveloped_shaft_green",
+      "x": 90
+    },
+    "axis=z": {
       "model": "createpropulsion:block/enveloped_shaft_green"
     }
   }

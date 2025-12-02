@@ -1,6 +1,8 @@
 {
-  "parent": "minecraft:block/cube_all",
+  "parent": "createpropulsion:block/enveloped_shaft_template",
   "textures": {
-    "all": "createpropulsion:block/enveloped_shaft/enveloped_shaft_yellow"
+    "0": "createpropulsion:block/envelope/envelope_yellow",
+    "1": "createpropulsion:block/enveloped_shaft/enveloped_shaft_yellow",
+    "particle": "createpropulsion:block/envelope/envelope_yellow"
   }
 }
