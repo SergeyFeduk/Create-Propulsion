@@ -2,7 +2,8 @@ package com.deltasf.createpropulsion.balloons.envelopes;
 
 import java.util.function.Supplier;
 
-import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
+import javax.annotation.Nonnull;
+
 import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.content.decoration.encasing.EncasedBlock;
@@ -13,6 +14,7 @@ import com.simibubi.create.foundation.block.IBE;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -42,23 +44,19 @@ public class EnvelopedShaftBlock extends AbstractEncasedShaftBlock implements En
     }
 
     @Override
+    public InteractionResult use(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull Player player, @Nonnull InteractionHand hand, @Nonnull BlockHitResult hit) {
+        return EnvelopeLogic.tryDye(state, level, pos, player, hand, true);
+    }
+
+    @Override
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
-        if (!level.isClientSide()) {
-            BalloonShipRegistry.updater().habBlockPlaced(pos, level);
-        }
+        EnvelopeLogic.onPlace(level, pos);
         super.onPlace(state, level, pos, oldState, isMoving);
     }
 
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-        if (state.is(newState.getBlock())) {
-            super.onRemove(state, level, pos, newState, isMoving);
-            return;
-        }
-        
-        if (!level.isClientSide()) {
-            BalloonShipRegistry.updater().habBlockRemoved(pos, level);
-        }
+        EnvelopeLogic.onRemove(state, level, pos, newState);
         super.onRemove(state, level, pos, newState, isMoving);
     }
 

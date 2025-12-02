@@ -2,8 +2,6 @@ package com.deltasf.createpropulsion.balloons.envelopes;
 
 import javax.annotation.Nonnull;
 
-import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -18,21 +16,12 @@ public abstract class AbstractEnvelopeBlock extends Block implements IEnvelope {
     @Override
     public void onPlace(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull BlockState oldState, boolean isMoving) {
         super.onPlace(state, level, pos, oldState, isMoving);
-        if (!level.isClientSide()) {
-            BalloonShipRegistry.updater().habBlockPlaced(pos, level);
-        }
+        EnvelopeLogic.onPlace(level, pos);
     }
 
     @Override
     public void onRemove(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull BlockState newState, boolean isMoving) {
-        if (state.is(newState.getBlock())) {
-            super.onRemove(state, level, pos, newState, isMoving);
-            return;
-        }
-        
-        if (!level.isClientSide()) {
-            BalloonShipRegistry.updater().habBlockRemoved(pos, level);
-        }
+        EnvelopeLogic.onRemove(state, level, pos, newState);
         super.onRemove(state, level, pos, newState, isMoving);
     }
 
