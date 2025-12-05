@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "aligned_x=false,axis=z,positive=false": { "model": "createpropulsion:block/tilt_adapter_base" },
+    "aligned_x=true,axis=z,positive=false":  { "model": "createpropulsion:block/tilt_adapter_base" },
+    
+    "aligned_x=false,axis=z,positive=true":  { "model": "createpropulsion:block/tilt_adapter_base", "y": 180 },
+    "aligned_x=true,axis=z,positive=true":   { "model": "createpropulsion:block/tilt_adapter_base", "y": 180 },
+
+    "aligned_x=false,axis=x,positive=false": { "model": "createpropulsion:block/tilt_adapter_base", "y": 270 },
+    "aligned_x=true,axis=x,positive=false":  { "model": "createpropulsion:block/tilt_adapter_base", "y": 270 },
+
+    "aligned_x=false,axis=x,positive=true":  { "model": "createpropulsion:block/tilt_adapter_base", "y": 90 },
+    "aligned_x=true,axis=x,positive=true":   { "model": "createpropulsion:block/tilt_adapter_base", "y": 90 },
+
+    "aligned_x=false,axis=y,positive=true":  { "model": "createpropulsion:block/tilt_adapter_base", "x": 270 },
+    "aligned_x=true,axis=y,positive=true":   { "model": "createpropulsion:block/tilt_adapter_base", "x": 270, "y": 90 },
+
+    "aligned_x=false,axis=y,positive=false": { "model": "createpropulsion:block/tilt_adapter_base", "x": 90 },
+    "aligned_x=true,axis=y,positive=false":  { "model": "createpropulsion:block/tilt_adapter_base", "x": 90, "y": 90 }
+  }
+}

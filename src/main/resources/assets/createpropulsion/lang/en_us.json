@@ -59,6 +59,7 @@
     "block.createpropulsion.propeller": "Propeller",
     "block.createpropulsion.reaction_wheel": "Reaction Wheel",
     "block.createpropulsion.stirling_engine": "Stirling Engine",
+    "block.createpropulsion.tilt_adapter": "Tilt Adapter",
 
     "item.createpropulsion.wooden_blade": "Wooden Blade",
     "item.createpropulsion.copper_blade": "Copper Blade",

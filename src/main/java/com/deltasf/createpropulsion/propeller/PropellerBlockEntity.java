@@ -41,7 +41,7 @@ import net.minecraftforge.items.ItemStackHandler;
 
 public class PropellerBlockEntity extends KineticBlockEntity {
     public static final int MAX_THRUST = 20000;
-    public static final int MAX_TORQUE = 10000; //This is quite high, but I want it to be noticeable
+    public static final int MAX_TORQUE = 5000; //This is quite high, but I want it to be noticeable
     public static final int MAX_EFFECTIVE_SPEED = 256;
 
     protected PropellerData propellerData;

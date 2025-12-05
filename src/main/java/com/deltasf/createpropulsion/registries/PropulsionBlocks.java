@@ -18,6 +18,7 @@ import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerBlock;
 import com.deltasf.createpropulsion.propeller.PropellerBlock;
 import com.deltasf.createpropulsion.reaction_wheel.ReactionWheelBlock;
 import com.deltasf.createpropulsion.thruster.thruster.ThrusterBlock;
+import com.deltasf.createpropulsion.tilt_adapter.TiltAdapterBlock;
 import com.deltasf.createpropulsion.wing.CopycatWingBlock;
 import com.deltasf.createpropulsion.wing.CopycatWingItem;
 import com.deltasf.createpropulsion.wing.CopycatWingModel;
@@ -129,8 +130,7 @@ public class PropulsionBlocks {
         .properties(p -> p.sound(SoundType.METAL))
         .properties(p -> p.strength(2.5F, 2.0F))
         .properties(p -> p.noOcclusion())
-        .tag(BlockTags.MINEABLE_WITH_PICKAXE)
-        .tag(BlockTags.MINEABLE_WITH_AXE)
+        .tag(BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.MINEABLE_WITH_AXE)
         .blockstate(FUCK_OFF())
         .item().model(FUCK_OFF_ITEM()).build()
         .setData(ProviderType.LANG, FUCK_OFF_LANG())
@@ -179,8 +179,7 @@ public class PropulsionBlocks {
         .properties(p -> p.requiresCorrectToolForDrops())
         .properties(p -> p.strength(1.5F, 1.0F))
         .transform(PropulsionDefaultStress.setNoImpact())
-        .tag(BlockTags.MINEABLE_WITH_PICKAXE)
-        .tag(BlockTags.MINEABLE_WITH_AXE)
+        .tag(BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.MINEABLE_WITH_AXE)
         .blockstate(FUCK_OFF())
         .item().model(FUCK_OFF_ITEM()).build()
         .setData(ProviderType.LANG, FUCK_OFF_LANG())
@@ -207,6 +206,18 @@ public class PropulsionBlocks {
         .setData(ProviderType.LANG, FUCK_OFF_LANG())
         .register();
 
+    public static final BlockEntry<TiltAdapterBlock> TILT_ADAPTER_BLOCK = REGISTRATE.block("tilt_adapter", TiltAdapterBlock::new)
+        .properties(p -> p.mapColor(MapColor.WOOD))
+        .properties(p -> p.sound(SoundType.WOOD))
+        .properties(p -> p.requiresCorrectToolForDrops())
+        .properties(p -> p.strength(2.5F, 2.0F))    
+        .properties(p -> p.noOcclusion())
+        .tag(BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.MINEABLE_WITH_AXE)
+        .blockstate(FUCK_OFF())
+        .item().model(FUCK_OFF_ITEM()).build()
+        .setData(ProviderType.LANG, FUCK_OFF_LANG())
+        .register();
+    
     //All wings
     public static final BlockEntry<WingBlock> WING_BLOCK = registerGenericWing("wing", PropulsionSpriteShifts.WING_TEXTURE);
     public static final BlockEntry<WingBlock> TEMPERED_WING_BLOCK = registerGenericWing("tempered_wing", PropulsionSpriteShifts.TEMPERED_WING_TEXTURE);
@@ -222,7 +233,6 @@ public class PropulsionBlocks {
             .properties(p -> p.strength(1.5F, 2.0F))
             .properties(p -> p.noOcclusion())
             .onRegister(connectedTextures(() -> new WingCTBehaviour(spriteShift)))
-            //.addLayer(() -> RenderType::cutoutMipped)
             .tag(BlockTags.MINEABLE_WITH_PICKAXE)
             .blockstate(FUCK_OFF())
             .item().model(FUCK_OFF_ITEM()).build()

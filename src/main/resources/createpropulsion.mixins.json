@@ -7,7 +7,9 @@
     "plugin": "com.deltasf.createpropulsion.mixin.plugin.PropulsionMixinPlugin",
     "mixins": [
       "CompassItemMixin",
-      "BlockMixin"
+      "BlockMixin",
+      "MechanicalBearingMixin",
+      "SequenceContextMixin"
     ],
     "client": [
       "CompassItemPropertyFunctionMixin"
