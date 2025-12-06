@@ -54,6 +54,9 @@ public class PropulsionConfig {
     public static final ForgeConfigSpec.ConfigValue<Double> STIRLING_REVOLUTION_PERIOD;
     public static final ForgeConfigSpec.ConfigValue<Double> STIRLING_CRANK_RADIUS;
     public static final ForgeConfigSpec.ConfigValue<Double> STIRLING_CONROD_LENGTH;
+    //Tilt adapter
+    public static final ForgeConfigSpec.ConfigValue<Double> TILT_ADAPTER_ANGLE_RANGE;
+
     //Atmosphere
     public static final ForgeConfigSpec.ConfigValue<Double> ATMOSPHERE_NOISE_MAGNITUDE;
     public static final ForgeConfigSpec.ConfigValue<Double> ATMOSPHERE_NOISE_TIME_FACTOR;
@@ -136,6 +139,11 @@ public class PropulsionConfig {
         SERVER_BUILDER.push("Stirling Engine");
             STIRLING_GENERATED_SU = SERVER_BUILDER.comment("STIRLING_GENERATED_SU")
                 .defineInRange("STIRLING_GENERATED_SU", 8.0, 1.0, 64.0);
+        SERVER_BUILDER.pop();
+
+        SERVER_BUILDER.push("Tilt Adapter");
+            TILT_ADAPTER_ANGLE_RANGE = SERVER_BUILDER.comment("TILT_ADAPTER_ANGLE_RANGE")
+                .defineInRange("TILT_ADAPTER_ANGLE_RANGE", 30.0, 10.0, 60.0); 
         SERVER_BUILDER.pop();
 
         SERVER_BUILDER.push("Atmosphere");

@@ -1,5 +1,6 @@
 package com.deltasf.createpropulsion.tilt_adapter;
 
+import com.deltasf.createpropulsion.PropulsionConfig;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import com.simibubi.create.content.kinetics.transmission.SplitShaftBlockEntity;
 import com.simibubi.create.content.kinetics.transmission.sequencer.SequencedGearshiftBlockEntity.SequenceContext;
@@ -16,7 +17,6 @@ import com.simibubi.create.content.kinetics.base.RotatedPillarKineticBlock;
 
 //TODO: Add flicker tally protection
 public class TiltAdapterBlockEntity extends SplitShaftBlockEntity {
-    public static final float MAX_ANGLE = 30.0f;
     public static final float SIGNAL_RANGE = 15.0f;
 
     //State
@@ -109,11 +109,11 @@ public class TiltAdapterBlockEntity extends SplitShaftBlockEntity {
         int signalNeg = level.getSignal(worldPosition.relative(negSignalSide), negSignalSide);
 
         int diff = signalPos - signalNeg; 
-        float newTarget = (diff / SIGNAL_RANGE) * MAX_ANGLE;
+        double newTarget = (diff / SIGNAL_RANGE) * PropulsionConfig.TILT_ADAPTER_ANGLE_RANGE.get();
         boolean targetChanged = Math.abs(newTarget - targetAngle) > 0.001f;
         
         if (targetChanged) {
-            targetAngle = newTarget;
+            targetAngle = (float)newTarget;
             triggerSyncFlush();
         }
     }

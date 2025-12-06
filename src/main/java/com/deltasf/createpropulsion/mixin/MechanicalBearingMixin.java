@@ -1,5 +1,6 @@
 package com.deltasf.createpropulsion.mixin;
 
+import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.tilt_adapter.ISnappingSequenceContext;
 import com.simibubi.create.content.contraptions.bearing.MechanicalBearingBlockEntity;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
@@ -32,7 +33,7 @@ public abstract class MechanicalBearingMixin extends KineticBlockEntity {
     }
 
     @Inject(method = "tick", at = @At("HEAD"), remap = false)
-    private void yourMod$captureSnapFlag(CallbackInfo ci) {
+    private void captureSnapFlag(CallbackInfo ci) {
         Level level = getLevel();
         if (level == null || level.isClientSide) return;
         if (sequenceContext == null) return;
@@ -55,7 +56,7 @@ public abstract class MechanicalBearingMixin extends KineticBlockEntity {
         ),
         remap = false
     )
-    private void yourMod$onTickSnapCheck(CallbackInfo ci) {
+    private void onTickSnapCheck(CallbackInfo ci) {
         Level level = getLevel();
         if (level == null || level.isClientSide) return;
         if (movementMode.get() != MechanicalBearingBlockEntity.RotationMode.ROTATE_NEVER_PLACE) { return; }
@@ -64,7 +65,9 @@ public abstract class MechanicalBearingMixin extends KineticBlockEntity {
         if (shouldSnapOnStop) {
             shouldSnapOnStop = false;
             float absAngle = Math.abs(angle);
-            float threshold = 1.75f; //Must be less than 1/15 * TiltAdapterBlockEntity.MAX_ANGLE
+
+            double tiltAdapterRange = PropulsionConfig.TILT_ADAPTER_ANGLE_RANGE.get();
+            float threshold = Math.max(0.333f, (1 / 15.0f * (float)tiltAdapterRange) - 0.25f);
             
             if (absAngle < threshold || absAngle > (360 - threshold)) {
                 angle = 0;
