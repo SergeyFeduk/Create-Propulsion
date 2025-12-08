@@ -143,8 +143,6 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
 
     protected abstract LangBuilder getGoggleStatus();
 
-    protected abstract Direction getFluidCapSide();
-
     public ThrusterData getThrusterData() {
         return thrusterData;
     }

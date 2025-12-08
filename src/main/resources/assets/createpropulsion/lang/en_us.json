@@ -60,6 +60,7 @@
     "block.createpropulsion.reaction_wheel": "Reaction Wheel",
     "block.createpropulsion.stirling_engine": "Stirling Engine",
     "block.createpropulsion.tilt_adapter": "Tilt Adapter",
+    "block.createpropulsion.creative_thruster": "Creative Thruster",
 
     "item.createpropulsion.wooden_blade": "Wooden Blade",
     "item.createpropulsion.copper_blade": "Copper Blade",
@@ -161,6 +162,8 @@
     "create.gui.goggles.hot_air_burner.status.on": "On",
     "create.gui.goggles.hot_air_burner.status.ready": "Ready",
     "create.gui.goggles.hot_air_burner.balloon.status": "Balloon Info:",
-    "create.gui.goggles.hot_air_burner.balloon.hot_air": "Hot Air"
+    "create.gui.goggles.hot_air_burner.balloon.hot_air": "Hot Air",
+
+    "create.gui.creative_thruster.power_behaviour": "Generated Thrust"
     
 }

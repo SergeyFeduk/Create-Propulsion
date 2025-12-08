@@ -88,7 +88,6 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
         return validFluid();
     }
 
-    @Override
     protected Direction getFluidCapSide() {
         return getBlockState().getValue(ThrusterBlock.FACING);
     }
