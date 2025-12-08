@@ -41,7 +41,7 @@ public class OpticalSensorDistanceScrollBehaviour extends ScrollValueBehaviour {
     public void setValueSettings(Player player, ValueSettings valueSetting, boolean ctrlHeld) {
         int value = Math.max(1, valueSetting.value());
         if (!valueSetting.equals(getValueSettings()))
-				playFeedbackSound(this);
+			playFeedbackSound(this);
         setValue(value);
     }
 

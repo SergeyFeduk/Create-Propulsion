@@ -1,0 +1,25 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "   ",
+        "GCG",
+        "RAR"
+    ],
+    "key": {
+        "G": {
+            "item": "create:gantry_shaft"
+        },
+        "C": {
+            "item": "create:cogwheel"
+        },
+        "A": {
+            "item": "create:andesite_casing"
+        }, 
+        "R": {
+            "item": "minecraft:redstone"
+        }
+    },
+    "result": {
+        "item": "createpropulsion:tilt_adapter"
+    }
+}
