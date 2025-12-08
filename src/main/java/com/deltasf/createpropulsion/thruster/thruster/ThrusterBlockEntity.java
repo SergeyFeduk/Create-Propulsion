@@ -108,7 +108,8 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
     }
 
     @Override
-    protected void addSpecificGoggleInfo(List<Component> tooltip, boolean isPlayerSneaking) {
+    protected void addThrusterDetails(List<Component> tooltip, boolean isPlayerSneaking) {
+        super.addThrusterDetails(tooltip, isPlayerSneaking);
         containedFluidTooltip(tooltip, isPlayerSneaking, tank.getCapability().cast());
     }
 

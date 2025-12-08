@@ -269,6 +269,12 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
 
         CreateLang.translate("gui.goggles.thruster.status", new Object[0]).text(":").space().add(getGoggleStatus()).forGoggles(tooltip);
 
+        addThrusterDetails(tooltip, isPlayerSneaking);
+
+        return true;
+    }
+
+    protected void addThrusterDetails(List<Component> tooltip, boolean isPlayerSneaking) {
         float efficiency = 100;
         ChatFormatting tooltipColor = ChatFormatting.GREEN;
         if (emptyBlocks < OBSTRUCTION_LENGTH) {
@@ -278,10 +284,8 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
         }
 
         CreateLang.builder().add(CreateLang.translate("gui.goggles.thruster.efficiency", new Object[0])).space().add(CreateLang.number(efficiency)).add(CreateLang.text("%")).style(tooltipColor).forGoggles(tooltip);
-
-        addSpecificGoggleInfo(tooltip, isPlayerSneaking);
-        return true;
     }
+
 
     @Override
     protected void write(CompoundTag compound, boolean clientPacket) {

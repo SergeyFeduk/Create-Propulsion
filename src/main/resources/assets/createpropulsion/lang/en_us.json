@@ -164,6 +164,7 @@
     "create.gui.goggles.hot_air_burner.balloon.status": "Balloon Info:",
     "create.gui.goggles.hot_air_burner.balloon.hot_air": "Hot Air",
 
+    "create.gui.goggles.thruster.thrust_output": "Thrust Output",
+    "create.gui.goggles.thruster.unit_kn": "kN",
     "create.gui.creative_thruster.power_behaviour": "Generated Thrust"
-    
 }

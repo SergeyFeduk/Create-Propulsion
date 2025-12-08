@@ -1,7 +1,7 @@
 {
     "type": "minecraft:crafting_shaped",
     "pattern": [
-        "   ",
+        " S ",
         "GCG",
         "RAR"
     ],
@@ -17,6 +17,9 @@
         }, 
         "R": {
             "item": "minecraft:redstone"
+        }, 
+        "S": {
+            "item": "create:iron_sheet"
         }
     },
     "result": {
