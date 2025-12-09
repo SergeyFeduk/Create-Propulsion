@@ -58,6 +58,6 @@ public class CreativeThrusterPowerScrollValueBehaviour extends ScrollValueBehavi
     public String formatValue() {
         int forceInNewtons = (value + 1) * FORCE_PER_STEP;
         int forceInKN = forceInNewtons / 1000;
-        return forceInKN + " kN";
+        return String.valueOf(forceInKN);
     }
 }

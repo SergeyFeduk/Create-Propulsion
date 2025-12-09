@@ -21,6 +21,7 @@ import com.deltasf.createpropulsion.reaction_wheel.ReactionWheelRenderer;
 import com.deltasf.createpropulsion.thruster.creative_thruster.CreativeThrusterBlockEntity;
 import com.deltasf.createpropulsion.thruster.thruster.ThrusterBlockEntity;
 import com.deltasf.createpropulsion.tilt_adapter.TiltAdapterBlockEntity;
+import com.deltasf.createpropulsion.tilt_adapter.TiltAdapterRenderer;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import com.simibubi.create.content.kinetics.base.ShaftRenderer;
 import com.simibubi.create.content.kinetics.base.SingleAxisRotatingVisual;
@@ -114,6 +115,6 @@ public class PropulsionBlockEntities {
         REGISTRATE.blockEntity("tilt_adapter_block_entity", TiltAdapterBlockEntity::new)
         //.instance(() -> StirlingEngineRenderInstance::new)
         .validBlock(PropulsionBlocks.TILT_ADAPTER_BLOCK)
-        //.renderer(() -> TiltAda::new)
+        .renderer(() -> TiltAdapterRenderer::new)
         .register();
 }

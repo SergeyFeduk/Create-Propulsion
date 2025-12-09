@@ -1,18 +1,25 @@
 package com.deltasf.createpropulsion.tilt_adapter;
 
+import javax.annotation.Nullable;
+
 import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
+import com.deltasf.createpropulsion.registries.PropulsionShapes;
 import com.simibubi.create.content.kinetics.base.AbstractEncasedShaftBlock;
 import com.simibubi.create.foundation.block.IBE;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class TiltAdapterBlock extends AbstractEncasedShaftBlock implements IBE<TiltAdapterBlockEntity> {
     public static final BooleanProperty POSITIVE = BooleanProperty.create("positive");
@@ -56,6 +63,29 @@ public class TiltAdapterBlock extends AbstractEncasedShaftBlock implements IBE<T
             .setValue(AXIS, axis)
             .setValue(POSITIVE, isPositive)
             .setValue(ALIGNED_X, alignedX);
+    }
+
+    @Override
+    public VoxelShape getShape(@Nullable BlockState pState, @Nullable BlockGetter pLevel, @Nullable BlockPos pPos, @Nullable CollisionContext pContext) {
+        Direction direction = getDirection(pState);
+        if (direction.getAxis() == Axis.Y) direction = direction.getOpposite();
+        return PropulsionShapes.TILT_ADAPTER.get(direction); 
+    }
+
+    public static Direction getDirection(BlockState state) {
+        Direction.Axis axis = state.getValue(AXIS);
+        boolean isPositive = state.getValue(POSITIVE);
+        
+        switch (axis) {
+            case X:
+                return isPositive ? Direction.EAST : Direction.WEST;
+            case Y:
+                return isPositive ? Direction.UP : Direction.DOWN;
+            case Z:
+                return isPositive ? Direction.SOUTH : Direction.NORTH;
+            default:
+                return Direction.UP;
+        }
     }
 
     @Override

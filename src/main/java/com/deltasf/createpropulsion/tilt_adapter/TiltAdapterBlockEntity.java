@@ -20,6 +20,8 @@ public class TiltAdapterBlockEntity extends SplitShaftBlockEntity {
     public static final float SIGNAL_RANGE = 15.0f;
 
     //State
+    protected int redstoneLeft = 0;
+    protected int redstoneRight = 0;
     protected float currentAngle = 0f;
     protected float startAngle = 0f;
     protected float targetAngle = 0f;
@@ -58,20 +60,17 @@ public class TiltAdapterBlockEntity extends SplitShaftBlockEntity {
             }
         }
 
-        //
         checkRedstoneAndSpeed();
 
         if (waitingForSync) {
             executeNewMove();
         }
-        
     }
 
+    public int getLeft() { return redstoneLeft; }
+    public int getRight() { return redstoneRight; }
+
     private void checkRedstoneAndSpeed() {
-        if (getTheoreticalSpeed() == 0) {
-            if (isMoving) forceStop();
-            return;
-        }
         Level level = getLevel();
         if (level == null) return;
 
@@ -105,10 +104,20 @@ public class TiltAdapterBlockEntity extends SplitShaftBlockEntity {
             negSignalSide = temp;
         }
 
-        int signalPos = level.getSignal(worldPosition.relative(posSignalSide), posSignalSide);
-        int signalNeg = level.getSignal(worldPosition.relative(negSignalSide), negSignalSide);
+        int newLeft = level.getSignal(worldPosition.relative(posSignalSide), posSignalSide);
+        int newRight = level.getSignal(worldPosition.relative(negSignalSide), negSignalSide);
+        if (newLeft != redstoneLeft || newRight != redstoneRight) {
+            redstoneLeft = newLeft;
+            redstoneRight = newRight;
+            sendData();
+        }
 
-        int diff = signalPos - signalNeg; 
+        if (getTheoreticalSpeed() == 0) {
+            if (isMoving) forceStop();
+            return;
+        }
+
+        int diff = redstoneLeft - redstoneRight; 
         double newTarget = (diff / SIGNAL_RANGE) * PropulsionConfig.TILT_ADAPTER_ANGLE_RANGE.get();
         boolean targetChanged = Math.abs(newTarget - targetAngle) > 0.001f;
         
@@ -243,6 +252,8 @@ public class TiltAdapterBlockEntity extends SplitShaftBlockEntity {
         compound.putFloat("targetAngle", targetAngle);
         compound.putBoolean("isMoving", isMoving);
         compound.putInt("moveDirection", moveDirection);
+        compound.putInt("redstoneLeft", redstoneLeft);
+        compound.putInt("redstoneRight", redstoneRight);
         super.write(compound, clientPacket);
     }
 
@@ -253,6 +264,8 @@ public class TiltAdapterBlockEntity extends SplitShaftBlockEntity {
         targetAngle = compound.getFloat("targetAngle");
         isMoving = compound.getBoolean("isMoving");
         moveDirection = compound.getInt("moveDirection");
+        redstoneLeft = compound.getInt("redstoneLeft");
+        redstoneRight = compound.getInt("redstoneRight");
         moveStartTime = -1; 
         super.read(compound, clientPacket);
     }

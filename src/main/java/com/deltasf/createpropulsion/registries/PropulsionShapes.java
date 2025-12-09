@@ -57,6 +57,10 @@ public class PropulsionShapes {
             .add(Block.box(2, 5, 0, 14, 13, 14))
             .forDirectional(Direction.SOUTH),
 
+        TILT_ADAPTER = ShapeBuilder.shape()
+            .add(Block.box(0, 0, 3, 16, 16, 16))
+            .forDirectional(Direction.NORTH),
+
         WING = getWingShape(4),
         WING_8 = getWingShape(8),
         WING_12 = getWingShape(12);

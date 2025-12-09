@@ -73,9 +73,7 @@ public class LodestoneTrackerRenderer extends SafeBlockEntityRenderer<LodestoneT
             float redstonePower = powers[i] / 15.0f;
             int color = Color.mixColors(0x470102, 0xCD0000, redstonePower);
 
-            partialIndicatorModel.light(light)
-                                 .color(color)
-                                 .renderInto(poseStack, vertexBuffer);
+            partialIndicatorModel.light(light).color(color).renderInto(poseStack, vertexBuffer);
             poseStack.popPose();
         }
     }
