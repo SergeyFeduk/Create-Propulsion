@@ -55,7 +55,7 @@ public class TiltAdapterRenderer extends KineticBlockEntityRenderer<TiltAdapterB
 
         renderShaft(aomInput, inputShaft, blockEntity, axis, light, ms, buffer);
         renderShaft(aomOutput, outputShaft, blockEntity, axis, light, ms, buffer);
-        renderOverlays(blockEntity, blockState, invDirection, aomOutput, light, ms, buffer, direction, alignedX, positive);
+        renderOverlays(blockEntity, blockState, invDirection, aomInput, light, ms, buffer, direction, alignedX, positive);
     }
 
     private void renderShaft(Vector3f aom, SuperByteBuffer shaft, TiltAdapterBlockEntity blockEntity, Axis axis, int light, PoseStack ms, MultiBufferSource buffer) {
@@ -79,13 +79,30 @@ public class TiltAdapterRenderer extends KineticBlockEntityRenderer<TiltAdapterB
 
     private void renderOverlaySide(float redstoneSignal, float angle, SuperByteBuffer gantry, SuperByteBuffer sideOverlay, int light, PoseStack ms, MultiBufferSource buffer, Direction direction, boolean isRight, boolean alignedX, boolean positive) {
         int color = Color.mixColors(0x470102, 0xCD0000, redstoneSignal);
-        com.mojang.math.Axis rotationAxis = direction.getAxis().isHorizontal() ? com.mojang.math.Axis.YP : com.mojang.math.Axis.ZP;
-        boolean flipRightCondition = direction.getAxis().isVertical() && (!positive ^ alignedX);
+        boolean isHorizontal = direction.getAxis().isHorizontal();
+        com.mojang.math.Axis rotationAxis = isHorizontal ? com.mojang.math.Axis.YP : com.mojang.math.Axis.ZP;
+        boolean flipRightCondition = !isHorizontal && (!positive ^ alignedX);
         boolean shouldFlip = isRight ^ flipRightCondition;
         float offset = shouldFlip ? 1/16.0f : -1/16.0f;
 
         ms.pushPose();
-        //Local
+        
+        applyLocalTransforms(ms, alignedX, shouldFlip, rotationAxis);
+        translateInDirection(ms, direction, offset);
+        sideOverlay.color(color).light(light).renderInto(ms, buffer.getBuffer(RenderType.cutout()));
+
+        Direction offsetDirection = isHorizontal ? direction.getClockWise() : Direction.EAST;
+        Direction rotationDirection = isHorizontal ? (positive ? Direction.DOWN : Direction.UP) : Direction.NORTH;
+
+        offset = -(0.5f + 4) / 16.0f;
+        translateInDirection(ms, offsetDirection, offset);
+        //TODO: Rotate only if signal changed
+        gantry.rotateCentered(angle, rotationDirection).color(color).light(light).renderInto(ms, buffer.getBuffer(RenderType.solid()));
+
+        ms.popPose();
+    }
+
+    private void applyLocalTransforms(PoseStack ms, boolean alignedX, boolean shouldFlip, com.mojang.math.Axis rotationAxis) {
         ms.translate(0.5, 0.5, 0.5);
         if (alignedX) {
             ms.mulPose(com.mojang.math.Axis.YP.rotationDegrees(270.0f));
@@ -95,9 +112,10 @@ public class TiltAdapterRenderer extends KineticBlockEntityRenderer<TiltAdapterB
             ms.mulPose(rotationAxis.rotationDegrees(180.0f));
         }
         ms.translate(-0.5, -0.5, -0.5);
+    }
+
+    private void translateInDirection(PoseStack ms, Direction direction, float offset) {
         ms.translate(direction.getStepX() * offset, direction.getStepY() * offset, direction.getStepZ() * offset);
-        sideOverlay.color(color).light(light).renderInto(ms, buffer.getBuffer(RenderType.cutout()));
-        ms.popPose();
     }
 
     private float getAngle(Vector3f aom) {
