@@ -24,15 +24,6 @@ public class DeltaPonderPlugin implements PonderPlugin {
     //TODO: Stirling engine ponder
     //(perhaps redirect to the Solid/Liquid burner ponder or have a separate one explaining that speed can be changed and SU output depends on heat amount)
 
-    //TODO: Tilt adapter ponder
-    //Show a powered tilt adapter connected to mechanical bearing
-    // - Place a wing in front of the mechanical bearing (or have this in initial setup)
-    // - Power one side of the tilt adapter, wait till mechanical bearing rotates to target angle ("Tilt adapter allows to tilt output shaft based on redstone signal" word ts better)
-    // - Power other side of the tilt adapter, wait
-    // - Keeping the 2nd side powered - power the first and wait till bearing returns to original position ("Connected bearings are guaranteed to return to their initial position")
-    // - Turn the 2nd side off, wait
-    // - Turn the 1st side off, wait
-
     public static void register(PonderSceneRegistrationHelper<ResourceLocation> helper) {
         PonderSceneRegistrationHelper<ItemProviderEntry<?>> HELPER = helper.withKeyFunction(RegistryEntry::getId);
         HELPER.forComponents(PropulsionBlocks.TILT_ADAPTER_BLOCK)
