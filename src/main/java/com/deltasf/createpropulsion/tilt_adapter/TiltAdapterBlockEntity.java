@@ -200,9 +200,14 @@ public class TiltAdapterBlockEntity extends SplitShaftBlockEntity {
         return super.propagateRotationTo(target, stateFrom, stateTo, diff, connectedViaAxes, connectedViaCogs);
     }
 
-   @Override
+    @Override
     public float getRotationSpeedModifier(Direction face) {
-        //Prevent receiving from the front side
+        Direction outputFace = TiltAdapterBlock.getDirection(getBlockState());
+        if (face == outputFace) {
+            if (waitingForSync) return 0;
+            return moveDirection;
+        }
+
         if (hasSource()) {
             Direction sourceFace = getSourceFacing();
             Direction backFace = getBackFace(getBlockState());
@@ -211,11 +216,6 @@ public class TiltAdapterBlockEntity extends SplitShaftBlockEntity {
             }
         }
 
-        //Source is valid
-        if (hasSource() && face != getSourceFacing()) {
-            if (waitingForSync) return 0;
-            return moveDirection;
-        }
         return 1;
     }
 

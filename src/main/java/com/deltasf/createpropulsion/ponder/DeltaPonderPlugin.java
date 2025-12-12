@@ -1,6 +1,17 @@
 package com.deltasf.createpropulsion.ponder;
 
-public class DeltaPonderPlugin {
+import javax.annotation.Nonnull;
+
+import com.deltasf.createpropulsion.CreatePropulsion;
+import com.deltasf.createpropulsion.registries.PropulsionBlocks;
+import com.tterrag.registrate.util.entry.ItemProviderEntry;
+import com.tterrag.registrate.util.entry.RegistryEntry;
+
+import net.createmod.ponder.api.registration.PonderPlugin;
+import net.createmod.ponder.api.registration.PonderSceneRegistrationHelper;
+import net.minecraft.resources.ResourceLocation;
+
+public class DeltaPonderPlugin implements PonderPlugin {
     //TODO: Solid/Liquid burner ponders
     //Show a burner with stirling engine
     // - Click on a burner with coal, wait, show that stirling engine now rotates (say smth like "Heat can be used to power Stirling engines")
@@ -21,4 +32,20 @@ public class DeltaPonderPlugin {
     // - Keeping the 2nd side powered - power the first and wait till bearing returns to original position ("Connected bearings are guaranteed to return to their initial position")
     // - Turn the 2nd side off, wait
     // - Turn the 1st side off, wait
+
+    public static void register(PonderSceneRegistrationHelper<ResourceLocation> helper) {
+        PonderSceneRegistrationHelper<ItemProviderEntry<?>> HELPER = helper.withKeyFunction(RegistryEntry::getId);
+        HELPER.forComponents(PropulsionBlocks.TILT_ADAPTER_BLOCK)
+			.addStoryBoard("tilt_adapter", TiltAdapterScene::tiltAdapter);
+    }
+
+    @Override
+	public String getModId() {
+		return CreatePropulsion.ID;
+	}
+
+	@Override
+	public void registerScenes(@Nonnull PonderSceneRegistrationHelper<ResourceLocation> helper) {
+		register(helper);
+	}
 }

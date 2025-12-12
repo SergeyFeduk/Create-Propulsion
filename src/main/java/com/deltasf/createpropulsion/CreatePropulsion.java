@@ -14,6 +14,7 @@ import com.deltasf.createpropulsion.compat.computercraft.CCProxy;
 import com.deltasf.createpropulsion.heat.burners.AbstractBurnerBlock;
 import com.deltasf.createpropulsion.network.PropulsionPackets;
 import com.deltasf.createpropulsion.particles.ParticleTypes;
+import com.deltasf.createpropulsion.ponder.DeltaPonderPlugin;
 import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
 import com.deltasf.createpropulsion.registries.PropulsionBlocks;
 import com.deltasf.createpropulsion.registries.PropulsionCreativeTab;
@@ -25,9 +26,11 @@ import com.simibubi.create.compat.Mods;
 import com.simibubi.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 
+import net.createmod.ponder.foundation.PonderIndex;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -45,6 +48,7 @@ public class CreatePropulsion {
     public CreatePropulsion() {
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
         //Content
+        modBus.addListener(CreatePropulsion::clientInit);
         ParticleTypes.register(modBus);
         PropulsionBlocks.register();
         PropulsionBlockEntities.register();
@@ -119,5 +123,9 @@ public class CreatePropulsion {
                 return 0;
             });
         });
+    }
+
+    public static void clientInit(final FMLClientSetupEvent event) {
+        PonderIndex.addPlugin(new DeltaPonderPlugin());
     }
 }
