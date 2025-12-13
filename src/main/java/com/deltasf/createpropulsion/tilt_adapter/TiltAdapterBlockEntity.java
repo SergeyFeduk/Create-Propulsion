@@ -137,8 +137,6 @@ public class TiltAdapterBlockEntity extends SplitShaftBlockEntity {
         predictedDuration = -1;
         
         sequenceContext = null;
-
-        updateDownstreamNetwork();
     }
 
     private void executeNewMove() {
