@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import com.deltasf.createpropulsion.debug.PropulsionDebug;
 import com.deltasf.createpropulsion.debug.routes.MainDebugRoute;
-import com.deltasf.createpropulsion.heat.burners.solid.SolidBurnerBlockEntity;
 import com.deltasf.createpropulsion.utility.AbstractAreaDamagerBehaviour;
 import com.simibubi.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
@@ -25,7 +24,7 @@ public class BurnerDamager extends AbstractAreaDamagerBehaviour {
 
     @Override
     protected boolean shouldDamage() {
-        SolidBurnerBlockEntity burner = (SolidBurnerBlockEntity) blockEntity;
+        AbstractBurnerBlockEntity burner = (AbstractBurnerBlockEntity) blockEntity;
         HeatLevel heatLevel = burner.getBlockState().getValue(AbstractBurnerBlock.HEAT);
         return heatLevel == HeatLevel.KINDLED && getWorld().getBlockState(getPos().above()).isAir();
     }

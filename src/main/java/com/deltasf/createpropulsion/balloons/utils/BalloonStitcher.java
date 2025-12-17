@@ -70,6 +70,7 @@ public class BalloonStitcher {
             return;
         }
 
+        //TODO: Maybe just replace with direct bfs component check? it should be much faster
         // Construct DSU
         DisjointSetUnion dsu = new DisjointSetUnion();
         Map<BlockPos, Integer> posToId = new HashMap<>();

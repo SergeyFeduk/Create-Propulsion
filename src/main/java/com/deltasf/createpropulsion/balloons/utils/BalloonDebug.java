@@ -43,6 +43,8 @@ public class BalloonDebug {
             return;
         }
 
+        if (!event.side.isClient()) return; //TODO: Fix by syncing balloons to clients
+
         BalloonShipRegistry shipRegistry = BalloonShipRegistry.get();
         if (shipRegistry == null) {
             return;

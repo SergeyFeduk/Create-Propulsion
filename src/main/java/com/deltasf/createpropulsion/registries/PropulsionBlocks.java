@@ -8,6 +8,7 @@ import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.balloons.envelopes.EnvelopeBlock;
 import com.deltasf.createpropulsion.balloons.envelopes.EnvelopedShaftBlock;
 import com.deltasf.createpropulsion.balloons.injectors.hot_air_burner.HotAirBurnerBlock;
+import com.deltasf.createpropulsion.heat.burners.liquid.LiquidBurnerBlock;
 import com.deltasf.createpropulsion.heat.burners.solid.SolidBurnerBlock;
 import com.deltasf.createpropulsion.heat.engine.StirlingEngineBlock;
 import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerBlock;
@@ -180,6 +181,17 @@ public class PropulsionBlocks {
         .properties(p -> p.requiresCorrectToolForDrops())
         .properties(p -> p.strength(2.5F, 2.0F))
         .properties(p -> p.lightLevel(state -> state.getValue(SolidBurnerBlock.LIT) ? 13 : 0))
+        .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+        .blockstate(FUCK_OFF())
+        .item().model(FUCK_OFF_ITEM()).build()
+        .setData(ProviderType.LANG, FUCK_OFF_LANG())
+        .register();
+
+    public static final BlockEntry<LiquidBurnerBlock> LIQUID_BURNER = REGISTRATE.block("liquid_burner", LiquidBurnerBlock::new)
+        .properties(p -> p.mapColor(MapColor.STONE))
+        .properties(p -> p.sound(SoundType.COPPER))
+        .properties(p -> p.requiresCorrectToolForDrops())
+        .properties(p -> p.strength(2.75F, 2.0F))
         .tag(BlockTags.MINEABLE_WITH_PICKAXE)
         .blockstate(FUCK_OFF())
         .item().model(FUCK_OFF_ITEM()).build()

@@ -11,26 +11,25 @@ import com.simibubi.create.api.stress.BlockStressValues;
 import com.deltasf.createpropulsion.balloons.serialization.BalloonSerializationHandler;
 import com.deltasf.createpropulsion.balloons.serialization.BalloonSerializationHandler.Query;
 import com.deltasf.createpropulsion.compat.computercraft.CCProxy;
+import com.deltasf.createpropulsion.events.ModClientEvents;
 import com.deltasf.createpropulsion.heat.burners.AbstractBurnerBlock;
 import com.deltasf.createpropulsion.network.PropulsionPackets;
 import com.deltasf.createpropulsion.particles.ParticleTypes;
-import com.deltasf.createpropulsion.ponder.DeltaPonderPlugin;
 import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
 import com.deltasf.createpropulsion.registries.PropulsionBlocks;
 import com.deltasf.createpropulsion.registries.PropulsionCreativeTab;
 import com.deltasf.createpropulsion.registries.PropulsionDefaultStress;
 import com.deltasf.createpropulsion.registries.PropulsionFluids;
+import com.deltasf.createpropulsion.registries.PropulsionInstanceTypes;
 import com.deltasf.createpropulsion.registries.PropulsionItems;
 import com.deltasf.createpropulsion.registries.PropulsionPartialModels;
 import com.simibubi.create.compat.Mods;
 import com.simibubi.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 
-import net.createmod.ponder.foundation.PonderIndex;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -48,7 +47,7 @@ public class CreatePropulsion {
     public CreatePropulsion() {
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
         //Content
-        modBus.addListener(CreatePropulsion::clientInit);
+        modBus.addListener(ModClientEvents::clientInit);
         ParticleTypes.register(modBus);
         PropulsionBlocks.register();
         PropulsionBlockEntities.register();
@@ -57,6 +56,7 @@ public class CreatePropulsion {
         PropulsionPartialModels.register();
         PropulsionCreativeTab.register(modBus);
         PropulsionPackets.register();
+        PropulsionInstanceTypes.init(); //TODO: Rename and move in client only place
 
         // VS Init
         VsApi api = ValkyrienSkies.api();
@@ -123,9 +123,5 @@ public class CreatePropulsion {
                 return 0;
             });
         });
-    }
-
-    public static void clientInit(final FMLClientSetupEvent event) {
-        PonderIndex.addPlugin(new DeltaPonderPlugin());
     }
 }

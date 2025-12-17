@@ -3,6 +3,7 @@ package com.deltasf.createpropulsion.registries;
 import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.balloons.injectors.hot_air_burner.HotAirBurnerBlockEntity;
 import com.deltasf.createpropulsion.balloons.injectors.hot_air_burner.HotAirBurnerRenderer;
+import com.deltasf.createpropulsion.heat.burners.liquid.LiquidBurnerBlockEntity;
 import com.deltasf.createpropulsion.heat.burners.solid.SolidBurnerBlockEntity;
 import com.deltasf.createpropulsion.heat.engine.StirlingEngineBlockEntity;
 import com.deltasf.createpropulsion.heat.engine.StirlingEngineRenderer;
@@ -89,6 +90,12 @@ public class PropulsionBlockEntities {
     public static final BlockEntityEntry<SolidBurnerBlockEntity> SOLID_BURNER_BLOCK_ENTITY = 
         REGISTRATE.blockEntity("solid_burner_block_entity", SolidBurnerBlockEntity::new)
         .validBlock(PropulsionBlocks.SOLID_BURNER)
+        .register();
+
+    public static final BlockEntityEntry<LiquidBurnerBlockEntity> LIQUID_BURNER_BLOCK_ENTITY = 
+        REGISTRATE.blockEntity("liquid_burner_block_entity", LiquidBurnerBlockEntity::new)
+        .validBlock(PropulsionBlocks.LIQUID_BURNER)
+        //.renderer(() -> LiquidBurnerRenderer::new)
         .register();
 
     public static final BlockEntityEntry<PropellerBlockEntity> PROPELLER_BLOCK_ENTITY = 
