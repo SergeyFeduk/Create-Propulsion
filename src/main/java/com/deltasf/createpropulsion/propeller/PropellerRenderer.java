@@ -205,12 +205,8 @@ public class PropellerRenderer extends KineticBlockEntityRenderer<PropellerBlock
             ms.mulPose(Axis.ZP.rotationDegrees(currentAngle));
 
             ms.translate(pivotX, pivotY, pivotZ);
-            // 2. Rotate around the Y-axis (which is now at the pivot).
             ms.mulPose(Axis.YP.rotationDegrees(pitchAngle));
-            // 3. Translate back.
             ms.translate(-pivotX, -pivotY, -pivotZ);
-
-
 
             ms.translate(-0.5, -0.5, -0.5);
             bladeModel.light(light).overlay(overlay).color(255, 255, 255, alpha).renderInto(ms, vb);

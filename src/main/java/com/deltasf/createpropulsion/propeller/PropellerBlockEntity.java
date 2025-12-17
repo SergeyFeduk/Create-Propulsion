@@ -31,8 +31,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
@@ -57,20 +55,13 @@ public class PropellerBlockEntity extends KineticBlockEntity {
     public float internalRPM = 0f;
 
     //Client-side animation state
-    @OnlyIn(Dist.CLIENT)
     public List<Float> prevBladeAngles;
-    @OnlyIn(Dist.CLIENT)
     public List<Float> renderedBladeAngles;
-    @OnlyIn(Dist.CLIENT)
     public float animationStartTime;
 
-    @OnlyIn(Dist.CLIENT)
     public float visualRPM = 0f;
-    @OnlyIn(Dist.CLIENT)
     public float visualAngle = 0f;
-    @OnlyIn(Dist.CLIENT)
     public float lastRenderTimeSeconds = 0;
-    @OnlyIn(Dist.CLIENT)
     private boolean hasLoadedClientState = false;
 
     public PropellerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
