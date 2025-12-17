@@ -7,6 +7,7 @@ import com.deltasf.createpropulsion.heat.burners.liquid.LiquidBurnerBlockEntity;
 import com.deltasf.createpropulsion.heat.burners.solid.SolidBurnerBlockEntity;
 import com.deltasf.createpropulsion.heat.engine.StirlingEngineBlockEntity;
 import com.deltasf.createpropulsion.heat.engine.StirlingEngineRenderer;
+import com.deltasf.createpropulsion.heat.engine.StirlingEngineVisual;
 import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerBlockEntity;
 import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerRenderer;
 import com.deltasf.createpropulsion.magnet.RedstoneMagnetBlockEntity;
@@ -113,7 +114,7 @@ public class PropulsionBlockEntities {
 
     public static final BlockEntityEntry<StirlingEngineBlockEntity> STIRLING_ENGINE_BLOCK_ENTITY = 
         REGISTRATE.blockEntity("stirling_engine_block_entity", StirlingEngineBlockEntity::new)
-        //.instance(() -> StirlingEngineRenderInstance::new)
+        .visual(() -> StirlingEngineVisual::new)
         .validBlock(PropulsionBlocks.STIRLING_ENGINE_BLOCK)
         .renderer(() -> StirlingEngineRenderer::new)
         .register();

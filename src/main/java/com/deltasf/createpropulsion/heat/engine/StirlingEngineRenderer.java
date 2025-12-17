@@ -14,6 +14,7 @@ import com.mojang.math.Axis;
 import com.simibubi.create.AllPartialModels;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntityRenderer;
 
+import dev.engine_room.flywheel.api.visualization.VisualizationManager;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -30,7 +31,7 @@ public class StirlingEngineRenderer extends KineticBlockEntityRenderer<StirlingE
     
     @Override
     public void renderSafe(StirlingEngineBlockEntity blockEntity, float partialTicks, PoseStack ms, MultiBufferSource bufferSource, int light, int overlay) {
-        //if (Backend.canUseInstancing(blockEntity.getLevel())) return;
+        if (VisualizationManager.supportsVisualization(blockEntity.getLevel())) return;
 
         Direction direction = blockEntity.getBlockState().getValue(StirlingEngineBlock.FACING);
         SuperByteBuffer shaft = CachedBuffers.partialFacing(AllPartialModels.SHAFT_HALF, blockEntity.getBlockState(), direction);

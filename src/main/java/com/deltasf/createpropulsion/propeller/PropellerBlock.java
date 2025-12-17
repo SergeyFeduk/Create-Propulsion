@@ -37,8 +37,9 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-//Let me try this IBE out
 public class PropellerBlock extends DirectionalKineticBlock implements IBE<PropellerBlockEntity> {
+    public static final float INTERACTION_RPM_THRESHOLD = 20.0f;
+
     public PropellerBlock(Properties properties) {
         super(properties);
     }
@@ -80,7 +81,7 @@ public class PropellerBlock extends DirectionalKineticBlock implements IBE<Prope
 
 
         if (propellerBE.getBladeCount() != 1) {
-            if (Math.abs(propellerBE.getInternalRPM()) > 10.0f) {
+            if (Math.abs(propellerBE.getInternalRPM()) > INTERACTION_RPM_THRESHOLD) {
                 // TODO: Notify player that propeller must be stopped
                 return InteractionResult.FAIL;
             }

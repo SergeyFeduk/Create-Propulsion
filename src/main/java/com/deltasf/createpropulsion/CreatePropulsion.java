@@ -56,7 +56,7 @@ public class CreatePropulsion {
         PropulsionPartialModels.register();
         PropulsionCreativeTab.register(modBus);
         PropulsionPackets.register();
-        PropulsionInstanceTypes.init(); //TODO: Rename and move in client only place
+        PropulsionInstanceTypes.register(); //TODO: move in client only place
 
         // VS Init
         VsApi api = ValkyrienSkies.api();
