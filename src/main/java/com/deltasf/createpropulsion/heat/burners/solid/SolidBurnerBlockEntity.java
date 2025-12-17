@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import com.deltasf.createpropulsion.heat.HeatMapper;
+import com.deltasf.createpropulsion.heat.IHeatConsumer;
 import com.deltasf.createpropulsion.heat.IHeatSource;
 import com.deltasf.createpropulsion.heat.HeatMapper.HeatLevelString;
 import com.deltasf.createpropulsion.heat.burners.AbstractBurnerBlock;
@@ -129,7 +130,10 @@ public class SolidBurnerBlockEntity extends AbstractBurnerBlockEntity implements
         BlockEntity beAbove = level.getBlockEntity(worldPosition.above());
         if (beAbove == null) return false;
 
-        return beAbove.getCapability(PropulsionCapabilities.HEAT_CONSUMER, Direction.DOWN).map(consumer -> {
+        return beAbove.getCapability(PropulsionCapabilities.HEAT_CONSUMER, Direction.DOWN)
+            .cast()
+            .filter(c -> c instanceof IHeatConsumer)
+            .map(c -> (IHeatConsumer) c).map(consumer -> {
             if (!consumer.isActive()) {
                 return false;
             }
@@ -152,8 +156,11 @@ public class SolidBurnerBlockEntity extends AbstractBurnerBlockEntity implements
         if (level == null) return 0f;
         BlockEntity beAbove = level.getBlockEntity(worldPosition.above());
         if (beAbove == null) return 0f;
-
-        return beAbove.getCapability(PropulsionCapabilities.HEAT_CONSUMER, Direction.DOWN).map(consumer -> {
+        
+        return beAbove.getCapability(PropulsionCapabilities.HEAT_CONSUMER, Direction.DOWN)
+            .cast()
+            .filter(c -> c instanceof IHeatConsumer) 
+            .map(c -> (IHeatConsumer) c).map(consumer -> {
             float availableHeat = heatSource.getCapability().map(IHeatSource::getHeatStored).orElse(0f);
             if (availableHeat <= 0) return 0f;
 

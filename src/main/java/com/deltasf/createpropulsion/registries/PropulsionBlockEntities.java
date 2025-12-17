@@ -96,12 +96,12 @@ public class PropulsionBlockEntities {
     public static final BlockEntityEntry<LiquidBurnerBlockEntity> LIQUID_BURNER_BLOCK_ENTITY = 
         REGISTRATE.blockEntity("liquid_burner_block_entity", LiquidBurnerBlockEntity::new)
         .validBlock(PropulsionBlocks.LIQUID_BURNER)
-        //.renderer(() -> LiquidBurnerRenderer::new)
+        //.renderer(() -> LiquidBurnerRenderer::new) //TODO: 
         .register();
 
     public static final BlockEntityEntry<PropellerBlockEntity> PROPELLER_BLOCK_ENTITY = 
         REGISTRATE.blockEntity("propeller_block_entity", PropellerBlockEntity::new)
-        //.visual(() -> PropellerRenderInstance::new)
+        //.visual(() -> PropellerRenderInstance::new) //TODO: 
         .validBlock(PropulsionBlocks.PROPELLER_BLOCK)
         .renderer(() -> PropellerRenderer::new)
         .register();
@@ -121,7 +121,6 @@ public class PropulsionBlockEntities {
 
     public static final BlockEntityEntry<TiltAdapterBlockEntity> TILT_ADAPTER_BLOCK_ENTITY = 
         REGISTRATE.blockEntity("tilt_adapter_block_entity", TiltAdapterBlockEntity::new)
-        //.instance(() -> StirlingEngineRenderInstance::new)
         .validBlock(PropulsionBlocks.TILT_ADAPTER_BLOCK)
         .renderer(() -> TiltAdapterRenderer::new)
         .register();
