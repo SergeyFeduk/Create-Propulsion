@@ -452,18 +452,33 @@ public class PhysicsAssemblerBlockEntity extends SmartBlockEntity {
         return 90.0f;
     }
 
-    //Stolen from https://github.com/Creators-of-Create/Create/blob/mc1.21.1/dev/src/main/java/com/simibubi/create/content/kinetics/base/KineticEffectHandler.java
     public void spawnEffect(ParticleOptions particle, float maxMotion, int amount) {
         Level world = getLevel();
-        if (world == null)
+        if (world == null || !world.isClientSide)
             return;
-        if (!world.isClientSide)
-            return;
+
         RandomSource r = world.random;
+        Vec3 center = VecHelper.getCenterOf(getBlockPos());
+
         for (int i = 0; i < amount; i++) {
             Vec3 motion = VecHelper.offsetRandomly(Vec3.ZERO, r, maxMotion);
-            Vec3 position = VecHelper.getCenterOf(getBlockPos());
-            world.addParticle(particle, position.x, position.y, position.z, motion.x, motion.y, motion.z);
+            Direction face = Direction.getNearest(motion.x, motion.y, motion.z);
+            double px = center.x + (face.getStepX() * 0.55);
+            double py = center.y + (face.getStepY() * 0.55);
+            double pz = center.z + (face.getStepZ() * 0.55);
+            float spread = 0.9f;
+            
+            if (face.getAxis() != Direction.Axis.X) {
+                px += (r.nextFloat() - 0.5f) * spread;
+            }
+            if (face.getAxis() != Direction.Axis.Y) {
+                py += (r.nextFloat() - 0.5f) * spread;
+            }
+            if (face.getAxis() != Direction.Axis.Z) {
+                pz += (r.nextFloat() - 0.5f) * spread;
+            }
+
+            world.addParticle(particle, px, py, pz, motion.x, motion.y, motion.z);
         }
     }
 
