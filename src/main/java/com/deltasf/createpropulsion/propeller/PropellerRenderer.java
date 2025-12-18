@@ -2,6 +2,7 @@ package com.deltasf.createpropulsion.propeller;
 
 import java.util.List;
 
+import dev.engine_room.flywheel.api.visualization.VisualizationManager;
 import dev.engine_room.flywheel.lib.model.baked.PartialModel;
 import net.createmod.catnip.animation.AnimationTickHolder;
 import net.createmod.catnip.math.AngleHelper;
@@ -52,7 +53,7 @@ public class PropellerRenderer extends KineticBlockEntityRenderer<PropellerBlock
     @SuppressWarnings("null")
     @Override
 	protected void renderSafe(PropellerBlockEntity be, float partialTicks, PoseStack ms, MultiBufferSource buffer, int light, int overlay) {
-        //if (Backend.canUseInstancing(be.getLevel())) return;
+        if (VisualizationManager.supportsVisualization(be.getLevel())) return;
 
         Direction direction = be.getBlockState().getValue(PropellerBlock.FACING);
 		VertexConsumer vb = buffer.getBuffer(RenderType.cutoutMipped());

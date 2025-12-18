@@ -18,6 +18,7 @@ import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerBlockEntit
 import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerRenderer;
 import com.deltasf.createpropulsion.propeller.PropellerBlockEntity;
 import com.deltasf.createpropulsion.propeller.PropellerRenderer;
+import com.deltasf.createpropulsion.propeller.PropellerVisual;
 import com.deltasf.createpropulsion.reaction_wheel.ReactionWheelBlockEntity;
 import com.deltasf.createpropulsion.reaction_wheel.ReactionWheelRenderer;
 import com.deltasf.createpropulsion.thruster.creative_thruster.CreativeThrusterBlockEntity;
@@ -101,7 +102,7 @@ public class PropulsionBlockEntities {
 
     public static final BlockEntityEntry<PropellerBlockEntity> PROPELLER_BLOCK_ENTITY = 
         REGISTRATE.blockEntity("propeller_block_entity", PropellerBlockEntity::new)
-        //.visual(() -> PropellerRenderInstance::new) //TODO: 
+        .visual(() -> PropellerVisual::new)
         .validBlock(PropulsionBlocks.PROPELLER_BLOCK)
         .renderer(() -> PropellerRenderer::new)
         .register();
