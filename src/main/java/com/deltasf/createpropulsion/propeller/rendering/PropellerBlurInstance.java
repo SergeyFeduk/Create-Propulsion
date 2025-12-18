@@ -1,4 +1,4 @@
-package com.deltasf.createpropulsion.propeller;
+package com.deltasf.createpropulsion.propeller.rendering;
 
 import dev.engine_room.flywheel.api.instance.InstanceHandle;
 import dev.engine_room.flywheel.api.instance.InstanceType;

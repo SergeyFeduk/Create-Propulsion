@@ -1,6 +1,5 @@
 package com.deltasf.createpropulsion.registries;
 
-import com.deltasf.createpropulsion.propeller.PropellerBlurInstance;
 import dev.engine_room.flywheel.api.instance.InstanceType;
 import dev.engine_room.flywheel.api.layout.FloatRepr;
 import dev.engine_room.flywheel.api.layout.IntegerRepr;
@@ -9,6 +8,8 @@ import dev.engine_room.flywheel.lib.instance.SimpleInstanceType;
 import dev.engine_room.flywheel.lib.util.ExtraMemoryOps;
 import net.minecraft.resources.ResourceLocation;
 import org.lwjgl.system.MemoryUtil;
+
+import com.deltasf.createpropulsion.propeller.rendering.PropellerBlurInstance;
 
 public class PropulsionInstanceTypes {
 

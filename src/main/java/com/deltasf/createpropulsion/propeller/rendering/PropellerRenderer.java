@@ -1,4 +1,4 @@
-package com.deltasf.createpropulsion.propeller;
+package com.deltasf.createpropulsion.propeller.rendering;
 
 import java.util.List;
 
@@ -11,6 +11,8 @@ import net.createmod.catnip.render.SuperByteBuffer;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import com.deltasf.createpropulsion.PropulsionConfig;
+import com.deltasf.createpropulsion.propeller.PropellerBlock;
+import com.deltasf.createpropulsion.propeller.PropellerBlockEntity;
 import com.deltasf.createpropulsion.registries.PropulsionPartialModels;
 import com.deltasf.createpropulsion.registries.PropulsionRenderTypes;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -195,7 +197,7 @@ public class PropellerRenderer extends KineticBlockEntityRenderer<PropellerBlock
         if (placementAngles.isEmpty() || bladeModel == null) return;
         
         double bladeAngle = PropulsionConfig.PROPELLER_BLADE_ANGLE.get();
-        float pitchAngle = (float)bladeAngle * (be.isClockwise ? 1.0f : -1.0f);
+        float pitchAngle = (float)bladeAngle * (be.IsClockwise() ? 1.0f : -1.0f);
 
         for (float currentAngle : placementAngles) {
             ms.pushPose();

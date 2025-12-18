@@ -1,4 +1,4 @@
-package com.deltasf.createpropulsion.propeller;
+package com.deltasf.createpropulsion.propeller.rendering;
 
 import java.util.function.Consumer;
 
@@ -7,6 +7,8 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import com.deltasf.createpropulsion.PropulsionConfig;
+import com.deltasf.createpropulsion.propeller.PropellerBlock;
+import com.deltasf.createpropulsion.propeller.PropellerBlockEntity;
 import com.deltasf.createpropulsion.propeller.blades.PropellerBladeItem;
 import com.deltasf.createpropulsion.registries.PropulsionInstanceTypes;
 import com.deltasf.createpropulsion.registries.PropulsionPartialModels;
@@ -174,7 +176,7 @@ public class PropellerVisual extends KineticBlockEntityVisual<PropellerBlockEnti
 
     private void transformBlade(Instance instance, float totalAngle, int alpha) {
         double bladeAngle = PropulsionConfig.PROPELLER_BLADE_ANGLE.get();
-        float pitchAngle = (float)bladeAngle * (blockEntity.isClockwise ? 1.0f : -1.0f);
+        float pitchAngle = (float)bladeAngle * (blockEntity.IsClockwise() ? 1.0f : -1.0f);
 
         Quaternionf rotation = getBaseRotation(totalAngle);
         Quaternionf pitchRot = new Quaternionf().rotationY(Mth.DEG_TO_RAD * pitchAngle);

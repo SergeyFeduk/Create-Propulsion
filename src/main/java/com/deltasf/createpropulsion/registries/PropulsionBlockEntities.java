@@ -17,8 +17,8 @@ import com.deltasf.createpropulsion.optical_sensors.rendering.OpticalSensorRende
 import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerBlockEntity;
 import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerRenderer;
 import com.deltasf.createpropulsion.propeller.PropellerBlockEntity;
-import com.deltasf.createpropulsion.propeller.PropellerRenderer;
-import com.deltasf.createpropulsion.propeller.PropellerVisual;
+import com.deltasf.createpropulsion.propeller.rendering.PropellerRenderer;
+import com.deltasf.createpropulsion.propeller.rendering.PropellerVisual;
 import com.deltasf.createpropulsion.reaction_wheel.ReactionWheelBlockEntity;
 import com.deltasf.createpropulsion.reaction_wheel.ReactionWheelRenderer;
 import com.deltasf.createpropulsion.thruster.creative_thruster.CreativeThrusterBlockEntity;

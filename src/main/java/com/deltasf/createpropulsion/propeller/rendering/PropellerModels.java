@@ -1,4 +1,4 @@
-package com.deltasf.createpropulsion.propeller;
+package com.deltasf.createpropulsion.propeller.rendering;
 
 import dev.engine_room.flywheel.api.material.DepthTest;
 import dev.engine_room.flywheel.api.material.Material;

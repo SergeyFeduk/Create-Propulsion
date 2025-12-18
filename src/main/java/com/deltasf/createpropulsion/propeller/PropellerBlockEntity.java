@@ -15,6 +15,7 @@ import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 import com.deltasf.createpropulsion.atmosphere.DimensionAtmosphereManager;
 import com.deltasf.createpropulsion.physics_assembler.AssemblyUtility;
 import com.deltasf.createpropulsion.propeller.blades.PropellerBladeItem;
+import com.deltasf.createpropulsion.propeller.rendering.PropellerRenderer;
 import com.deltasf.createpropulsion.utility.math.MathUtility;
 import com.simibubi.create.AllSpecialTextures;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
@@ -96,6 +97,10 @@ public class PropellerBlockEntity extends KineticBlockEntity {
             }
             updateThrust();
         }
+    }
+
+    public boolean IsClockwise() {
+        return isClockwise;
     }
 
     @Override
