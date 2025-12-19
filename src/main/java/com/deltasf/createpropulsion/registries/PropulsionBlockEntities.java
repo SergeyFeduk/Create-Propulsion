@@ -29,7 +29,7 @@ import com.deltasf.createpropulsion.tilt_adapter.TiltAdapterRenderer;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import com.simibubi.create.content.kinetics.base.ShaftRenderer;
 import com.simibubi.create.content.kinetics.base.SingleAxisRotatingVisual;
-import com.simibubi.create.content.kinetics.transmission.SplitShaftInstance;
+import com.simibubi.create.content.kinetics.transmission.SplitShaftVisual;
 import com.simibubi.create.content.kinetics.transmission.SplitShaftRenderer;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.BlockEntityEntry;
@@ -80,7 +80,7 @@ public class PropulsionBlockEntities {
 
     public static final BlockEntityEntry<RedstoneTransmissionBlockEntity> REDSTONE_TRANSMISSION_BLOCK_ENTITY =
             REGISTRATE.blockEntity("redstone_transmission_block_entity", RedstoneTransmissionBlockEntity::new)
-                    .instance(() -> SplitShaftInstance::new, false)
+                    .visual(() -> SplitShaftVisual::new, false)
                     .validBlock(PropulsionBlocks.REDSTONE_TRANSMISSION_BLOCK)
                     .renderer(() -> SplitShaftRenderer::new)
                     .register();

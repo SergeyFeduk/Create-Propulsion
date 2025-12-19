@@ -8,13 +8,14 @@ import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform;
 import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.INamedIconOptions;
 import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollOptionBehaviour;
 import com.simibubi.create.foundation.gui.AllIcons;
-import com.simibubi.create.foundation.utility.AngleHelper;
-import com.simibubi.create.foundation.utility.Lang;
-import com.simibubi.create.foundation.utility.VecHelper;
+import net.createmod.catnip.lang.Lang;
+import net.createmod.catnip.math.AngleHelper;
+import net.createmod.catnip.math.VecHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -83,14 +84,14 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
         }
 
         @Override
-        public Vec3 getLocalOffset(BlockState state) {
+        public Vec3 getLocalOffset(LevelAccessor level, BlockPos pos, BlockState state) {
             Direction side = state.getValue(HORIZONTAL_FACING);
             float horizontalAngle = AngleHelper.horizontalAngle(side);
             return VecHelper.rotateCentered(getSouthLocation(), horizontalAngle, Direction.Axis.Y);
         }
 
         @Override
-        public void rotate(BlockState state, PoseStack ms) {
+        public void rotate(LevelAccessor level, BlockPos pos, BlockState state, PoseStack ms) {
             Direction facing = state.getValue(HORIZONTAL_FACING);
             float yRot = AngleHelper.horizontalAngle(facing);
             ms.mulPose(com.mojang.math.Axis.YP.rotationDegrees(yRot));

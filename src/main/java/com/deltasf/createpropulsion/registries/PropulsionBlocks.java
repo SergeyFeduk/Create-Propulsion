@@ -21,7 +21,6 @@ import com.deltasf.createpropulsion.reaction_wheel.ReactionWheelBlock;
 import com.deltasf.createpropulsion.redstone_transmission.RedstoneTransmissionBlock;
 import com.deltasf.createpropulsion.thruster.creative_thruster.CreativeThrusterBlock;
 import com.deltasf.createpropulsion.thruster.thruster.ThrusterBlock;
-import com.simibubi.create.content.kinetics.BlockStressDefaults;
 import com.simibubi.create.foundation.data.AssetLookup;
 import com.simibubi.create.foundation.data.BlockStateGen;
 import com.deltasf.createpropulsion.tilt_adapter.TiltAdapterBlock;
@@ -174,7 +173,7 @@ public class PropulsionBlocks {
     public static final BlockEntry<RedstoneTransmissionBlock> REDSTONE_TRANSMISSION_BLOCK = REGISTRATE.block("redstone_transmission", RedstoneTransmissionBlock::new)
             .initialProperties(SharedProperties::stone)
             .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
-            .transform(BlockStressDefaults.setNoImpact())
+            .transform(PropulsionDefaultStress.setNoImpact())
             .transform(axeOrPickaxe())
             .addLayer(() -> RenderType::cutoutMipped)
             .blockstate((c, p) -> BlockStateGen.axisBlock(c, p, AssetLookup.forPowered(c, p)))
