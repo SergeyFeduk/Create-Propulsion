@@ -45,9 +45,13 @@ public class PropellerVisual extends KineticBlockEntityVisual<PropellerBlockEnti
     protected final Direction facing;
 
     private final SmartRecycler<Integer, OrientedInstance> sharpHead;
-    private final SmartRecycler<Integer, PropellerBlurInstance> blurHead;
     private final SmartRecycler<PartialModel, OrientedInstance> sharpBlades;
-    private final SmartRecycler<PartialModel, PropellerBlurInstance> blurBlades;
+
+    private final SmartRecycler<Integer, PropellerBlurInstance> blurHeadOIT;
+    private final SmartRecycler<PartialModel, PropellerBlurInstance> blurBladesOIT;
+
+    private final SmartRecycler<Integer, PropellerBlurInstance> blurHeadStd;
+    private final SmartRecycler<PartialModel, PropellerBlurInstance> blurBladesStd;
 
     private float lastRenderTimeSeconds;
 
@@ -64,13 +68,21 @@ public class PropellerVisual extends KineticBlockEntityVisual<PropellerBlockEnti
         sharpHead = new SmartRecycler<>(key ->
             instancerProvider().instancer(InstanceTypes.ORIENTED, Models.partial(PropulsionPartialModels.PROPELLER_HEAD)).createInstance());
 
-        blurHead = new SmartRecycler<>(key ->
-            instancerProvider().instancer(PropulsionInstanceTypes.PROPELLER_BLUR, PropellerModels.getBlurred(PropulsionPartialModels.PROPELLER_HEAD)).createInstance());
-
         sharpBlades = new SmartRecycler<>(model -> 
             instancerProvider().instancer(InstanceTypes.ORIENTED, Models.partial(model)).createInstance());
 
-        blurBlades = new SmartRecycler<>(model -> 
+        // Post-translucent instancers
+        blurHeadOIT = new SmartRecycler<>(key ->
+            instancerProvider().instancer(PropulsionInstanceTypes.PROPELLER_OIT_BLUR, PropellerModels.getOITBlurred(PropulsionPartialModels.PROPELLER_HEAD)).createInstance());
+
+        blurBladesOIT = new SmartRecycler<>(model -> 
+            instancerProvider().instancer(PropulsionInstanceTypes.PROPELLER_OIT_BLUR, PropellerModels.getOITBlurred(model)).createInstance());
+
+        // Pre-translucent instancers
+        blurHeadStd = new SmartRecycler<>(key ->
+            instancerProvider().instancer(PropulsionInstanceTypes.PROPELLER_BLUR, PropellerModels.getBlurred(PropulsionPartialModels.PROPELLER_HEAD)).createInstance());
+
+        blurBladesStd = new SmartRecycler<>(model -> 
             instancerProvider().instancer(PropulsionInstanceTypes.PROPELLER_BLUR, PropellerModels.getBlurred(model)).createInstance());
 
         Level level = blockEntity.getLevel();
@@ -81,9 +93,12 @@ public class PropellerVisual extends KineticBlockEntityVisual<PropellerBlockEnti
     @Override
     public void beginFrame(Context ctx) {
         sharpHead.resetCount();
-        blurHead.resetCount();
         sharpBlades.resetCount();
-        blurBlades.resetCount();
+        
+        blurHeadOIT.resetCount();
+        blurBladesOIT.resetCount();
+        blurHeadStd.resetCount();
+        blurBladesStd.resetCount();
 
         float time = AnimationTickHolder.getRenderTime(level);
         float timeSeconds = time / 20.0f;
@@ -109,9 +124,12 @@ public class PropellerVisual extends KineticBlockEntityVisual<PropellerBlockEnti
         }
 
         sharpHead.discardExtra();
-        blurHead.discardExtra();
         sharpBlades.discardExtra();
-        blurBlades.discardExtra();
+        
+        blurHeadOIT.discardExtra();
+        blurBladesOIT.discardExtra();
+        blurHeadStd.discardExtra();
+        blurBladesStd.discardExtra();
     }
 
     private void renderSharp(@Nullable PartialModel bladeModel, int light) {
@@ -147,14 +165,17 @@ public class PropellerVisual extends KineticBlockEntityVisual<PropellerBlockEnti
 
         for (int i = 0; i < N; i++) {
             float rotationalAngle = stroboscopicAngle - (i * angleStep);
+            
+            //Alternate between pre-translucent and post-translucent groups
+            boolean useOIT = (i % 2 == 0);
 
-            PropellerBlurInstance head = blurHead.get(0);
+            PropellerBlurInstance head = useOIT ? blurHeadOIT.get(0) : blurHeadStd.get(0);
             transformHead(head, rotationalAngle, headAlphaInt);
             head.light(light).setChanged();
 
             if (bladeModel != null) {
                 for (float placementAngle : blockEntity.renderedBladeAngles) {
-                    PropellerBlurInstance blade = blurBlades.get(bladeModel);
+                    PropellerBlurInstance blade = useOIT ? blurBladesOIT.get(bladeModel) : blurBladesStd.get(bladeModel);
                     transformBlade(blade, rotationalAngle + placementAngle, alphaInt);
                     blade.light(light).setChanged();
                 }
@@ -265,9 +286,12 @@ public class PropellerVisual extends KineticBlockEntityVisual<PropellerBlockEnti
     protected void _delete() {
         shaft.delete();
         sharpHead.delete();
-        blurHead.delete();
         sharpBlades.delete();
-        blurBlades.delete();
+        
+        blurHeadOIT.delete();
+        blurBladesOIT.delete();
+        blurHeadStd.delete();
+        blurBladesStd.delete();
     }
 
     @Override

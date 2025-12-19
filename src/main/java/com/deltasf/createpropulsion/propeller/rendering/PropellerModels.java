@@ -16,13 +16,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PropellerModels {
-    private static final Material BLUR_MATERIAL = SimpleMaterial.builder()
+    private static final Material BLUR_MATERIAL_OIT = SimpleMaterial.builder()
         .texture(InventoryMenu.BLOCK_ATLAS)
         .depthTest(DepthTest.LEQUAL)
         .transparency(Transparency.ORDER_INDEPENDENT)
-        //.writeMask(WriteMask.COLOR)
         .backfaceCulling(true)
         .build();
+
+    private static final Material BLUR_MATERIAL = SimpleMaterial.builder()
+        .texture(InventoryMenu.BLOCK_ATLAS)
+        .depthTest(DepthTest.LEQUAL)
+        .transparency(Transparency.TRANSLUCENT)
+        .writeMask(WriteMask.COLOR)
+        .backfaceCulling(true)
+        .build();
+
+    private static final RendererReloadCache<PartialModel, Model> BLURRED_OIT_MODELS =
+        new RendererReloadCache<>(partial -> new MaterialOverridenModel(Models.partial(partial), BLUR_MATERIAL_OIT));
+
+    public static Model getOITBlurred(PartialModel partial) {
+        return BLURRED_OIT_MODELS.get(partial);
+    }
 
     private static final RendererReloadCache<PartialModel, Model> BLURRED_MODELS =
         new RendererReloadCache<>(partial -> new MaterialOverridenModel(Models.partial(partial), BLUR_MATERIAL));

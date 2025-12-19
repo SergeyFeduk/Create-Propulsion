@@ -11,17 +11,14 @@ import java.util.Set;
 
 public class PropellerRenderControl {
     public static int renderStage = 0;
-    
-    // We store the specific draw objects (InstancedDraw) to skip this frame
     public static final Set<Object> hiddenDraws = new HashSet<>();
 
     public static boolean shouldSkip(InstancerKey<?> key) {
-        boolean isBlur = key.type() == PropulsionInstanceTypes.PROPELLER_BLUR;
+        boolean isBlur = key.type() == PropulsionInstanceTypes.PROPELLER_OIT_BLUR;
         if (renderStage == 0) return isBlur;
         else return !isBlur;
     }
 
-    // Helper to find the draws for an instancer and hide them
     public static void hideInstancer(AbstractInstancer<?> instancer) {
         if (instancer instanceof IInstancedInstancerExposer exposer) {
             List<?> draws = exposer.createpropulsion$getDraws();
@@ -31,7 +28,6 @@ public class PropellerRenderControl {
         }
     }
 
-    // Helper to filter the main render list
     public static List<?> filterDraws(List<?> originalDraws) {
         if (hiddenDraws.isEmpty()) return originalDraws;
 
