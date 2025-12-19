@@ -19,8 +19,8 @@ public class PropellerModels {
     private static final Material BLUR_MATERIAL = SimpleMaterial.builder()
         .texture(InventoryMenu.BLOCK_ATLAS)
         .depthTest(DepthTest.LEQUAL)
-        .transparency(Transparency.TRANSLUCENT)
-        .writeMask(WriteMask.COLOR)
+        .transparency(Transparency.ORDER_INDEPENDENT)
+        //.writeMask(WriteMask.COLOR)
         .backfaceCulling(true)
         .build();
 

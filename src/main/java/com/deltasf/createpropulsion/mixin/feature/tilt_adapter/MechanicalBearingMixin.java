@@ -1,4 +1,4 @@
-package com.deltasf.createpropulsion.mixin;
+package com.deltasf.createpropulsion.mixin.feature.tilt_adapter;
 
 import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.tilt_adapter.ISnappingSequenceContext;
@@ -21,6 +21,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(MechanicalBearingBlockEntity.class)
 public abstract class MechanicalBearingMixin extends KineticBlockEntity {
+
+    /// This mixin forces mechanical bearing to snap to angle = 0 when it is in downstream network related to tilt_adapter (and therefore uses sequence context emitted by tilt adapter)
+    /// Snapping is performed within angular range produced by one redstone signal level of tilt adapter with current settings
+
     @Shadow(remap = false) protected ScrollOptionBehaviour<MechanicalBearingBlockEntity.RotationMode> movementMode;
     @Shadow(remap = false) protected float angle;
     @Shadow(remap = false) protected boolean running;

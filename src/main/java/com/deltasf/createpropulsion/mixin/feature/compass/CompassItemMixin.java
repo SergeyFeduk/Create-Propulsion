@@ -1,4 +1,4 @@
-package com.deltasf.createpropulsion.mixin;
+package com.deltasf.createpropulsion.mixin.feature.compass;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -23,9 +23,6 @@ public abstract class CompassItemMixin {
     /// This mixin fixes binding compass to lodestone located on ship
     /// If lodestone block is in shipyard - ship managing this pos in shipyard must actuall exist
     /// If it does not - do not bind to the lodestone, as it is located on dead ship
-    
-
-    /// Note: This does not work correctly if we shipify the lodestone block due to the fact that poi manager is not updated. This is a VS issue and most likely it is fixed in vs 2.5
     
     @WrapOperation(
         method = "inventoryTick",

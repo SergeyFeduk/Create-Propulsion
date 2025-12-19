@@ -6,13 +6,18 @@
     "refmap": "createpropulsion.refmap.json",
     "plugin": "com.deltasf.createpropulsion.mixin.plugin.PropulsionMixinPlugin",
     "mixins": [
-      "CompassItemMixin",
-      "BlockMixin",
-      "MechanicalBearingMixin",
-      "SequenceContextMixin"
+      "feature.compass.CompassItemMixin",
+      "feature.envelopes.BlockMixin",
+      "feature.tilt_adapter.MechanicalBearingMixin",
+      "feature.tilt_adapter.SequenceContextMixin"
     ],
     "client": [
-      "CompassItemPropertyFunctionMixin"
+      "feature.compass.CompassItemPropertyFunctionMixin",
+      "rendering.LevelRendererMixin",
+      "rendering.EngineImplMixin",
+      "rendering.DrawManagerAccessor",
+      "rendering.InstancedDrawManagerMixin",
+      "rendering.InstancedInstancerMixin"
     ],
     "server": [],
     "injectors": {

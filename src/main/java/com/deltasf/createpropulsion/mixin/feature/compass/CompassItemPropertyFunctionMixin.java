@@ -1,4 +1,4 @@
-package com.deltasf.createpropulsion.mixin;
+package com.deltasf.createpropulsion.mixin.feature.compass;
 
 import org.joml.Vector3d;
 import org.spongepowered.asm.mixin.Mixin;
