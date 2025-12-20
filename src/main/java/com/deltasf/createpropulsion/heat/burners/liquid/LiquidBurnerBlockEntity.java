@@ -20,14 +20,11 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 
 public class LiquidBurnerBlockEntity extends AbstractBurnerBlockEntity {
@@ -38,7 +35,7 @@ public class LiquidBurnerBlockEntity extends AbstractBurnerBlockEntity {
     protected SmartFluidTankBehaviour tank;
     private final Map<Direction, LazyOptional<IFluidHandler>> fluidCaps = new IdentityHashMap<>();
 
-    private static final float MAX_HEAT = 400.0f;
+    private static final float MAX_HEAT = 600.0f;
 
     public LiquidBurnerBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
@@ -101,7 +98,7 @@ public class LiquidBurnerBlockEntity extends AbstractBurnerBlockEntity {
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
         if (cap == ForgeCapabilities.FLUID_HANDLER && side != null) {
             if (side.getAxis() == getPipeAxis()) {
-                return fluidCaps.computeIfAbsent(side, s -> LazyOptional.of(() -> new PassthroughFluidHandler(s))).cast();
+                return fluidCaps.computeIfAbsent(side, s -> LazyOptional.of(() -> new PassthroughFluidHandler(this, s))).cast();
             }
         }
         return super.getCapability(cap, side);
@@ -109,14 +106,6 @@ public class LiquidBurnerBlockEntity extends AbstractBurnerBlockEntity {
 
     @Override
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
-        /*if (!heatSource.getCapability().isPresent()) return false;
-        IHeatSource heatSourceCap = heatSource.getCapability().resolve().get();
-        
-        CreateLang.builder()
-            .add(CreateLang.number(heatSourceCap.getHeatStored()))
-            .text(" / ")
-            .add(CreateLang.number(heatSourceCap.getMaxHeatStored())).forGoggles(tooltip);*/
-
         ChatFormatting color = null;
         String key = null;
 
@@ -170,74 +159,5 @@ public class LiquidBurnerBlockEntity extends AbstractBurnerBlockEntity {
         super.read(tag, clientPacket);
         heatLevelName = HeatLevelString.valueOf(tag.getString("heatLevelName"));
         isPowered = tag.getBoolean("isPowered");
-    }
-
-    private class PassthroughFluidHandler implements IFluidHandler {
-        private final Direction inputSide; 
-
-        public PassthroughFluidHandler(Direction side) {
-            this.inputSide = side;
-        }
-
-        private boolean isFuel(FluidStack stack) {
-            // TODO: 
-            return stack.getFluid().isSame(Fluids.WATER);
-        }
-
-        @SuppressWarnings("null")
-        @Override
-        public int fill(FluidStack resource, FluidAction action) {
-            if (resource.isEmpty()) return 0;
-
-            int totalFilled = 0;
-            FluidStack remaining = resource.copy();
-
-            // Try to fill internal tank
-            if (isFuel(resource)) {
-                int filledIntoTank = tank.getPrimaryHandler().fill(remaining, action);
-                totalFilled += filledIntoTank;
-                remaining.shrink(filledIntoTank);
-            }
-
-            // Pass to the opposite side
-            if (!remaining.isEmpty()) {
-                Direction outputSide = inputSide.getOpposite();
-                BlockPos neighborPos = worldPosition.relative(outputSide);
-                BlockEntity neighbor = level.getBlockEntity(neighborPos);
-
-                if (neighbor != null) {
-                    LazyOptional<IFluidHandler> neighborCap = neighbor.getCapability(ForgeCapabilities.FLUID_HANDLER, inputSide);
-                    IFluidHandler cap = neighborCap.orElse(null);
-                    if (cap != null) {
-                        int filledIntoNeighbor = cap.fill(remaining, action);
-                        totalFilled += filledIntoNeighbor;
-                    }
-                }
-            }
-
-            return totalFilled;
-        }
-
-        @Override
-        public FluidStack drain(FluidStack resource, FluidAction action) {
-            return tank.getPrimaryHandler().drain(resource, action);
-        }
-
-        @Override
-        public FluidStack drain(int maxDrain, FluidAction action) {
-            return tank.getPrimaryHandler().drain(maxDrain, action);
-        }
-
-        @Override
-        public int getTanks() { return tank.getPrimaryHandler().getTanks(); }
-
-        @Override
-        public FluidStack getFluidInTank(int tankIndex) { return tank.getPrimaryHandler().getFluidInTank(tankIndex); }
-
-        @Override
-        public int getTankCapacity(int tankIndex) { return tank.getPrimaryHandler().getTankCapacity(tankIndex); }
-
-        @Override
-        public boolean isFluidValid(int tankIndex, FluidStack stack) { return tank.getPrimaryHandler().isFluidValid(tankIndex, stack); }
     }
 }

@@ -4,6 +4,7 @@ import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.design_goggles.DesignGogglesOverlayRenderer;
 import com.deltasf.createpropulsion.physics_assembler.AssemblyGaugeOverlayRenderer;
 import com.deltasf.createpropulsion.ponder.DeltaPonderPlugin;
+import com.deltasf.createpropulsion.registries.PropulsionInstanceTypes;
 import com.deltasf.createpropulsion.registries.PropulsionItems;
 
 import net.createmod.ponder.foundation.PonderIndex;
@@ -58,5 +59,6 @@ public class ModClientEvents {
 
     public static void clientInit(final FMLClientSetupEvent event) {
         PonderIndex.addPlugin(new DeltaPonderPlugin());
+        PropulsionInstanceTypes.register();
     }
 }

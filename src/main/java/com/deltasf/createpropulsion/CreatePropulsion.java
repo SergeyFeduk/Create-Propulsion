@@ -20,7 +20,6 @@ import com.deltasf.createpropulsion.registries.PropulsionBlocks;
 import com.deltasf.createpropulsion.registries.PropulsionCreativeTab;
 import com.deltasf.createpropulsion.registries.PropulsionDefaultStress;
 import com.deltasf.createpropulsion.registries.PropulsionFluids;
-import com.deltasf.createpropulsion.registries.PropulsionInstanceTypes;
 import com.deltasf.createpropulsion.registries.PropulsionItems;
 import com.deltasf.createpropulsion.registries.PropulsionPartialModels;
 import com.simibubi.create.compat.Mods;
@@ -56,8 +55,7 @@ public class CreatePropulsion {
         PropulsionPartialModels.register();
         PropulsionCreativeTab.register(modBus);
         PropulsionPackets.register();
-        PropulsionInstanceTypes.register(); //TODO: move in client only place
-
+        
         // VS Init
         VsApi api = ValkyrienSkies.api();
         api.registerAttachment(api.newAttachmentRegistrationBuilder(ThrusterForceAttachment.class)
