@@ -19,6 +19,8 @@ public class PropulsionPartialModels {
     public static final PartialModel REACTION_WHEEL_CORE = partial("reaction_wheel_core");
     //Stirling engine
     public static final PartialModel STIRLING_ENGINE_PISTON = partial("stirling_piston");
+    //Liquid burner
+    public static final PartialModel LIQUID_BURNER_FAN = partial("liquid_burner_fan");
     //Tilt adapter
     public static final PartialModel TILT_ADAPTER_INPUT_SHAFT = partial("tilt_adapter_input_shaft");
     public static final PartialModel TILT_ADAPTER_OUTPUT_SHAFT = partial("tilt_adapter_output_shaft");

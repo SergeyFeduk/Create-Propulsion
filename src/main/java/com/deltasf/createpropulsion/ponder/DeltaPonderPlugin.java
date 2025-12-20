@@ -19,15 +19,18 @@ public class DeltaPonderPlugin implements PonderPlugin {
     // - Replace mixer with boiler ("...or boilers")
     // - Replace boiler with heat pump ("...or other heat-driven machinery")
 
+    //TODO: Stirling engine ponder
+    // Show a solid burner, place a stirling engine on it
+    // Click on solid burner with coal
+
+    //TODO: Envelope ponder
+
     //TODO: Transmission ponder
 
-    //TODO: Stirling engine ponder
-    //(perhaps redirect to the Solid/Liquid burner ponder or have a separate one explaining that speed can be changed and SU output depends on heat amount)
-
     public static void register(PonderSceneRegistrationHelper<ResourceLocation> helper) {
-        PonderSceneRegistrationHelper<ItemProviderEntry<?>> HELPER = helper.withKeyFunction(RegistryEntry::getId);
-        HELPER.forComponents(PropulsionBlocks.TILT_ADAPTER_BLOCK)
-			.addStoryBoard("tilt_adapter", TiltAdapterScene::tiltAdapter);
+        final PonderSceneRegistrationHelper<ItemProviderEntry<?>> HELPER = helper.withKeyFunction(RegistryEntry::getId);
+        //Tilt adapter
+        HELPER.forComponents(PropulsionBlocks.TILT_ADAPTER_BLOCK).addStoryBoard("tilt_adapter", TiltAdapterScene::tiltAdapter);
     }
 
     @Override
