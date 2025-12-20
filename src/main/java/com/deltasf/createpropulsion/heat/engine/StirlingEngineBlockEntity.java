@@ -19,7 +19,7 @@ import net.minecraftforge.common.util.LazyOptional;
 
 public class StirlingEngineBlockEntity extends GeneratingKineticBlockEntity implements IHeatConsumer {
     public static final float MAX_GENERATED_RPM = 256.0f;
-    public static final float HEAT_CONSUMPTION_RATE = 1.0f; 
+    public static final float HEAT_CONSUMPTION_RATE = 1.0f; //TODO: Maybe lower the output speed - lower the heat consumption -> lower fuel consumption by burner ?
 
     private final LazyOptional<IHeatConsumer> heatConsumerCapability;
     protected StirlingScrollValueBehaviour targetSpeedBehaviour;
