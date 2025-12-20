@@ -24,7 +24,6 @@ public abstract class AbstractBurnerBlock extends HorizontalDirectionalBlock imp
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
     //Heat property is from Create. It is used in all blaze-related interactions (boilers, heated mixers, etc.)
     //Using BlazeBurnerBlock.HEAT_LEVEL is required for heated mixers. If I want to disallow my burners to be used in heated mixers - just define custom enum
-    //TODO: Do not forget to update it to reflect the actual heat state of the burner
     public static final EnumProperty<HeatLevel> HEAT = BlazeBurnerBlock.HEAT_LEVEL;
 
     protected AbstractBurnerBlock(Properties properties) {

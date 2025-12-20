@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "createpropulsion:block/liquid_burner_base"
+    },
+    "facing=east": {
+      "model": "createpropulsion:block/liquid_burner_base",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "createpropulsion:block/liquid_burner_base",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "createpropulsion:block/liquid_burner_base",
+      "y": 270
+    }
+  }
+}

@@ -188,6 +188,7 @@ public class PropulsionBlocks {
         .register();
 
     public static final BlockEntry<LiquidBurnerBlock> LIQUID_BURNER = REGISTRATE.block("liquid_burner", LiquidBurnerBlock::new)
+        .properties(p -> p.noOcclusion())
         .properties(p -> p.mapColor(MapColor.STONE))
         .properties(p -> p.sound(SoundType.COPPER))
         .properties(p -> p.requiresCorrectToolForDrops())

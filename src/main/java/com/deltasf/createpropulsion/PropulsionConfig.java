@@ -178,7 +178,7 @@ public class PropulsionConfig {
             PROPELLER_BLUR_SAMPLE_RATE = CLIENT_BUILDER.comment("How slow propeller blades start to become blurry")
                 .define("Sample rate", 2.0); //Set to 3
             PROPELLER_LOD_DISTANCE = CLIENT_BUILDER.comment("Distance at which propllers no longer blur")
-                .define("LOD", 64.0);
+                .define("LOD", 128.0);
             PROPELLER_EXPOSURE_TIME = CLIENT_BUILDER.comment("Simulated exposure time. Set to 1/120 by default")
                 .define("Exposure time", 1.0/120.0);
             PROPELLER_BLADE_ANGLE = CLIENT_BUILDER.comment("Angle of the propeller's blade, in degrees")

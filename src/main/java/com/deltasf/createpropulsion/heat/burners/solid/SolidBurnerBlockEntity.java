@@ -253,7 +253,7 @@ public class SolidBurnerBlockEntity extends AbstractBurnerBlockEntity implements
                 .style(!isPowered ? ChatFormatting.GREEN : ChatFormatting.RED))
             .forGoggles(tooltip);
 
-
+        //Fuel
         ItemStack fuel = fuelInventory.fuelStack;
         if (!fuel.isEmpty()) {
             LangBuilder fuelName = CreateLang.builder().add(fuel.getHoverName()).style(ChatFormatting.GRAY);

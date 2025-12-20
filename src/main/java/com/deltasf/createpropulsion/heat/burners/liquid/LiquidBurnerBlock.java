@@ -7,6 +7,9 @@ import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntityTicker;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -22,6 +25,20 @@ public class LiquidBurnerBlock extends AbstractBurnerBlock {
     }
 
     @Override
+    public BlockState getStateForPlacement(@Nonnull BlockPlaceContext context) {
+        Direction baseDirection = context.getNearestLookingDirection();
+        Direction placeDirection;
+        Player player = context.getPlayer();
+        if (player != null) {
+            placeDirection = player.isShiftKeyDown() ? baseDirection.getOpposite() : baseDirection;
+        } else {
+            placeDirection = baseDirection;
+        }
+
+        return this.defaultBlockState().setValue(FACING, placeDirection);
+    }
+
+    @Override
     public BlockEntity newBlockEntity(@Nonnull BlockPos pos, @Nonnull BlockState state) {
         return new LiquidBurnerBlockEntity(PropulsionBlockEntities.LIQUID_BURNER_BLOCK_ENTITY.get(), pos, state);
     }
@@ -34,28 +51,33 @@ public class LiquidBurnerBlock extends AbstractBurnerBlock {
         return null;
     }
 
-    //TODO: Abstract out into base class
     @Override
     public void onPlace(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull BlockState oldState, boolean isMoving) {
         super.onPlace(state, level, pos, oldState, isMoving);
-        if (level.isClientSide()) {
-            return;
-        }
+        if (level.isClientSide()) return;
+        
         if (level.getBlockEntity(pos) instanceof LiquidBurnerBlockEntity burner) {
             burner.updatePoweredState();
+            burner.updatePipeCapability(); 
+        }
+
+        for (Direction direction : Direction.values()) {
+            BlockPos neighborPos = pos.relative(direction);
+            BlockEntity neighborBE = level.getBlockEntity(neighborPos);
+            if (neighborBE != null) {
+                neighborBE.setChanged(); 
+            }
         }
     }
 
-    //TODO: Abstract out into base class
     @Override
     public void neighborChanged(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull Block block, @Nonnull BlockPos fromPos, boolean isMoving) {
         super.neighborChanged(state, level, pos, block, fromPos, isMoving);
-        if (level.isClientSide()) {
-            return;
-        }
+        if (level.isClientSide()) return;
 
         if (level.getBlockEntity(pos) instanceof LiquidBurnerBlockEntity burner) {
             burner.updatePoweredState();
+            burner.updatePipeCapability();
         }
     }
 }
