@@ -39,5 +39,5 @@ DiscoveredVolume - a record containing a set of discovered blocks as well as the
 
 # Constants:
 
-HAI_AABB_SIZE = 17 - not 16 as aabb is centered around the hai block
+HAI_AABB_SIZE = 127 (arbitrary number large enough to host most balloons)
 VERTICAL_ANOMALY_SCAN_DISTANCE = 32 - maximum distance for performing anomaly vertical probe during the scan process. 

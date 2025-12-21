@@ -10,18 +10,26 @@ import javax.annotation.Nullable;
 import com.deltasf.createpropulsion.heat.burners.AbstractBurnerBlock;
 import com.deltasf.createpropulsion.heat.burners.AbstractBurnerBlockEntity;
 import com.deltasf.createpropulsion.heat.burners.BurnerDamager;
+import com.deltasf.createpropulsion.registries.PropulsionCapabilities;
 import com.deltasf.createpropulsion.thruster.FluidThrusterProperties;
 import com.deltasf.createpropulsion.thruster.ThrusterFuelManager;
 import com.simibubi.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour;
+
+import net.createmod.catnip.math.VecHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
@@ -32,6 +40,9 @@ public class LiquidBurnerBlockEntity extends AbstractBurnerBlockEntity {
     protected SmartFluidTankBehaviour tank;
     private BurnerDamager damager;
     private int burnTime = 0;
+
+    public float fanAngle = 0;
+    public float lastRenderTime = -1;
 
     private final Map<Direction, LazyOptional<IFluidHandler>> fluidCaps = new IdentityHashMap<>();
 
@@ -54,11 +65,46 @@ public class LiquidBurnerBlockEntity extends AbstractBurnerBlockEntity {
         behaviours.add(tank);
     }
 
+    public int getBurnTime() {
+        return burnTime;
+    }
+
+    public boolean isBurning() {
+        return burnTime > 0;
+    }
+
+    private boolean hasEnoughFuel() {
+        if (tank.isEmpty()) return false;
+        FluidStack fluid = tank.getPrimaryHandler().getFluidInTank(0);
+        if (fluid.getAmount() < FUEL_CONSUMPTION_MB) return false;
+        return ThrusterFuelManager.getProperties(fluid.getFluid()) != null;
+    }
+
+    private boolean isConnectedToConsumer() {
+        Level level = getLevel();
+        if (level == null) return false;
+        BlockPos posAbove = worldPosition.above();
+        BlockEntity blockEntityAbove = level.getBlockEntity(posAbove);
+        if (blockEntityAbove == null) return false;
+        return blockEntityAbove.getCapability(PropulsionCapabilities.HEAT_CONSUMER, Direction.DOWN).isPresent();
+    }
+
+    public boolean isFanSpinning() {
+        if (isBurning()) return true;
+        if (hasEnoughFuel() && isConnectedToConsumer()) return true;
+        return false;
+    }
+
     @SuppressWarnings("null")
     @Override
     public void tick() {
         super.tick();
-        if (level.isClientSide()) return;
+        if (level.isClientSide()) {
+            if (burnTime > 0) burnTime--;
+            tickParticles();
+            return;
+        }
+
         float heatGeneration = (burnTime > 0) ? getHeatPerTick() : 0;
         if (burnTime > 0) burnTime--;
 
@@ -75,6 +121,42 @@ public class LiquidBurnerBlockEntity extends AbstractBurnerBlockEntity {
 
         updateBlockState();
         updateHeatLevelName();
+    }
+
+    private void tickParticles() {
+        Level level = getLevel();
+        if (level == null) return;
+        
+        //Smoke
+        if (isBurning() && level.getGameTime() % 2 == 0) {
+            final float PIPE_OFFSET = 2.5f / 16.0f;
+            final float Y_OFFSET = 0.3f;
+            final Vec3 EXHAUST_VELOCITY = new Vec3(0.01, 0.05, 0);
+
+            //Alternate pipes
+            boolean isLeft = level.getGameTime() % 4 == 0;
+            spawnParticleEffect(
+                new Vec3(0.6, Y_OFFSET, isLeft ? PIPE_OFFSET : -PIPE_OFFSET), 
+                EXHAUST_VELOCITY,
+                ParticleTypes.SMOKE
+            );
+        }
+
+        //TODO: Air sucked in
+        //Likely will need a separate particle type with behavior similar to airflow particle ones
+    }
+
+    private void spawnParticleEffect(Vec3 localOffset, Vec3 localVelocity, ParticleOptions particle) {
+        Level level = getLevel();
+        if (level == null) return;
+        Direction facing = getBlockState().getValue(AbstractBurnerBlock.FACING);
+        float yRot = -facing.toYRot();
+        
+        Vec3 offset = VecHelper.rotate(localOffset, yRot, Direction.Axis.Y);
+        Vec3 velocity = VecHelper.rotate(localVelocity, yRot, Direction.Axis.Y);
+        Vec3 spawnPos = VecHelper.getCenterOf(worldPosition).add(offset);
+
+        level.addParticle(particle, spawnPos.x, spawnPos.y, spawnPos.z, velocity.x, velocity.y, velocity.z);
     }
 
     private boolean tryConsumeFuel() {
