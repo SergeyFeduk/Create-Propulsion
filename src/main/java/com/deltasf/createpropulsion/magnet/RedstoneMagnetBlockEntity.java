@@ -103,7 +103,7 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
         //TODO: Uhh, this should already be handled by ForgeEvents::onServerStart
         if (!updatedAttachment) {
             // update attachment level reference
-            var serverShip = VSGameUtilsKt.getShipObjectManagingPos((ServerLevel)level, worldPosition);
+            var serverShip = VSGameUtilsKt.getLoadedShipManagingPos((ServerLevel)level, worldPosition);
             if (serverShip != null) {
                 var magnetAttachment  = serverShip.getAttachment(MagnetForceAttachment.class);
                 if (magnetAttachment != null && magnetAttachment.level == null) {
@@ -115,7 +115,7 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
 
         MagnetData data = MagnetRegistry.forLevel(level).getMagnet(this.magnetId);
         if (data != null && data.shipId != -1) {
-            var serverShip = VSGameUtilsKt.getShipObjectManagingPos((ServerLevel)level, worldPosition);
+            var serverShip = VSGameUtilsKt.getLoadedShipManagingPos((ServerLevel)level, worldPosition);
             if (serverShip == null) {
                 MagnetRegistry.forLevel(level).removeAllMagnetsForShip(data.shipId); //Technically we could just remove only this magnet but who cares
             } else {

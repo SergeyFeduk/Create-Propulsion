@@ -17,7 +17,7 @@ public class AttachmentUtils {
 
     @Nullable
     public static ServerShip getShipAt(ServerLevel serverLevel, BlockPos pos) {
-        ServerShip ship = VSGameUtilsKt.getShipObjectManagingPos(serverLevel, pos);
+        ServerShip ship = VSGameUtilsKt.getLoadedShipManagingPos(serverLevel, pos);
         if (ship == null) {
             ship = VSGameUtilsKt.getShipManagingPos(serverLevel, pos);
         }

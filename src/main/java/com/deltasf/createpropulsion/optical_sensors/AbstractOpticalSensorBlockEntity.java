@@ -168,7 +168,7 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
         boolean onShip = VSGameUtilsKt.isBlockInShipyard(level, localBlockPos);
 
         if (onShip) {
-            LoadedShip ship = VSGameUtilsKt.getShipObjectManagingPos(level, localBlockPos);
+            LoadedShip ship = VSGameUtilsKt.getLoadedShipManagingPos(level, localBlockPos);
             if (ship != null && ship.getTransform() != null) {
                 worldFrom = VSGameUtilsKt.toWorldCoordinates(ship, localFromCenter);
 

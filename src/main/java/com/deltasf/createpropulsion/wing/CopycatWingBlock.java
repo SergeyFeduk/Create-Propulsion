@@ -48,7 +48,6 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-@SuppressWarnings("deprecation")
 public class CopycatWingBlock extends CopycatBlock implements WingBlock {
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
     private final int width;

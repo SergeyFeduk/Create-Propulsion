@@ -128,10 +128,10 @@ public final class BalloonAttachment implements ShipPhysicsListener {
 
         //Apply aggregated force and torque
         if (accumulatedForce.lengthSquared() > 1e-9) {
-            physicShip.applyInvariantForce(accumulatedForce);
+            physicShip.applyWorldForce(accumulatedForce, physicShip.getKinematics().getPosition());
         }
         if (accumulatedTorque.lengthSquared() > 1e-9) {
-            physicShip.applyInvariantTorque(accumulatedTorque);
+            physicShip.applyWorldTorque(accumulatedTorque);
         }
     }
 
