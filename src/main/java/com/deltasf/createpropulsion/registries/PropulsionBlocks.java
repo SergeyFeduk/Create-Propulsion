@@ -11,6 +11,7 @@ import com.deltasf.createpropulsion.balloons.injectors.hot_air_burner.HotAirBurn
 import com.deltasf.createpropulsion.heat.burners.liquid.LiquidBurnerBlock;
 import com.deltasf.createpropulsion.heat.burners.solid.SolidBurnerBlock;
 import com.deltasf.createpropulsion.heat.engine.StirlingEngineBlock;
+import com.deltasf.createpropulsion.impact_sensor.ImpactSensorBlock;
 import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerBlock;
 import com.deltasf.createpropulsion.magnet.RedstoneMagnetBlock;
 import com.deltasf.createpropulsion.optical_sensors.InlineOpticalSensorBlock;
@@ -244,6 +245,18 @@ public class PropulsionBlocks {
         .item().model(FUCK_OFF_ITEM()).build()
         .setData(ProviderType.LANG, FUCK_OFF_LANG())
         .register();
+
+    public static final BlockEntry<ImpactSensorBlock> IMPACT_SENSOR_BLOCK = REGISTRATE.block("impact_sensor", ImpactSensorBlock::new)
+        .properties(p -> p.mapColor(MapColor.WOOD))
+        .properties(p -> p.sound(SoundType.WOOD))
+        .properties(p -> p.requiresCorrectToolForDrops())
+        .properties(p -> p.strength(2.5F, 2.0F))    
+        .properties(p -> p.noOcclusion())
+        .tag(BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.MINEABLE_WITH_AXE)
+        .blockstate(FUCK_OFF())
+        .item().model(FUCK_OFF_ITEM()).build()
+        .setData(ProviderType.LANG, FUCK_OFF_LANG())
+        .register();
     
     //All wings
     public static final BlockEntry<WingBlock> WING_BLOCK = registerGenericWing("wing", PropulsionSpriteShifts.WING_TEXTURE);
@@ -367,7 +380,7 @@ public class PropulsionBlocks {
         };
     }
 
-    public static final TagKey<Block> ENVELOPES = TagKey.create(Registries.BLOCK, new ResourceLocation(CreatePropulsion.ID, "envelopes"));
+    public static final TagKey<Block> ENVELOPES = TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(CreatePropulsion.ID, "envelopes"));
 
     public static final Map<EnvelopeColor, BlockEntry<EnvelopeBlock>> ENVELOPE_BLOCKS = new EnumMap<>(EnvelopeColor.class);
     public static final Map<EnvelopeColor, BlockEntry<EnvelopedShaftBlock>> ENVELOPED_SHAFT_BLOCKS = new EnumMap<>(EnvelopeColor.class);
