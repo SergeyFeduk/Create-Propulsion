@@ -28,7 +28,7 @@ public class PropulsionPartialModels {
     public static final PartialModel TILT_ADAPTER_SIDE_INDICATOR = partial("tilt_adapter_side_overlay");
 
     private static PartialModel partial(String path) {
-        return PartialModel.of(new ResourceLocation(CreatePropulsion.ID, "partial/" + path));
+        return PartialModel.of(ResourceLocation.fromNamespaceAndPath(CreatePropulsion.ID, "partial/" + path));
     }
 
     public static void register() {}

@@ -13,6 +13,8 @@ import com.deltasf.createpropulsion.balloons.serialization.BalloonSerializationH
 import com.deltasf.createpropulsion.compat.computercraft.CCProxy;
 import com.deltasf.createpropulsion.events.ModClientEvents;
 import com.deltasf.createpropulsion.heat.burners.AbstractBurnerBlock;
+import com.deltasf.createpropulsion.impact_sensor.ImpactSensorAttachment;
+import com.deltasf.createpropulsion.impact_sensor.ImpactSensorSystem;
 import com.deltasf.createpropulsion.network.PropulsionPackets;
 import com.deltasf.createpropulsion.particles.ParticleTypes;
 import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
@@ -78,6 +80,13 @@ public class CreatePropulsion {
             .useLegacySerializer()
             .build()
         );
+        api.registerAttachment(api.newAttachmentRegistrationBuilder(ImpactSensorAttachment.class)
+            .useLegacySerializer()
+            .build()
+        );
+
+
+        ImpactSensorSystem.register();
 
         //Compat
         Mods.COMPUTERCRAFT.executeIfInstalled(() -> CCProxy::register);

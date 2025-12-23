@@ -89,7 +89,7 @@ public class ForgeEvents {
                 String shipDimensionId = serverShip.getChunkClaimDimension();
                 if (shipDimensionId != null && shipDimensionId.startsWith(PREFIX)) {
                     String resourceLocationString = shipDimensionId.substring(PREFIX.length());
-                    ResourceLocation dimensionKey = new ResourceLocation(resourceLocationString);
+                    ResourceLocation dimensionKey = ResourceLocation.parse(resourceLocationString);
                     ServerLevel level = levelLookup.get(dimensionKey);
                     if (level == null) continue; //Wtf
 
@@ -160,7 +160,7 @@ public class ForgeEvents {
                 String shipDimensionId = serverShip.getChunkClaimDimension();
                 if (shipDimensionId != null && shipDimensionId.startsWith(PREFIX)) {
                     String resourceLocationString = shipDimensionId.substring(PREFIX.length());
-                    ResourceLocation dimensionKey = new ResourceLocation(resourceLocationString);
+                    ResourceLocation dimensionKey = ResourceLocation.parse(resourceLocationString);
                     ServerLevel level = levelLookup.get(dimensionKey);
                     if (level == null) continue; //Wtf
 

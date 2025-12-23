@@ -35,7 +35,7 @@ public class ThrusterFuelManager extends SimpleJsonResourceReloadListener {
     public static final String DIRECTORY = "thruster_fuels";
 
     private static Map<Fluid, FluidThrusterProperties> fuelPropertiesMap = new HashMap<>();
-    public static final TagKey<Fluid> FORGE_FUEL_TAG = TagKey.create(ForgeRegistries.FLUIDS.getRegistryKey(), new ResourceLocation("forge", "fuel"));
+    public static final TagKey<Fluid> FORGE_FUEL_TAG = TagKey.create(ForgeRegistries.FLUIDS.getRegistryKey(), ResourceLocation.fromNamespaceAndPath("forge", "fuel"));
 
     public static Map<Fluid, FluidThrusterProperties> getFuelPropertiesMap() { return fuelPropertiesMap; }
 

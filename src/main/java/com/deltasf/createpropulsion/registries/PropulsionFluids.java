@@ -31,8 +31,8 @@ public class PropulsionFluids {
     );
 
     public static final FluidEntry<ForgeFlowingFluid.Flowing> TURPENTINE = REGISTRATE.fluid("turpentine", 
-            new ResourceLocation("minecraft", "block/water_still"), 
-            new ResourceLocation("minecraft", "block/water_flow"),
+            ResourceLocation.fromNamespaceAndPath("minecraft", "block/water_still"), 
+            ResourceLocation.fromNamespaceAndPath("minecraft", "block/water_flow"),
             TURPENTINE_TYPE_FACTORY.get())
         .renderType(getSidedRenderType())
         .source(ForgeFlowingFluid.Source::new) 
@@ -50,8 +50,8 @@ public class PropulsionFluids {
     
     private static Supplier<RenderType> getSidedRenderType() {
         return DistExecutor.unsafeRunForDist(
-                () -> PropulsionFluidsClient::getTurpentineRenderType,
-                () -> () -> null
+            () -> PropulsionFluidsClient::getTurpentineRenderType,
+            () -> () -> null
         );
     }
     

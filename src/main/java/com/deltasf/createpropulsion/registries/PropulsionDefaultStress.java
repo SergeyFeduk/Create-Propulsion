@@ -25,8 +25,7 @@ public class PropulsionDefaultStress {
 
     public static <B extends Block, P> NonNullUnaryOperator<BlockBuilder<B, P>> setImpact(double impact) {
         return b -> {
-            setDefaultImpact(new ResourceLocation(b.getOwner()
-                    .getModid(), b.getName()), impact);
+            setDefaultImpact(ResourceLocation.fromNamespaceAndPath(b.getOwner().getModid(), b.getName()), impact);
             return b;
         };
     }

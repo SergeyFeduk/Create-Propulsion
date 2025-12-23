@@ -14,8 +14,8 @@ import com.deltasf.createpropulsion.propeller.rendering.PropellerBlurInstance;
 public class PropulsionInstanceTypes {
 
     public static final InstanceType<PropellerBlurInstance> PROPELLER_OIT_BLUR = SimpleInstanceType.builder(PropellerBlurInstance::new)
-        .cullShader(new ResourceLocation("createpropulsion", "instance/cull/propeller_blur.glsl"))
-        .vertexShader(new ResourceLocation("createpropulsion", "instance/propeller_blur.vert"))
+        .cullShader(ResourceLocation.fromNamespaceAndPath("createpropulsion", "instance/cull/propeller_blur.glsl"))
+        .vertexShader(ResourceLocation.fromNamespaceAndPath("createpropulsion", "instance/propeller_blur.vert"))
         .layout(LayoutBuilder.create()
             .vector("color", FloatRepr.NORMALIZED_UNSIGNED_BYTE, 4)
             .vector("light", IntegerRepr.SHORT, 2)
@@ -42,8 +42,8 @@ public class PropulsionInstanceTypes {
         .build();
 
     public static final InstanceType<PropellerBlurInstance> PROPELLER_BLUR = SimpleInstanceType.builder(PropellerBlurInstance::new)
-        .cullShader(new ResourceLocation("createpropulsion", "instance/cull/propeller_blur.glsl"))
-        .vertexShader(new ResourceLocation("createpropulsion", "instance/propeller_blur.vert"))
+        .cullShader(ResourceLocation.fromNamespaceAndPath("createpropulsion", "instance/cull/propeller_blur.glsl"))
+        .vertexShader(ResourceLocation.fromNamespaceAndPath("createpropulsion", "instance/propeller_blur.vert"))
         .layout(LayoutBuilder.create()
             .vector("color", FloatRepr.NORMALIZED_UNSIGNED_BYTE, 4)
             .vector("light", IntegerRepr.SHORT, 2)

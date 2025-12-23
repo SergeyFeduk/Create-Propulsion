@@ -26,12 +26,12 @@ public class CapabilityEventHandler {
         BlockEntity be = event.getObject();
 
         if (be instanceof FluidTankBlockEntity tank) {
-            event.addCapability(new ResourceLocation(CreatePropulsion.ID, "heat_consumer"),
+            event.addCapability(ResourceLocation.fromNamespaceAndPath(CreatePropulsion.ID, "heat_consumer"),
                 new BoilerHeatConsumerProvider(tank));
         }
 
         if (be instanceof BasinBlockEntity basin) {
-            event.addCapability(new ResourceLocation(CreatePropulsion.ID, "heat_consumer"),
+            event.addCapability(ResourceLocation.fromNamespaceAndPath(CreatePropulsion.ID, "heat_consumer"),
                 new BasinHeatConsumerProvider(basin));
         }
     }

@@ -18,7 +18,7 @@ import net.minecraftforge.network.simple.SimpleChannel;
 public class PropulsionPackets {
     private static final String PROTOCOL_VERSION = "1";
     private static SimpleChannel INSTANCE = NetworkRegistry.newSimpleChannel(
-        new ResourceLocation(CreatePropulsion.ID, "main"),
+        ResourceLocation.fromNamespaceAndPath(CreatePropulsion.ID, "main"),
         () -> PROTOCOL_VERSION,
         PROTOCOL_VERSION::equals,
         PROTOCOL_VERSION::equals

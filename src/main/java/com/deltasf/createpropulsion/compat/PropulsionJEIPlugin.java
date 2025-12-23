@@ -13,7 +13,7 @@ import javax.annotation.Nonnull;
 public class PropulsionJEIPlugin implements IModPlugin {
     @Override
     public ResourceLocation getPluginUid() {
-        return new ResourceLocation(CreatePropulsion.ID, "jei_plugin");
+        return ResourceLocation.fromNamespaceAndPath(CreatePropulsion.ID, "jei_plugin");
     }
 
     @Override

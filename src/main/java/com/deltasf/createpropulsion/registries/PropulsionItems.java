@@ -95,7 +95,7 @@ public class PropulsionItems {
         .register();
 
     public static TagKey<Item> makeTag(String key) {
-        ResourceLocation resource = new ResourceLocation(CreatePropulsion.ID, key);
+        ResourceLocation resource = ResourceLocation.fromNamespaceAndPath(CreatePropulsion.ID, key);
         return TagKey.create(Registries.ITEM, resource);
     }
 }

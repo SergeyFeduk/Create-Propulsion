@@ -38,7 +38,7 @@ import net.minecraft.world.phys.BlockHitResult;
 @SuppressWarnings("deprecation")
 public class InlineOpticalSensorBlock extends AbstractOpticalSensorBlock {
     public static final TagKey<Item> CBC_PROJECTILE_ITEM_TAG =
-        TagKey.create(Registries.ITEM, new ResourceLocation("createbigcannons", "big_cannon_projectiles"));
+        TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("createbigcannons", "big_cannon_projectiles"));
     private static Set<Block> validCbcSupportBlocks = null;
     private static final Object initLock = new Object();
 

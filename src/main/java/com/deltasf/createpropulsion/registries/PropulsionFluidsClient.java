@@ -103,19 +103,17 @@ public class PropulsionFluidsClient {
         protected float getFogDistanceModifier() {
             return 1f;
         }
-
     }
 
     private static class SolidRenderedPlaceableFluidType extends TintedFluidType {
-
         private Vector3f fogColor;
         private Supplier<Float> fogDistance;
         private int tintColor;
 
         public static FluidTypeFactory create(int fogColor, Supplier<Float> fogDistance, int tintColor) {
             return (p, s, f) -> {
-                s = new ResourceLocation("block/water_still");
-                f = new ResourceLocation("block/water_flow");
+                s = ResourceLocation.parse("block/water_still");
+                f = ResourceLocation.parse("block/water_flow");
                 SolidRenderedPlaceableFluidType fluidType = new SolidRenderedPlaceableFluidType(p, s, f);
                 fluidType.fogColor = new Color(fogColor, false).asVectorF();
                 fluidType.fogDistance = fogDistance;
@@ -124,8 +122,7 @@ public class PropulsionFluidsClient {
             };
         }
 
-        private SolidRenderedPlaceableFluidType(Properties properties, ResourceLocation stillTexture,
-                                                ResourceLocation flowingTexture) {
+        private SolidRenderedPlaceableFluidType(Properties properties, ResourceLocation stillTexture, ResourceLocation flowingTexture) {
             super(properties, stillTexture, flowingTexture);
         }
 
@@ -148,6 +145,5 @@ public class PropulsionFluidsClient {
         protected float getFogDistanceModifier() {
             return fogDistance.get();
         }
-
     }
 }
