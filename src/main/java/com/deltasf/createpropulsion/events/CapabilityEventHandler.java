@@ -46,7 +46,10 @@ public class CapabilityEventHandler {
 
         @Override
         public boolean isActive() {
-            return tank.boiler.isActive() && tank.boiler.waterSupply > 0;
+            FluidTankBlockEntity controller = tank.getControllerBE();
+            if (controller == null) return false;
+
+            return controller.boiler.isActive() && controller.boiler.waterSupply > 0;
         }
 
         @Override

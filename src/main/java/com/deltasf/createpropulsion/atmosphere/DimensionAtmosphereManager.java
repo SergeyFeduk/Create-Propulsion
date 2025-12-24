@@ -83,7 +83,7 @@ public class DimensionAtmosphereManager extends SimpleJsonResourceReloadListener
                 if (definition.requiredMod().isPresent() && !ModList.get().isLoaded(definition.requiredMod().get())) {
                     return;
                 }
-                ResourceLocation dimensionId = new ResourceLocation(file.getPath());
+                ResourceLocation dimensionId = ResourceLocation.parse(file.getPath());
                 ResourceKey<Level> dimensionKey = ResourceKey.create(Registries.DIMENSION, dimensionId);
                 VarianceNoiseProperties noise = definition.varianceNoise().orElse(DEFAULT_NOISE);
 

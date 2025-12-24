@@ -192,7 +192,7 @@ public class BurnerScenes {
         scene.world().modifyBlock(burnerAPos, s -> s.setValue(AbstractBurnerBlock.HEAT, HeatLevel.KINDLED), false);
         
         scene.idle(20);
-        scene.world().setKineticSpeed(stirlingASel, 256);
+        scene.world().setKineticSpeed(stirlingASel, 128);
         scene.effects().indicateSuccess(stirlingAPos);
 
         scene.overlay().showText(70)
