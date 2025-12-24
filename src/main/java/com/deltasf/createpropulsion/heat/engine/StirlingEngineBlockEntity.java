@@ -100,7 +100,7 @@ public class StirlingEngineBlockEntity extends GeneratingKineticBlockEntity impl
     public float getGeneratedSpeed() {
         if (activeTicks <= 0) return 0f;
         int generatedRPM = targetSpeedBehaviour.getRPM();
-        return convertToDirection(generatedRPM, getBlockState().getValue(StirlingEngineBlock.FACING));
+        return convertToDirection(generatedRPM, getBlockState().getValue(StirlingEngineBlock.HORIZONTAL_FACING));
     }
 
     @Override

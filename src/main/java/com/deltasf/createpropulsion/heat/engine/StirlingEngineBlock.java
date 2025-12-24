@@ -4,7 +4,7 @@ import javax.annotation.Nullable;
 
 import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
 import com.deltasf.createpropulsion.registries.PropulsionShapes;
-import com.simibubi.create.content.kinetics.base.DirectionalKineticBlock;
+import com.simibubi.create.content.kinetics.base.HorizontalKineticBlock;
 import com.simibubi.create.content.kinetics.base.IRotate;
 import com.simibubi.create.foundation.block.IBE;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntityTicker;
@@ -24,8 +24,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class StirlingEngineBlock extends DirectionalKineticBlock implements IBE<StirlingEngineBlockEntity> {
-
+public class StirlingEngineBlock extends HorizontalKineticBlock implements IBE<StirlingEngineBlockEntity> {
     public StirlingEngineBlock(Properties properties) {
         super(properties);
         registerDefaultState(super.defaultBlockState());
@@ -53,21 +52,21 @@ public class StirlingEngineBlock extends DirectionalKineticBlock implements IBE<
         }
 
         if (preferred != null && !isSneaking) {
-            return defaultBlockState().setValue(FACING, preferred);
+            return defaultBlockState().setValue(HORIZONTAL_FACING, preferred);
         }
         
         Direction placedFacing = context.getHorizontalDirection().getOpposite();
-        return defaultBlockState().setValue(FACING, placedFacing);
+        return defaultBlockState().setValue(HORIZONTAL_FACING, placedFacing);
     }
 
     @Override
     public boolean hasShaftTowards(LevelReader world, BlockPos pos, BlockState state, Direction face) {
-        return face == state.getValue(FACING);
+        return face == state.getValue(HORIZONTAL_FACING);
     }
 
     @Override
     public Axis getRotationAxis(BlockState state) {
-        return state.getValue(FACING).getAxis();
+        return state.getValue(HORIZONTAL_FACING).getAxis();
     }
 
     @Override
@@ -75,7 +74,7 @@ public class StirlingEngineBlock extends DirectionalKineticBlock implements IBE<
         if (pState == null) {
             return PropulsionShapes.STIRLING_ENGINE.get(Direction.NORTH);
         }
-        Direction direction = pState.getValue(FACING);
+        Direction direction = pState.getValue(HORIZONTAL_FACING);
         return PropulsionShapes.STIRLING_ENGINE.get(direction);
     }
 

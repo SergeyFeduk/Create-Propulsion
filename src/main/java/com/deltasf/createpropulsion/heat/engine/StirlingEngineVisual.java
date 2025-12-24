@@ -39,7 +39,7 @@ public class StirlingEngineVisual extends KineticBlockEntityVisual<StirlingEngin
     public StirlingEngineVisual(VisualizationContext context, StirlingEngineBlockEntity blockEntity, float partialTick) {
         super(context, blockEntity, partialTick);
 
-        this.facing = blockState.getValue(StirlingEngineBlock.FACING);
+        this.facing = blockState.getValue(StirlingEngineBlock.HORIZONTAL_FACING);
 
         shaft = instancerProvider().instancer(AllInstanceTypes.ROTATING, Models.partial(AllPartialModels.SHAFT_HALF)).createInstance();
 

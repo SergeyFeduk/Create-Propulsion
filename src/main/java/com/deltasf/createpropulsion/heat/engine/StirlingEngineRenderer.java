@@ -33,7 +33,7 @@ public class StirlingEngineRenderer extends KineticBlockEntityRenderer<StirlingE
     public void renderSafe(StirlingEngineBlockEntity blockEntity, float partialTicks, PoseStack ms, MultiBufferSource bufferSource, int light, int overlay) {
         if (VisualizationManager.supportsVisualization(blockEntity.getLevel())) return;
 
-        Direction direction = blockEntity.getBlockState().getValue(StirlingEngineBlock.FACING);
+        Direction direction = blockEntity.getBlockState().getValue(StirlingEngineBlock.HORIZONTAL_FACING);
         SuperByteBuffer shaft = CachedBuffers.partialFacing(AllPartialModels.SHAFT_HALF, blockEntity.getBlockState(), direction);
         standardKineticRotationTransform(shaft, blockEntity, light).renderInto(ms, bufferSource.getBuffer(RenderType.solid()));
 
