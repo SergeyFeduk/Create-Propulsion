@@ -20,6 +20,10 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LeverBlock;
+import net.minecraft.world.level.block.state.properties.AttachFace;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.fluids.FluidStack;
 
@@ -82,7 +86,6 @@ public class BurnerScenes {
         scene.idle(100);
 
         scene.world().hideSection(engineSel, Direction.UP);
-        scene.world().setKineticSpeed(engineSel, 0); 
         scene.idle(25);
         
         scene.world().showSection(leverSel, Direction.EAST);
@@ -117,7 +120,7 @@ public class BurnerScenes {
             .text("createpropulsion.ponder.solid_burner.text_7") 
             .pointAt(util.vector().topOf(burnerPos))
             .placeNearTarget();
-        scene.idle(60);
+        scene.idle(65);
 
         scene.world().modifyBlock(burnerPos, s -> s.setValue(AbstractBurnerBlock.HEAT, HeatLevel.SEETHING), false);
         scene.overlay().showText(80)
@@ -138,9 +141,16 @@ public class BurnerScenes {
         BlockPos stirlingAPos = util.grid().at(2, 2, 1);
         BlockPos mechPipePos = util.grid().at(1, 1, 3);
         BlockPos powerInputCog = util.grid().at(5, 0, 4);
+        BlockPos leverPos = util.grid().at(1, 1, 1);
+        
+        BlockPos burnerBPos = util.grid().at(2, 1, 2);
+        BlockPos stirlingBPos = util.grid().at(2, 2, 2);
 
         Selection burnerASel = util.select().position(burnerAPos);
         Selection stirlingASel = util.select().position(stirlingAPos);
+        Selection leverSel = util.select().position(leverPos);
+        Selection stirlingBSel = util.select().position(stirlingBPos);
+        
         Selection fluidsGroup = util.select().fromTo(2, 1, 2, 2, 1, 3)
             .add(util.select().position(mechPipePos))
             .add(util.select().fromTo(0, 1, 3, 0, 2, 3));
@@ -156,37 +166,33 @@ public class BurnerScenes {
         scene.world().showSection(kineticsGroup, Direction.WEST);
         scene.idle(10);
 
-        scene.overlay().showText(70)
+        scene.overlay().showText(60)
             .text("createpropulsion.ponder.liquid_burner.text_1")
             .pointAt(util.vector().blockSurface(burnerAPos, Direction.WEST))
             .placeNearTarget();
-        scene.idle(80);
+        scene.idle(70);
 
         scene.world().setKineticSpeed(kineticsGroup, 32);
         scene.world().setKineticSpeed(util.select().position(mechPipePos), 32);
         scene.idle(10);
+
+        scene.effects().emitParticles(util.vector().centerOf(burnerAPos), (world, x, y, z) -> {
+            Direction facing = Direction.SOUTH;
+            float yRot = -facing.toYRot();
+            float pipeOffset = 2.5f / 16.0f;
+            boolean isLeft = world.getGameTime() % 4 == 0;
+            Vec3 localOffset = new Vec3(0.6, 0.3, isLeft ? pipeOffset : -pipeOffset);
+            Vec3 localVelocity = new Vec3(0.01, 0.05, 0);
+            Vec3 offset = VecHelper.rotate(localOffset, yRot, Direction.Axis.Y);
+            Vec3 velocity = VecHelper.rotate(localVelocity, yRot, Direction.Axis.Y);
+            world.addParticle(ParticleTypes.SMOKE, x + offset.x, y + offset.y, z + offset.z, velocity.x, velocity.y, velocity.z);
+        }, 1.0f, 260);
 
         scene.world().modifyBlockEntityNBT(burnerASel, LiquidBurnerBlockEntity.class, nbt -> {
             CompoundTag tankNbt = new CompoundTag();
             FluidStack fuel = new FluidStack(PropulsionFluids.TURPENTINE.get(), 100); 
             tankNbt.put("Fluid", fuel.writeToNBT(new CompoundTag()));
             nbt.put("Tank", tankNbt);
-        });
-
-        scene.effects().emitParticles(util.vector().centerOf(burnerAPos), (world, x, y, z) -> {
-            Direction facing = Direction.SOUTH;
-            float yRot = -facing.toYRot();
-            
-            float pipeOffset = 2.5f / 16.0f;
-            boolean isLeft = world.getGameTime() % 4 == 0;
-            
-            Vec3 localOffset = new Vec3(0.6, 0.3, isLeft ? pipeOffset : -pipeOffset);
-            Vec3 localVelocity = new Vec3(0.01, 0.05, 0);
-            Vec3 offset = VecHelper.rotate(localOffset, yRot, Direction.Axis.Y);
-            Vec3 velocity = VecHelper.rotate(localVelocity, yRot, Direction.Axis.Y);
-            world.addParticle(ParticleTypes.SMOKE, x + offset.x, y + offset.y, z + offset.z, velocity.x, velocity.y, velocity.z);
-        }, 1.0f, 1000);
-        scene.world().modifyBlockEntityNBT(burnerASel, LiquidBurnerBlockEntity.class, nbt -> {
             nbt.putInt("burnTime", 1000);
         });
         scene.world().modifyBlock(burnerAPos, s -> s.setValue(AbstractBurnerBlock.HEAT, HeatLevel.KINDLED), false);
@@ -195,26 +201,137 @@ public class BurnerScenes {
         scene.world().setKineticSpeed(stirlingASel, 128);
         scene.effects().indicateSuccess(stirlingAPos);
 
-        scene.overlay().showText(70)
+        scene.overlay().showText(60)
             .text("createpropulsion.ponder.liquid_burner.text_2")
             .pointAt(util.vector().centerOf(stirlingAPos))
             .placeNearTarget();
-        scene.idle(80);
+        scene.idle(70);
 
-        scene.overlay().showText(80)
+        scene.overlay().showText(70)
             .colored(PonderPalette.GREEN)
             .text("createpropulsion.ponder.liquid_burner.text_3")
             .pointAt(util.vector().blockSurface(burnerAPos, Direction.WEST))
             .placeNearTarget();
-        scene.idle(90);
+        scene.idle(80);
 
-        scene.overlay().showText(80)
+        scene.overlay().showText(70)
             .colored(PonderPalette.GREEN)
             .text("createpropulsion.ponder.liquid_burner.text_4")
             .pointAt(util.vector().blockSurface(burnerAPos, Direction.WEST))
             .placeNearTarget();
+        scene.idle(90);
+
+        scene.world().hideSection(stirlingASel, Direction.UP);
+        
+        scene.idle(2);
+        scene.world().modifyBlockEntityNBT(burnerASel, LiquidBurnerBlockEntity.class, nbt -> nbt.putInt("burnTime", 0));
+        scene.world().modifyBlock(burnerAPos, s -> s.setValue(AbstractBurnerBlock.HEAT, HeatLevel.NONE), false);
+        
+        scene.idle(20);
+        
+        scene.world().showSection(leverSel, Direction.SOUTH); 
+        scene.world().setBlock(leverPos, Blocks.LEVER.defaultBlockState()
+            .setValue(LeverBlock.FACE, AttachFace.FLOOR)
+            .setValue(LeverBlock.FACING, Direction.NORTH), true);
+        scene.idle(20);
+
+        scene.overlay().showText(60)
+            .attachKeyFrame()
+            .text("createpropulsion.ponder.liquid_burner.text_5")
+            .pointAt(util.vector().blockSurface(burnerAPos, Direction.WEST))
+            .placeNearTarget();
+        scene.idle(70);
+
+        scene.overlay().showText(70)
+            .text("createpropulsion.ponder.liquid_burner.text_6")
+            .pointAt(util.vector().blockSurface(burnerAPos, Direction.WEST))
+            .placeNearTarget();
+        scene.idle(80);
+        
+        scene.world().toggleRedstonePower(leverSel);
+        scene.effects().indicateRedstone(leverPos);
+        
+        scene.world().modifyBlockEntityNBT(burnerASel, LiquidBurnerBlockEntity.class, nbt -> nbt.putInt("burnTime", 2000));
+        scene.world().modifyBlock(burnerAPos, s -> s.setValue(AbstractBurnerBlock.HEAT, HeatLevel.KINDLED), false);
+        scene.effects().emitParticles(util.vector().centerOf(burnerAPos), (world, x, y, z) -> {
+            Direction facing = Direction.SOUTH;
+            float yRot = -facing.toYRot();
+            float pipeOffset = 2.5f / 16.0f;
+            boolean isLeft = world.getGameTime() % 4 == 0;
+            Vec3 localOffset = new Vec3(0.6, 0.3, isLeft ? pipeOffset : -pipeOffset);
+            Vec3 localVelocity = new Vec3(0.01, 0.05, 0);
+            Vec3 offset = VecHelper.rotate(localOffset, yRot, Direction.Axis.Y);
+            Vec3 velocity = VecHelper.rotate(localVelocity, yRot, Direction.Axis.Y);
+            world.addParticle(ParticleTypes.SMOKE, x + offset.x, y + offset.y, z + offset.z, velocity.x, velocity.y, velocity.z);
+        }, 1.0f, 2000);
+
+        scene.idle(20);
+
+        scene.overlay().showText(90)
+            .colored(PonderPalette.RED)
+            .text("createpropulsion.ponder.liquid_burner.text_7")
+            .pointAt(util.vector().blockSurface(burnerAPos, Direction.WEST))
+            .placeNearTarget();
         scene.idle(100);
 
+        scene.world().modifyBlock(burnerAPos, s -> s.setValue(AbstractBurnerBlock.HEAT, HeatLevel.KINDLED), false);
+        scene.overlay().showText(60)
+            .text("createpropulsion.ponder.liquid_burner.text_8") 
+            .pointAt(util.vector().topOf(burnerAPos))
+            .placeNearTarget();
+        scene.idle(65);
+
+        scene.world().modifyBlock(burnerAPos, s -> s.setValue(AbstractBurnerBlock.HEAT, HeatLevel.SEETHING), false);
+        scene.overlay().showText(80)
+            .text("createpropulsion.ponder.liquid_burner.text_9") 
+            .pointAt(util.vector().topOf(burnerAPos))
+            .placeNearTarget();
+        scene.idle(90);
+
+        scene.addKeyframe();
+        scene.idle(10);
+
+        scene.world().setBlock(burnerBPos, PropulsionBlocks.LIQUID_BURNER.getDefaultState()
+            .setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.SOUTH), true);
+        
+        scene.overlay().showText(60)
+            .text("createpropulsion.ponder.liquid_burner.text_10")
+            .pointAt(util.vector().blockSurface(burnerBPos, Direction.WEST))
+            .placeNearTarget();
+        scene.idle(60);
+
+        scene.world().showSection(stirlingBSel, Direction.DOWN);
+        scene.world().setBlock(stirlingBPos, PropulsionBlocks.STIRLING_ENGINE_BLOCK.getDefaultState()
+            .setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH), true);
+        scene.idle(5);
+
+        scene.world().modifyBlockEntityNBT(util.select().position(burnerBPos), LiquidBurnerBlockEntity.class, nbt -> {
+            nbt.putInt("burnTime", 1000);
+        });
+        scene.world().modifyBlock(burnerBPos, s -> s.setValue(AbstractBurnerBlock.HEAT, HeatLevel.KINDLED), false);
+        
+        scene.effects().emitParticles(util.vector().centerOf(burnerBPos), (world, x, y, z) -> {
+            Direction facing = Direction.SOUTH;
+            float yRot = -facing.toYRot();
+            float pipeOffset = 2.5f / 16.0f;
+            boolean isLeft = world.getGameTime() % 4 == 0;
+            Vec3 localOffset = new Vec3(0.6, 0.3, isLeft ? pipeOffset : -pipeOffset);
+            Vec3 localVelocity = new Vec3(0.01, 0.05, 0);
+            Vec3 offset = VecHelper.rotate(localOffset, yRot, Direction.Axis.Y);
+            Vec3 velocity = VecHelper.rotate(localVelocity, yRot, Direction.Axis.Y);
+            world.addParticle(ParticleTypes.SMOKE, x + offset.x, y + offset.y, z + offset.z, velocity.x, velocity.y, velocity.z);
+        }, 1.0f, 1000);
+
+        scene.overlay().showText(70)
+            .text("createpropulsion.ponder.liquid_burner.text_11")
+            .pointAt(util.vector().blockSurface(burnerBPos, Direction.SOUTH))
+            .placeNearTarget();
+
+        scene.idle(20);
+        scene.world().setKineticSpeed(stirlingBSel, 128);
+        scene.effects().indicateSuccess(stirlingBPos);
+        
+        scene.idle(100);
         scene.markAsFinished();
     }
 

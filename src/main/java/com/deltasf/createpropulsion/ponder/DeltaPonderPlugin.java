@@ -12,13 +12,6 @@ import net.createmod.ponder.api.registration.PonderSceneRegistrationHelper;
 import net.minecraft.resources.ResourceLocation;
 
 public class DeltaPonderPlugin implements PonderPlugin {
-    //TODO: Solid/Liquid burner ponders
-    //Show a burner with stirling engine
-    // - Click on a burner with coal, wait, show that stirling engine now rotates (say smth like "Heat can be used to power Stirling engines")
-    // - Replace stirling engine with heated mixer ("...or heated mixers")
-    // - Replace mixer with boiler ("...or boilers")
-    // - Replace boiler with heat pump ("...or other heat-driven machinery")
-
     //TODO: Stirling engine ponder
     // Show a solid burner, place a stirling engine on it
     // Click on solid burner with coal
