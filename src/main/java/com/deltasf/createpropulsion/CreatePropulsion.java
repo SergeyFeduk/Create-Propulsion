@@ -113,10 +113,23 @@ public class CreatePropulsion {
     }
 
     public static void init(final FMLCommonSetupEvent event) {
-        //TODO: Move this in correct place
+        //TODO: Move this in correct place and mayhaps do in a more adequate way?
         //Registers solid burner as heater
         event.enqueueWork(() -> {
             BoilerHeater.REGISTRY.register(PropulsionBlocks.SOLID_BURNER.get(), (level, pos, state) -> {
+                HeatLevel value = state.getValue(AbstractBurnerBlock.HEAT);
+                if (value == HeatLevel.NONE) {
+                    return -1;
+                }
+                if (value == HeatLevel.SEETHING) {
+                    return 2;
+                }
+                if (value.isAtLeast(HeatLevel.FADING)) {
+                    return 1;
+                }
+                return 0;
+            });
+            BoilerHeater.REGISTRY.register(PropulsionBlocks.LIQUID_BURNER.get(), (level, pos, state) -> {
                 HeatLevel value = state.getValue(AbstractBurnerBlock.HEAT);
                 if (value == HeatLevel.NONE) {
                     return -1;

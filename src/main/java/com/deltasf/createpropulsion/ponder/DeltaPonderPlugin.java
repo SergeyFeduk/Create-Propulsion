@@ -31,6 +31,8 @@ public class DeltaPonderPlugin implements PonderPlugin {
         final PonderSceneRegistrationHelper<ItemProviderEntry<?>> HELPER = helper.withKeyFunction(RegistryEntry::getId);
         //Tilt adapter
         HELPER.forComponents(PropulsionBlocks.TILT_ADAPTER_BLOCK).addStoryBoard("tilt_adapter", TiltAdapterScene::tiltAdapter);
+        //Burners
+        HELPER.forComponents(PropulsionBlocks.SOLID_BURNER).addStoryBoard("solid_burner", BurnerScenes::solidBurner);
     }
 
     @Override

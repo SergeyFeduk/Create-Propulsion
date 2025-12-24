@@ -56,7 +56,7 @@ public class CapabilityEventHandler {
 
         @Override
         public float consumeHeat(float maxAvailable, boolean simulate) {
-            return isActive() ? Math.min(1.0f, maxAvailable) : 0f;
+            return isActive() ? Math.min(1.0f, maxAvailable) : 0f; 
         }
 
         @Override
