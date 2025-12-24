@@ -8,4 +8,7 @@ public interface IHeatSource {
     float getHeatStored();
 
     float getMaxHeatStored();
+
+    //Should be constant
+    float getExpectedHeatProduction();
 }

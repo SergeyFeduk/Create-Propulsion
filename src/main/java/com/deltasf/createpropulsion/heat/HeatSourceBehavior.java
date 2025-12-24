@@ -13,9 +13,9 @@ public class HeatSourceBehavior extends BlockEntityBehaviour {
     private HeatBuffer heatBuffer; 
     private LazyOptional<IHeatSource> capability;
 
-    public HeatSourceBehavior(SmartBlockEntity be, float capacity) {
+    public HeatSourceBehavior(SmartBlockEntity be, float capacity, float expectedHeatProduction) {
         super(be);
-        this.heatBuffer = new HeatBuffer(0, capacity);
+        this.heatBuffer = new HeatBuffer(0, capacity, expectedHeatProduction);
         this.capability = LazyOptional.of(() -> this.heatBuffer);
     }
 

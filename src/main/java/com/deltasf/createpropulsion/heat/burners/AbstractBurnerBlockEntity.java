@@ -41,13 +41,15 @@ public abstract class AbstractBurnerBlockEntity extends SmartBlockEntity impleme
 
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
-        heatSource = new HeatSourceBehavior(this, getBaseHeatCapacity());
+        heatSource = new HeatSourceBehavior(this, getBaseHeatCapacity(), getHeatPerTick());
         behaviours.add(heatSource);
     }
 
     protected abstract float getBaseHeatCapacity();
 
     protected abstract Direction getHeatCapSide();
+
+    protected abstract float getHeatPerTick();
 
     @SuppressWarnings("null")
     public void updatePoweredState() {
@@ -92,8 +94,9 @@ public abstract class AbstractBurnerBlockEntity extends SmartBlockEntity impleme
                 float thresholdInHU = getBaseHeatCapacity() * thresholdPercent;
 
                 float currentHeat = heatSource.getCapability().map(IHeatSource::getHeatStored).orElse(0f);
+                float expectedHeatProduction = heatSource.getCapability().map(IHeatSource::getExpectedHeatProduction).orElse(1f);
                 // Prediction logic
-                float consumptionNextTick = consumer.consumeHeat(currentHeat, true); 
+                float consumptionNextTick = consumer.consumeHeat(currentHeat, expectedHeatProduction, true); 
                 float heatNextTick = currentHeat - consumptionNextTick - PASSIVE_LOSS_PER_TICK;
 
                 return heatNextTick < thresholdInHU;
@@ -115,9 +118,10 @@ public abstract class AbstractBurnerBlockEntity extends SmartBlockEntity impleme
 
                 float thresholdPercent = consumer.getOperatingThreshold();
                 float thresholdInHU = getBaseHeatCapacity() * thresholdPercent;
+                float expectedHeatProduction = heatSource.getCapability().map(IHeatSource::getExpectedHeatProduction).orElse(1f);
 
                 if (consumer.isActive() && availableHeat >= thresholdInHU) {
-                    return consumer.consumeHeat(availableHeat, false);
+                    return consumer.consumeHeat(availableHeat, expectedHeatProduction,  false);
                 }
                 return 0f;
             }).orElse(0f);

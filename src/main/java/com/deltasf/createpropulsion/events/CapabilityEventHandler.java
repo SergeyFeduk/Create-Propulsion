@@ -58,8 +58,8 @@ public class CapabilityEventHandler {
         }
 
         @Override
-        public float consumeHeat(float maxAvailable, boolean simulate) {
-            return isActive() ? Math.min(1.0f, maxAvailable) : 0f; 
+        public float consumeHeat(float maxAvailable, float expectedHeatOutput, boolean simulate) {
+            return isActive() ? Math.min(expectedHeatOutput, maxAvailable) : 0f; 
         }
 
         @Override
@@ -96,11 +96,11 @@ public class CapabilityEventHandler {
 
         @SuppressWarnings("null")
         @Override
-        public float consumeHeat(float maxAvailable, boolean simulate) {
+        public float consumeHeat(float maxAvailable, float expectedHeatOutput, boolean simulate) {
             BlockEntity beAbove = basin.getLevel().getBlockEntity(basin.getBlockPos().above(2));
             //Consume heat only when mixer is actually running
             if (beAbove instanceof MechanicalMixerBlockEntity mixer) {
-                return mixer.running ? Math.min(1.0f, maxAvailable) : 0f; 
+                return mixer.running ? Math.min(1.0f, maxAvailable) : 0f; //Do not care about expected heat output
             }
             return 0;
         }

@@ -58,6 +58,7 @@ public class SolidBurnerBlockEntity extends AbstractBurnerBlockEntity implements
         return fuelInventory.fuelStack;
     }
 
+    @Override
     public float getHeatPerTick() { return 1; }
 
     @SuppressWarnings("null")

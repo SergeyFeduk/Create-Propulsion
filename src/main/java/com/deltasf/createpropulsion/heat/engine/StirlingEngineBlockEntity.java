@@ -80,8 +80,8 @@ public class StirlingEngineBlockEntity extends GeneratingKineticBlockEntity impl
     }
 
     @Override
-    public float consumeHeat(float maxAvailable, boolean simulate) {
-        float toConsume = Math.min(HEAT_CONSUMPTION_RATE, maxAvailable);
+    public float consumeHeat(float maxAvailable, float expectedHeatOutput, boolean simulate) {
+        float toConsume = Math.min(HEAT_CONSUMPTION_RATE, maxAvailable); //Do not care about expected heat output (we always consume less than it)
 
         if (!simulate && toConsume > 0) {
             boolean wasInactive = activeTicks == 0;

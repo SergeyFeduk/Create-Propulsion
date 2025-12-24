@@ -135,10 +135,10 @@ public class CreatePropulsion {
                     return -1;
                 }
                 if (value == HeatLevel.SEETHING) {
-                    return 2;
+                    return 4;
                 }
                 if (value.isAtLeast(HeatLevel.FADING)) {
-                    return 1;
+                    return 2;
                 }
                 return 0;
             });

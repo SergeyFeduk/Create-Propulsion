@@ -6,10 +6,12 @@ import net.minecraftforge.common.util.INBTSerializable;
 public class HeatBuffer implements IHeatSource, INBTSerializable<CompoundTag> {
     protected float heat;
     protected float capacity;
+    protected float expectedHeatProduction;
 
-    public HeatBuffer(float initialHeat, float capacity) {
+    public HeatBuffer(float initialHeat, float capacity, float expectedHeatProduction) {
         this.heat = initialHeat;
         this.capacity = capacity;
+        this.expectedHeatProduction = expectedHeatProduction;
     }
 
     @Override
@@ -29,6 +31,11 @@ public class HeatBuffer implements IHeatSource, INBTSerializable<CompoundTag> {
     @Override
     public float getMaxHeatStored() {
         return capacity;
+    }
+
+    @Override
+    public float getExpectedHeatProduction() {
+        return expectedHeatProduction;
     }
 
     @Override

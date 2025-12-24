@@ -5,5 +5,5 @@ public interface IHeatConsumer {
 
     float getOperatingThreshold();
     
-    float consumeHeat(float maxAvailable, boolean simulate);
+    float consumeHeat(float maxAvailable, float expectedHeatOutput, boolean simulate);
 }
