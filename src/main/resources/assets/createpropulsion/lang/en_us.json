@@ -169,7 +169,7 @@
     "create.gui.goggles.thruster.unit_kn": "kN",
     "create.gui.creative_thruster.power_behaviour": "Generated Thrust",
 
-    "createpropulsion.ponder.tilt_adapter.header": "Tilting wings with Tilt Adapter",
+    "createpropulsion.ponder.tilt_adapter.header": "Tilting the Adapt with Tilt Adapter",
     "createpropulsion.ponder.tilt_adapter.text_1": "Tilt Adapter allows tilting the output shaft based on Redstone signals",
     "createpropulsion.ponder.tilt_adapter.text_2": "Connected bearings are guaranteed to return to their initial position",
     "createpropulsion.ponder.tilt_adapter.text_3": "Final angle scales proportionally with Redstone signal strength",

@@ -79,5 +79,17 @@
         "mass": 10.0,
         "friction": 0.6,
         "priority": 1100
+    },
+    {
+        "tag": "createpropulsion:liquid_burner",
+        "mass": 10.0,
+        "friction": 0.6,
+        "priority": 1800
+    },
+    {
+        "tag": "createpropulsion:tilt_adapter",
+        "mass": 10.0,
+        "friction": 0.4,
+        "priority": 200
     }
 ]
