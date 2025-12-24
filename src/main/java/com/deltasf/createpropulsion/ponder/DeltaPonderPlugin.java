@@ -33,6 +33,7 @@ public class DeltaPonderPlugin implements PonderPlugin {
         HELPER.forComponents(PropulsionBlocks.TILT_ADAPTER_BLOCK).addStoryBoard("tilt_adapter", TiltAdapterScene::tiltAdapter);
         //Burners
         HELPER.forComponents(PropulsionBlocks.SOLID_BURNER).addStoryBoard("solid_burner", BurnerScenes::solidBurner);
+        HELPER.forComponents(PropulsionBlocks.LIQUID_BURNER).addStoryBoard("liquid_burner", BurnerScenes::liquidBurner);
     }
 
     @Override

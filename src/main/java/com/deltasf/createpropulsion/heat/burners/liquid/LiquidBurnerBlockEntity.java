@@ -18,6 +18,7 @@ import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour
 import com.simibubi.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour;
 
 import net.createmod.catnip.math.VecHelper;
+import net.createmod.ponder.api.level.PonderLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleOptions;
@@ -128,15 +129,14 @@ public class LiquidBurnerBlockEntity extends AbstractBurnerBlockEntity {
         if (level == null) return;
         
         //Smoke
-        if (isBurning() && level.getGameTime() % 2 == 0) {
+        if (isBurning() && level.getGameTime() % 2 == 0 && !(level instanceof PonderLevel)) {
             final float PIPE_OFFSET = 2.5f / 16.0f;
-            final float Y_OFFSET = 0.3f;
-            final Vec3 EXHAUST_VELOCITY = new Vec3(0.01, 0.05, 0);
+            final float Y_OFFSET = 13.0f / 16.0f; // Adjusted height for exhaust pipes
+            final Vec3 EXHAUST_VELOCITY = new Vec3(0, 0.05, 0);
 
-            //Alternate pipes
             boolean isLeft = level.getGameTime() % 4 == 0;
             spawnParticleEffect(
-                new Vec3(0.6, Y_OFFSET, isLeft ? PIPE_OFFSET : -PIPE_OFFSET), 
+                new Vec3(0, Y_OFFSET, isLeft ? PIPE_OFFSET : -PIPE_OFFSET), 
                 EXHAUST_VELOCITY,
                 ParticleTypes.SMOKE
             );

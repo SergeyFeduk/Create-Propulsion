@@ -182,5 +182,11 @@
     "createpropulsion.ponder.solid_burner.text_5": "Applying a Redstone signal will disable the thermostat",
     "createpropulsion.ponder.solid_burner.text_6": "While disabled, fuel is consumed at a constant rate, even without a consumer on top",
     "createpropulsion.ponder.solid_burner.text_7": "§fBurner Status: §6Hot",
-    "createpropulsion.ponder.solid_burner.text_8": "§fBurner Status: §cSearing"
+    "createpropulsion.ponder.solid_burner.text_8": "§fBurner Status: §cSearing",
+
+    "createpropulsion.ponder.liquid_burner.header": "Generating heat with Liquid Burner",
+    "createpropulsion.ponder.liquid_burner.text_1": "Liquid burners burn liquid fuels to provide heat to consumers directly above them",
+    "createpropulsion.ponder.liquid_burner.text_2": "Heat consumers will activate the burner once fueled",
+    "createpropulsion.ponder.liquid_burner.text_3": "Heat output is automatically regulated for fuel efficiency",
+    "createpropulsion.ponder.liquid_burner.text_4": "Liquid burners produce twice as much heat, compared to solid burners"
 }
