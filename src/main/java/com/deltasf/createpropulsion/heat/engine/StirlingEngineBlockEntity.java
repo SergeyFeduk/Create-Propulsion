@@ -19,7 +19,7 @@ import net.minecraftforge.common.util.LazyOptional;
 
 public class StirlingEngineBlockEntity extends GeneratingKineticBlockEntity implements IHeatConsumer {
     public static final float MAX_GENERATED_RPM = 256.0f;
-    public static final float HEAT_CONSUMPTION_RATE = 1.0f; //TODO: Maybe lower the output speed - lower the heat consumption -> lower fuel consumption by burner ?
+    public static final float HEAT_CONSUMPTION_RATE = 1.0f;
 
     private final LazyOptional<IHeatConsumer> heatConsumerCapability;
     protected StirlingScrollValueBehaviour targetSpeedBehaviour;
@@ -81,7 +81,9 @@ public class StirlingEngineBlockEntity extends GeneratingKineticBlockEntity impl
 
     @Override
     public float consumeHeat(float maxAvailable, float expectedHeatOutput, boolean simulate) {
-        float toConsume = Math.min(HEAT_CONSUMPTION_RATE, maxAvailable); //Do not care about expected heat output (we always consume less than it)
+        float rpm = targetSpeedBehaviour.getUnsignedRPM();
+        float modeConsumptionFactor = rpm / MAX_GENERATED_RPM;
+        float toConsume = Math.min(modeConsumptionFactor * HEAT_CONSUMPTION_RATE, maxAvailable); //Do not care about expected heat output (we always consume less than it)
 
         if (!simulate && toConsume > 0) {
             boolean wasInactive = activeTicks == 0;
