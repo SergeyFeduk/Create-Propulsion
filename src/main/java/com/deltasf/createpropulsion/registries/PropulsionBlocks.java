@@ -11,15 +11,12 @@ import com.deltasf.createpropulsion.balloons.injectors.hot_air_burner.HotAirBurn
 import com.deltasf.createpropulsion.heat.burners.liquid.LiquidBurnerBlock;
 import com.deltasf.createpropulsion.heat.burners.solid.SolidBurnerBlock;
 import com.deltasf.createpropulsion.heat.engine.StirlingEngineBlock;
-import com.deltasf.createpropulsion.impact_sensor.ImpactSensorBlock;
 import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerBlock;
 import com.deltasf.createpropulsion.magnet.RedstoneMagnetBlock;
 import com.deltasf.createpropulsion.optical_sensors.InlineOpticalSensorBlock;
 import com.deltasf.createpropulsion.optical_sensors.OpticalSensorBlock;
 import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerBlock;
 import com.deltasf.createpropulsion.propeller.PropellerBlock;
-import com.deltasf.createpropulsion.reaction_wheel.ReactionWheelBlock;
-import com.deltasf.createpropulsion.thruster.creative_thruster.CreativeThrusterBlock;
 import com.deltasf.createpropulsion.thruster.thruster.ThrusterBlock;
 import com.deltasf.createpropulsion.tilt_adapter.TiltAdapterBlock;
 import com.deltasf.createpropulsion.wing.CopycatWingBlock;
@@ -95,7 +92,7 @@ public class PropulsionBlocks {
         .setData(ProviderType.LANG, FUCK_OFF_LANG())
         .register();
 
-    public static final BlockEntry<CreativeThrusterBlock> CREATIVE_THRUSTER_BLOCK = REGISTRATE.block("creative_thruster", CreativeThrusterBlock::new)
+    /*public static final BlockEntry<CreativeThrusterBlock> CREATIVE_THRUSTER_BLOCK = REGISTRATE.block("creative_thruster", CreativeThrusterBlock::new)
         .properties(p -> p.mapColor(MapColor.METAL))
         .properties(p -> p.requiresCorrectToolForDrops())
         .properties(p -> p.sound(SoundType.METAL))
@@ -105,7 +102,7 @@ public class PropulsionBlocks {
         .blockstate(FUCK_OFF())
         .item().model(FUCK_OFF_ITEM()).build()
         .setData(ProviderType.LANG, FUCK_OFF_LANG())
-        .register();
+        .register();*/
 
 
     public static final BlockEntry<InlineOpticalSensorBlock> INLINE_OPTICAL_SENSOR_BLOCK = REGISTRATE.block("inline_optical_sensor", InlineOpticalSensorBlock::new)
@@ -213,14 +210,14 @@ public class PropulsionBlocks {
         .setData(ProviderType.LANG, FUCK_OFF_LANG())
         .register();
 
-    public static final BlockEntry<ReactionWheelBlock> REACTION_WHEEL_BLOCK = REGISTRATE.block("reaction_wheel", ReactionWheelBlock::new)
+    /*public static final BlockEntry<ReactionWheelBlock> REACTION_WHEEL_BLOCK = REGISTRATE.block("reaction_wheel", ReactionWheelBlock::new)
         .properties(p -> p.noOcclusion())
         .transform(PropulsionDefaultStress.setImpact(8.0))
         .tag(BlockTags.MINEABLE_WITH_PICKAXE)
         .blockstate(FUCK_OFF())
         .item().model(FUCK_OFF_ITEM()).build()
         .setData(ProviderType.LANG, FUCK_OFF_LANG())
-        .register();
+        .register();*/
 
     public static final BlockEntry<StirlingEngineBlock> STIRLING_ENGINE_BLOCK = REGISTRATE.block("stirling_engine", StirlingEngineBlock::new)
         .properties(p -> p.mapColor(MapColor.STONE))
@@ -246,7 +243,7 @@ public class PropulsionBlocks {
         .setData(ProviderType.LANG, FUCK_OFF_LANG())
         .register();
 
-    public static final BlockEntry<ImpactSensorBlock> IMPACT_SENSOR_BLOCK = REGISTRATE.block("impact_sensor", ImpactSensorBlock::new)
+    /*public static final BlockEntry<ImpactSensorBlock> IMPACT_SENSOR_BLOCK = REGISTRATE.block("impact_sensor", ImpactSensorBlock::new)
         .properties(p -> p.mapColor(MapColor.WOOD))
         .properties(p -> p.sound(SoundType.WOOD))
         .properties(p -> p.requiresCorrectToolForDrops())
@@ -256,7 +253,7 @@ public class PropulsionBlocks {
         .blockstate(FUCK_OFF())
         .item().model(FUCK_OFF_ITEM()).build()
         .setData(ProviderType.LANG, FUCK_OFF_LANG())
-        .register();
+        .register();*/
     
     //All wings
     public static final BlockEntry<WingBlock> WING_BLOCK = registerGenericWing("wing", PropulsionSpriteShifts.WING_TEXTURE);

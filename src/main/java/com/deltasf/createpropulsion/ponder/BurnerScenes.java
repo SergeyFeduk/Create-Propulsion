@@ -303,7 +303,7 @@ public class BurnerScenes {
         scene.world().showSection(stirlingBSel, Direction.DOWN);
         scene.world().setBlock(stirlingBPos, PropulsionBlocks.STIRLING_ENGINE_BLOCK.getDefaultState()
             .setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH), true);
-        scene.idle(5);
+        scene.idle(10);
 
         scene.world().modifyBlockEntityNBT(util.select().position(burnerBPos), LiquidBurnerBlockEntity.class, nbt -> {
             nbt.putInt("burnTime", 1000);

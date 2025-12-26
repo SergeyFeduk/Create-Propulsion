@@ -63,7 +63,7 @@ public class ReactionWheelBlock extends DirectionalKineticBlock implements IBE<R
 
     @Override
     public BlockEntityType<? extends ReactionWheelBlockEntity> getBlockEntityType() {
-        // Assuming this exists in your registries
-        return PropulsionBlockEntities.REACTION_WHEEL_BLOCK_ENTITY.get();
+        return null;
+        //return PropulsionBlockEntities.REACTION_WHEEL_BLOCK_ENTITY.get();
     }
 }

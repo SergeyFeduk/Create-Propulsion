@@ -9,7 +9,6 @@ import com.deltasf.createpropulsion.heat.burners.solid.SolidBurnerBlockEntity;
 import com.deltasf.createpropulsion.heat.engine.StirlingEngineBlockEntity;
 import com.deltasf.createpropulsion.heat.engine.StirlingEngineRenderer;
 import com.deltasf.createpropulsion.heat.engine.StirlingEngineVisual;
-import com.deltasf.createpropulsion.impact_sensor.ImpactSensorBlockEntity;
 import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerBlockEntity;
 import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerRenderer;
 import com.deltasf.createpropulsion.magnet.RedstoneMagnetBlockEntity;
@@ -21,9 +20,6 @@ import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerRenderer;
 import com.deltasf.createpropulsion.propeller.PropellerBlockEntity;
 import com.deltasf.createpropulsion.propeller.rendering.PropellerRenderer;
 import com.deltasf.createpropulsion.propeller.rendering.PropellerVisual;
-import com.deltasf.createpropulsion.reaction_wheel.ReactionWheelBlockEntity;
-import com.deltasf.createpropulsion.reaction_wheel.ReactionWheelRenderer;
-import com.deltasf.createpropulsion.thruster.creative_thruster.CreativeThrusterBlockEntity;
 import com.deltasf.createpropulsion.thruster.thruster.ThrusterBlockEntity;
 import com.deltasf.createpropulsion.tilt_adapter.TiltAdapterBlockEntity;
 import com.deltasf.createpropulsion.tilt_adapter.TiltAdapterRenderer;
@@ -43,10 +39,10 @@ public class PropulsionBlockEntities {
         .validBlocks(PropulsionBlocks.THRUSTER_BLOCK)
         .register();
 
-    public static final BlockEntityEntry<CreativeThrusterBlockEntity> CREATIVE_THRUSTER_BLOCK_ENTITY = 
+    /*public static final BlockEntityEntry<CreativeThrusterBlockEntity> CREATIVE_THRUSTER_BLOCK_ENTITY = 
         REGISTRATE.blockEntity("creative_thruster_block_entity", CreativeThrusterBlockEntity::new)
         .validBlocks(PropulsionBlocks.CREATIVE_THRUSTER_BLOCK)
-        .register();
+        .register();*/
 
     public static final BlockEntityEntry<InlineOpticalSensorBlockEntity> INLINE_OPTICAL_SENSOR_BLOCK_ENTITY = 
         REGISTRATE.blockEntity("inline_optical_sensor_block_entity", InlineOpticalSensorBlockEntity::new)
@@ -109,11 +105,11 @@ public class PropulsionBlockEntities {
         .renderer(() -> PropellerRenderer::new)
         .register();
 
-    public static final BlockEntityEntry<ReactionWheelBlockEntity> REACTION_WHEEL_BLOCK_ENTITY = 
+    /*public static final BlockEntityEntry<ReactionWheelBlockEntity> REACTION_WHEEL_BLOCK_ENTITY = 
         REGISTRATE.blockEntity("reaction_wheel_block_entity", ReactionWheelBlockEntity::new)
         .validBlock(PropulsionBlocks.REACTION_WHEEL_BLOCK)
         .renderer(() -> ReactionWheelRenderer::new)
-        .register();
+        .register();*/
 
     public static final BlockEntityEntry<StirlingEngineBlockEntity> STIRLING_ENGINE_BLOCK_ENTITY = 
         REGISTRATE.blockEntity("stirling_engine_block_entity", StirlingEngineBlockEntity::new)
@@ -128,8 +124,8 @@ public class PropulsionBlockEntities {
         .renderer(() -> TiltAdapterRenderer::new)
         .register();
 
-    public static final BlockEntityEntry<ImpactSensorBlockEntity> IMPACT_SENSOR_BLOCK_ENTITY = 
+    /*public static final BlockEntityEntry<ImpactSensorBlockEntity> IMPACT_SENSOR_BLOCK_ENTITY = 
         REGISTRATE.blockEntity("impact_sensor_block_entity", ImpactSensorBlockEntity::new)
         .validBlock(PropulsionBlocks.IMPACT_SENSOR_BLOCK)
-        .register();
+        .register();*/
 }

@@ -35,20 +35,20 @@ public class ImpactSensorBlock extends Block implements EntityBlock {
     }
 
     public BlockEntity newBlockEntity(@Nonnull BlockPos pos, @Nonnull BlockState state) {
-        return new ImpactSensorBlockEntity(PropulsionBlockEntities.IMPACT_SENSOR_BLOCK_ENTITY.get(), pos, state);
+        return null;
+        //return new ImpactSensorBlockEntity(PropulsionBlockEntities.IMPACT_SENSOR_BLOCK_ENTITY.get(), pos, state);
     }
 
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(@Nonnull Level level, @Nonnull BlockState state, @Nonnull BlockEntityType<T> type) {
-        if (level.isClientSide) return null;
-        if (type == PropulsionBlockEntities.IMPACT_SENSOR_BLOCK_ENTITY.get()) {
+        /*if (type == PropulsionBlockEntities.IMPACT_SENSOR_BLOCK_ENTITY.get()) {
             return (lvl, pos, st, be) -> {
                 if (be instanceof ImpactSensorBlockEntity sensorBe) {
                     sensorBe.tick();
                 }
             };
-        }
+        }*/
         return null;
     }
 }

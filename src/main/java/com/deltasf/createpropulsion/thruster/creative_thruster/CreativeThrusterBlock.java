@@ -21,15 +21,16 @@ public class CreativeThrusterBlock extends AbstractThrusterBlock {
 
     @Override
     public BlockEntity newBlockEntity(@Nonnull BlockPos pos, @Nonnull BlockState state) {
-        return new CreativeThrusterBlockEntity(PropulsionBlockEntities.CREATIVE_THRUSTER_BLOCK_ENTITY.get(), pos, state);
+        return null;
+        //return new CreativeThrusterBlockEntity(PropulsionBlockEntities.CREATIVE_THRUSTER_BLOCK_ENTITY.get(), pos, state);
     }
 
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(@Nonnull Level level, @Nonnull BlockState state, @Nonnull BlockEntityType<T> type) {
-        if (type == PropulsionBlockEntities.CREATIVE_THRUSTER_BLOCK_ENTITY.get()) {
+        /*if (type == PropulsionBlockEntities.CREATIVE_THRUSTER_BLOCK_ENTITY.get()) {
             return new SmartBlockEntityTicker<>();
-        }
+        }*/
         return null;
     }
 }

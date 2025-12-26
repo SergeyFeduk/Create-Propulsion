@@ -7,14 +7,14 @@
         "drift_speed_z": -0.05,
         "evolution_speed": 0.2,
         "octaves": [
-        {
-            "scale": 250.0,
-            "magnitude": 0.03
-        },
-        {
-            "scale": 80.0,
-            "magnitude": 0.015
-        }
+            {
+                "scale": 250.0,
+                "magnitude": 0.03
+            },
+            {
+                "scale": 80.0,
+                "magnitude": 0.015
+            }
         ]
     }
 }
