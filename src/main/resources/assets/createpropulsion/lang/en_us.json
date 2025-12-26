@@ -138,9 +138,13 @@
     "createpropulsion.invisibility_lens.tooltip.summary": "Makes an _optical sensor_'s beam _invisible_.",
     "createpropulsion.unfinished_lens.tooltip.summary": "_Halves_ an _optical sensor_'s maximum _range_.",
 
-    "createpropulsion.propeller.tooltip.summary": "Propeller.",
+    "createpropulsion.propeller.tooltip.summary": "Provides thrust when _two or more blades_ are installed. _Thrust_ is _proportional_ to input _RPM_.",
     "createpropulsion.propeller.tooltip.condition1": "When Shift R-clicked",
-    "createpropulsion.propeller.tooltip.behaviour1": "Flips direction of installed blades, effectievely reversing the thrust direction.",
+    "createpropulsion.propeller.tooltip.behaviour1": "_Flips direction_ of installed blades, effectievely _reversing_ the _thrust_ direction.",
+
+    "createpropulsion.stirling_engine.tooltip.summary": "Uses _heat_ from sources with high heat conductivity to _generate rotational power_.",
+    "createpropulsion.stirling_engine.tooltip.condition1": "When heat is provided",
+    "createpropulsion.stirling_engine.tooltip.behaviour1": "Generates _RPM_.",
 
     "createpropulsion.tooltip.holdForRocketFuelSummary": "Hold [%1$s] for Rocket Fuel Summary",
     "createpropulsion.tooltip.thrust": "Thrust",
