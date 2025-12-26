@@ -55,9 +55,9 @@ public class HaiGroup {
             }
         }
 
-        long start = System.nanoTime();
+        //long start = System.nanoTime();
         List<DiscoveredVolume> discoveredVolumes = BalloonScanner.scan(level, seeds, this, new ArrayList<>());
-        System.out.println("BalloonScanner scan time: " + (System.nanoTime() - start) / 1000 + " µs");
+        //System.out.println("BalloonScanner scan time: " + (System.nanoTime() - start) / 1000 + " us");
         generateBalloons(discoveredVolumes);
     }
 

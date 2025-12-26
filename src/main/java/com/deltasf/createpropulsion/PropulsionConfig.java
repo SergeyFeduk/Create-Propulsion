@@ -67,7 +67,7 @@ public class PropulsionConfig {
         //#region Server
         SERVER_BUILDER.push("Thruster");
             THRUSTER_THRUST_MULTIPLIER = SERVER_BUILDER.comment("Thrust is multiplied by that.")
-                .define("Thrust multiplier", 1.0);
+                .define("Thrust multiplier", 0.1);
             THRUSTER_CONSUMPTION_MULTIPLIER = SERVER_BUILDER.comment("Fuel consumption is multiplied by that.")
                 .define("Fuel consumption", 1.0);
             THRUSTER_MAX_SPEED = SERVER_BUILDER.comment("Thrusters stop accelerating ships upon reaching this speed. Defined in blocks per second.")
@@ -80,7 +80,7 @@ public class PropulsionConfig {
 
         SERVER_BUILDER.push("Creative Thruster");
             CREATIVE_THRUSTER_THRUST_MULTIPLIER = SERVER_BUILDER.comment("Thrust is multiplied by that.")
-                .define("Creative thrust multiplier", 1.0);
+                .define("Creative thrust multiplier", 0.1);
         SERVER_BUILDER.pop();
 
         SERVER_BUILDER.push("Optical sensors");
@@ -94,7 +94,7 @@ public class PropulsionConfig {
 
         SERVER_BUILDER.push("Redstone magnet");
             REDSTONE_MAGNET_POWER_MULTIPLIER = SERVER_BUILDER.comment("Magnet power is multiplied by that.")
-                .define("Power multiplier", 1.0);
+                .define("Power multiplier", 0.1);
             REDSTONE_MAGNET_FORCE_INDUCED_TORQUE_MULTIPLIER = SERVER_BUILDER.comment("Torque induced by offset of the force-applying magnet from COM. Value of 1.0 is realistic but does not allow for statically stable contraptions. Modify this value only if you know what you are doing!")
                 .define("Force-induced torque multiplier", 1.0);
         SERVER_BUILDER.pop();
@@ -125,7 +125,7 @@ public class PropulsionConfig {
             SERVER_BUILDER.pop();
         
             BALLOON_FORCE_COEFFICIENT = SERVER_BUILDER.comment("Balloon's buoyant force is multiplied by that.")
-                .define("Balloon force multiplier", 375.0);
+                .define("Balloon force multiplier", 37.5);
             BALLOON_SURFACE_LEAK_FACTOR = SERVER_BUILDER.comment("The higher this values is - the more hot air leaks out naturally.")
                 .define("Surface leak factor", 1e-2);
             BALLOON_HOLE_LEAK_FACTOR = SERVER_BUILDER.comment("The higher this values is - the more hot air leaks out of holes in balloon.")
@@ -138,7 +138,7 @@ public class PropulsionConfig {
             PROPELLER_MAX_SPEED = SERVER_BUILDER.comment("Propellers stop accelerating ships upon reaching this speed. Defined in blocks per second")
                 .defineInRange("Max speed", 40.0, 10.0, 100.0);
             PROPELLER_POWER_MULTIPLIER = SERVER_BUILDER.comment("Propeller force and torque are multiplied by this number")
-                .defineInRange("Power multiplier", 6.0, 0.01, 100.0); //TODO: Figure out better value
+                .defineInRange("Power multiplier", 0.6, 0.01, 100.0); //TODO: Figure out better value
             PROPELLER_TORQUE_EFFECT_MULTIPLIER = SERVER_BUILDER.comment("Propeller torque is multiplied by this number")
                 .defineInRange("Torque effect multiplier", 1.0, 0.0, 100.0);
         SERVER_BUILDER.pop();
