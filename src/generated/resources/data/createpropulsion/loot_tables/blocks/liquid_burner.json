@@ -11,11 +11,11 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "createpropulsion:reaction_wheel"
+          "name": "createpropulsion:liquid_burner"
         }
       ],
       "rolls": 1.0
     }
   ],
-  "random_sequence": "createpropulsion:blocks/reaction_wheel"
+  "random_sequence": "createpropulsion:blocks/liquid_burner"
 }

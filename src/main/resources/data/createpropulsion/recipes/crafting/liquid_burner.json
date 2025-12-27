@@ -1,0 +1,28 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "CCC",
+        "TMF",
+        "SSS"
+    ],
+    "key": {
+        "C": {
+            "item": "create:copper_sheet"
+        },
+        "M": {
+            "item": "create:precision_mechanism"
+        },
+        "T": {
+            "item": "minecraft:redstone_torch"
+        },
+        "F": {
+            "item": "create:propeller"
+        },
+        "S": {
+            "item": "create:sturdy_sheet"
+        }
+    },
+    "result": {
+        "item": "createpropulsion:liquid_burner"
+    }
+}

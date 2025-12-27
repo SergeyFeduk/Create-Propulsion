@@ -1,4 +1,4 @@
-// 1.20.1	2025-12-02T15:50:57.988268	Registrate Provider for createpropulsion [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
+// 1.20.1	2025-12-27T18:23:33.1987493	Registrate Provider for createpropulsion [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
 99975fce0ea5a83884c83fd6e8739e42623bc471 assets/createpropulsion/blockstates/envelope.json
 bf68cf768ac01bed2d3f60d63b081f4770ba8f69 assets/createpropulsion/blockstates/enveloped_shaft.json
 b2771a6d6e096894f1b921893e1a1023152fa509 assets/createpropulsion/blockstates/enveloped_shaft_black.json
@@ -137,16 +137,17 @@ d3a2b32c34452c15424c571df9750c02fa072e14 data/createpropulsion/loot_tables/block
 fd207cdcf942bcd312b6c210996ecb9ab16c5ceb data/createpropulsion/loot_tables/blocks/envelope_yellow.json
 520b8f5aec6190eec5df0bf8663514ddab5e6fcb data/createpropulsion/loot_tables/blocks/hot_air_burner.json
 c1d24aaf3dc925b733b34e4f85129d84990a0ba3 data/createpropulsion/loot_tables/blocks/inline_optical_sensor.json
+8763dd9e7a18cb00b7203871dcd387556bbc5fe4 data/createpropulsion/loot_tables/blocks/liquid_burner.json
 a3b17afa60551bcd92c8ee38cba642208662e077 data/createpropulsion/loot_tables/blocks/lodestone_tracker.json
 5bfab8de2bcf6083b7545d10b2ce0708d514681a data/createpropulsion/loot_tables/blocks/optical_sensor.json
 5c4bf097670e73cacf45bb194f3fcf7cc9d3cad6 data/createpropulsion/loot_tables/blocks/physics_assembler.json
 b595765d5390942fe806964ebe1a1d1205243bf9 data/createpropulsion/loot_tables/blocks/propeller.json
-6a7cf1d953bd26acf756ed23d3af785ab08393c2 data/createpropulsion/loot_tables/blocks/reaction_wheel.json
 e1f6adec1cc13327cb1363b7ced1d281ce35defc data/createpropulsion/loot_tables/blocks/redstone_magnet.json
 4de7232945635be6a2171ac1d26131e2a6423861 data/createpropulsion/loot_tables/blocks/solid_burner.json
 85f3f9876fc975b43d4ed4e00128dfd4aa0cf4a6 data/createpropulsion/loot_tables/blocks/stirling_engine.json
 c572a1d2a4798ff23ba1bf761939fb489d245ebd data/createpropulsion/loot_tables/blocks/tempered_wing.json
 d8ebb8b3c825383d60e227879a453c1fc5c92a4d data/createpropulsion/loot_tables/blocks/thruster.json
+6452e9afd59fc9477e544a00b07bb7e964888d12 data/createpropulsion/loot_tables/blocks/tilt_adapter.json
 0a1d943760f3e4f8935baa82cf6c0ebf80b436a9 data/createpropulsion/loot_tables/blocks/wing.json
 1133688999a3f9eb6436111dbf0e878258e90fec data/createpropulsion/recipes/envelope_black.json
 c06dd0a9a8be0b166d26a0978dd9688111391e70 data/createpropulsion/recipes/envelope_blue.json
@@ -166,6 +167,6 @@ e532f65558586f2768be2a33f80eaec50fa0a801 data/createpropulsion/recipes/envelope_
 8a87ea4e3649569d95523f33b6c138b2953b20cc data/createpropulsion/tags/blocks/envelopes.json
 a9a36e1dd6680e18b2c591ef766edce94b65e733 data/createpropulsion/tags/items/blade.json
 6c256d8058a2bc9e6923695449035ff4465f82b0 data/createpropulsion/tags/items/optical_lens.json
-0934d96b47992820ff74ebe3f55b88c64e0e0c92 data/minecraft/tags/blocks/mineable/axe.json
-988cf566fa95a2c57ea81965dfe91432082d63d6 data/minecraft/tags/blocks/mineable/pickaxe.json
+2aeaa7a8dec0ea4192ef197b966d03da0a44e8c9 data/minecraft/tags/blocks/mineable/axe.json
+fbc9561cb6eed12c23d69a6aff58235138280baf data/minecraft/tags/blocks/mineable/pickaxe.json
 8a87ea4e3649569d95523f33b6c138b2953b20cc data/minecraft/tags/blocks/wool.json
