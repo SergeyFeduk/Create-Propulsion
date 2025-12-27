@@ -25,6 +25,9 @@ public class PropulsionPartialModels {
     public static final PartialModel TILT_ADAPTER_GANTRY = partial("tilt_adapter_screw_overlay");
     public static final PartialModel TILT_ADAPTER_SIDE_INDICATOR = partial("tilt_adapter_side_overlay");
 
+    public static final PartialModel TRANSMISSION_PLUS = partial("transmission_plus");
+    public static final PartialModel TRANSMISSION_MINUS = partial("transmission_minus");
+
     private static PartialModel partial(String path) {
         return PartialModel.of(new ResourceLocation(CreatePropulsion.ID, "partial/" + path));
     }

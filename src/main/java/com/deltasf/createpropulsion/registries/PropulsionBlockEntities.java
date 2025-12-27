@@ -21,6 +21,8 @@ import com.deltasf.createpropulsion.propeller.rendering.PropellerRenderer;
 import com.deltasf.createpropulsion.propeller.rendering.PropellerVisual;
 import com.deltasf.createpropulsion.reaction_wheel.ReactionWheelBlockEntity;
 import com.deltasf.createpropulsion.reaction_wheel.ReactionWheelRenderer;
+import com.deltasf.createpropulsion.redstone_transmission.RedstoneTransmissionRenderer;
+import com.deltasf.createpropulsion.redstone_transmission.RedstoneTransmissionVisual;
 import com.deltasf.createpropulsion.thruster.creative_thruster.CreativeThrusterBlockEntity;
 import com.deltasf.createpropulsion.redstone_transmission.RedstoneTransmissionBlockEntity;
 import com.deltasf.createpropulsion.thruster.thruster.ThrusterBlockEntity;
@@ -80,9 +82,9 @@ public class PropulsionBlockEntities {
 
     public static final BlockEntityEntry<RedstoneTransmissionBlockEntity> REDSTONE_TRANSMISSION_BLOCK_ENTITY =
             REGISTRATE.blockEntity("redstone_transmission_block_entity", RedstoneTransmissionBlockEntity::new)
-                    .visual(() -> SplitShaftVisual::new, false)
+                    .visual(() -> RedstoneTransmissionVisual::new, false)
                     .validBlock(PropulsionBlocks.REDSTONE_TRANSMISSION_BLOCK)
-                    .renderer(() -> SplitShaftRenderer::new)
+                    .renderer(() -> RedstoneTransmissionRenderer::new)
                     .register();
 
     public static final BlockEntityEntry<HotAirBurnerBlockEntity> HOT_AIR_BURNER_BLOCK_ENTITY =

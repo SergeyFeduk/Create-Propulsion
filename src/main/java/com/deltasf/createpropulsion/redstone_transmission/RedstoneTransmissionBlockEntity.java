@@ -64,8 +64,8 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
             return;
         }
         Direction facing = getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING);
-        int shift_up = level.getSignal(getBlockPos().relative(facing.getClockWise()), facing.getClockWise());
-        int shift_down = level.getSignal(getBlockPos().relative(facing.getCounterClockWise()), facing.getCounterClockWise());
+        int shift_up = level.getSignal(getBlockPos().relative(facing.getCounterClockWise()), facing.getCounterClockWise());
+        int shift_down = level.getSignal(getBlockPos().relative(facing.getClockWise()), facing.getClockWise());
         updateShift(shift_up, shift_down);
     }
 
@@ -80,7 +80,7 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
 
         @Override
         protected Vec3 getSouthLocation() {
-            return VecHelper.voxelSpace(8,8,-0.5);
+            return VecHelper.voxelSpace(8,8,-0.125);
         }
 
         @Override
