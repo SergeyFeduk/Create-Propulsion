@@ -197,7 +197,7 @@ public class PropellerVisual extends KineticBlockEntityVisual<PropellerBlockEnti
 
     private void transformBlade(Instance instance, float totalAngle, int alpha) {
         double bladeAngle = PropulsionConfig.PROPELLER_BLADE_ANGLE.get();
-        float pitchAngle = (float)bladeAngle * (blockEntity.IsClockwise() ? 1.0f : -1.0f);
+        float pitchAngle = (float)bladeAngle * (blockEntity.IsClockwise() ? -1.0f : 1.0f);
 
         Quaternionf rotation = getBaseRotation(totalAngle);
         Quaternionf pitchRot = new Quaternionf().rotationY(Mth.DEG_TO_RAD * pitchAngle);

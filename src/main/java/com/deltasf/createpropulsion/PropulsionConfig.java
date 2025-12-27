@@ -125,7 +125,7 @@ public class PropulsionConfig {
             SERVER_BUILDER.pop();
         
             BALLOON_FORCE_COEFFICIENT = SERVER_BUILDER.comment("Balloon's buoyant force is multiplied by that.")
-                .define("Balloon force multiplier", 37.5);
+                .define("Balloon force multiplier", 75.0);
             BALLOON_SURFACE_LEAK_FACTOR = SERVER_BUILDER.comment("The higher this values is - the more hot air leaks out naturally.")
                 .define("Surface leak factor", 1e-2);
             BALLOON_HOLE_LEAK_FACTOR = SERVER_BUILDER.comment("The higher this values is - the more hot air leaks out of holes in balloon.")
@@ -138,7 +138,7 @@ public class PropulsionConfig {
             PROPELLER_MAX_SPEED = SERVER_BUILDER.comment("Propellers stop accelerating ships upon reaching this speed. Defined in blocks per second")
                 .defineInRange("Max speed", 40.0, 10.0, 100.0);
             PROPELLER_POWER_MULTIPLIER = SERVER_BUILDER.comment("Propeller force and torque are multiplied by this number")
-                .defineInRange("Power multiplier", 0.2, 0.01, 100.0); //TODO: Figure out better value
+                .defineInRange("Power multiplier", 0.8, 0.01, 100.0); //TODO: Figure out better value
             PROPELLER_TORQUE_EFFECT_MULTIPLIER = SERVER_BUILDER.comment("Propeller torque is multiplied by this number")
                 .defineInRange("Torque effect multiplier", 1.0, 0.0, 100.0);
         SERVER_BUILDER.pop();

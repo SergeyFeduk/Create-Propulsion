@@ -6,11 +6,13 @@ import dev.engine_room.flywheel.api.visualization.VisualizationManager;
 import dev.engine_room.flywheel.impl.event.RenderContextImpl;
 import dev.engine_room.flywheel.impl.visualization.VisualizationManagerImpl;
 import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.RenderBuffers;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Final;
@@ -27,6 +29,7 @@ public class LevelRendererMixin {
 
     @Shadow @Nullable private ClientLevel level;
     @Shadow @Final private RenderBuffers renderBuffers;
+    private static boolean hasShownConflictWarning = false;
 
     @Inject(method = "renderLevel", at = @At(value = "INVOKE_STRING", target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V", args = "ldc=particles"))
     private void createpropulsion$renderAfterTranslucent(PoseStack poseStack, float partialTick, long finishNanoTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightTexture lightTexture, Matrix4f projectionMatrix, CallbackInfo ci) {
@@ -39,6 +42,12 @@ public class LevelRendererMixin {
                 var engine = impl.getEngineImpl();
                 if (engine != null) {
                     engine.render(context);
+                }
+            } catch(NoSuchMethodError nsme) {
+                Minecraft mc = Minecraft.getInstance();
+                if (mc.player != null && !hasShownConflictWarning) {
+                    mc.player.displayClientMessage(Component.literal("§cCreate: Propulsion and Vanillin are incompatible, please uninstall one of them!"), false);
+                    hasShownConflictWarning = true;
                 }
             } finally {
                 PropellerRenderControl.renderStage = 0; //Default mode
