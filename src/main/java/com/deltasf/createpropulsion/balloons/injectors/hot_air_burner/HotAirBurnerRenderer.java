@@ -42,7 +42,7 @@ public class HotAirBurnerRenderer extends SmartBlockEntityRenderer<HotAirBurnerB
         ms.mulPose(Axis.YP.rotationDegrees(AngleHelper.horizontalAngle(direction)));
         ms.translate(horizontalOffset, verticalOffset, 0);
         ms.translate(-0.5, -0.5, -0.5);
-        leverModel.light(light).overlay(overlay).renderInto(ms, solidVB);
+        leverModel.light(light).renderInto(ms, solidVB);
         ms.popPose();
     }
 }

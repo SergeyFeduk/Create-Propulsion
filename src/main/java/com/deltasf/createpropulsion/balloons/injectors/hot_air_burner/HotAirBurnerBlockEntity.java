@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
+import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.atmosphere.DimensionAtmosphereManager;
 import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.injectors.AbstractHotAirInjectorBlockEntity;
@@ -97,7 +98,7 @@ public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity i
             case 2:  efficiency = 1.0 / 3.0; break;
             default: efficiency = 0.0; break;
         }
-        return baseInjection * efficiency;
+        return baseInjection * efficiency * PropulsionConfig.HOT_AIR_BURNER_PRODUCTION_MULTIPLIER.get();
     }
 
     @Override
@@ -217,12 +218,21 @@ public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity i
         String key = "";
         ChatFormatting color = null;
 
+        //Airless -> Not on ship -> No balloon / Fuel -> Valid statuses
         if (isAirless) {
             key = "gui.goggles.hot_air_burner.status.airless";
             color = ChatFormatting.RED;
+        } else if (!VSGameUtilsKt.isBlockInShipyard(getLevel(), getBlockPos())) {
+            key = "gui.goggles.hot_air_burner.status.not_shipified";
+            color = ChatFormatting.RED;
         } else if (!isBalloonPresent) {
-            key = "gui.goggles.hot_air_burner.status.no_balloon";
-            color = ChatFormatting.DARK_GRAY;
+            if (hasFuel) {
+                key = "gui.goggles.hot_air_burner.status.no_balloon";
+                color = ChatFormatting.DARK_GRAY;
+            } else {
+                key = "gui.goggles.hot_air_burner.status.no_fuel";
+                color = ChatFormatting.GOLD;
+            }
         } else if (isBurning) {
             key = "gui.goggles.hot_air_burner.status.on";
             color = ChatFormatting.GREEN;

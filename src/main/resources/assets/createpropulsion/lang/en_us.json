@@ -167,6 +167,7 @@
     "create.gui.goggles.hot_air_burner.status": "Hot Air Burner Status",
     "create.gui.goggles.hot_air_burner.status.airless": "No Atmosphere",
     "create.gui.goggles.hot_air_burner.status.no_balloon": "No Balloon",
+    "create.gui.goggles.hot_air_burner.status.not_shipified": "Not On Ship",
     "create.gui.goggles.hot_air_burner.status.no_fuel": "No Fuel",
     "create.gui.goggles.hot_air_burner.status.on": "On",
     "create.gui.goggles.hot_air_burner.status.ready": "Ready",

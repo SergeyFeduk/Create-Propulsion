@@ -30,7 +30,9 @@ public class AtmoshpereHelper {
         if (clampAtSea) {
             altitude = Math.max(0, altitude);
         }
-        return atmosphere.pressureAtSea() * Math.exp(-altitude / atmosphere.scaleHeight());
+        
+        double height = PropulsionConfig.ATMOSPHERE_HEIGHT_FACTOR.get() * atmosphere.scaleHeight();
+        return atmosphere.pressureAtSea() * Math.exp(-altitude / height);
     }
 
     public static double calculateVariableExternalAirDensity(AtmosphereData atmosphere, double worldX, double worldY, double worldZ, long gameTime, boolean clampAtSea) {
