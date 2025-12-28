@@ -63,9 +63,9 @@
     "block.createpropulsion.tilt_adapter": "倾斜适配器",
     "block.createpropulsion.creative_thruster": "创造推进器",
 
-    "item.createpropulsion.wooden_blade": "木质桨叶",
-    "item.createpropulsion.copper_blade": "铜质桨叶",
-    "item.createpropulsion.andesite_blade": "安山桨叶",
+    "item.createpropulsion.wooden_blade": "木质叶片",
+    "item.createpropulsion.copper_blade": "铜质叶片",
+    "item.createpropulsion.andesite_blade": "安山叶片",
 
     "create.gui.goggles.thruster.status": "推进器状态",
     "create.gui.goggles.thruster.status.no_fuel": "燃料耗尽",
@@ -138,9 +138,9 @@
     "createpropulsion.invisibility_lens.tooltip.summary": "使_光学传感器_的光束_不再可见_。",
     "createpropulsion.unfinished_lens.tooltip.summary": "使_光学传感器_的最大_探测距离_减半。",
 
-    "createpropulsion.propeller.tooltip.summary": "安装_两个或更多桨叶_时提供推力。_推力_与输入_RPM_成_正比_。",
+    "createpropulsion.propeller.tooltip.summary": "安装_两个或更多叶片_时提供推力。_推力_与输入_RPM_成_正比_。",
     "createpropulsion.propeller.tooltip.condition1": "潜行并右击时",
-    "createpropulsion.propeller.tooltip.behaviour1": "_翻转_已安装桨叶的方向，从而_反转_推力方向。",
+    "createpropulsion.propeller.tooltip.behaviour1": "_翻转_已安装叶片的方向，从而_反转_推力方向。",
 
     "createpropulsion.stirling_engine.tooltip.summary": "利用热导率高的热源提供的_热量_来_产生旋转力_。",
     "createpropulsion.stirling_engine.tooltip.condition1": "提供热量时",
@@ -150,7 +150,7 @@
     "createpropulsion.tooltip.thrust": "推力",
     "createpropulsion.tooltip.consumption": "燃烧速率",
 
-    "createpropulsion.tooltip.holdForBladeSummary": "按住 [%1$s] 可查看桨叶概要",
+    "createpropulsion.tooltip.holdForBladeSummary": "按住 [%1$s] 可查看叶片概要",
     "createpropulsion.tooltip.airEfficiency": "空气推进效率",
     "createpropulsion.tooltip.waterEfficiency": "水下推进效率",
     "createpropulsion.tooltip.noTorque": "无扭矩效应。",
