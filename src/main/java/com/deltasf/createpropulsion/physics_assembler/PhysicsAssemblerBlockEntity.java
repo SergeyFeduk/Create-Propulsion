@@ -162,7 +162,7 @@ public class PhysicsAssemblerBlockEntity extends SmartBlockEntity {
 
         //Teleport ship to actual location
         Vector3dc comInShip = ship.getInertiaData().getCenterOfMass();
-        Vector3d finalShipPosInShipyard = new Vector3d(comInShip).add(0.5,0.5,0.5);
+        Vector3d finalShipPosInShipyard = new Vector3d(comInShip).add(0.0,0.0,0.0);
 
         Vector3d newShipInternalCenterPosVec = VectorConversionsMCKt.toJOMLD(newShipInternalCenterPos);
         Vector3d creationAnchorPosVec = VectorConversionsMCKt.toJOMLD(creationAnchorPos);
@@ -171,7 +171,7 @@ public class PhysicsAssemblerBlockEntity extends SmartBlockEntity {
             .sub(newShipInternalCenterPosVec)
             .add(creationAnchorPosVec);
 
-        Vector3d finalShipPosInWorld = shipComInWorld.add(0.5,0.5,0.5);
+        Vector3d finalShipPosInWorld = shipComInWorld.add(0.0,0.0,0.0);
         Quaterniondc finalShipRotation = new Quaterniond();
         Vector3d finalShipScale = new Vector3d(1, 1, 1);
 
