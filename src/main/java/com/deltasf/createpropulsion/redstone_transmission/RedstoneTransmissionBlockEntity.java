@@ -2,15 +2,19 @@ package com.deltasf.createpropulsion.redstone_transmission;
 
 import com.deltasf.createpropulsion.PropulsionAllIcons;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.simibubi.create.content.kinetics.base.IRotate;
 import com.simibubi.create.content.kinetics.transmission.SplitShaftBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform;
 import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.INamedIconOptions;
 import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollOptionBehaviour;
 import com.simibubi.create.foundation.gui.AllIcons;
+import com.simibubi.create.foundation.utility.CreateLang;
 import net.createmod.catnip.lang.Lang;
+import net.createmod.catnip.lang.LangBuilder;
 import net.createmod.catnip.math.AngleHelper;
 import net.createmod.catnip.math.VecHelper;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -109,6 +113,31 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
             float yRot = AngleHelper.horizontalAngle(facing);
             ms.mulPose(com.mojang.math.Axis.YP.rotationDegrees(yRot));
         }
+    }
+
+    @Override
+    public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
+        CreateLang.builder()
+                .add(Component.translatable("createpropulsion.gui.goggles.redstone_transmission.control_mode"))
+                .text(": ")
+                .add(Component.translatable(controlMode.get().getTranslationKey()))
+                .forGoggles(tooltip);
+        
+        CreateLang.builder()
+                .add(Component.translatable(
+                                    "createpropulsion.gui.goggles.redstone_transmission.internal_shift",
+                                    getBlockState().getValue(SHIFT_LEVEL) / (controlMode.get().equals(TransmissionMode.DIRECT) ? 17 : 1),
+                                    controlMode.get().equals(TransmissionMode.DIRECT) ? 15 : 255
+                        )
+                )
+                .forGoggles(tooltip);
+
+        CreateLang.builder()
+                .add(Component.translatable("createpropulsion.gui.goggles.redstone_transmission.output"))
+                .add(IRotate.SpeedLevel.getFormattedSpeedText(speed, isOverStressed()).component())
+                .forGoggles(tooltip);
+
+        return true;
     }
 
     public enum TransmissionMode implements INamedIconOptions {
