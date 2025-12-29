@@ -204,5 +204,13 @@
     "createpropulsion.ponder.liquid_burner.text_8": "§fBurner Status: §6Hot",
     "createpropulsion.ponder.liquid_burner.text_9": "§fBurner Status: §cSearing",
     "createpropulsion.ponder.liquid_burner.text_10": "Liquid Burners can be chained together.",
-    "createpropulsion.ponder.liquid_burner.text_11": "They will act as a pipe and pass fuel to other Liquid Burners."
+    "createpropulsion.ponder.liquid_burner.text_11": "They will act as a pipe and pass fuel to other Liquid Burners.",
+
+    "createpropulsion.ponder.making_balloon.header": "Making a Hot Air Balloon",
+    "createpropulsion.ponder.making_balloon.text_1": "Envelopes encase volume that can be filled with hot air.",
+    "createpropulsion.ponder.making_balloon.text_2": "Hot Air Burners will fill balloons above them, when fueled.",
+    "createpropulsion.ponder.making_balloon.text_3": "Hot Air Burners must not be further than 5 blocks from the open bottom of the balloon.",
+    "createpropulsion.ponder.making_balloon.text_4": "Hot air output can be controlled by clicking on the lever.",
+    "createpropulsion.ponder.making_balloon.text_5": "Hot Air Burner has 3 power levels.",
+    "createpropulsion.ponder.making_balloon.text_6": "The higher is power level - the higher is hot air output."
 }

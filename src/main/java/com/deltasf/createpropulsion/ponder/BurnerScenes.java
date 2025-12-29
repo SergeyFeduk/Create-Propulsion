@@ -128,6 +128,7 @@ public class BurnerScenes {
             .pointAt(util.vector().topOf(burnerPos))
             .placeNearTarget();
         scene.idle(90);
+        scene.markAsFinished();
     }
 
     public static void liquidBurner(SceneBuilder builder, SceneBuildingUtil util) {
