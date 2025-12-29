@@ -7,6 +7,7 @@ import com.simibubi.create.content.kinetics.transmission.SplitShaftBlockEntity;
 import com.simibubi.create.content.kinetics.transmission.SplitShaftVisual;
 import dev.engine_room.flywheel.api.instance.Instance;
 import dev.engine_room.flywheel.api.visualization.VisualizationContext;
+import dev.engine_room.flywheel.api.visualization.VisualizationManager;
 import dev.engine_room.flywheel.lib.instance.InstanceTypes;
 import dev.engine_room.flywheel.lib.instance.OrientedInstance;
 import dev.engine_room.flywheel.lib.instance.TransformedInstance;
@@ -75,6 +76,9 @@ public class RedstoneTransmissionVisual extends SplitShaftVisual implements Simp
 
     @Override
     public void beginFrame(Context context) {
+
+        if (!(blockEntity instanceof RedstoneTransmissionBlockEntity rtbe)) return;
+
         Direction facing = blockEntity.getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING);
         int shift_up = blockEntity.getLevel().getSignal(blockEntity.getBlockPos().relative(facing.getCounterClockWise()), facing.getCounterClockWise());
         int shift_down = blockEntity.getLevel().getSignal(blockEntity.getBlockPos().relative(facing.getClockWise()), facing.getClockWise());
@@ -91,7 +95,7 @@ public class RedstoneTransmissionVisual extends SplitShaftVisual implements Simp
 
         msr.center().translate(0, 0, 2f / 16).rotateTo(Direction.EAST, facing).uncenter()
                 .translate(0, dialPivot, dialPivot)
-                .rotate((float) (Math.PI / 2 * -blockEntity.getBlockState().getValue(SHIFT_LEVEL) / 255f), Direction.EAST)
+                .rotate(rtbe.getGaugeTarget(context.partialTick()), Direction.EAST)
                 .translate(0, -dialPivot, -dialPivot);;
 
         hand.setTransform(ms).setChanged();

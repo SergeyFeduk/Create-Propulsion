@@ -38,7 +38,7 @@ public class RedstoneTransmissionRenderer extends SplitShaftRenderer {
         dialBuffer
                 .rotateCentered((float) ((-facing.toYRot() - 90) / 180 * Math.PI), Direction.UP)
                 .translate(2f / 16, 5.75f / 16, 5.75f / 16)
-                .rotate((float) (-Math.PI / 2 * be.getBlockState().getValue(SHIFT_LEVEL) / 255f), Direction.EAST)
+                .rotate(rtbe.getGaugeTarget(partialTicks), Direction.EAST)
                 .translate(0, -5.75f / 16, -5.75f / 16)
                 .light(light)
                 .renderInto(ms, buffer.getBuffer(RenderType.solid()));

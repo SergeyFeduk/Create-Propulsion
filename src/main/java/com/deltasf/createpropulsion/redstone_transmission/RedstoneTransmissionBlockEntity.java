@@ -30,6 +30,8 @@ import static com.deltasf.createpropulsion.redstone_transmission.RedstoneTransmi
 public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
 
     ScrollOptionBehaviour<TransmissionMode> controlMode;
+    private float prevGaugeTarget = 0f;
+    private float gaugeTarget = 0f;
 
     public RedstoneTransmissionBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -59,6 +61,13 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
     }
 
     @Override
+    public void tick() {
+        super.tick();
+        prevGaugeTarget = gaugeTarget;
+        gaugeTarget += Mth.clamp(Mth.PI / 2 * -getBlockState().getValue(SHIFT_LEVEL) / 255f - gaugeTarget, - Mth.PI / 4, Mth.PI / 4) / 10f;
+    }
+
+    @Override
     public void lazyTick() {
         if(level == null) {
             return;
@@ -74,6 +83,10 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
         if (getBlockState().getValue(SHIFT_LEVEL) == 0) return 0;
         if (hasSource() && getSourceFacing() == face) return (float) MAX_VALUE / getBlockState().getValue(SHIFT_LEVEL);
         else return 1;
+    }
+
+    public float getGaugeTarget(float partialTick) {
+        return Mth.lerp(partialTick, prevGaugeTarget, gaugeTarget);
     }
 
     public static class TransmissionValueBox extends ValueBoxTransform.Sided {
