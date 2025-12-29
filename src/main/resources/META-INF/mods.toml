@@ -36,7 +36,7 @@ description='''A mod that adds optical sensors and thruster to the Create mod. A
 [[dependencies.${mod_id}]]
 	modId = "valkyrienskies"
 	mandatory = true
-	versionRange = "[2.4.0,)"
+	versionRange = "[2.4.3,)"
 	ordering = "AFTER"
 	side = "BOTH"
 

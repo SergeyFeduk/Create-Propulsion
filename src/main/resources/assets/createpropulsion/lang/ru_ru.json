@@ -138,6 +138,14 @@
     "createpropulsion.invisibility_lens.tooltip.summary": "Делает луч _оптического сенсора невидимым_.",
     "createpropulsion.unfinished_lens.tooltip.summary": "_Уменьшает_ предельную дальность _оптического сенсора_ вдвое.",
 
+    "createpropulsion.propeller.tooltip.summary": "Создаёт тягу если _две или более лопасти_ установлены. _Тяга пропорциональна оборотам вала_.",
+    "createpropulsion.propeller.tooltip.condition1": "Shift+ПКМ",
+    "createpropulsion.propeller.tooltip.behaviour1": "_Изменяет направление_ установленных лопастей, тем самым _меняя направление тяги_.",
+
+    "createpropulsion.stirling_engine.tooltip.summary": "Использует _тепло_ от источников с высокой теплопроводностью для _вращения вала_.",
+    "createpropulsion.stirling_engine.tooltip.condition1": "При подаче тепла",
+    "createpropulsion.stirling_engine.tooltip.behaviour1": "Вращает вал.",
+
     "createpropulsion.tooltip.holdForRocketFuelSummary": "Удерживайте [%1$s] для сводки о ракетном топливе",
     "createpropulsion.tooltip.thrust": "Тяга",
     "createpropulsion.tooltip.consumption": "Расход топлива",
@@ -159,6 +167,7 @@
     "create.gui.goggles.hot_air_burner.status": "Статус горелки",
     "create.gui.goggles.hot_air_burner.status.airless": "Нет атмосферы",
     "create.gui.goggles.hot_air_burner.status.no_balloon": "Нет воздушного шара",
+    "create.gui.goggles.hot_air_burner.status.not_shipified": "Не на корабле",
     "create.gui.goggles.hot_air_burner.status.no_fuel": "Нет топлива",
     "create.gui.goggles.hot_air_burner.status.on": "Работает",
     "create.gui.goggles.hot_air_burner.status.ready": "Готов",
