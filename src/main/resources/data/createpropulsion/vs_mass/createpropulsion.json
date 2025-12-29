@@ -1,32 +1,32 @@
 [
     {
         "block": "createpropulsion:thruster",
-        "mass": 300.0,
+        "mass": 3000.0,
         "friction": 0.6
     },
     {
         "block": "createpropulsion:inline_optical_sensor",
-        "mass": 10.0,
+        "mass": 100.0,
         "friction": 0.6
     },
     {
         "block": "createpropulsion:optical_sensor",
-        "mass": 120.0,
+        "mass": 800.0,
         "friction": 0.6
     },
     {
         "block": "createpropulsion:lodestone_tracker",
-        "mass": 90.0,
+        "mass": 900.0,
         "friction": 0.6
     },
     {
         "block": "createpropulsion:redstone_magnet",
-        "mass": 100.0,
+        "mass": 1000.0,
         "friction": 0.4
     },
     {
         "block": "createpropulsion:physics_assembler",
-        "mass": 160.0,
+        "mass": 1600.0,
         "friction": 0.4
     },
     {
@@ -56,38 +56,38 @@
     },
     {
         "block": "createpropulsion:hot_air_burner",
-        "mass": 70.0,
+        "mass": 700.0,
         "friction": 0.4
     },
     {
         "block": "createpropulsion:solid_burner",
-        "mass": 120.0,
+        "mass": 1200.0,
         "friction": 0.2
     },
     {
         "block": "createpropulsion:propeller",
-        "mass": 50.0,
+        "mass": 300.0,
         "friction": 0.2
     },
     {
         "block": "createpropulsion:stirling_engine",
-        "mass": 80.0,
+        "mass": 800.0,
         "friction": 0.6
     },
     {
         "tag": "createpropulsion:envelopes",
-        "mass": 5.0,
+        "mass": 10.0,
         "friction": 0.6,
         "priority": 1100
     },
     {
         "block": "createpropulsion:liquid_burner",
-        "mass": 180.0,
+        "mass": 1800.0,
         "friction": 0.6
     },
     {
         "block": "createpropulsion:tilt_adapter",
-        "mass": 50.0,
+        "mass": 500.0,
         "friction": 0.4
     }
 ]
