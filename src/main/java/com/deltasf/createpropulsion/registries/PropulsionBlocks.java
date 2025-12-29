@@ -171,14 +171,15 @@ public class PropulsionBlocks {
         .register();
 
     public static final BlockEntry<RedstoneTransmissionBlock> REDSTONE_TRANSMISSION_BLOCK = REGISTRATE.block("redstone_transmission", RedstoneTransmissionBlock::new)
-            .initialProperties(SharedProperties::stone)
-            .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
+            .properties(p -> p.mapColor(MapColor.PODZOL))
+            .properties(p -> p.sound(SoundType.METAL))
+            .properties(p -> p.strength(2.5F, 2.0F))
+            .properties(p -> p.noOcclusion())
             .transform(PropulsionDefaultStress.setNoImpact())
             .transform(axeOrPickaxe())
-            .addLayer(() -> RenderType::cutoutMipped)
             .blockstate((c, p) -> BlockStateGen.axisBlock(c, p, AssetLookup.forPowered(c, p)))
-            .item()
-            .transform(customItemModel())
+            .item().model(FUCK_OFF_ITEM()).build()
+            .setData(ProviderType.LANG, FUCK_OFF_LANG())
             .register();
 
     public static final BlockEntry<HotAirBurnerBlock> HOT_AIR_BURNER_BLOCK = REGISTRATE.block("hot_air_burner", HotAirBurnerBlock::new)
