@@ -181,13 +181,14 @@ public class BurnerScenes {
             Direction facing = Direction.SOUTH;
             float yRot = -facing.toYRot();
             float pipeOffset = 2.5f / 16.0f;
-            boolean isLeft = world.getGameTime() % 4 == 0;
-            Vec3 localOffset = new Vec3(0.6, 0.3, isLeft ? pipeOffset : -pipeOffset);
-            Vec3 localVelocity = new Vec3(0.01, 0.05, 0);
-            Vec3 offset = VecHelper.rotate(localOffset, yRot, Direction.Axis.Y);
-            Vec3 velocity = VecHelper.rotate(localVelocity, yRot, Direction.Axis.Y);
-            world.addParticle(ParticleTypes.SMOKE, x + offset.x, y + offset.y, z + offset.z, velocity.x, velocity.y, velocity.z);
-        }, 1.0f, 260);
+            for (boolean isLeft : new boolean[]{false, true}) {
+                Vec3 localOffset = new Vec3(0.6, 0.3, isLeft ? pipeOffset : -pipeOffset);
+                Vec3 localVelocity = new Vec3(0.01, 0.05, 0);
+                Vec3 offset = VecHelper.rotate(localOffset, yRot, Direction.Axis.Y);
+                Vec3 velocity = VecHelper.rotate(localVelocity, yRot, Direction.Axis.Y);
+                world.addParticle(ParticleTypes.SMOKE, x + offset.x, y + offset.y, z + offset.z, velocity.x, velocity.y, velocity.z);
+            }
+        }, 0.5f, 260);
 
         scene.world().modifyBlockEntityNBT(burnerASel, LiquidBurnerBlockEntity.class, nbt -> {
             CompoundTag tankNbt = new CompoundTag();
@@ -258,13 +259,14 @@ public class BurnerScenes {
             Direction facing = Direction.SOUTH;
             float yRot = -facing.toYRot();
             float pipeOffset = 2.5f / 16.0f;
-            boolean isLeft = world.getGameTime() % 4 == 0;
-            Vec3 localOffset = new Vec3(0.6, 0.3, isLeft ? pipeOffset : -pipeOffset);
-            Vec3 localVelocity = new Vec3(0.01, 0.05, 0);
-            Vec3 offset = VecHelper.rotate(localOffset, yRot, Direction.Axis.Y);
-            Vec3 velocity = VecHelper.rotate(localVelocity, yRot, Direction.Axis.Y);
-            world.addParticle(ParticleTypes.SMOKE, x + offset.x, y + offset.y, z + offset.z, velocity.x, velocity.y, velocity.z);
-        }, 1.0f, 2000);
+            for (boolean isLeft : new boolean[]{false, true}) {
+                Vec3 localOffset = new Vec3(0.6, 0.3, isLeft ? pipeOffset : -pipeOffset);
+                Vec3 localVelocity = new Vec3(0.01, 0.05, 0);
+                Vec3 offset = VecHelper.rotate(localOffset, yRot, Direction.Axis.Y);
+                Vec3 velocity = VecHelper.rotate(localVelocity, yRot, Direction.Axis.Y);
+                world.addParticle(ParticleTypes.SMOKE, x + offset.x, y + offset.y, z + offset.z, velocity.x, velocity.y, velocity.z);
+            }
+        }, 0.5f, 260);
 
         scene.idle(20);
 
@@ -315,13 +317,14 @@ public class BurnerScenes {
             Direction facing = Direction.SOUTH;
             float yRot = -facing.toYRot();
             float pipeOffset = 2.5f / 16.0f;
-            boolean isLeft = world.getGameTime() % 4 == 0;
-            Vec3 localOffset = new Vec3(0.6, 0.3, isLeft ? pipeOffset : -pipeOffset);
-            Vec3 localVelocity = new Vec3(0.01, 0.05, 0);
-            Vec3 offset = VecHelper.rotate(localOffset, yRot, Direction.Axis.Y);
-            Vec3 velocity = VecHelper.rotate(localVelocity, yRot, Direction.Axis.Y);
-            world.addParticle(ParticleTypes.SMOKE, x + offset.x, y + offset.y, z + offset.z, velocity.x, velocity.y, velocity.z);
-        }, 1.0f, 1000);
+            for (boolean isLeft : new boolean[]{false, true}) {
+                Vec3 localOffset = new Vec3(0.6, 0.3, isLeft ? pipeOffset : -pipeOffset);
+                Vec3 localVelocity = new Vec3(0.01, 0.05, 0);
+                Vec3 offset = VecHelper.rotate(localOffset, yRot, Direction.Axis.Y);
+                Vec3 velocity = VecHelper.rotate(localVelocity, yRot, Direction.Axis.Y);
+                world.addParticle(ParticleTypes.SMOKE, x + offset.x, y + offset.y, z + offset.z, velocity.x, velocity.y, velocity.z);
+            }
+        }, 0.5f, 260);
 
         scene.overlay().showText(70)
             .text("createpropulsion.ponder.liquid_burner.text_11")
