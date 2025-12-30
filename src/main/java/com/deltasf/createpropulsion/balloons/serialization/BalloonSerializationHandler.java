@@ -2,6 +2,7 @@ package com.deltasf.createpropulsion.balloons.serialization;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,14 +26,16 @@ public class BalloonSerializationHandler {
         }
     };
     private static final Set<Query> pendingQueries = ConcurrentHashMap.newKeySet();
-    private static final Set<Long> readyShips = ConcurrentHashMap.newKeySet();
+    private static final Map<Long, Integer> readyShips = new ConcurrentHashMap<>();
+
 
     public static void queryShipLoad(Query query) {
         pendingQueries.add(query);
     }
 
+    @SuppressWarnings("null")
     public static void onHaiReady(Ship ship, Level level) {
-        readyShips.add(ship.getId());
+        readyShips.putIfAbsent(ship.getId(), level.getServer().getTickCount());
     }
 
     @SubscribeEvent
@@ -44,7 +47,9 @@ public class BalloonSerializationHandler {
         Iterator<Query> queryIterator = pendingQueries.iterator();
         while (queryIterator.hasNext()) {
             Query query = queryIterator.next();
-            if (readyShips.contains(query.id())) {
+
+            Integer firstReadyTick = readyShips.get(query.id());
+            if (firstReadyTick != null && event.getServer().getTickCount() > firstReadyTick) {
                 for (ServerLevel level : event.getServer().getAllLevels()) {
                     if (query.di().equals(VSGameUtilsKt.getDimensionId(level))) {
                         try {

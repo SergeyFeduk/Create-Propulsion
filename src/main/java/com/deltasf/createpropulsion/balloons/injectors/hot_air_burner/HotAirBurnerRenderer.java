@@ -32,10 +32,9 @@ public class HotAirBurnerRenderer extends SmartBlockEntityRenderer<HotAirBurnerB
         BlockState state = be.getBlockState();
         Direction direction = state.getValue(HotAirBurnerBlock.FACING).getOpposite();
 
-        VertexConsumer solidVB = buffer.getBuffer(RenderType.cutoutMipped());
+        VertexConsumer solidVB = buffer.getBuffer(RenderType.cutout());
         SuperByteBuffer leverModel = CachedBuffers.partial(PropulsionPartialModels.HOT_AIR_BURNER_LEVER, state);
 
-        int lightBehind = LevelRenderer.getLightColor(level, be.getBlockPos().relative(direction));
         //Calculate translation & rotation
         int leverPosition = be.getLeverPosition();
 
@@ -47,7 +46,7 @@ public class HotAirBurnerRenderer extends SmartBlockEntityRenderer<HotAirBurnerB
         ms.mulPose(Axis.YP.rotationDegrees(AngleHelper.horizontalAngle(direction)));
         ms.translate(horizontalOffset, verticalOffset, 0);
         ms.translate(-0.5, -0.5, -0.5);
-        leverModel.light(lightBehind).renderInto(ms, solidVB);
+        leverModel.light(light).renderInto(ms, solidVB);
         ms.popPose();
     }
 }

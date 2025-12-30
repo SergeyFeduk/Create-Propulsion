@@ -28,6 +28,7 @@ public class BalloonRegistry {
     private final Map<UUID, HaiData> haiDataMap = new HashMap<>();
     private final Map<UUID, HaiGroup> haiGroupMap = new HashMap<>();
     private final List<HaiGroup> haiGroups = Collections.synchronizedList(new ArrayList<>());
+    private final Map<BlockPos, UUID> posToIdMap = new HashMap<>();
 
     public List<HaiGroup> getHaiGroups() {
         return haiGroups;
@@ -42,10 +43,12 @@ public class BalloonRegistry {
     }
 
     public HaiData getHaiAt(Level level, BlockPos pos) {
-        if (level.getBlockEntity(pos) instanceof AbstractHotAirInjectorBlockEntity hai) {
+        /*if (level.getBlockEntity(pos) instanceof AbstractHotAirInjectorBlockEntity hai) {
             return getHaiById(hai.getId());
         }
-        return null;
+        return null;*/
+        UUID id = posToIdMap.get(pos);
+        return id != null ? haiDataMap.get(id) : null;
     }
 
     public HaiGroup getGroupOf(UUID id) {
@@ -77,25 +80,20 @@ public class BalloonRegistry {
 
         if (haiDataMap.containsKey(id)) {
             HaiGroup oldGroup = haiGroupMap.get(id);
+            posToIdMap.remove(haiDataMap.get(id).position());
             if (oldGroup != null) {
                 HaiData oldData = getHaiById(id);
-                // c. Detach it from the old group structure.
                 oldGroup.hais.remove(oldData);
                 haiGroupMap.remove(id);
                 if (BalloonRegistryUtility.didGroupSplit(oldGroup.hais)) {
                     handleSplitGroups(id, oldGroup, level);
                 }
             }
-            haiDataMap.put(id, data);
-            // f. And finally, re-integrate it into the group structure as if it were new.
-            BalloonRegistryUtility.addHaiAndRegroup(data, haiGroups, haiGroupMap, level);
-
-        } else {
-            // --- NEW REGISTRATION PATH ---
-            // This is simple: just add the new HAI.
-            haiDataMap.put(id, data);
-            BalloonRegistryUtility.addHaiAndRegroup(data, haiGroups, haiGroupMap, level);
         }
+
+        haiDataMap.put(id, data);
+        posToIdMap.put(pos, id);
+        BalloonRegistryUtility.addHaiAndRegroup(data, haiGroups, haiGroupMap, level);
     }
 
     public void unregisterHai(UUID id, Level level) {
@@ -108,6 +106,7 @@ public class BalloonRegistry {
 
         affectedGroup.hais.remove(data);
         haiGroupMap.remove(id);
+        posToIdMap.remove(data.position());
 
         //The group is empty, destroy it
         if (affectedGroup.hais.isEmpty()) {

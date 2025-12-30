@@ -20,7 +20,6 @@ import net.minecraft.world.level.block.state.BlockState;
 public abstract class AbstractHotAirInjectorBlockEntity extends SmartBlockEntity {
     public AbstractHotAirInjectorBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
-        tryRegister();
     }
 
     protected UUID haiId;
@@ -31,6 +30,14 @@ public abstract class AbstractHotAirInjectorBlockEntity extends SmartBlockEntity
     public void onLoad() {
         super.onLoad();
         tryRegister();
+    }
+
+    @SuppressWarnings("null")
+    @Override
+    public void initialize() {
+        if (!level.isClientSide) {
+            tryRegister();
+        }
     }
 
     public void onBalloonLoaded() {}
@@ -48,7 +55,6 @@ public abstract class AbstractHotAirInjectorBlockEntity extends SmartBlockEntity
             BalloonShipRegistry.forShip(ship.getId(), level).registerHai(haiId, level, worldPosition);
             BalloonAttachment.ensureAttachmentExists(level, worldPosition);
             BalloonSerializationHandler.onHaiReady(ship, level);
-
         }
     }
 

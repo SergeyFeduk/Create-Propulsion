@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.nio.file.StandardCopyOption;
 
@@ -23,51 +22,47 @@ import net.minecraft.world.level.storage.LevelResource;
 public class BalloonSerializer {
     private BalloonSerializer() {}
 
+    private static final int CURRENT_SERIALIZATION_VERSION = -1;
     private static final String MOD_DATA_FOLDER = "propulsion";
     private static final String BALLOON_DATA_FOLDER = "balloons";
 
     public static void loadForShip(ServerLevel level, long shipId) throws IOException {
-        //Load compoundData from disk
-        List<byte[]> compoundData = new ArrayList<>();
         Path filePath = getShipDataPath(level, shipId);
-
-        if (!Files.exists(filePath)) {
-            return; //Ship does not have any balloons on it, skip it
-        }
+        if (!Files.exists(filePath)) return;
 
         try (InputStream fileStream = Files.newInputStream(filePath); DataInputStream dataStream = new DataInputStream(fileStream)) {
-            while (dataStream.available() > 0) {
-                int length = dataStream.readInt();
-                byte[] balloonData = dataStream.readNBytes(length);
-                if (balloonData.length != length) {
-                    throw new IOException("What the actual fuck is happening? We expected " + length + " bytes but got " + balloonData.length);
-                }
-                compoundData.add(balloonData);
-            }
-        }
+            if (dataStream.available() < 4) return;
 
-        //Deserialize all balloons from compoundData
-        for(byte[] balloonData : compoundData) {
-            BalloonSerializationUtil.deserialize(balloonData, level);
+            int header = dataStream.readInt();
+
+            if (header < 0 && header == -1) {
+                int balloonCount = dataStream.readInt();
+                
+                for (int i = 0; i < balloonCount; i++) {
+                    int length = dataStream.readInt();
+                    byte[] balloonData = dataStream.readNBytes(length);
+                    BalloonSerializationUtil.deserialize(balloonData, level);
+                }
+            } else {
+                int firstLength = header;
+                byte[] firstBalloonData = dataStream.readNBytes(firstLength);
+                BalloonSerializationUtil.deserialize(firstBalloonData, level);
+
+                while (dataStream.available() > 0) {
+                    int nextLength = dataStream.readInt();
+                    byte[] nextData = dataStream.readNBytes(nextLength);
+                    BalloonSerializationUtil.deserialize(nextData, level);
+                }
+            }
         }
     }
 
     public static void saveForShip(ServerLevel level, long shipId) throws IOException {
         BalloonRegistry registry = BalloonShipRegistry.forShip(shipId);
-        //Serialize balloons into compoundData
         List<Balloon> balloons = registry.getBalloons();
-        List<byte[]> compoundData = new ArrayList<>();
-        for(Balloon balloon : balloons) {
-            try {
-                byte[] data = BalloonSerializationUtil.serialize(balloon, registry);
-                compoundData.add(data);
-            } catch (IOException e) {
-                throw new IOException("Failed to serialize a balloon: ", e);
-            }
-        }
-        //Save compoundData to disk
+        
         Path filePath = getShipDataPath(level, shipId);
-        if (compoundData == null || compoundData.isEmpty()) {
+        if (balloons.isEmpty()) {
             Files.deleteIfExists(filePath);
             return;
         }
@@ -75,9 +70,13 @@ public class BalloonSerializer {
         Path tempFilePath = filePath.resolveSibling(filePath.getFileName().toString() + ".tmp");
 
         try(OutputStream fileStream = Files.newOutputStream(tempFilePath); DataOutputStream dataStream = new DataOutputStream(fileStream)) {
-            for(byte[] balloonData : compoundData) {
-                dataStream.writeInt(balloonData.length);
-                dataStream.write(balloonData);
+            dataStream.writeInt(CURRENT_SERIALIZATION_VERSION); 
+            dataStream.writeInt(balloons.size());
+
+            for(Balloon balloon : balloons) {
+                byte[] data = BalloonSerializationUtil.serialize(balloon, registry);
+                dataStream.writeInt(data.length);
+                dataStream.write(data);
             }
         }
 
