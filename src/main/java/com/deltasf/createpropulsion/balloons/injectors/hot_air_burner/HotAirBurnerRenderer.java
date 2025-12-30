@@ -9,7 +9,6 @@ import com.simibubi.create.foundation.blockEntity.renderer.SmartBlockEntityRende
 import net.createmod.catnip.math.AngleHelper;
 import net.createmod.catnip.render.CachedBuffers;
 import net.createmod.catnip.render.SuperByteBuffer;
-import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -32,7 +31,7 @@ public class HotAirBurnerRenderer extends SmartBlockEntityRenderer<HotAirBurnerB
         BlockState state = be.getBlockState();
         Direction direction = state.getValue(HotAirBurnerBlock.FACING).getOpposite();
 
-        VertexConsumer solidVB = buffer.getBuffer(RenderType.cutout());
+        VertexConsumer solidVB = buffer.getBuffer(RenderType.solid());
         SuperByteBuffer leverModel = CachedBuffers.partial(PropulsionPartialModels.HOT_AIR_BURNER_LEVER, state);
 
         //Calculate translation & rotation
@@ -44,9 +43,10 @@ public class HotAirBurnerRenderer extends SmartBlockEntityRenderer<HotAirBurnerB
         ms.pushPose();
         ms.translate(0.5, 0.5, 0.5);
         ms.mulPose(Axis.YP.rotationDegrees(AngleHelper.horizontalAngle(direction)));
+        ms.translate(0, 0, 1.0);
         ms.translate(horizontalOffset, verticalOffset, 0);
         ms.translate(-0.5, -0.5, -0.5);
-        leverModel.light(light).renderInto(ms, solidVB);
+        leverModel.light(light).overlay(overlay).renderInto(ms, solidVB);
         ms.popPose();
     }
 }
