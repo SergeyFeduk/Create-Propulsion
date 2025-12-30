@@ -8,7 +8,7 @@ import org.valkyrienskies.mod.api.ValkyrienSkies;
 public class ImpactSensorSystem {
     public static void register() {
         //TODO: Waiting for collision start events to work
-        ValkyrienSkies.api().getCollisionPersistEvent().on(ImpactSensorSystem::onGlobalCollision);
+        ValkyrienSkies.api().getCollisionStartEvent().on(ImpactSensorSystem::onGlobalCollision);
     }
 
     private static void onGlobalCollision(CollisionEvent event) {
