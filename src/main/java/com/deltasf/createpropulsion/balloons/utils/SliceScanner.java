@@ -60,7 +60,7 @@ public final class SliceScanner {
                     return new SliceScanResult(new HashSet<>(context.sliceVolume), new HashSet<>(context.sliceHoles), new HashSet<>(context.sliceShell), false, yLevel);
                 }
                 context.sliceVolume.add(currentPos);
-            } else if (balloon.holes.contains(currentPos)) {
+            } else if (balloon.containsHoleAt(currentPos)) {
                 context.sliceHoles.add(currentPos);
             }
 
@@ -71,7 +71,7 @@ public final class SliceScanner {
                     continue;
                 }
 
-                if (balloon.contains(neighbor) || balloon.holes.contains(neighbor)) {
+                if (balloon.contains(neighbor) || balloon.containsHoleAt(neighbor)) {
                     context.visited.add(neighbor);
                     context.queue.add(neighbor);
                 } else if (HaiGroup.isHab(neighbor, level)) {

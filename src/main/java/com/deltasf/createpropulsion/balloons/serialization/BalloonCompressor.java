@@ -41,6 +41,7 @@ public class BalloonCompressor {
     }
 
     public static long[] decompress(byte[] data, int size) throws IOException {
+        if (size == 0) return new long[0];
         long[] positions = new long[size];
 
         ByteArrayInputStream byteStream = new ByteArrayInputStream(data);

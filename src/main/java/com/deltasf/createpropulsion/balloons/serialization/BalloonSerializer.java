@@ -30,6 +30,8 @@ public class BalloonSerializer {
         Path filePath = getShipDataPath(level, shipId);
         if (!Files.exists(filePath)) return;
 
+        BalloonRegistry registry = BalloonShipRegistry.forShip(shipId);
+
         try (InputStream fileStream = Files.newInputStream(filePath); DataInputStream dataStream = new DataInputStream(fileStream)) {
             if (dataStream.available() < 4) return;
 
@@ -41,17 +43,17 @@ public class BalloonSerializer {
                 for (int i = 0; i < balloonCount; i++) {
                     int length = dataStream.readInt();
                     byte[] balloonData = dataStream.readNBytes(length);
-                    BalloonSerializationUtil.deserialize(balloonData, level);
+                    BalloonSerializationUtil.deserialize(balloonData, level, registry);
                 }
             } else {
                 int firstLength = header;
                 byte[] firstBalloonData = dataStream.readNBytes(firstLength);
-                BalloonSerializationUtil.deserialize(firstBalloonData, level);
+                BalloonSerializationUtil.deserialize(firstBalloonData, level, registry);
 
                 while (dataStream.available() > 0) {
                     int nextLength = dataStream.readInt();
                     byte[] nextData = dataStream.readNBytes(nextLength);
-                    BalloonSerializationUtil.deserialize(nextData, level);
+                    BalloonSerializationUtil.deserialize(nextData, level, registry);
                 }
             }
         }

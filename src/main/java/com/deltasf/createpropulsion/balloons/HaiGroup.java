@@ -15,10 +15,12 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import com.deltasf.createpropulsion.balloons.envelopes.IEnvelope;
 import com.deltasf.createpropulsion.balloons.hot_air.HotAirSolver;
+import com.deltasf.createpropulsion.balloons.network.BalloonSyncManager;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry.HaiData;
 import com.deltasf.createpropulsion.balloons.utils.BalloonRegistryUtility;
 import com.deltasf.createpropulsion.balloons.utils.BalloonScanner;
+import com.deltasf.createpropulsion.balloons.utils.BalloonStitcher;
 import com.deltasf.createpropulsion.balloons.utils.ManagedHaiSet;
 import com.deltasf.createpropulsion.balloons.utils.RLEVolume;
 import com.deltasf.createpropulsion.balloons.utils.BalloonScanner.DiscoveredVolume;
@@ -42,11 +44,8 @@ public class HaiGroup {
     public AABB groupAABB;
     private ServerShip ship;
 
-    public void scan(Level level) {
-        //We shouldn't really recalculate the RLE volume here as it should be constantly valid, but this fails at some place in hai management logic
-        //Needs to be fixed anyway
+    public void scan(Level level, BalloonRegistry registry) {
         regenerateRLEVolume(level);
-        //Probe to get seeds
         List<BlockPos> seeds = new ArrayList<>();
         for(HaiData data : hais) {
             BlockPos seed = getSeedFromHai(data, level);
@@ -55,17 +54,24 @@ public class HaiGroup {
             }
         }
 
-        //long start = System.nanoTime();
         List<DiscoveredVolume> discoveredVolumes = BalloonScanner.scan(level, seeds, this, new ArrayList<>());
-        //System.out.println("BalloonScanner scan time: " + (System.nanoTime() - start) / 1000 + " us");
-        generateBalloons(discoveredVolumes);
+        generateBalloons(discoveredVolumes, registry);
     }
 
     public void regenerateRLEVolume(Level level) {
         groupAABB = BalloonRegistryUtility.calculateGroupAABB(hais);
-        if (ship == null && hais.size() > 0) {
-            ship = (ServerShip)VSGameUtilsKt.getShipManagingPos(level, hais.get(0).position());
+        if (ship == null) {
+            if (!hais.isEmpty()) {
+                ship = (ServerShip)VSGameUtilsKt.getShipManagingPos(level, hais.get(0).position());
+            } else if (!balloons.isEmpty()) {
+                // Fallback for zombie groups
+                Balloon b = balloons.get(0);
+                if (!b.isEmpty()) {
+                    ship = (ServerShip)VSGameUtilsKt.getShipManagingPos(level, b.iterator().next());
+                }
+            }
         }
+
         rleVolume.regenerate(hais, groupAABB);
     }
 
@@ -89,7 +95,6 @@ public class HaiGroup {
     }
 
     public static boolean isHab(BlockPos pos, Level level) {
-        //Yes I optimized out half of the safety checks
         LevelChunk chunk = level.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
         LevelChunkSection section = chunk.getSection(chunk.getSectionIndex(pos.getY()));
         if (section.hasOnlyAir()) return false;
@@ -112,12 +117,17 @@ public class HaiGroup {
         synchronized (balloons)  {
             if (balloons.remove(balloon)) {
                 balloon.supportHais.clear();
+
+                if (this.ship != null) {
+                    BalloonSyncManager.pushDestroy(this.ship.getId(), balloon.id);
+                }
             }
         }
     }
 
-    public Balloon createBalloon(Set<BlockPos> volume, Set<UUID> supportHais) {
-        Balloon balloon = new Balloon(volume, null);
+    public Balloon createBalloon(Set<BlockPos> volume, Set<UUID> supportHais, BalloonRegistry registry) {
+        int newId = registry.nextBalloonId();
+        Balloon balloon = new Balloon(newId, volume, null);
         Set<UUID> managedSet = new ManagedHaiSet(balloon, this.haiToBalloonMap, new HashSet<>(supportHais));
         balloon.supportHais = managedSet;
 
@@ -129,7 +139,6 @@ public class HaiGroup {
     }
 
     public Balloon createManagedBalloonFromSave(double hotAir, Set<BlockPos> holes, long[] unpackedVolume, List<BlockPos> supportHaiPositions, Level level, BalloonRegistry registry) {
-        //Pos's -> UUID's
         Set<UUID> supportHaiIds = new HashSet<>();
         for (BlockPos pos : supportHaiPositions) {
             BalloonRegistry.HaiData haiData = registry.getHaiAt(level, pos);
@@ -144,10 +153,9 @@ public class HaiGroup {
             return null;
         }
 
-        //Create balloon
-        Balloon balloon = new Balloon(hotAir, holes, unpackedVolume);
+        int newId = registry.nextBalloonId();
+        Balloon balloon = new Balloon(newId, hotAir, holes, unpackedVolume);
         
-        // Create and inject the ManagedHaiSet
         synchronized(balloons) {
             Set<UUID> managedSet = new ManagedHaiSet(balloon, this.haiToBalloonMap, supportHaiIds);
             balloon.supportHais = managedSet;
@@ -166,14 +174,13 @@ public class HaiGroup {
         orphan.supportHais = managedSet;
     }
 
-    private void generateBalloons(List<DiscoveredVolume> discoveredVolumes) {
+    private void generateBalloons(List<DiscoveredVolume> discoveredVolumes, BalloonRegistry registry) {
         for(DiscoveredVolume discoveredVolume : discoveredVolumes) {
-            if (discoveredVolume.isLeaky() || discoveredVolume.volume().isEmpty()) continue; //Leaky volume cannot become a balloon
-            //Find support hais and obtain aabb
+            if (discoveredVolume.isLeaky() || discoveredVolume.volume().isEmpty()) continue;
+            
             Set<UUID> supportHais = findSupportHaisForVolume(discoveredVolume.volume());
             if (supportHais.isEmpty()) { continue; }
 
-            //Find all balloons that this volume connects to
             Set<Balloon> connectedBalloons = new HashSet<>();
             for (UUID haiId : supportHais) {
                 Balloon existingBalloon = haiToBalloonMap.get(haiId);
@@ -182,19 +189,72 @@ public class HaiGroup {
                 }
             }
 
+            AABB dvBounds = BalloonStitcher.getAABB(discoveredVolume);
+
+            //Find zombie balloons in this group
+            synchronized(this.balloons) {
+                for (Balloon candidate : this.balloons) {
+                    if (connectedBalloons.contains(candidate)) continue; // Already found via id
+                    
+                    if (!candidate.getAABB().intersects(dvBounds)) continue;
+
+                    // Check for block overlap
+                    for (BlockPos p : discoveredVolume.volume()) {
+                        if (candidate.contains(p)) {
+                            connectedBalloons.add(candidate);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            //Scan and steal zombie balloons from other groups
+            List<HaiGroup> allGroups = registry.getHaiGroups();
+            synchronized(allGroups) {
+                for (HaiGroup otherGroup : allGroups) {
+                    if (otherGroup == this) continue; 
+                    if (!otherGroup.hais.isEmpty()) continue; // Only steal from Zombie Groups
+
+                    List<Balloon> balloonsToSteal = new ArrayList<>();
+                    synchronized(otherGroup.balloons) {
+                        for (Balloon candidate : otherGroup.balloons) {
+                            if (!candidate.getAABB().intersects(dvBounds)) continue;
+                            
+                            for (BlockPos p : discoveredVolume.volume()) {
+                                if (candidate.contains(p)) {
+                                    balloonsToSteal.add(candidate);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    
+                    for (Balloon stolen : balloonsToSteal) {
+                        synchronized(otherGroup.balloons) {
+                            otherGroup.balloons.remove(stolen);
+                        }
+                        
+                        synchronized(this.balloons) {
+                            this.balloons.add(stolen);
+                        }
+                        connectedBalloons.add(stolen);
+                        
+                        Set<UUID> oldIds = new HashSet<>(stolen.supportHais);
+                        stolen.supportHais = new ManagedHaiSet(stolen, this.haiToBalloonMap, oldIds);
+                    }
+                }
+            }
+
             //Handle all cases
             if (connectedBalloons.isEmpty()) {
-                //New balloon
-                createBalloon(discoveredVolume.volume(), supportHais);
+                createBalloon(discoveredVolume.volume(), supportHais, registry);
             } else if (connectedBalloons.size() == 1) {
-                //Extend a balloon
                 Balloon targetBalloon = connectedBalloons.iterator().next();
 
                 targetBalloon.addAll(discoveredVolume.volume());
-                targetBalloon.supportHais.addAll(supportHais);
+                targetBalloon.supportHais.addAll(supportHais); 
                 targetBalloon.resolveHolesAfterMerge();
             } else {
-                //Merge multiple balloons
                 List<Balloon> balloonsToMerge = new ArrayList<>(connectedBalloons);
                 Balloon targetBalloon = balloonsToMerge.get(0);
 
@@ -226,8 +286,23 @@ public class HaiGroup {
     }
 
     public boolean isInsideRleVolume(BlockPos pos) {
-        AABBic shipAABB = ship.getShipAABB();
-        return rleVolume.isInside(pos.getX(), pos.getY(), pos.getZ(), groupAABB, shipAABB);
+        if (groupAABB != null) {
+            return rleVolume.isInside(pos.getX(), pos.getY(), pos.getZ(), groupAABB, ship.getShipAABB());
+        }
+
+        //Fallback for zombie groups - only ship aabb
+        AABBic shipBounds = ship.getShipAABB();
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
+
+        if (x < shipBounds.minX() - 1 || x > shipBounds.maxX() + 1 ||
+            y > shipBounds.maxY() + 1 || y < shipBounds.minY() - 1 ||
+            z < shipBounds.minZ() - 1 || z > shipBounds.maxZ() + 1) {
+            return false;
+        }
+
+        return true;
     }
 
     public ServerShip getShip() {

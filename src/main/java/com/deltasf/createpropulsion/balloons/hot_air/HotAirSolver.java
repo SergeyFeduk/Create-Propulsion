@@ -90,7 +90,7 @@ public class HotAirSolver {
     private static void calculateHoleLeak(SolverContext ctx) {
         //Hole leak based on y coordinate of each hole. We assume that hot air is evenlt distributed along all y levels
         double activeHoleCount = 0;
-        for (BlockPos holePos : ctx.balloon.holes) {
+        for (BlockPos holePos : ctx.balloon.getHoles()) {
             double interpolationValue = (holePos.getY() + 1.0) - ctx.pressureFloor;
             double activityFraction = org.joml.Math.clamp(0.0, 1.0, interpolationValue);
             activeHoleCount += activityFraction;
@@ -108,11 +108,19 @@ public class HotAirSolver {
 
     private static void handleInvalidation(SolverContext ctx) {
         //Handle invalidation
-        boolean needsInvalidationCheck = ctx.balloon.isInvalid;
         if (ctx.isStructurallyFailed) {
             ctx.balloon.isInvalid = true;
-        } else if (needsInvalidationCheck) {
-            ctx.balloon.isInvalid = !BalloonRegistryUtility.isBalloonValid(ctx.balloon, ctx.group);
+        } else {
+            // Re-check validity against the group
+            boolean isValid = BalloonRegistryUtility.isBalloonValid(ctx.balloon, ctx.group);
+            
+            if (isValid && ctx.balloon.supportHais.isEmpty()) {
+                if (ctx.hotAirAmount <= epsilon) { 
+                    isValid = false;
+                }
+            }
+            
+            ctx.balloon.isInvalid = !isValid;
         }
     }
 
@@ -148,7 +156,7 @@ public class HotAirSolver {
             this.fullness = this.hotAirAmount / this.volume;
             this.leakAdjustedFullness = Math.max(this.fullness, 0.1); //Use max here so leak is still significant for almost empty balloons
             this.surfaceArea = surfaceAreaFactor * Math.pow(this.volume, 2.0/3.0);
-            this.isStructurallyFailed = balloon.holes.size() >= this.surfaceArea * holeInvalidationThresholdPercent;
+            this.isStructurallyFailed = balloon.getHoles().size() >= this.surfaceArea * holeInvalidationThresholdPercent;
             this.catastrophicFailureModifier = this.isStructurallyFailed ? catastrophicLeakFactor : 1.0;
 
             AABB bounds = balloon.getAABB();

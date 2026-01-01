@@ -10,14 +10,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.mod.common.VSGameUtilsKt;
-
 import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.HaiGroup;
 import com.deltasf.createpropulsion.balloons.injectors.AbstractHotAirInjectorBlockEntity;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry;
-import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
 
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.minecraft.core.BlockPos;
@@ -52,7 +48,7 @@ public class BalloonSerializationUtil {
         return byteStream.toByteArray();
     }
 
-    public static Balloon deserialize(byte[] data, Level level) throws IOException {
+    public static Balloon deserialize(byte[] data, Level level, BalloonRegistry registry) throws IOException {
         ByteArrayInputStream byteStream = new ByteArrayInputStream(data);
         try (DataInputStream in = new DataInputStream(byteStream)) {
             double hotAir = in.readDouble();
@@ -69,16 +65,16 @@ public class BalloonSerializationUtil {
                 supportHaiPositions.add(BlockPos.of(in.readLong()));
             }
 
-            if (supportHaiPositions.isEmpty()) return null;
+            //Removed as we now have zombie balloons impl'd
+            //if (supportHaiPositions.isEmpty()) return null; 
 
             //Find concrete registry
-            BlockPos firstHaiPos = supportHaiPositions.get(0);
+            /*BlockPos firstHaiPos = supportHaiPositions.get(0);
             Ship ship = VSGameUtilsKt.getShipManagingPos(level, firstHaiPos);
             if (ship == null) {
                 System.out.println("Achtung! Balloon orphaned, ship not found for HAI at " + firstHaiPos);
                 return null;
-            }
-            BalloonRegistry registry = BalloonShipRegistry.forShip(ship.getId());
+            }*/
 
             //Volume metadata
             int volumeSize = in.readInt();
@@ -98,8 +94,9 @@ public class BalloonSerializationUtil {
             }
 
             if (group == null) {
-                System.out.println("Achtung! Could not find a valid HaiGroup for balloon supported by HAIs at " + supportHaiPositions);
-                return null;
+                group = new HaiGroup();
+                registry.getHaiGroups().add(group); 
+                //System.out.println("Achtung! Could not find a valid HaiGroup for balloon supported by HAIs at " + supportHaiPositions);
             }
 
             Balloon balloon = group.createManagedBalloonFromSave(hotAir, holes, decompressedVolume, supportHaiPositions, level, registry);
@@ -113,6 +110,8 @@ public class BalloonSerializationUtil {
                     injector.onBalloonLoaded();
                 }
             } 
+
+            group.regenerateRLEVolume(level);
 
             return balloon;
         }

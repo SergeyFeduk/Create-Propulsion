@@ -3,15 +3,18 @@ package com.deltasf.createpropulsion.balloons.utils;
 import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.BalloonForceChunk;
+import com.deltasf.createpropulsion.balloons.ClientBalloon;
 import com.deltasf.createpropulsion.balloons.HaiGroup;
 import com.deltasf.createpropulsion.balloons.Balloon.ChunkKey;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry;
 import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
+import com.deltasf.createpropulsion.balloons.registries.ClientBalloonRegistry;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry.HaiData;
 import com.deltasf.createpropulsion.debug.DebugRenderer;
 import com.deltasf.createpropulsion.debug.PropulsionDebug;
 import com.deltasf.createpropulsion.debug.routes.BalloonDebugRoute;
 
+import it.unimi.dsi.fastutil.longs.LongIterator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.event.TickEvent;
@@ -37,57 +40,67 @@ public class BalloonDebug {
         new Color(255, 0, 255)
     };
 
+     @SubscribeEvent
+    public static void onClientTick(TickEvent.ClientTickEvent event) {
+        if (!IS_ENABLED || event.phase != TickEvent.Phase.END) return;
+
+        Map<Long, Map<Integer, ClientBalloon>> allData = ClientBalloonRegistry.getAllShipBalloons();
+        if (allData.isEmpty()) return;
+
+        for (Map<Integer, ClientBalloon> shipBalloons : allData.values()) {
+            for (ClientBalloon balloon : shipBalloons.values()) {
+                // Use ID for stable coloring
+                float hue = (balloon.id * GOLDEN_RATIO_CONJUGATE) % 1.0f;
+                Color balloonColor = Color.getHSBColor(hue, 0.8f, 0.95f);
+
+                // Render Client AABB
+                if (PropulsionDebug.isDebug(BalloonDebugRoute.AABB)) {
+                    renderClientAABB(balloon, balloonColor);
+                }
+                // Render Client Volume
+                if (PropulsionDebug.isDebug(BalloonDebugRoute.VOLUME)) {
+                    renderClientVolume(balloon, balloonColor);
+                }
+                // Render Client Holes
+                if (PropulsionDebug.isDebug(BalloonDebugRoute.HOLES)) {
+                    renderClientHoles(balloon);
+                }
+            }
+        }
+    }
+
     @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
         if (!IS_ENABLED || event.phase != TickEvent.Phase.END) {
             return;
         }
 
-        if (!event.side.isClient()) return; //TODO: Fix by syncing balloons to clients
-
         BalloonShipRegistry shipRegistry = BalloonShipRegistry.get();
-        if (shipRegistry == null) {
-            return;
-        }
+        if (shipRegistry == null) return;
 
         Collection<BalloonRegistry> allRegistries = shipRegistry.getRegistries();
         
         int groupIndex = 0;
-        int balloonIndex = 0; // Index for coloring balloons
+        
         for (BalloonRegistry registry : allRegistries) {
             List<HaiGroup> groups = registry.getHaiGroups();
-            if (groups.isEmpty()) {
-                continue;
-            }
+            if (groups.isEmpty()) continue;
 
             for (HaiGroup group : groups) {
                 Color baseColor = GROUP_COLORS[groupIndex % GROUP_COLORS.length];
+                
                 if (PropulsionDebug.isDebug(BalloonDebugRoute.HAI_AABBS)) {
                     renderHaiGroupBounds(group, baseColor);
                 }
+
                 for (Balloon balloon : group.balloons) {
-                    // Generate a unique color
-                    float hue = (balloonIndex * GOLDEN_RATIO_CONJUGATE) % 1.0f;
+                    float hue = (balloon.id * GOLDEN_RATIO_CONJUGATE) % 1.0f;
                     Color balloonColor = Color.getHSBColor(hue, 0.8f, 0.95f);
-                    balloonIndex++;
-                    //Render aabb
-                    if (PropulsionDebug.isDebug(BalloonDebugRoute.AABB)) {
-                        renderBalloonAABB(balloon, balloonColor);
-                    }
-                    //Render volume
-                    if (PropulsionDebug.isDebug(BalloonDebugRoute.VOLUME)) {
-                        renderBalloonVolume(balloon, balloonColor);
-                    }
-                    //Render holes
-                    if (PropulsionDebug.isDebug(BalloonDebugRoute.HOLES)) {
-                        renderBalloonHoles(balloon);
-                    }
-                    //Render force chunks
+
                     if (PropulsionDebug.isDebug(BalloonDebugRoute.FORCE_CHUNKS)) {
                         renderBalloonForceChunks(balloon, balloonColor);
                     }
                 }
-
                 groupIndex++;
             }
         }
@@ -95,32 +108,34 @@ public class BalloonDebug {
 
     //Rendering functions
 
+    private static void renderClientAABB(ClientBalloon balloon, Color color) {
+        String balloonId = "client_aabb_" + balloon.id;
+        DebugRenderer.drawBox(balloonId, balloon.getBounds(), color, 1);
+    }
+
+    private static void renderClientVolume(ClientBalloon balloon, Color color) {
+        String balloonIdPrefix = "client_vol_" + balloon.id + "_";
+        LongIterator it = balloon.volume.iterator();
+        while (it.hasNext()) {
+            long packed = it.nextLong();
+            BlockPos pos = BlockPos.of(packed);
+            String blockIdentifier = balloonIdPrefix + packed;
+            DebugRenderer.drawBox(blockIdentifier, pos, color, 1);
+        }
+    }
+
+    private static void renderClientHoles(ClientBalloon balloon) {
+        for (BlockPos hole : balloon.holes) {
+            String identifier = "client_hole_" + hole.asLong();
+            DebugRenderer.drawBox(identifier, new AABB(hole), Color.white, 1);
+        }
+    }
+
     private static void renderHaiGroupBounds(HaiGroup group, Color baseColor) {
         Color haiAABBColor = new Color(baseColor.getRed(), baseColor.getGreen(), baseColor.getBlue(), 80);
         for (HaiData hai : group.hais) {
             String haiIdentifier = "hai_aabb_" + hai.id().toString();
             DebugRenderer.drawBox(haiIdentifier, hai.aabb(), haiAABBColor, 3);
-        }
-    }
-
-    private static void renderBalloonAABB(Balloon balloon, Color color) {
-        String balloonId = "balloon_aabb_" + balloon.hashCode();
-        DebugRenderer.drawBox(balloonId, balloon.getAABB(), color, 3);
-    }
-
-    private static void renderBalloonVolume(Balloon balloon, Color color) {
-        String balloonIdPrefix = "balloon_vol_" + balloon.hashCode() + "_";
-
-        for (BlockPos pos : balloon) {
-            String blockIdentifier = balloonIdPrefix + pos.asLong();
-            DebugRenderer.drawBox(blockIdentifier, pos, color, 3);
-        }
-    }
-
-    private static void renderBalloonHoles(Balloon balloon) {
-        for(BlockPos hole : balloon.holes) {
-            String identifier = hole.toShortString() + "_hole";
-            DebugRenderer.drawBox(identifier, new AABB(hole), Color.white, 3);
         }
     }
 
@@ -135,7 +150,6 @@ public class BalloonDebug {
             ChunkKey key = entry.getKey();
             BalloonForceChunk chunk = entry.getValue();
 
-
             int chunkX = key.x();
             int chunkY = key.y();
             int chunkZ = key.z();
@@ -146,7 +160,7 @@ public class BalloonDebug {
 
             AABB chunkAABB = new AABB(originX, originY, originZ, originX + CHUNK_SIZE, originY + CHUNK_SIZE, originZ + CHUNK_SIZE);
             
-            String chunkAABBId = "chunk_aabb_" + UUID.randomUUID();
+            String chunkAABBId = "chunk_aabb_" + UUID.randomUUID(); // This UUID generation might be spammy, consider hashing pos
             Color transparentColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), 60);
             DebugRenderer.drawBox(chunkAABBId, chunkAABB, transparentColor, 3);
 

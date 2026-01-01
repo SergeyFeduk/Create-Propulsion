@@ -86,6 +86,8 @@ public class BalloonUpdater {
         Set<BlockPos> handledPlacements = new HashSet<>();
         List<BlockPos> potentialScanSeeds = new ArrayList<>();
 
+        BalloonRegistry registry = BalloonShipRegistry.forShip(haiGroup.getShip().getId());
+
         //Pass 1: Handle adjacency events
         for (Map.Entry<BlockPos, Set<Balloon>> entry : affectedBalloonsMap.entrySet()) {
             BlockPos pos = entry.getKey();
@@ -98,7 +100,7 @@ public class BalloonUpdater {
             //Check if this event plugs a hole
             boolean wasPlug = false;
             for (Balloon balloon : nearbyBalloons) {
-                if (balloon.holes.contains(pos)) {
+                if (balloon.containsHoleAt(pos)) {
                     BalloonStitcher.removeHole(balloon, pos);
                     modifiedBalloons.add(balloon);
                     wasPlug = true;
@@ -113,7 +115,7 @@ public class BalloonUpdater {
             //Check if this event splits volume
             for (Balloon balloon : nearbyBalloons) {
                 if (balloon.contains(pos)) {
-                    BalloonStitcher.handleSplit(balloon, pos, subGroup.haiGroup());
+                    BalloonStitcher.handleSplit(balloon, pos, subGroup.haiGroup(), registry);
                     handledPlacements.add(pos);
                     modifiedBalloons.add(balloon);
                     break;
@@ -162,7 +164,7 @@ public class BalloonUpdater {
                 //Find connections via holes
                 Map<DiscoveredVolume, Set<Balloon>> connections = new HashMap<>();
                 for (Balloon balloon : haiGroup.balloons) {
-                    for (BlockPos hole : balloon.holes) {
+                    for (BlockPos hole : balloon.getHoles()) {
                         DiscoveredVolume connectingDV = posToDVMap.get(hole);
                         if (connectingDV != null) {
                             connections.computeIfAbsent(connectingDV, k -> new HashSet<>()).add(balloon);
@@ -373,7 +375,9 @@ public class BalloonUpdater {
             balloon.remove(pos);
         }
 
-        balloon.holes.removeAll(result.sliceHoles());
+        for (BlockPos holePos : result.sliceHoles()) {
+            balloon.removeHole(holePos);
+        }
 
         //Find and kill orphans
         List<UUID> supportersToRemove = findOrphanedSupporters(balloon, group.hais);
@@ -426,7 +430,8 @@ public class BalloonUpdater {
             HaiGroup parentHaiGroup = null;
             for (HaiGroup haiGroup : allHaiGroups) {
                 //Broad phase 
-                if (haiGroup.groupAABB != null && haiGroup.groupAABB.contains(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5)) {
+                boolean broadPhase = (haiGroup.groupAABB == null) || haiGroup.groupAABB.contains(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
+                if (broadPhase) {
                     //Narrow phase
                     if (haiGroup.isInsideRleVolume(pos)) {
                         parentHaiGroup = haiGroup;

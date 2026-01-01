@@ -10,6 +10,7 @@ import java.util.UUID;
 
 import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.HaiGroup;
+import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry.HaiData;
 import com.deltasf.createpropulsion.balloons.utils.BalloonScanner.DiscoveredVolume;
 
@@ -29,11 +30,11 @@ public class BalloonStitcher {
     }
 
     public static void createHole(Balloon balloon, BlockPos holePos) {
-        balloon.holes.add(holePos);
+        balloon.addHole(holePos);
     }
 
     public static void removeHole(Balloon balloon, BlockPos holePos) {
-        balloon.holes.remove(holePos);
+        balloon.removeHole(holePos);
     }
 
     public static void extend(Balloon target, DiscoveredVolume extension) {
@@ -47,7 +48,7 @@ public class BalloonStitcher {
         target.resolveHolesAfterMerge();
     }
 
-    public static void handleSplit(Balloon originalBalloon, BlockPos splitPos, HaiGroup owner) {
+    public static void handleSplit(Balloon originalBalloon, BlockPos splitPos, HaiGroup owner, BalloonRegistry registry) {
         //Capture the original density
         final double originalHotAir = originalBalloon.hotAir;
         final double originalVolumeSize = originalBalloon.getVolumeSize();
@@ -117,8 +118,13 @@ public class BalloonStitcher {
 
         for (Set<BlockPos> newVolume : rootToVolume.values()) {
             Set<UUID> newSupportHais = findSupportHaisForVolume(newVolume, owner.hais);
-            Balloon newBalloon = owner.createBalloon(newVolume, newSupportHais);
-            newBalloon.holes = partitionHoles(newVolume, originalBalloon.holes);
+            Balloon newBalloon = owner.createBalloon(newVolume, newSupportHais, registry);
+
+            Set<BlockPos> validHoles = partitionHoles(newVolume, originalBalloon.getHoles());
+            for (BlockPos hole : validHoles) {
+                newBalloon.addHole(hole);
+            }
+
             validateHoles(newBalloon);
             newBalloon.hotAir = newBalloon.getVolumeSize() * hotAirDensity;
             newBalloons.add(newBalloon);
@@ -168,18 +174,27 @@ public class BalloonStitcher {
 
     //Iterates through all holes to check if they are no longer adjacent to balloon's volume. If so - removes them
     public static void validateHoles(Balloon balloon) {
-        if (balloon.holes.isEmpty()) {
+        if (balloon.getHoles().isEmpty()) {
             return;
         }
 
-        balloon.holes.removeIf(holePos -> {
+        List<BlockPos> toRemove = new ArrayList<>();
+        for (BlockPos holePos : balloon.getHoles()) {
+            boolean isStillAdjacent = false;
             for (Direction dir : holeCheckDirections) {
                 if (balloon.contains(holePos.relative(dir))) {
-                    return false; //Holes is still adjacent to volume
+                    isStillAdjacent = true;
+                    break;
                 }
             }
-            return true;
-        });
+            if (!isStillAdjacent) {
+                toRemove.add(holePos);
+            }
+        }
+
+        for (BlockPos pos : toRemove) {
+            balloon.removeHole(pos);
+        }
     }
 
     private static Set<BlockPos> partitionHoles(Set<BlockPos> newVolume, Set<BlockPos> originalHoles) {

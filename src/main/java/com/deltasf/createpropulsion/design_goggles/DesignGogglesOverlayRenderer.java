@@ -1,6 +1,6 @@
 package com.deltasf.createpropulsion.design_goggles;
 
-import java.util.ArrayList;
+/*import java.util.ArrayList;
 import java.util.List;
 
 import net.createmod.catnip.outliner.Outliner;
@@ -26,9 +26,9 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
+import net.minecraftforge.client.gui.overlay.IGuiOverlay;*/
 
-public class DesignGogglesOverlayRenderer {
+/*public class DesignGogglesOverlayRenderer {
     public static final IGuiOverlay OVERLAY = DesignGogglesOverlayRenderer::renderOverlay;
     public static final double GLOBAL_INFLATION_RATE = 8;
 
@@ -123,6 +123,7 @@ public class DesignGogglesOverlayRenderer {
                 .colored(0x68c586)
                 .disableLineNormals()
                 .lineWidth(1/16f);
-        }*/
+        }
     }
 }
+*/

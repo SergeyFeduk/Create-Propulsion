@@ -1,6 +1,9 @@
 package com.deltasf.createpropulsion.network;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
+import com.deltasf.createpropulsion.balloons.network.BalloonDeltaPacket;
+import com.deltasf.createpropulsion.balloons.network.BalloonDestroyPacket;
+import com.deltasf.createpropulsion.balloons.network.BalloonStructureSyncPacket;
 import com.deltasf.createpropulsion.physics_assembler.packets.AssemblyFailedPacket;
 import com.deltasf.createpropulsion.physics_assembler.packets.GaugeInsertionErrorPacket;
 import com.deltasf.createpropulsion.physics_assembler.packets.GaugeUsedPacket;
@@ -57,6 +60,26 @@ public class PropulsionPackets {
             .decoder(AssemblyFailedPacket::new)
             .consumerMainThread(AssemblyFailedPacket::handle)
             .add();
+
+        //Bloons
+        INSTANCE.messageBuilder(BalloonStructureSyncPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+            .encoder(BalloonStructureSyncPacket::encode)
+            .decoder(BalloonStructureSyncPacket::decode)
+            .consumerMainThread(BalloonStructureSyncPacket::handle)
+            .add();
+
+        INSTANCE.messageBuilder(BalloonDeltaPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+            .encoder(BalloonDeltaPacket::encode)
+            .decoder(BalloonDeltaPacket::decode)
+            .consumerMainThread(BalloonDeltaPacket::handle)
+            .add();
+
+        INSTANCE.messageBuilder(BalloonDestroyPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+            .encoder(BalloonDestroyPacket::encode)
+            .decoder(BalloonDestroyPacket::decode)
+            .consumerMainThread(BalloonDestroyPacket::handle)
+            .add();
+
     }
 
     public static <MSG> void sendToPlayer(MSG message, ServerPlayer player) {

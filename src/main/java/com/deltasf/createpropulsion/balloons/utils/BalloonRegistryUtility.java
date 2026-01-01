@@ -68,7 +68,7 @@ public class BalloonRegistryUtility {
         List<HaiGroup> intersectingGroups = new ArrayList<>();
 
         for (HaiGroup group : haiGroups) {
-            if (group.groupAABB.intersects(data.aabb())) {
+            if (group.groupAABB != null && group.groupAABB.intersects(data.aabb())) {
                 intersectingGroups.add(group);
             }
         }
@@ -168,17 +168,24 @@ public class BalloonRegistryUtility {
         //Rule 3: balloon is not empty
         if (balloon.isEmpty()) return false;
 
-        //Rule 1: balloon is fully contained within its group
-        if (!isInside(group.groupAABB, balloon.getAABB())) return false;
+        //Rule 1: balloon is fully contained within its group if group present (not zombie)
+        if (group.groupAABB != null) {
+            if (!isInside(group.groupAABB, balloon.getAABB())) return false;
+        }
 
         //Rule 2 (partial): there must be at least one hai block below balloons bottom
         Set<UUID> currentGroupHais = group.hais.stream().map(HaiData::id).collect(Collectors.toSet()); //TODO: just store a set in haiGroup to avoid THIS
-        if (Collections.disjoint(balloon.supportHais, currentGroupHais)) return false;
+        //if (Collections.disjoint(balloon.supportHais, currentGroupHais)) return false;
+        if (!balloon.supportHais.isEmpty() && Collections.disjoint(balloon.supportHais, currentGroupHais)) {
+            return false;
+        }
 
         return true;
     }
 
     public static boolean isInside(AABB outerBox, AABB innerBox) {
+        if (outerBox == null || innerBox == null) return false;
+
         return outerBox.minX <= innerBox.minX &&
                outerBox.minY <= innerBox.minY &&
                outerBox.minZ <= innerBox.minZ &&

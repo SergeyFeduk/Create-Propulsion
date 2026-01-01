@@ -38,13 +38,22 @@ public class Balloon implements Iterable<BlockPos> {
     private final Set<ChunkKey> dirtyChunks = new HashSet<>();
     //Validation data
     public Set<UUID> supportHais;
-    public Set<BlockPos> holes = new HashSet<>();
+    private Set<BlockPos> holes = new HashSet<>();
     //Gameplay data
     public volatile double hotAir = 0;
     public boolean isInvalid;
 
-    public Balloon(Collection<BlockPos> initialVolume, AABB initialBounds) {
-        //We are supposed to assign ManagedHaiSet externally  
+    public final int id;
+    //Transient data
+    private final LongOpenHashSet transientAddedBlocks = new LongOpenHashSet();
+    private final LongOpenHashSet transientRemovedBlocks = new LongOpenHashSet();
+    private final LongOpenHashSet transientAddedHoles = new LongOpenHashSet();
+    private final LongOpenHashSet transientRemovedHoles = new LongOpenHashSet();
+    private final Object dirtyLock = new Object();
+
+    public Balloon(int id, Collection<BlockPos> initialVolume, AABB initialBounds) {
+        this.id = id;
+        //We are supposed to assign ManagedHaiSet externally
         this.supportHais = new HashSet<>(); 
 
         if (initialVolume != null && !initialVolume.isEmpty()) {
@@ -56,7 +65,8 @@ public class Balloon implements Iterable<BlockPos> {
         isInvalid = initialVolume == null || initialVolume.isEmpty();
     }
 
-    public Balloon(double hotAir, Set<BlockPos> holes, long[] unpackedVolume) {
+    public Balloon(int id, double hotAir, Set<BlockPos> holes, long[] unpackedVolume) {
+        this.id = id;
         this.hotAir = hotAir;
         this.holes = holes;
         this.supportHais = new HashSet<>(); //This will be populated after relinking
@@ -104,6 +114,13 @@ public class Balloon implements Iterable<BlockPos> {
         if (volume.add(p)) {
             onAddCoords(pos.getX(), pos.getY(), pos.getZ());
             markChunkDirtyForPos(pos.getX(), pos.getY(), pos.getZ());
+
+            //Track transient
+            synchronized(dirtyLock) {
+                if (!transientRemovedBlocks.remove(p)) {
+                    transientAddedBlocks.add(p);
+                }
+            }
             return true;
         }
         return false;
@@ -114,6 +131,13 @@ public class Balloon implements Iterable<BlockPos> {
         if (volume.remove(p)) {
             onRemoveCoords(pos.getX(), pos.getY(), pos.getZ());
             markChunkDirtyForPos(pos.getX(), pos.getY(), pos.getZ());
+
+            //Track transient
+            synchronized(dirtyLock) {
+                if (!transientAddedBlocks.remove(p)) {
+                    transientRemovedBlocks.add(p);
+                }
+            }
             return true;
         }
         return false;
@@ -126,9 +150,40 @@ public class Balloon implements Iterable<BlockPos> {
         }
     }
 
+    public void addHole(BlockPos pos) {
+        if (holes.add(pos)) {
+            long p = pos.asLong();
+            synchronized(dirtyLock) {
+                if (!transientRemovedHoles.remove(p)) {
+                    transientAddedHoles.add(p);
+                }
+            }
+        }
+    }
+
+    public void removeHole(BlockPos pos) {
+        if (holes.remove(pos)) {
+            long p = pos.asLong();
+            synchronized(dirtyLock) {
+                if (!transientAddedHoles.remove(p)) {
+                    transientRemovedHoles.add(p);
+                }
+            }
+        }
+    }
+
+    public boolean containsHoleAt(BlockPos checkPos) {
+        return holes.contains(checkPos);
+    }
+
+    public Set<BlockPos> getHoles() {
+        return holes;
+    }
+
     public void mergeFrom(Balloon other) {
         if (other == null) return;
-        //Merge the volume and mark related chunks
+        
+        // Merge the volume and mark related chunks
         final LongIterator it = other.volume.iterator();
         while (it.hasNext()) {
             long packed = it.nextLong();
@@ -136,18 +191,31 @@ public class Balloon implements Iterable<BlockPos> {
                 int x = unpackX(packed), y = unpackY(packed), z = unpackZ(packed);
                 onAddCoords(x, y, z);
                 markChunkDirtyForPos(x, y, z);
+                
+                // --- FIX: Update Dirty Tracker ---
+                synchronized(dirtyLock) {
+                    if (!transientRemovedBlocks.remove(packed)) {
+                        transientAddedBlocks.add(packed);
+                    }
+                }
             }
         }
-        //Migrate holes
-        holes.addAll(other.holes);
-        //Migrate support hais
+
+        // Migrate holes (Use helper to ensure tracking!)
+        // WAS: holes.addAll(other.holes);
+        for (BlockPos hole : other.holes) {
+            addHole(hole);
+        }
+
+        // Migrate support hais
         supportHais.addAll(other.supportHais);
-        //Migrate hot air
+        // Migrate hot air
         hotAir += other.hotAir;
     }
 
+
     public void resolveHolesAfterMerge() {
-        //Check if any holes ended up in the new volume. If they did - remove them
+        // Check if any holes ended up in the new volume. If they did - remove them
         List<BlockPos> holesToKill = new ArrayList<>();
         
         for(BlockPos hole : holes) {
@@ -155,11 +223,14 @@ public class Balloon implements Iterable<BlockPos> {
                 holesToKill.add(hole);
             }
         }
-        //Kill
+        
+        // Kill
         for(BlockPos hole : holesToKill) {
-            holes.remove(hole);
+            // WAS: holes.remove(hole);
+            removeHole(hole); // Use helper to trigger dirty tracker
         }
     }
+
 
     public void addAllTo(Collection<BlockPos> out) {
         Objects.requireNonNull(out);
@@ -382,6 +453,7 @@ public class Balloon implements Iterable<BlockPos> {
         out.writeDouble(hotAir);
         out.writeInt(holes.size());
         out.writeInt(supportHais.size());
+        System.out.println(supportHais.size());
 
         //Holes
         for(BlockPos hole : holes) {
@@ -392,6 +464,8 @@ public class Balloon implements Iterable<BlockPos> {
         if (registry != null) {
             for(UUID id : supportHais) {
                 BalloonRegistry.HaiData data = registry.getHaiById(id);
+                System.out.println(data);
+                //TODO: data can be null
                 out.writeLong(data.position().asLong());
             }
         }
@@ -415,4 +489,34 @@ public class Balloon implements Iterable<BlockPos> {
 
         resolveDirtyChunks();
     }
+
+    //Delta delta delta
+
+    public DeltaData popDeltas() {
+        synchronized(dirtyLock) {
+            if (transientAddedBlocks.isEmpty() && transientRemovedBlocks.isEmpty() &&
+                transientAddedHoles.isEmpty() && transientRemovedHoles.isEmpty()) {
+                return null;
+            }
+
+            DeltaData data = new DeltaData(
+                transientAddedBlocks.clone(),
+                transientRemovedBlocks.clone(),
+                transientAddedHoles.clone(),
+                transientRemovedHoles.clone()
+            );
+
+            transientAddedBlocks.clear();
+            transientRemovedBlocks.clear();
+            transientAddedHoles.clear();
+            transientRemovedHoles.clear();
+            return data;
+        }
+    }
+
+    public record DeltaData(
+        LongOpenHashSet addedBlocks, LongOpenHashSet removedBlocks,
+        LongOpenHashSet addedHoles, LongOpenHashSet removedHoles
+    ) {}
+
 }

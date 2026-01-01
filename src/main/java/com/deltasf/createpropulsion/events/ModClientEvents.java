@@ -1,7 +1,7 @@
 package com.deltasf.createpropulsion.events;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
-import com.deltasf.createpropulsion.design_goggles.DesignGogglesOverlayRenderer;
+//import com.deltasf.createpropulsion.design_goggles.DesignGogglesOverlayRenderer;
 import com.deltasf.createpropulsion.physics_assembler.AssemblyGaugeOverlayRenderer;
 import com.deltasf.createpropulsion.ponder.DeltaPonderPlugin;
 import com.deltasf.createpropulsion.registries.PropulsionInstanceTypes;
@@ -54,7 +54,7 @@ public class ModClientEvents {
     @SubscribeEvent
     public static void registerGuiOverlays(RegisterGuiOverlaysEvent event) {
         event.registerAbove(VanillaGuiOverlay.HOTBAR.id(), "assembly_gauge", AssemblyGaugeOverlayRenderer.OVERLAY);
-        event.registerAbove(VanillaGuiOverlay.HOTBAR.id(), "goggle_info", DesignGogglesOverlayRenderer.OVERLAY);
+        //event.registerAbove(VanillaGuiOverlay.HOTBAR.id(), "goggle_info", DesignGogglesOverlayRenderer.OVERLAY);
     }
 
     public static void clientInit(final FMLClientSetupEvent event) {
