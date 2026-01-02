@@ -49,6 +49,7 @@ public class Balloon implements Iterable<BlockPos> {
     private final LongOpenHashSet transientRemovedBlocks = new LongOpenHashSet();
     private final LongOpenHashSet transientAddedHoles = new LongOpenHashSet();
     private final LongOpenHashSet transientRemovedHoles = new LongOpenHashSet();
+    public List<BlockPos> offlineSupportPositions;
     private final Object dirtyLock = new Object();
 
     public Balloon(int id, Collection<BlockPos> initialVolume, AABB initialBounds) {

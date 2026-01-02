@@ -62,7 +62,7 @@ public class ClientBalloonRegistry {
 
     //GC
 
-    @SubscribeEvent
+    /*@SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
         
@@ -86,5 +86,5 @@ public class ClientBalloonRegistry {
         }
 
         shipBalloons.keySet().retainAll(loadedShipIds);
-    }
+    }*/
 }

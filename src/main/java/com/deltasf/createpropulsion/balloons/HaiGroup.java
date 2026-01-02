@@ -154,7 +154,8 @@ public class HaiGroup {
 
         int newId = registry.nextBalloonId();
         Balloon balloon = new Balloon(newId, hotAir, holes, unpackedVolume);
-        
+        balloon.offlineSupportPositions = supportHaiPositions;
+
         synchronized(balloons) {
             Set<UUID> managedSet = new ManagedHaiSet(balloon, this.haiToBalloonMap, supportHaiIds);
             balloon.supportHais = managedSet;
