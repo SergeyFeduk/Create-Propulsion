@@ -38,6 +38,10 @@ public class BalloonSyncManager {
         pendingDestroys.computeIfAbsent(shipId, k -> ConcurrentHashMap.newKeySet()).add(balloonId);
     }
 
+    public static void requestResync(long shipId) {
+        syncedPlayers.remove(shipId);
+    }
+
     @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
@@ -130,7 +134,6 @@ public class BalloonSyncManager {
             }
         }
     }
-
 
     private static void sendAllStructuresToPlayer(long shipId, BalloonRegistry registry, ServerPlayer player) {
         List<Balloon> balloons = registry.getBalloons();

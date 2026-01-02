@@ -7,8 +7,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 
 import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry;
@@ -30,16 +30,16 @@ public class BalloonSerializer {
         Path filePath = getShipDataPath(level, shipId);
         if (!Files.exists(filePath)) return;
 
-        BalloonRegistry registry = BalloonShipRegistry.forShip(shipId);
+
+        BalloonRegistry registry = BalloonShipRegistry.forShip(shipId, level);
 
         try (InputStream fileStream = Files.newInputStream(filePath); DataInputStream dataStream = new DataInputStream(fileStream)) {
-            if (dataStream.available() < 4) return;
+             if (dataStream.available() < 4) return;
 
             int header = dataStream.readInt();
 
             if (header < 0 && header == -1) {
                 int balloonCount = dataStream.readInt();
-                
                 for (int i = 0; i < balloonCount; i++) {
                     int length = dataStream.readInt();
                     byte[] balloonData = dataStream.readNBytes(length);
@@ -70,6 +70,9 @@ public class BalloonSerializer {
         }
 
         Path tempFilePath = filePath.resolveSibling(filePath.getFileName().toString() + ".tmp");
+        
+        // Ensure directory exists before saving
+        Files.createDirectories(filePath.getParent());
 
         try(OutputStream fileStream = Files.newOutputStream(tempFilePath); DataOutputStream dataStream = new DataOutputStream(fileStream)) {
             dataStream.writeInt(CURRENT_SERIALIZATION_VERSION); 
@@ -93,7 +96,6 @@ public class BalloonSerializer {
         MinecraftServer server = level.getServer();
         Path worldSavePath = server.getWorldPath(LevelResource.ROOT);
         Path dataDir = worldSavePath.resolve(MOD_DATA_FOLDER).resolve(BALLOON_DATA_FOLDER);
-        Files.createDirectories(dataDir);
         return dataDir.resolve("ship_" + shipId + ".dat");
     }
 }

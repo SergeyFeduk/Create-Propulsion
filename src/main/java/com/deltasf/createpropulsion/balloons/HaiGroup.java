@@ -149,9 +149,6 @@ public class HaiGroup {
             }
         }
         
-        if (supportHaiIds.isEmpty()) {
-            return null;
-        }
 
         int newId = registry.nextBalloonId();
         Balloon balloon = new Balloon(newId, hotAir, holes, unpackedVolume);

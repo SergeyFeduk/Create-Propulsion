@@ -103,6 +103,7 @@ public class BalloonSerializationUtil {
 
             if (balloon == null) {
                 System.out.println("Achtung! Achtung! We havent managed to recreate the balloon. This is bad.");
+                return null; 
             }
 
             for(BlockPos haiPos : supportHaiPositions) {

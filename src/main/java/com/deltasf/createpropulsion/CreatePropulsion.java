@@ -9,7 +9,6 @@ import com.simibubi.create.api.boiler.BoilerHeater;
 import com.simibubi.create.api.stress.BlockStressValues;
 
 import com.deltasf.createpropulsion.balloons.serialization.BalloonSerializationHandler;
-import com.deltasf.createpropulsion.balloons.serialization.BalloonSerializationHandler.Query;
 import com.deltasf.createpropulsion.compat.computercraft.CCProxy;
 import com.deltasf.createpropulsion.events.ModClientEvents;
 import com.deltasf.createpropulsion.heat.burners.AbstractBurnerBlock;
@@ -102,7 +101,7 @@ public class CreatePropulsion {
             //time to commit a war crime
             LoadedServerShip ship = e.getShip();
             if (ship.getAttachment(BalloonAttachment.class) != null) {
-                BalloonSerializationHandler.queryShipLoad(Query.of(ship));
+                BalloonSerializationHandler.queryShipLoad(ship);
             }
         });
 

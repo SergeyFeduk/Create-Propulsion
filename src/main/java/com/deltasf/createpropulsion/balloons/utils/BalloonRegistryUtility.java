@@ -66,52 +66,80 @@ public class BalloonRegistryUtility {
 
     public static void addHaiAndRegroup(HaiData data, List<HaiGroup> haiGroups, Map<UUID, HaiGroup> haiGroupMap, Level level) {
         List<HaiGroup> intersectingGroups = new ArrayList<>();
+        BlockPos haiPos = data.position();
 
         for (HaiGroup group : haiGroups) {
             if (group.groupAABB != null && group.groupAABB.intersects(data.aabb())) {
                 intersectingGroups.add(group);
+                continue;
+            }
+
+            if (group.hais.isEmpty()) {
+                synchronized(group.balloons) {
+                    boolean connects = false;
+                    for (Balloon b : group.balloons) {
+                        // Check if this HAI is physically supporting this balloon
+                        for (int d = 1; d <= HaiGroup.HAI_TO_BALLOON_DIST; d++) {
+                            if (b.contains(haiPos.above(d))) {
+                                connects = true;
+                                break;
+                            }
+                        }
+                        if (connects) break;
+                    }
+                    if (connects) {
+                        intersectingGroups.add(group);
+                    }
+                }
             }
         }
 
-        if (intersectingGroups.isEmpty()) {
-            //Case 1: New hai group
-            HaiGroup group = new HaiGroup();
-            group.hais.add(data);
-            group.regenerateRLEVolume(level);
-            haiGroups.add(group);
-            haiGroupMap.put(data.id(), group);
-        } else if (intersectingGroups.size() == 1) {
-            //Case 2: Add hai to a single group
-            HaiGroup group = intersectingGroups.get(0);
-            group.hais.add(data);
-            group.regenerateRLEVolume(level);
-            haiGroupMap.put(data.id(), group);
-        } else {
-            //Case 3: Add hai and merge intersecting groups
-            HaiGroup primaryGroup = intersectingGroups.get(0);
-            primaryGroup.hais.add(data);
-            haiGroupMap.put(data.id(), primaryGroup);
+        //Merge / Creation
+        HaiGroup targetGroup;
 
-            //Merge other intersecting groups into the primary one
+        if (intersectingGroups.isEmpty()) {
+            //Case 1: New Group
+            targetGroup = new HaiGroup();
+            targetGroup.hais.add(data);
+            haiGroups.add(targetGroup);
+        } else {
+            //Case 2 & 3: Merge into primary
+            targetGroup = intersectingGroups.get(0);
+            targetGroup.hais.add(data);
+
             for(int i = 1; i < intersectingGroups.size(); i++) {
                 HaiGroup groupToMerge = intersectingGroups.get(i);
-                primaryGroup.hais.addAll(groupToMerge.hais);
-
-                //Update the map for all moved hais to point to the primary group
+                
+                //Merge HAIs
+                targetGroup.hais.addAll(groupToMerge.hais);
                 for(HaiData hai : groupToMerge.hais) {
-                    haiGroupMap.put(hai.id(), primaryGroup);
+                    haiGroupMap.put(hai.id(), targetGroup);
                 }
-
-                //Migrate all balloons too
+                
                 for (Balloon balloonToMigrate : groupToMerge.balloons) {
-                    primaryGroup.adoptOrphanBalloon(balloonToMigrate);
+                    targetGroup.adoptOrphanBalloon(balloonToMigrate);
                 }
-
-                //Remove merged group
+                
                 haiGroups.remove(groupToMerge);
             }
         }
+
+        haiGroupMap.put(data.id(), targetGroup);
+        targetGroup.regenerateRLEVolume(level);
+        
+        synchronized(targetGroup.balloons) {
+            for (Balloon b : targetGroup.balloons) {
+                for (int d = 1; d <= HaiGroup.HAI_TO_BALLOON_DIST; d++) {
+                    if (b.contains(haiPos.above(d))) {
+                        b.supportHais.add(data.id());
+                        break;
+                    }
+                }
+            }
+        }
     }
+
+
 
     public static AABB calculateGroupAABB(List<HaiData> group) {
         if (group == null || group.isEmpty()) {
