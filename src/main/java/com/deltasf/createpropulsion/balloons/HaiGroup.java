@@ -39,7 +39,6 @@ public class HaiGroup {
     public final List<Balloon> balloons = Collections.synchronizedList(new ArrayList<>());
     private final Map<UUID, Balloon> haiToBalloonMap = new HashMap<>();
 
-
     public RLEVolume rleVolume = new RLEVolume();
     public AABB groupAABB;
     private ServerShip ship;
@@ -136,7 +135,6 @@ public class HaiGroup {
         synchronized(balloons) {
             this.balloons.add(balloon);
         }
-        // INSERT: Update master list
         registry.onBalloonAdded(balloon);
 
         return balloon;
@@ -217,7 +215,7 @@ public class HaiGroup {
             synchronized(allGroups) {
                 for (HaiGroup otherGroup : allGroups) {
                     if (otherGroup == this) continue; 
-                    if (!otherGroup.hais.isEmpty()) continue; // Only steal from Zombie Groups
+                    if (!otherGroup.hais.isEmpty()) continue; // Only steal from zombie groups
 
                     List<Balloon> balloonsToSteal = new ArrayList<>();
                     synchronized(otherGroup.balloons) {
