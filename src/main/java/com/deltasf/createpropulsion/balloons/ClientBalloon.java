@@ -23,7 +23,6 @@ public class ClientBalloon {
     private boolean boundsInitialized = false;
     private AABB cachedBounds = null;
 
-
     public ClientBalloon(int id) {
         this.id = id;
     }

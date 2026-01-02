@@ -12,7 +12,6 @@ import it.unimi.dsi.fastutil.longs.LongIterator;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
 public class BalloonCompressor {
-
     public static byte[] compress(LongOpenHashSet positions) throws IOException {
         ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
         try (DeflaterOutputStream deflaterStream = new DeflaterOutputStream(byteStream)) {

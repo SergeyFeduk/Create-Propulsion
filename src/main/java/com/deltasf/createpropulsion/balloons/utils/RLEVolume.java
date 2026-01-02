@@ -39,6 +39,11 @@ public class RLEVolume {
         final int innerIndex = innerZ * CHUNK_SIZE + innerX;
         return worldY >= chunk[innerIndex];
     }
+
+    public void clear() {
+        this.chunkMap = null;
+        this.chunkGridWidth = 0;
+    }
     
     public void regenerate(List<HaiData> hais, AABB groupAABB) {
         if (hais.isEmpty() || groupAABB == null) {

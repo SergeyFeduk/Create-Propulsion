@@ -36,9 +36,7 @@ import net.minecraft.world.level.Level;
 //Current model adds some custom drag, both linear and angular. VS 2.5 should handle this for us
 //So after updating to it - get rid of our drag, or at least change default values
 //Upd: Nvm, 2.4 drag is negligible
-@JsonAutoDetect(
-    fieldVisibility = JsonAutoDetect.Visibility.ANY
-)
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public final class BalloonAttachment implements ShipPhysicsListener {
     public BalloonAttachment() {}
     private AtmosphereData atmosphereData;

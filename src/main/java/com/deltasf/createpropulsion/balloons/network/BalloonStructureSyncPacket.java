@@ -13,6 +13,7 @@ public class BalloonStructureSyncPacket extends BalloonPacket {
     private final int volumeSize;
     private final byte[] compressedHoles;
     private final int holesSize;
+    //TODO: Just send aabb
 
     public BalloonStructureSyncPacket(long shipId, int balloonId, byte[] compressedVolume, int volumeSize, byte[] compressedHoles, int holesSize) {
         super(shipId, balloonId);

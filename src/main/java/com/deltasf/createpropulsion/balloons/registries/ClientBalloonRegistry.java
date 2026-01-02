@@ -2,20 +2,12 @@ package com.deltasf.createpropulsion.balloons.registries;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
-
-import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.mod.api.ValkyrienSkies;
 
 import com.deltasf.createpropulsion.balloons.ClientBalloon;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
-import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -60,6 +52,7 @@ public class ClientBalloonRegistry {
         shipBalloons.clear();
     }
 
+    //TODO: This likely causes the issue with client balloon persistence
     //GC
 
     /*@SubscribeEvent

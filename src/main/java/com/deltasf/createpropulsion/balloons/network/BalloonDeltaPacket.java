@@ -9,9 +9,9 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
 public class BalloonDeltaPacket extends BalloonPacket {
-    // Stores 4 compressed arrays
     private final byte[] addedB, removedB, addedH, removedH;
     private final int sAB, sRB, sAH, sRH; // Sizes
+    //TODO: Just send an aabb
 
     public BalloonDeltaPacket(long shipId, int balloonId, 
                               byte[] addedB, int sAB, byte[] removedB, int sRB,

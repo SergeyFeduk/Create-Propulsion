@@ -17,7 +17,7 @@ public class DisjointSetUnion {
             return i;
         }
         int root = find(parent.get(i));
-        parent.put(i, root); // Path compression
+        parent.put(i, root);
         return root;
     }
 

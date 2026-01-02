@@ -31,7 +31,6 @@ public class BalloonRegistry {
     public int nextBalloonId() { return nextBalloonId.getAndIncrement(); }
     private final List<Balloon> allActiveBalloons = new CopyOnWriteArrayList<>();
 
-
     public record HaiData(UUID id, BlockPos position, AABB aabb) {}
     
     private final Map<UUID, HaiData> haiDataMap = new HashMap<>();
@@ -203,8 +202,7 @@ public class BalloonRegistry {
                 if (affectedGroup.getShip() != null) {
                     BalloonSyncManager.pushDestroy(affectedGroup.getShip().getId(), orphan.id);
                 }
-                // ADD THIS LINE:
-                this.onBalloonRemoved(orphan); 
+                onBalloonRemoved(orphan); 
             }
         }
     }

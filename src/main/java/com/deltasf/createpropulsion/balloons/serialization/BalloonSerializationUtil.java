@@ -18,19 +18,9 @@ import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 
 public class BalloonSerializationUtil {
-    //Format:
-
-    //double hotAir
-    //int holeCount
-    //int supportHaiCount
-    //long[] holes
-    //long[] supportHaiPoses
-
-    //int volumeSize
-    //int compressedVolumeSize
-    //long[] volume (it is not written here as we compress it externally)
 
     public static byte[] serialize(Balloon balloon, BalloonRegistry registry) throws IOException {
         ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
@@ -65,17 +55,6 @@ public class BalloonSerializationUtil {
                 supportHaiPositions.add(BlockPos.of(in.readLong()));
             }
 
-            //Removed as we now have zombie balloons impl'd
-            //if (supportHaiPositions.isEmpty()) return null; 
-
-            //Find concrete registry
-            /*BlockPos firstHaiPos = supportHaiPositions.get(0);
-            Ship ship = VSGameUtilsKt.getShipManagingPos(level, firstHaiPos);
-            if (ship == null) {
-                System.out.println("Achtung! Balloon orphaned, ship not found for HAI at " + firstHaiPos);
-                return null;
-            }*/
-
             //Volume metadata
             int volumeSize = in.readInt();
             int compressedVolumeSize = in.readInt();
@@ -83,20 +62,38 @@ public class BalloonSerializationUtil {
             byte[] compressedVolume = in.readNBytes(compressedVolumeSize);
             long[] decompressedVolume = BalloonCompressor.decompress(compressedVolume, volumeSize);
 
-            //Instantiating and re-linking stuff
+
+            //Find a group for our lil balloon
             HaiGroup group = null;
+            
+            //By hai linking...
             for (BlockPos pos : supportHaiPositions) {
                 BalloonRegistry.HaiData haiData = registry.getHaiAt(level, pos);
                 if (haiData != null) {
                     group = registry.getGroupOf(haiData.id());
-                    if (group != null) break; // Found it
+                    if (group != null) break; 
                 }
             }
 
+            //We are zombie, do geometric overlap check
+            if (group == null) {
+                // Calculate AABB of the balloon being loaded
+                AABB balloonAABB = calculateAABB(decompressedVolume);
+                
+                if (balloonAABB != null) {
+                    for (HaiGroup candidate : registry.getHaiGroups()) {
+                        if (candidate.groupAABB != null && candidate.groupAABB.intersects(balloonAABB)) {
+                            group = candidate;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            //Nothing was found - new group it is
             if (group == null) {
                 group = new HaiGroup();
                 registry.getHaiGroups().add(group); 
-                //System.out.println("Achtung! Could not find a valid HaiGroup for balloon supported by HAIs at " + supportHaiPositions);
             }
 
             Balloon balloon = group.createManagedBalloonFromSave(hotAir, holes, decompressedVolume, supportHaiPositions, level, registry);
@@ -113,8 +110,34 @@ public class BalloonSerializationUtil {
             } 
 
             group.regenerateRLEVolume(level);
-
             return balloon;
         }
+    }
+    
+    //TODO: Really should just serialize/deserialize already known aabb, but for now this suffices 
+    private static AABB calculateAABB(long[] volume) {
+        if (volume.length == 0) return null;
+        int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE;
+        int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE, maxZ = Integer.MIN_VALUE;
+        
+        for(long packed : volume) {
+            int x = (int) (packed >> 38);
+            if (x >= (1 << 25)) x -= (1 << 26);
+            
+            int y = (int) (packed & 0xFFFL);
+            if (y >= (1 << 11)) y -= (1 << 12);
+            
+            int z = (int) ((packed >> 12) & 0x3FFFFFFL);
+            if (z >= (1 << 25)) z -= (1 << 26);
+            
+            if (x < minX) minX = x;
+            if (x > maxX) maxX = x;
+            if (y < minY) minY = y;
+            if (y > maxY) maxY = y;
+            if (z < minZ) minZ = z;
+            if (z > maxZ) maxZ = z;
+        }
+        
+        return new AABB(minX, minY, minZ, maxX + 1, maxY + 1, maxZ + 1);
     }
 }

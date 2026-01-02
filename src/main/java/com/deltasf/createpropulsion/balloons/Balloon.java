@@ -49,7 +49,6 @@ public class Balloon implements Iterable<BlockPos> {
     private final LongOpenHashSet transientRemovedBlocks = new LongOpenHashSet();
     private final LongOpenHashSet transientAddedHoles = new LongOpenHashSet();
     private final LongOpenHashSet transientRemovedHoles = new LongOpenHashSet();
-    public List<BlockPos> offlineSupportPositions;
     private final Object dirtyLock = new Object();
 
     public Balloon(int id, Collection<BlockPos> initialVolume, AABB initialBounds) {
@@ -193,7 +192,6 @@ public class Balloon implements Iterable<BlockPos> {
                 onAddCoords(x, y, z);
                 markChunkDirtyForPos(x, y, z);
                 
-                // --- FIX: Update Dirty Tracker ---
                 synchronized(dirtyLock) {
                     if (!transientRemovedBlocks.remove(packed)) {
                         transientAddedBlocks.add(packed);
@@ -202,8 +200,6 @@ public class Balloon implements Iterable<BlockPos> {
             }
         }
 
-        // Migrate holes (Use helper to ensure tracking!)
-        // WAS: holes.addAll(other.holes);
         for (BlockPos hole : other.holes) {
             addHole(hole);
         }
@@ -227,8 +223,7 @@ public class Balloon implements Iterable<BlockPos> {
         
         // Kill
         for(BlockPos hole : holesToKill) {
-            // WAS: holes.remove(hole);
-            removeHole(hole); // Use helper to trigger dirty tracker
+            removeHole(hole);
         }
     }
 
@@ -399,7 +394,6 @@ public class Balloon implements Iterable<BlockPos> {
         dirtyChunks.removeAll(keys);
     }
 
-
     //Position packing
 
     private static long packPos(int x, int y, int z) {
@@ -465,9 +459,9 @@ public class Balloon implements Iterable<BlockPos> {
         if (registry != null) {
             for(UUID id : supportHais) {
                 BalloonRegistry.HaiData data = registry.getHaiById(id);
-                System.out.println(data);
-                //TODO: data can be null
-                out.writeLong(data.position().asLong());
+                if (data != null) {
+                    out.writeLong(data.position().asLong());
+                }
             }
         }
     }
@@ -519,5 +513,4 @@ public class Balloon implements Iterable<BlockPos> {
         LongOpenHashSet addedBlocks, LongOpenHashSet removedBlocks,
         LongOpenHashSet addedHoles, LongOpenHashSet removedHoles
     ) {}
-
 }

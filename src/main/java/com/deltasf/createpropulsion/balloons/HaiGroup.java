@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.joml.primitives.AABBic;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
@@ -17,6 +16,7 @@ import com.deltasf.createpropulsion.balloons.envelopes.IEnvelope;
 import com.deltasf.createpropulsion.balloons.hot_air.HotAirSolver;
 import com.deltasf.createpropulsion.balloons.network.BalloonSyncManager;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry;
+import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry.HaiData;
 import com.deltasf.createpropulsion.balloons.utils.BalloonRegistryUtility;
 import com.deltasf.createpropulsion.balloons.utils.BalloonScanner;
@@ -34,6 +34,7 @@ import net.minecraft.world.phys.AABB;
 
 public class HaiGroup {
     public static final int HAI_TO_BALLOON_DIST = 5;
+    private static final int ZOMBIE_AABB_INFLATION = BalloonShipRegistry.MAX_HORIZONTAL_SCAN / 2; 
 
     public final List<HaiData> hais = new ArrayList<>();
     public final List<Balloon> balloons = Collections.synchronizedList(new ArrayList<>());
@@ -69,6 +70,19 @@ public class HaiGroup {
                     ship = (ServerShip)VSGameUtilsKt.getShipManagingPos(level, b.iterator().next());
                 }
             }
+        }
+
+        if (!hais.isEmpty()) {
+            //Normal Mode
+            groupAABB = BalloonRegistryUtility.calculateGroupAABBFromHais(hais);
+            rleVolume.regenerate(hais, groupAABB);
+        } else {
+            //Zombie Mode
+            groupAABB = BalloonRegistryUtility.calculateGroupAABBFromBalloons(balloons);
+            if (groupAABB != null) {
+                groupAABB = groupAABB.inflate(ZOMBIE_AABB_INFLATION);
+            }
+            rleVolume.clear();
         }
 
         rleVolume.regenerate(hais, groupAABB);
@@ -154,7 +168,6 @@ public class HaiGroup {
 
         int newId = registry.nextBalloonId();
         Balloon balloon = new Balloon(newId, hotAir, holes, unpackedVolume);
-        balloon.offlineSupportPositions = supportHaiPositions;
 
         synchronized(balloons) {
             Set<UUID> managedSet = new ManagedHaiSet(balloon, this.haiToBalloonMap, supportHaiIds);
@@ -289,22 +302,22 @@ public class HaiGroup {
     }
 
     public boolean isInsideRleVolume(BlockPos pos) {
-        if (groupAABB != null) {
-            return rleVolume.isInside(pos.getX(), pos.getY(), pos.getZ(), groupAABB, ship.getShipAABB());
-        }
+        if (groupAABB == null) return false;
 
-        //Fallback for zombie groups - only ship aabb
-        AABBic shipBounds = ship.getShipAABB();
-        int x = pos.getX();
-        int y = pos.getY();
-        int z = pos.getZ();
-
-        if (x < shipBounds.minX() - 1 || x > shipBounds.maxX() + 1 ||
-            y > shipBounds.maxY() + 1 || y < shipBounds.minY() - 1 ||
-            z < shipBounds.minZ() - 1 || z > shipBounds.maxZ() + 1) {
+        // Fast Fail
+        if (!groupAABB.contains(pos.getX(), pos.getY(), pos.getZ())) {
             return false;
         }
 
+        if (!hais.isEmpty()) {
+            //Normal Mode:
+            if (ship != null) {
+                return rleVolume.isInside(pos.getX(), pos.getY(), pos.getZ(), groupAABB, ship.getShipAABB());
+            } else {
+                return true; 
+            }
+        } 
+        // Zombie Mode
         return true;
     }
 

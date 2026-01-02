@@ -38,12 +38,12 @@ public class BalloonUpdater {
     
     public void habBlockPlaced(BlockPos pos, Level level) {
         eventQueues.computeIfAbsent(level.dimension(), k -> new LinkedList<>())
-                   .add(new DynamicUpdate(pos.immutable(), true));
+            .add(new DynamicUpdate(pos.immutable(), true));
     }
 
     public void habBlockRemoved(BlockPos pos, Level level) {
         eventQueues.computeIfAbsent(level.dimension(), k -> new LinkedList<>())
-                   .add(new DynamicUpdate(pos.immutable(), false));
+            .add(new DynamicUpdate(pos.immutable(), false));
     }
 
     public static void tick(BalloonUpdater instance, Iterable<ServerLevel> levels) {
@@ -185,9 +185,7 @@ public class BalloonUpdater {
                         }
                     }
                 }
-
-                //TODO: Find connections via bottoms
-
+                
                 //Perform actual merges based on discovered connections
                 for (Map.Entry<DiscoveredVolume, Set<Balloon>> connectionEntry : connections.entrySet()) {
                     DiscoveredVolume dvToMerge = connectionEntry.getKey();

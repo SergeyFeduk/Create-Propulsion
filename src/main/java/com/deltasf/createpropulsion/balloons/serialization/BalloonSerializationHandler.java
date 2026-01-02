@@ -5,13 +5,11 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
-import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
 
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.Level;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -29,11 +27,6 @@ public class BalloonSerializationHandler {
     
     public static void queryShipLoad(LoadedServerShip ship) {
         incomingQueries.add(Query.of(ship));
-    }
-
-    
-    public static void onHaiReady(Ship ship, Level level) {
-        //TODO: No-op
     }
 
     @SubscribeEvent

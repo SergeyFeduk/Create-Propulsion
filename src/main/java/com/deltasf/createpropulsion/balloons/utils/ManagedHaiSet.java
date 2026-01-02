@@ -78,7 +78,7 @@ public class ManagedHaiSet implements Set<UUID>{
         return this.removeIf(element -> !c.contains(element));
     }
 
-     @Override
+    @Override
     public int size() { return delegate.size(); }
 
     @Override
