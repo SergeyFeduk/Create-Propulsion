@@ -199,7 +199,7 @@ public class BalloonUpdater {
                     BalloonStitcher.extend(primaryBalloon, dvToMerge);
                     for (Balloon otherBalloon : balloonsToMergeInto) {
                         if (otherBalloon != primaryBalloon) {
-                            BalloonStitcher.mergeInto(primaryBalloon, otherBalloon, haiGroup);
+                            BalloonStitcher.mergeInto(primaryBalloon, otherBalloon, haiGroup, registry);
                         }
                     }
                     modifiedBalloons.add(primaryBalloon);
@@ -239,6 +239,8 @@ public class BalloonUpdater {
                 blockToVolumeMap.put(pos, volume);
             }
         }
+        BalloonRegistry registry = BalloonShipRegistry.forShip(haiGroup.getShip().getId());
+
         //Invoke correct handlers
         Set<DiscoveredVolume> processedVolumes = new HashSet<>();
         Map<Balloon, Set<BlockPos>> newHolesPerBalloon = new HashMap<>();
@@ -303,7 +305,7 @@ public class BalloonUpdater {
             //Merge
             for (Balloon otherBalloon : balloonsToMerge) {
                 if (otherBalloon != primaryBalloon) {
-                    BalloonStitcher.mergeInto(primaryBalloon, otherBalloon, haiGroup);
+                    BalloonStitcher.mergeInto(primaryBalloon, otherBalloon, haiGroup, registry);
                 }
             }
         }

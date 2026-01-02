@@ -85,7 +85,7 @@ public class HaiGroup {
 
         synchronized(balloons) {
             for(Balloon balloon : balloonsToKill) {
-                killBalloon(balloon);
+                killBalloon(balloon, registry);
             }
         }
     }
@@ -113,7 +113,7 @@ public class HaiGroup {
         return null;
     }
 
-    public void killBalloon(Balloon balloon) {
+    public void killBalloon(Balloon balloon, BalloonRegistry registry) {
         synchronized (balloons)  {
             if (balloons.remove(balloon)) {
                 balloon.supportHais.clear();
@@ -121,6 +121,8 @@ public class HaiGroup {
                 if (this.ship != null) {
                     BalloonSyncManager.pushDestroy(this.ship.getId(), balloon.id);
                 }
+
+                if (registry != null) registry.onBalloonRemoved(balloon);
             }
         }
     }
@@ -134,6 +136,8 @@ public class HaiGroup {
         synchronized(balloons) {
             this.balloons.add(balloon);
         }
+        // INSERT: Update master list
+        registry.onBalloonAdded(balloon);
 
         return balloon;
     }
@@ -159,14 +163,17 @@ public class HaiGroup {
             this.balloons.add(balloon);
         }
 
+        registry.onBalloonAdded(balloon);
+
         return balloon;
     }
 
-    public void adoptOrphanBalloon(Balloon orphan) {
+    public void adoptOrphanBalloon(Balloon orphan, BalloonRegistry registry) {
         Set<UUID> currentSupporterIds = new HashSet<>(orphan.supportHais);
         synchronized (balloons) {
             this.balloons.add(orphan);
         }
+
         Set<UUID> managedSet = new ManagedHaiSet(orphan, this.haiToBalloonMap, currentSupporterIds);
         orphan.supportHais = managedSet;
     }
@@ -261,7 +268,7 @@ public class HaiGroup {
                 for (int i = 1; i < balloonsToMerge.size(); i++) {
                     Balloon sourceBalloon = balloonsToMerge.get(i);
                     targetBalloon.mergeFrom(sourceBalloon);
-                    killBalloon(sourceBalloon);
+                    killBalloon(sourceBalloon, registry);
                 }
                 targetBalloon.resolveHolesAfterMerge();
             }

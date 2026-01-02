@@ -42,9 +42,9 @@ public class BalloonStitcher {
         target.resolveHolesAfterMerge();
     }
 
-    public static void mergeInto(Balloon target, Balloon source, HaiGroup owner) {
+    public static void mergeInto(Balloon target, Balloon source, HaiGroup owner, BalloonRegistry registry) {
         target.mergeFrom(source);
-        owner.killBalloon(source);
+        owner.killBalloon(source, registry);
         target.resolveHolesAfterMerge();
     }
 
@@ -113,7 +113,7 @@ public class BalloonStitcher {
             rootToVolume.computeIfAbsent(rootId, k -> new HashSet<>()).add(idToPos.get(i));
         }
 
-        owner.killBalloon(originalBalloon);
+        owner.killBalloon(originalBalloon, registry);
         List<Balloon> newBalloons = new ArrayList<>();
 
         for (Set<BlockPos> newVolume : rootToVolume.values()) {

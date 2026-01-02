@@ -47,7 +47,9 @@ public class BalloonDebug {
         Map<Long, Map<Integer, ClientBalloon>> allData = ClientBalloonRegistry.getAllShipBalloons();
         if (allData.isEmpty()) return;
 
-        for (Map<Integer, ClientBalloon> shipBalloons : allData.values()) {
+        for (Map.Entry<Long, Map<Integer, ClientBalloon>> entry : allData.entrySet()) {
+            long shipId = entry.getKey();
+            Map<Integer, ClientBalloon> shipBalloons = entry.getValue();
             for (ClientBalloon balloon : shipBalloons.values()) {
                 // Use ID for stable coloring
                 float hue = (balloon.id * GOLDEN_RATIO_CONJUGATE) % 1.0f;
@@ -55,7 +57,7 @@ public class BalloonDebug {
 
                 // Render Client AABB
                 if (PropulsionDebug.isDebug(BalloonDebugRoute.AABB)) {
-                    renderClientAABB(balloon, balloonColor);
+                    renderClientAABB(shipId, balloon, balloonColor); 
                 }
                 // Render Client Volume
                 if (PropulsionDebug.isDebug(BalloonDebugRoute.VOLUME)) {
@@ -108,8 +110,8 @@ public class BalloonDebug {
 
     //Rendering functions
 
-    private static void renderClientAABB(ClientBalloon balloon, Color color) {
-        String balloonId = "client_aabb_" + balloon.id;
+    private static void renderClientAABB(long shipId, ClientBalloon balloon, Color color) {
+        String balloonId = "client_aabb_" + shipId + "_" + balloon.id;
         DebugRenderer.drawBox(balloonId, balloon.getBounds(), color, 1);
     }
 

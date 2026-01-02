@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.HaiGroup;
+import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry;
 import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry.HaiData;
 
@@ -64,7 +65,7 @@ public class BalloonRegistryUtility {
         return visited.size() < group.size();
     }
 
-    public static void addHaiAndRegroup(HaiData data, List<HaiGroup> haiGroups, Map<UUID, HaiGroup> haiGroupMap, Level level) {
+    public static void addHaiAndRegroup(HaiData data, List<HaiGroup> haiGroups, Map<UUID, HaiGroup> haiGroupMap, Level level, BalloonRegistry registry) {
         List<HaiGroup> intersectingGroups = new ArrayList<>();
         BlockPos haiPos = data.position();
 
@@ -117,7 +118,7 @@ public class BalloonRegistryUtility {
                 }
                 
                 for (Balloon balloonToMigrate : groupToMerge.balloons) {
-                    targetGroup.adoptOrphanBalloon(balloonToMigrate);
+                    targetGroup.adoptOrphanBalloon(balloonToMigrate, registry);
                 }
                 
                 haiGroups.remove(groupToMerge);

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -28,6 +29,8 @@ public class BalloonRegistry {
     public BalloonRegistry() {}
     private final AtomicInteger nextBalloonId = new AtomicInteger(0);
     public int nextBalloonId() { return nextBalloonId.getAndIncrement(); }
+    private final List<Balloon> allActiveBalloons = new CopyOnWriteArrayList<>();
+
 
     public record HaiData(UUID id, BlockPos position, AABB aabb) {}
     
@@ -95,7 +98,7 @@ public class BalloonRegistry {
 
         haiDataMap.put(id, data);
         posToIdMap.put(pos, id);
-        BalloonRegistryUtility.addHaiAndRegroup(data, haiGroups, haiGroupMap, level);
+        BalloonRegistryUtility.addHaiAndRegroup(data, haiGroups, haiGroupMap, level, this);
     }
 
     public void unregisterHai(UUID id, Level level) {
@@ -149,18 +152,16 @@ public class BalloonRegistry {
         }
     }
 
-    //This one should only be used for the physics thread logic as it requires syncing a bunch of stuff
-    //But also can be used for serialization
+    public void onBalloonAdded(Balloon balloon) {
+        allActiveBalloons.add(balloon);
+    }
+
+    public void onBalloonRemoved(Balloon balloon) {
+        allActiveBalloons.remove(balloon);
+    }
+
     public List<Balloon> getBalloons() {
-        List<Balloon> balloons = new ArrayList<>();
-        synchronized (haiGroups) {
-            for (HaiGroup group : haiGroups) {
-                synchronized (group.balloons) {
-                    balloons.addAll(group.balloons);
-                }
-            }
-        }
-        return Collections.unmodifiableList(balloons);
+        return allActiveBalloons;
     }
 
     private void handleShrinkedGroup(UUID id, HaiGroup affectedGroup, Level level) {
@@ -178,14 +179,11 @@ public class BalloonRegistry {
 
 
     private void handleSplitGroups(UUID id, HaiGroup affectedGroup, Level level) {
-        // Original group is invalid, remove it but keep orphaned balloons
         haiGroups.remove(affectedGroup);
         List<Balloon> orphanedBalloons = new ArrayList<>(affectedGroup.balloons);
 
-        // Create new groups from remaining pieces
         List<HaiGroup> newGroups = BalloonRegistryUtility.splitAndRecreateGroups(affectedGroup.hais, haiGroups, haiGroupMap, level);
 
-        // Try to rehome each orphaned balloon
         for(Balloon orphan : orphanedBalloons) {
             orphan.supportHais.remove(id);
             
@@ -194,18 +192,19 @@ public class BalloonRegistry {
                 Set<UUID> ownerHaiIds = potentialOwner.hais.stream().map(HaiData::id).collect(Collectors.toSet());
                 if (!Collections.disjoint(orphan.supportHais, ownerHaiIds)) {
                     if (BalloonRegistryUtility.isBalloonValid(orphan, potentialOwner)) {
-                        potentialOwner.adoptOrphanBalloon(orphan);
+                        potentialOwner.adoptOrphanBalloon(orphan, this);
                         adopted = true;
                     }
                     break;
                 }
             }
             
-            //Guh, this is bad
             if (!adopted) {
                 if (affectedGroup.getShip() != null) {
                     BalloonSyncManager.pushDestroy(affectedGroup.getShip().getId(), orphan.id);
                 }
+                // ADD THIS LINE:
+                this.onBalloonRemoved(orphan); 
             }
         }
     }
