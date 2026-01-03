@@ -1,5 +1,6 @@
 package com.deltasf.createpropulsion.balloons.registries;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -17,13 +18,18 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.HaiGroup;
+import com.deltasf.createpropulsion.balloons.events.BalloonVolumeChangeEvent;
 import com.deltasf.createpropulsion.balloons.injectors.AbstractHotAirInjectorBlockEntity;
 import com.deltasf.createpropulsion.balloons.network.BalloonSyncManager;
 import com.deltasf.createpropulsion.balloons.utils.BalloonRegistryUtility;
+import com.deltasf.createpropulsion.debug.DebugRenderer;
+import com.deltasf.createpropulsion.debug.PropulsionDebug;
+import com.deltasf.createpropulsion.debug.routes.BalloonDebugRoute;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import net.minecraftforge.common.MinecraftForge;
 
 public class BalloonRegistry {
     public BalloonRegistry() {}
@@ -204,6 +210,45 @@ public class BalloonRegistry {
                 }
                 onBalloonRemoved(orphan); 
             }
+        }
+    }
+
+    //Events
+
+    public void dispatchBalloonEvent(Balloon balloon, AABB changedBounds, BalloonVolumeChangeEvent.Type type) {
+        if (balloon == null || changedBounds == null) return;
+        MinecraftForge.EVENT_BUS.post(new BalloonVolumeChangeEvent(balloon, changedBounds, type, this));
+
+        if (PropulsionDebug.isDebug(BalloonDebugRoute.EVENTS)) {
+            String ident = changedBounds.toString();
+            Color color;
+            switch (type) {
+                case CREATED:
+                    color = Color.GREEN;
+                    break;
+                case DESTROYED:
+                    color = Color.RED;
+                    break;
+                case EXTENDED:
+                    color = Color.CYAN;
+                    break;
+                case MERGED:
+                    color = Color.MAGENTA;
+                    break;
+                case SPLIT:
+                    color = Color.BLACK;
+                    break;
+                case HOLE_CREATED:
+                    color = Color.ORANGE;
+                    break;
+                case HOLE_REMOVED:
+                    color = Color.PINK;
+                    break;
+                default:
+                    color = Color.WHITE;
+                    break;
+            }
+            DebugRenderer.drawBox(ident, changedBounds, color, 40);
         }
     }
 }

@@ -13,6 +13,7 @@ import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import com.deltasf.createpropulsion.balloons.envelopes.IEnvelope;
+import com.deltasf.createpropulsion.balloons.events.BalloonVolumeChangeEvent;
 import com.deltasf.createpropulsion.balloons.hot_air.HotAirSolver;
 import com.deltasf.createpropulsion.balloons.network.BalloonSyncManager;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry;
@@ -131,6 +132,10 @@ public class HaiGroup {
             if (balloons.remove(balloon)) {
                 balloon.supportHais.clear();
 
+                if (registry != null) {
+                    registry.dispatchBalloonEvent(balloon, balloon.getAABB(), BalloonVolumeChangeEvent.Type.DESTROYED);
+                }
+
                 if (this.ship != null) {
                     BalloonSyncManager.pushDestroy(this.ship.getId(), balloon.id);
                 }
@@ -149,6 +154,7 @@ public class HaiGroup {
         synchronized(balloons) {
             this.balloons.add(balloon);
         }
+        registry.dispatchBalloonEvent(balloon, balloon.getAABB(), BalloonVolumeChangeEvent.Type.CREATED);
         registry.onBalloonAdded(balloon);
 
         return balloon;

@@ -10,6 +10,7 @@ import java.util.UUID;
 
 import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.HaiGroup;
+import com.deltasf.createpropulsion.balloons.events.BalloonVolumeChangeEvent;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry.HaiData;
 import com.deltasf.createpropulsion.balloons.utils.BalloonScanner.DiscoveredVolume;
@@ -29,23 +30,31 @@ public class BalloonStitcher {
         holeCheckDirections[4] = Direction.SOUTH;
     }
 
-    public static void createHole(Balloon balloon, BlockPos holePos) {
+    public static void createHole(Balloon balloon, BlockPos holePos, BalloonRegistry registry) {
         balloon.addHole(holePos);
+        registry.dispatchBalloonEvent(balloon, new AABB(holePos), BalloonVolumeChangeEvent.Type.HOLE_CREATED);
     }
 
-    public static void removeHole(Balloon balloon, BlockPos holePos) {
+    public static void removeHole(Balloon balloon, BlockPos holePos, BalloonRegistry registry) {
         balloon.removeHole(holePos);
+        registry.dispatchBalloonEvent(balloon, new AABB(holePos), BalloonVolumeChangeEvent.Type.HOLE_REMOVED);
     }
 
-    public static void extend(Balloon target, DiscoveredVolume extension) {
+    public static void extend(Balloon target, DiscoveredVolume extension, BalloonRegistry registry) {
         target.addAll(extension.volume());
         target.resolveHolesAfterMerge();
+
+        AABB changeBounds = getAABB(extension);
+        registry.dispatchBalloonEvent(target, changeBounds, BalloonVolumeChangeEvent.Type.EXTENDED);
     }
 
     public static void mergeInto(Balloon target, Balloon source, HaiGroup owner, BalloonRegistry registry) {
         target.mergeFrom(source);
         owner.killBalloon(source, registry);
         target.resolveHolesAfterMerge();
+
+        AABB sourceBounds = source.getAABB();
+        registry.dispatchBalloonEvent(target, sourceBounds, BalloonVolumeChangeEvent.Type.MERGED);
     }
 
     public static void handleSplit(Balloon originalBalloon, BlockPos splitPos, HaiGroup owner, BalloonRegistry registry) {
@@ -56,6 +65,9 @@ public class BalloonStitcher {
 
         // Prepare seeds for splitting
         originalBalloon.remove(splitPos);
+
+        AABB shrunkBounds = new AABB(splitPos);
+        registry.dispatchBalloonEvent(originalBalloon, shrunkBounds, BalloonVolumeChangeEvent.Type.SHRUNK);
 
         List<BlockPos> neighborSeeds = new ArrayList<>();
         for (Direction dir : Direction.values()) {
@@ -128,6 +140,8 @@ public class BalloonStitcher {
             validateHoles(newBalloon);
             newBalloon.hotAir = newBalloon.getVolumeSize() * hotAirDensity;
             newBalloons.add(newBalloon);
+
+            registry.dispatchBalloonEvent(newBalloon, newBalloon.getAABB(), BalloonVolumeChangeEvent.Type.SPLIT);
         }
 
         //Validate created balloons
@@ -210,7 +224,7 @@ public class BalloonStitcher {
         return newHoles;
     }
 
-    private static AABB calculateBoundsForVolume(Set<BlockPos> volume) {
+    public static AABB calculateBoundsForVolume(Set<BlockPos> volume) {
         if (volume.isEmpty()) return new AABB(0,0,0,0,0,0);
         int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE;
         int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE, maxZ = Integer.MIN_VALUE;

@@ -7,7 +7,8 @@ public enum BalloonDebugRoute implements IDebugRoute {
     AABB,
     VOLUME, 
     HOLES,
-    FORCE_CHUNKS;
+    FORCE_CHUNKS,
+    EVENTS;
     
     private final IDebugRoute[] children;
     BalloonDebugRoute(IDebugRoute... children) { this.children = children; }

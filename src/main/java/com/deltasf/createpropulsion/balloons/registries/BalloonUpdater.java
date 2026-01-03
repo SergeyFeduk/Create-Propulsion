@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.HaiGroup;
+import com.deltasf.createpropulsion.balloons.events.BalloonVolumeChangeEvent;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry.HaiData;
 import com.deltasf.createpropulsion.balloons.utils.BalloonRegistryUtility;
 import com.deltasf.createpropulsion.balloons.utils.BalloonScanner;
@@ -101,7 +102,7 @@ public class BalloonUpdater {
             boolean wasPlug = false;
             for (Balloon balloon : nearbyBalloons) {
                 if (balloon.containsHoleAt(pos)) {
-                    BalloonStitcher.removeHole(balloon, pos);
+                    BalloonStitcher.removeHole(balloon, pos, registry);
                     modifiedBalloons.add(balloon);
                     wasPlug = true;
                 }
@@ -194,7 +195,7 @@ public class BalloonUpdater {
                     if (balloonsToMergeInto.isEmpty()) continue;
                     Balloon primaryBalloon = balloonsToMergeInto.stream().max(java.util.Comparator.comparingInt(Balloon::size)).get();
 
-                    BalloonStitcher.extend(primaryBalloon, dvToMerge);
+                    BalloonStitcher.extend(primaryBalloon, dvToMerge, registry);
                     for (Balloon otherBalloon : balloonsToMergeInto) {
                         if (otherBalloon != primaryBalloon) {
                             BalloonStitcher.mergeInto(primaryBalloon, otherBalloon, haiGroup, registry);
@@ -263,7 +264,7 @@ public class BalloonUpdater {
                                               || balloon.contains(holeSeed.east())
                                               || balloon.contains(holeSeed.west());
                             if (isNotBelow) {
-                                BalloonStitcher.createHole(balloon, holeSeed);
+                                BalloonStitcher.createHole(balloon, holeSeed, registry);
                                 modifiedBalloons.add(balloon);
                                 newHolesPerBalloon.computeIfAbsent(balloon, k -> new HashSet<>()).add(holeSeed);
                             }
@@ -298,7 +299,7 @@ public class BalloonUpdater {
             modifiedBalloons.add(primaryBalloon);
 
             //Extend
-            BalloonStitcher.extend(primaryBalloon, resultVolume);
+            BalloonStitcher.extend(primaryBalloon, resultVolume, registry);
 
             //Merge
             for (Balloon otherBalloon : balloonsToMerge) {
@@ -344,7 +345,7 @@ public class BalloonUpdater {
 
                         //Remove bottom-most layer
                         if (result.isBottomMostLayer()) {
-                            handleBottomLayerRemoval(level, balloon, result, haiGroup);
+                            handleBottomLayerRemoval(level, balloon, result, haiGroup, registry);
                             //Balloon is guaranteed to be marked for modification at this point, as it had at least one hole in it
                         }
                     }
@@ -359,7 +360,7 @@ public class BalloonUpdater {
         }
     }
 
-    private void handleBottomLayerRemoval(Level level, Balloon balloon, SliceScanner.SliceScanResult result, HaiGroup group) {
+    private void handleBottomLayerRemoval(Level level, Balloon balloon, SliceScanner.SliceScanResult result, HaiGroup group, BalloonRegistry registry) {
         int holeCount = result.sliceHoles().size();
         int shellCount = result.sliceShell().size();
         int denominator = holeCount + shellCount;
@@ -378,6 +379,9 @@ public class BalloonUpdater {
         for (BlockPos holePos : result.sliceHoles()) {
             balloon.removeHole(holePos);
         }
+
+        AABB removedBounds = BalloonStitcher.calculateBoundsForVolume(result.sliceVolume());
+        registry.dispatchBalloonEvent(balloon, removedBounds, BalloonVolumeChangeEvent.Type.SHRUNK);
 
         //Find and kill orphans
         List<UUID> supportersToRemove = findOrphanedSupporters(balloon, group.hais);
