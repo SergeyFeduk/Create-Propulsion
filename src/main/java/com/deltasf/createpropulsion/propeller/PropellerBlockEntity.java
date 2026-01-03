@@ -12,6 +12,7 @@ import net.createmod.catnip.outliner.Outliner;
 import org.jetbrains.annotations.NotNull;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
+import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.atmosphere.DimensionAtmosphereManager;
 import com.deltasf.createpropulsion.physics_assembler.AssemblyUtility;
 import com.deltasf.createpropulsion.propeller.blades.PropellerBladeItem;
@@ -193,7 +194,12 @@ public class PropellerBlockEntity extends KineticBlockEntity {
             float speedPercentage = Math.min(speed / (float)MAX_EFFECTIVE_SPEED, 1.0f);
             float bladeCountModifier = (float)getBladeCount() / (float)blade.getMaxBlades();
             float fluidSample = getSpatialHandler().getSmoothFluidSample();
-            float substanceEfficiency = fluidSample * blade.getFluidEfficiency() + (1 - fluidSample) * blade.getAirEfficiency();
+
+            //Technically when PROPELLER_WATER_POWER_MULTIPLIER is larger than 1.0 we can get more than 100% efficiency, but who cares :P
+            double fluidEfficiency = fluidSample * blade.getFluidEfficiency() * PropulsionConfig.PROPELLER_WATER_POWER_MULTIPLIER.get();
+            float airEfficiency = (1 - fluidSample) * blade.getAirEfficiency();
+            float substanceEfficiency = (float)fluidEfficiency + airEfficiency;
+
             float baseWorkMultiplier = speedPercentage * bladeCountModifier * substanceEfficiency;
 
             //Thrust
