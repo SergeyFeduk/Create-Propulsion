@@ -32,6 +32,7 @@ public class ModEvents {
 
     private static void populateEnvelopeCauldronInteractions() {
         for(EnvelopeColor color : EnvelopeColor.values()) {
+            if (color == EnvelopeColor.WHITE) continue; //Do not wash white
             Item envelopeItem = PropulsionBlocks.getEnvelope(color).asItem();
             CauldronInteraction.WATER.put(envelopeItem, CLEAN_ENVELOPE);
             Item envelopedShaftItem = PropulsionBlocks.getEnvelopedShaft(color).asItem();
@@ -40,14 +41,19 @@ public class ModEvents {
     }
 
     public static final CauldronInteraction CLEAN_ENVELOPE = (blockState, level, blockPos, player, hand, stack) -> {
-        //Replace
-        ItemStack whiteEnvelope = new ItemStack(PropulsionBlocks.getEnvelope(EnvelopeColor.WHITE).asItem(), stack.getCount());
+        if (stack.isEmpty())
+            return InteractionResult.PASS;
+
+        ItemStack whiteEnvelope = new ItemStack(
+            PropulsionBlocks.getEnvelope(EnvelopeColor.WHITE).asItem(),
+            stack.getCount()
+        );
         player.setItemInHand(hand, ItemUtils.createFilledResult(stack, player, whiteEnvelope));
-        //CONSUME
+
         LayeredCauldronBlock.lowerFillLevel(blockState, level, blockPos);
-        //Effects
         player.awardStat(Stats.USE_CAULDRON);
         level.playSound(null, blockPos, SoundEvents.GENERIC_SPLASH, SoundSource.BLOCKS, 1.0F, 1.0F);
+
         return InteractionResult.sidedSuccess(level.isClientSide);
     };
 }

@@ -12,11 +12,10 @@ import dev.engine_room.flywheel.lib.instance.InstanceTypes;
 import dev.engine_room.flywheel.lib.instance.OrientedInstance;
 import dev.engine_room.flywheel.lib.model.Models;
 import dev.engine_room.flywheel.lib.visual.AbstractBlockEntityVisual;
-import dev.engine_room.flywheel.lib.visual.SimpleDynamicVisual;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 
-public class CreativeThrusterVisual extends AbstractBlockEntityVisual<CreativeThrusterBlockEntity> implements SimpleDynamicVisual {
+public class CreativeThrusterVisual extends AbstractBlockEntityVisual<CreativeThrusterBlockEntity> {
     private OrientedInstance bracket;
 
     public CreativeThrusterVisual(VisualizationContext context, CreativeThrusterBlockEntity blockEntity, float partialTick) {
@@ -51,9 +50,6 @@ public class CreativeThrusterVisual extends AbstractBlockEntityVisual<CreativeTh
         double targetAngle = Math.toDegrees(Math.atan2(local.y, local.x));
         return (float) (targetAngle + 90);
     }
-
-    @Override
-    public void beginFrame(Context ctx) {}
 
     @Override
     public void updateLight(float partialTick) {
