@@ -174,7 +174,7 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
         return (float) emptyBlocks / (float) OBSTRUCTION_LENGTH;
     }
     
-    protected int getOverriddenPowerOrState(BlockState currentBlockState) {
+    public int getOverriddenPowerOrState(BlockState currentBlockState) {
         if (PropulsionCompatibility.CC_ACTIVE && overridePower) {
             return overridenPower;
         }

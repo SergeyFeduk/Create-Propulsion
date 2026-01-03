@@ -4,6 +4,7 @@ import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerBlockEntit
 import com.deltasf.createpropulsion.magnet.RedstoneMagnetBlockEntity;
 import com.deltasf.createpropulsion.optical_sensors.OpticalSensorBlockEntity;
 import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerBlockEntity;
+import com.deltasf.createpropulsion.thruster.creative_thruster.CreativeThrusterBlockEntity;
 import com.deltasf.createpropulsion.thruster.thruster.ThrusterBlockEntity;
 import com.simibubi.create.compat.computercraft.AbstractComputerBehaviour;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
@@ -31,6 +32,8 @@ public class ComputerBehaviour extends AbstractComputerBehaviour {
     public static NonNullSupplier<IPeripheral> getPeripheralFor(SmartBlockEntity blockEntity) {
         if (blockEntity instanceof ThrusterBlockEntity thruster)
             return () -> new ThrusterPeripheral(thruster);
+        if (blockEntity instanceof CreativeThrusterBlockEntity creativeThruster)
+            return () -> new CreativeThrusterPeripheral(creativeThruster);
         if (blockEntity instanceof OpticalSensorBlockEntity opticalSensor)
             return () -> new OpticalSensorPeripheral(opticalSensor);
         if (blockEntity instanceof LodestoneTrackerBlockEntity tracker)

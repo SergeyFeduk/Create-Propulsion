@@ -5,6 +5,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import com.deltasf.createpropulsion.PropulsionConfig;
+import com.deltasf.createpropulsion.compat.PropulsionCompatibility;
 import com.deltasf.createpropulsion.thruster.AbstractThrusterBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.utility.CreateLang;
@@ -39,9 +40,11 @@ public class CreativeThrusterBlockEntity extends AbstractThrusterBlockEntity {
         behaviours.add(powerBehaviour);
     }
 
-    //TODO: Creative thruster computer beh (+ update insides of abstract thruster)
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
+        if (PropulsionCompatibility.CC_ACTIVE && computerBehaviour.isPeripheralCap(cap)) {
+            return computerBehaviour.getPeripheralCapability().cast();
+        }
         return super.getCapability(cap, side);
     }
 
@@ -105,5 +108,29 @@ public class CreativeThrusterBlockEntity extends AbstractThrusterBlockEntity {
             return CreateLang.translate("gui.goggles.thruster.status.working").style(ChatFormatting.GREEN);
         }
         return CreateLang.translate("gui.goggles.thruster.status.not_powered").style(ChatFormatting.GOLD);
+    }
+
+    // CC slop
+
+    public int getOverriddenPowerOrState(BlockState state) {
+        return super.getOverriddenPowerOrState(state);
+    }
+
+    public void setThrustConfig(int value) {
+        int clamped = Math.max(0, Math.min(value, 99));
+        if (powerBehaviour.getValue() != clamped) {
+            powerBehaviour.setValue(clamped);
+            updateThrust(getBlockState());
+            setChanged();
+            sendData();
+        }
+    }
+
+    public int getThrustConfig() {
+        return powerBehaviour.getValue();
+    }
+
+    public float getTargetThrustNewtons() {
+        return powerBehaviour.getTargetThrust();
     }
 }
