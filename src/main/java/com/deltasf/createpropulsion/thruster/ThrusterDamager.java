@@ -12,13 +12,14 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import org.joml.*;
 import org.joml.Math;
+import org.joml.Quaterniond;
+import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.Optional;
 
 public class ThrusterDamager extends AbstractAreaDamagerBehaviour {

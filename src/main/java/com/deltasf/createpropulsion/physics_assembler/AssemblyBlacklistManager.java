@@ -13,8 +13,12 @@ import net.minecraft.world.level.block.Block;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.slf4j.Logger;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import javax.annotation.Nonnull;
-import java.util.*;
 
 public class AssemblyBlacklistManager extends SimpleJsonResourceReloadListener {
     private static final Logger LOGGER = LogUtils.getLogger();
