@@ -38,7 +38,6 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
     protected static final int TICKS_PER_ENTITY_CHECK = 5;
     protected static final int LOWEST_POWER_THRSHOLD = 5;
     private static final float PARTICLE_VELOCITY = 4;
-    private static final double NOZZLE_OFFSET_FROM_CENTER = 0.9;
     private static final double SHIP_VELOCITY_INHERITANCE = 0.5;
 
     // Common State
@@ -180,6 +179,8 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
         return currentBlockState.getValue(AbstractThrusterBlock.POWER);
     }
 
+    protected abstract double getNozzleOffsetFromCenter();
+
     public void emitParticles(Level level, BlockPos pos, BlockState state) {
         if (emptyBlocks == 0) return;
         int power = getOverriddenPowerOrState(state);
@@ -203,7 +204,7 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
         Direction direction = state.getValue(AbstractThrusterBlock.FACING);
         Direction oppositeDirection = direction.getOpposite();
     
-        double currentNozzleOffset = NOZZLE_OFFSET_FROM_CENTER;
+        double currentNozzleOffset = getNozzleOffsetFromCenter();
         Vector3d additionalVel = new Vector3d();
         ClientShip ship = VSGameUtilsKt.getShipObjectManagingPos((ClientLevel) level, pos);
         if (ship != null) {
@@ -211,13 +212,9 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
             Matrix4dc transform = ship.getRenderTransform().getShipToWorld();
             Matrix4dc invTransform = ship.getRenderTransform().getWorldToShip();
     
-            Vector3d shipVelocity = invTransform
-                // Rotate velocity with ship transform
-                .transformDirection(new Vector3d(shipWorldVelocityJOML));
+            Vector3d shipVelocity = invTransform.transformDirection(new Vector3d(shipWorldVelocityJOML));
     
-            Vector3d particleEjectionUnitVecJOML = transform
-                // Rotate velocity with ship transform
-                .transformDirection(VectorConversionsMCKt.toJOMLD(oppositeDirection.getNormal()));
+            Vector3d particleEjectionUnitVecJOML = transform.transformDirection(VectorConversionsMCKt.toJOMLD(oppositeDirection.getNormal()));
     
             double shipVelComponentAlongRotatedEjection = shipWorldVelocityJOML.dot(particleEjectionUnitVecJOML);
             if (shipVelComponentAlongRotatedEjection > 0.0) {

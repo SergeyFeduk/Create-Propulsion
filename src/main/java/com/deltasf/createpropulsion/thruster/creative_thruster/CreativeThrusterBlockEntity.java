@@ -68,6 +68,11 @@ public class CreativeThrusterBlockEntity extends AbstractThrusterBlockEntity {
     }
 
     @Override
+    protected double getNozzleOffsetFromCenter() {
+        return 0.7;
+    }
+
+    @Override
     protected boolean shouldEmitParticles() {
         if (!isPowered()) return false; 
         Level level = getLevel();

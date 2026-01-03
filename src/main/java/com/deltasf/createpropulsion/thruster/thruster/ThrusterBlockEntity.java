@@ -93,6 +93,11 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
     }
 
     @Override
+    protected double getNozzleOffsetFromCenter() {
+        return 0.9;
+    }
+
+    @Override
     protected LangBuilder getGoggleStatus() {
         if (fluidStack().isEmpty()) {
             return CreateLang.translate("gui.goggles.thruster.status.no_fuel").style(ChatFormatting.RED);

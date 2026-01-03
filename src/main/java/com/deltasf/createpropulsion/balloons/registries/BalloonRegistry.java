@@ -245,6 +245,7 @@ public class BalloonRegistry {
                     color = Color.PINK;
                     break;
                 default:
+                    //Also includes SHRUNK
                     color = Color.WHITE;
                     break;
             }

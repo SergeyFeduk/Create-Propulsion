@@ -10,23 +10,45 @@ import com.simibubi.create.foundation.blockEntity.SmartBlockEntityTicker;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class CreativeThrusterBlock extends AbstractThrusterBlock {
+    public static final DirectionProperty PLACEMENT_FACING = DirectionProperty.create("placement_facing", Direction.values());
+
     public CreativeThrusterBlock(Properties properties) {
         super(properties);
+        this.registerDefaultState(this.defaultBlockState().setValue(PLACEMENT_FACING, Direction.DOWN));
+    }
+
+    @Override
+    protected void createBlockStateDefinition(@Nonnull StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
+        builder.add(PLACEMENT_FACING);
     }
 
     @Override
     public BlockEntity newBlockEntity(@Nonnull BlockPos pos, @Nonnull BlockState state) {
         return new CreativeThrusterBlockEntity(PropulsionBlockEntities.CREATIVE_THRUSTER_BLOCK_ENTITY.get(), pos, state);
+    }
+
+    @Override
+    public BlockState getStateForPlacement(@Nonnull BlockPlaceContext context) {
+        BlockState state = super.getStateForPlacement(context);
+        if (state == null) return null;
+
+        Direction placedAgainst = context.getClickedFace().getOpposite();
+        return state.setValue(PLACEMENT_FACING, placedAgainst);
     }
 
     @Override
