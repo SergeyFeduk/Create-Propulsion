@@ -1,0 +1,25 @@
+{
+	"format_version": "1.9.0",
+	"credit": "Made with Blockbench",
+	"texture_size": [64, 64],
+	"textures": {
+		"0": "creative_thruster",
+		"particle": "creative_thruster"
+	},
+	"elements": [
+		{
+			"name": "Bracket",
+			"from": [1, 0, 1],
+			"to": [15, 3, 9],
+			"rotation": {"angle": 0, "axis": "y", "origin": [0, 0, 2]},
+			"faces": {
+				"north": {"uv": [5, 14, 12, 15.5], "texture": "#0"},
+				"east": {"uv": [12, 10, 16, 11.5], "texture": "#0"},
+				"south": {"uv": [5, 14, 12, 15.5], "texture": "#0"},
+				"west": {"uv": [12, 10, 16, 11.5], "texture": "#0"},
+				"up": {"uv": [5, 10, 12, 14], "texture": "#0"},
+				"down": {"uv": [5, 10, 12, 14], "texture": "#0"}
+			}
+		}
+	]
+}

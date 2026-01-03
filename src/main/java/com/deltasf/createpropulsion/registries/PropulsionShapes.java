@@ -22,6 +22,11 @@ public class PropulsionShapes {
             .add(Block.box(3, 3, 14, 13, 13, 16))
             .forDirectional(Direction.NORTH),
 
+        CREATIVE_THRUSTER = ShapeBuilder.shape()
+            .add(Block.box(3, 3, 0, 13, 13, 10))
+            .add(Block.box(4, 4, 10, 12, 12, 12))
+            .forDirectional(Direction.NORTH),
+
         INLINE_OPTICAL_SENSOR = ShapeBuilder.shape()
             .add(Block.box(4, 4, 10, 12, 12, 16))
             .forDirectional(Direction.NORTH),

@@ -89,5 +89,10 @@
         "block": "createpropulsion:tilt_adapter",
         "mass": 500.0,
         "friction": 0.4
+    },
+    {
+        "block": "createpropulsion:creative_thruster",
+        "mass": 10.0,
+        "friction": 0.4
     }
 ]

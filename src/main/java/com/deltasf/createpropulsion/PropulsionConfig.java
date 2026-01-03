@@ -137,7 +137,7 @@ public class PropulsionConfig {
             BALLOON_SURFACE_LEAK_FACTOR = SERVER_BUILDER.comment("The higher this values is - the more hot air leaks out naturally.")
                 .define("Surface leak factor", 1e-2);
             BALLOON_HOLE_LEAK_FACTOR = SERVER_BUILDER.comment("The higher this values is - the more hot air leaks out of holes in balloon.")
-                .define("Hole leak factor", 0.2);
+                .define("Hole leak factor", 0.25);
             BALLOON_HOLE_LAYER_REMOVAL_THRESHOLD = SERVER_BUILDER.comment("BALLOON_HOLE_LAYER_REMOVAL_THRESHOLD")
                 .define("BALLOON_HOLE_LAYER_REMOVAL_THRESHOLD", 0.5);
         SERVER_BUILDER.pop();

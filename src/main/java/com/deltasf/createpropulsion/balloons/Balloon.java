@@ -448,7 +448,6 @@ public class Balloon implements Iterable<BlockPos> {
         out.writeDouble(hotAir);
         out.writeInt(holes.size());
         out.writeInt(supportHais.size());
-        System.out.println(supportHais.size());
 
         //Holes
         for(BlockPos hole : holes) {

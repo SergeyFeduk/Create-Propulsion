@@ -203,8 +203,6 @@ public class PhysicsAssemblerBlockEntity extends SmartBlockEntity {
 
         //ShipTeleportData td = new ShipTeleportDataImpl(finalShipPosInWorld, finalShipRotation, velocity, omega, vsDimName, 1.0);
 
-        /*System.out.println(velocity);
-        System.out.println(omega);*/
 
         if (ship instanceof ShipDataCommon shipData) {
             shipData.setKinematics(newShipTransform);

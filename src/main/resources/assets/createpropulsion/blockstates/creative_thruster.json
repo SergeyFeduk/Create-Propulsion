@@ -1,0 +1,10 @@
+{
+    "variants": {
+        "facing=north": { "model": "createpropulsion:block/creative_thruster" },
+        "facing=south": { "model": "createpropulsion:block/creative_thruster", "y": 180 },
+        "facing=west":  { "model": "createpropulsion:block/creative_thruster", "y": 270 },
+        "facing=east":  { "model": "createpropulsion:block/creative_thruster", "y": 90 },
+        "facing=up":    { "model": "createpropulsion:block/creative_thruster", "x": 270 },
+        "facing=down":  { "model": "createpropulsion:block/creative_thruster", "x": 90 }
+    }
+}

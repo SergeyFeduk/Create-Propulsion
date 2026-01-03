@@ -17,6 +17,7 @@ import com.deltasf.createpropulsion.optical_sensors.InlineOpticalSensorBlock;
 import com.deltasf.createpropulsion.optical_sensors.OpticalSensorBlock;
 import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerBlock;
 import com.deltasf.createpropulsion.propeller.PropellerBlock;
+import com.deltasf.createpropulsion.thruster.creative_thruster.CreativeThrusterBlock;
 import com.deltasf.createpropulsion.thruster.thruster.ThrusterBlock;
 import com.deltasf.createpropulsion.tilt_adapter.TiltAdapterBlock;
 import com.deltasf.createpropulsion.wing.CopycatWingBlock;
@@ -92,7 +93,7 @@ public class PropulsionBlocks {
         .setData(ProviderType.LANG, FUCK_OFF_LANG())
         .register();
 
-    /*public static final BlockEntry<CreativeThrusterBlock> CREATIVE_THRUSTER_BLOCK = REGISTRATE.block("creative_thruster", CreativeThrusterBlock::new)
+    public static final BlockEntry<CreativeThrusterBlock> CREATIVE_THRUSTER_BLOCK = REGISTRATE.block("creative_thruster", CreativeThrusterBlock::new)
         .properties(p -> p.mapColor(MapColor.METAL))
         .properties(p -> p.requiresCorrectToolForDrops())
         .properties(p -> p.sound(SoundType.METAL))
@@ -102,8 +103,7 @@ public class PropulsionBlocks {
         .blockstate(FUCK_OFF())
         .item().model(FUCK_OFF_ITEM()).build()
         .setData(ProviderType.LANG, FUCK_OFF_LANG())
-        .register();*/
-
+        .register();
 
     public static final BlockEntry<InlineOpticalSensorBlock> INLINE_OPTICAL_SENSOR_BLOCK = REGISTRATE.block("inline_optical_sensor", InlineOpticalSensorBlock::new)
         .properties(p -> p.mapColor(MapColor.COLOR_YELLOW))
