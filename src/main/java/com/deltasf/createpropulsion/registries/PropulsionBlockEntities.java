@@ -21,6 +21,8 @@ import com.deltasf.createpropulsion.propeller.PropellerBlockEntity;
 import com.deltasf.createpropulsion.propeller.rendering.PropellerRenderer;
 import com.deltasf.createpropulsion.propeller.rendering.PropellerVisual;
 import com.deltasf.createpropulsion.thruster.creative_thruster.CreativeThrusterBlockEntity;
+import com.deltasf.createpropulsion.thruster.creative_thruster.CreativeThrusterRenderer;
+import com.deltasf.createpropulsion.thruster.creative_thruster.CreativeThrusterVisual;
 import com.deltasf.createpropulsion.thruster.thruster.ThrusterBlockEntity;
 import com.deltasf.createpropulsion.tilt_adapter.TiltAdapterBlockEntity;
 import com.deltasf.createpropulsion.tilt_adapter.TiltAdapterRenderer;
@@ -42,7 +44,9 @@ public class PropulsionBlockEntities {
 
     public static final BlockEntityEntry<CreativeThrusterBlockEntity> CREATIVE_THRUSTER_BLOCK_ENTITY = 
         REGISTRATE.blockEntity("creative_thruster_block_entity", CreativeThrusterBlockEntity::new)
+        .visual(() -> CreativeThrusterVisual::new)
         .validBlocks(PropulsionBlocks.CREATIVE_THRUSTER_BLOCK)
+        .renderer(() -> CreativeThrusterRenderer::new)
         .register();
 
     public static final BlockEntityEntry<InlineOpticalSensorBlockEntity> INLINE_OPTICAL_SENSOR_BLOCK_ENTITY = 
