@@ -34,6 +34,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
@@ -151,7 +152,7 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
             this.raycastDistance = distance;
             setChanged();
             if (!level.isClientSide()) {
-                level.sendBlockUpdated(this.worldPosition, state, state, 3);
+                level.sendBlockUpdated(this.worldPosition, state, state, Block.UPDATE_ALL);
             }
         }
     }
@@ -229,7 +230,7 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
 
                 // sync
                 setChanged();
-                level.sendBlockUpdated(this.worldPosition, getBlockState(), getBlockState(), 3);
+                level.sendBlockUpdated(this.worldPosition, getBlockState(), getBlockState(), Block.UPDATE_ALL);
 
                 lensStack.shrink(1);
                 return true;
@@ -255,7 +256,7 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
 
                 // sync
                 setChanged();
-                level.sendBlockUpdated(this.worldPosition, getBlockState(), getBlockState(), 3);
+                level.sendBlockUpdated(this.worldPosition, getBlockState(), getBlockState(), Block.UPDATE_ALL);
 
                 return extractedStack;
             }

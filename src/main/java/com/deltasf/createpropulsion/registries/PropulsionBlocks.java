@@ -2,7 +2,6 @@ package com.deltasf.createpropulsion.registries;
 
 import java.util.EnumMap;
 import java.util.Map;
-import java.util.function.Supplier;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.balloons.envelopes.EnvelopeBlock;
@@ -43,7 +42,7 @@ import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeCategory;
-import net.minecraft.data.recipes.ShapelessRecipeBuilder;
+import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
@@ -95,11 +94,9 @@ public class PropulsionBlocks {
 
     public static final BlockEntry<CreativeThrusterBlock> CREATIVE_THRUSTER_BLOCK = REGISTRATE.block("creative_thruster", CreativeThrusterBlock::new)
         .properties(p -> p.mapColor(MapColor.METAL))
-        .properties(p -> p.requiresCorrectToolForDrops())
         .properties(p -> p.sound(SoundType.METAL))
         .properties(p -> p.strength(5.5f, 4.0f))
         .properties(p -> p.noOcclusion())
-        .tag(BlockTags.MINEABLE_WITH_PICKAXE)
         .blockstate(FUCK_OFF())
         .item().model(FUCK_OFF_ITEM()).build()
         .setData(ProviderType.LANG, FUCK_OFF_LANG())
@@ -334,19 +331,20 @@ public class PropulsionBlocks {
         };
     }
 
-    private static <T extends Block> NonNullBiConsumer<DataGenContext<Block, T>, RegistrateRecipeProvider> createDyeingRecipe(EnvelopeColor color, boolean isShaft) {
+    private static <T extends Block> NonNullBiConsumer<DataGenContext<Block, T>, RegistrateRecipeProvider> createDyeingRecipe(EnvelopeColor color) {
         return (ctx, prov) -> {
             if (color == EnvelopeColor.WHITE) return;
 
             ItemLike dyeItem = color.getDye();
-            Supplier<ItemLike> baseItemSupplier = () -> isShaft 
-                ? ENVELOPED_SHAFT_BLOCKS.get(EnvelopeColor.WHITE).get() 
-                : ENVELOPE_BLOCKS.get(EnvelopeColor.WHITE).get();
+            ItemLike envelope = ENVELOPE_BLOCKS.get(EnvelopeColor.WHITE).get();
 
-            ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, ctx.getEntry())
-                .requires(baseItemSupplier.get())
-                .requires(dyeItem)
-                .unlockedBy("has_base", RegistrateRecipeProvider.has(baseItemSupplier.get()))
+            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ctx.getEntry(), 8)
+                .pattern("EEE")
+                .pattern("EDE")
+                .pattern("EEE")
+                .define('D', dyeItem)
+                .define('E', envelope)
+                .unlockedBy("has_base", RegistrateRecipeProvider.has(envelope))
                 .save(prov);
         };
     }
@@ -391,7 +389,7 @@ public class PropulsionBlocks {
                 .properties(p -> p.ignitedByLava())
                 .tag(BlockTags.WOOL, ENVELOPES)
                 .blockstate(createEnvelopeBlockstate("envelope", color))
-                .recipe(createDyeingRecipe(color, false))
+                .recipe(createDyeingRecipe(color))
                 .loot((loot, block) -> loot.add(block, loot.createSingleItemTable(block)))
                 .simpleItem()
                 .setData(ProviderType.LANG, FUCK_OFF_LANG())

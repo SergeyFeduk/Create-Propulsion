@@ -1,15 +1,22 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "building",
-  "ingredients": [
-    {
-      "item": "createpropulsion:envelope"
-    },
-    {
+  "key": {
+    "D": {
       "item": "minecraft:red_dye"
+    },
+    "E": {
+      "item": "createpropulsion:envelope"
     }
+  },
+  "pattern": [
+    "EEE",
+    "EDE",
+    "EEE"
   ],
   "result": {
+    "count": 8,
     "item": "createpropulsion:envelope_red"
-  }
+  },
+  "show_notification": true
 }

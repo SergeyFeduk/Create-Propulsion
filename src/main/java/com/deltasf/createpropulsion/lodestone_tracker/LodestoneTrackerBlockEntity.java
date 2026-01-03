@@ -388,7 +388,7 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
     public void notifyUpdate() {
         setChanged();
         if (level != null && !level.isClientSide) {
-            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_ALL);
         }
     }
 
