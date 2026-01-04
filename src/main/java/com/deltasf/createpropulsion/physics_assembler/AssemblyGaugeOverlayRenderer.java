@@ -5,6 +5,7 @@ import java.util.Objects;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
+import com.deltasf.createpropulsion.PropulsionConfig;
 import com.simibubi.create.AllSpecialTextures;
 
 import net.createmod.catnip.outliner.Outline;
@@ -114,7 +115,8 @@ public class AssemblyGaugeOverlayRenderer {
         AABB selectionBox = null; 
         if (selectingSecond && lookingAtPos != null) {
             selectionBox = new AABB(posA, lookingAtPos);
-            isTooLarge = AssemblyUtility.isAABBLarger(selectionBox, AssemblyUtility.MAX_ASSEMBLY_SIZE);
+            final int maxAssemblySize = PropulsionConfig.ASSEMBLY_GAUGE_MAX_SIZE.get();
+            isTooLarge = AssemblyUtility.isAABBLarger(selectionBox, maxAssemblySize);
         }
 
         if (selectingSecond) {

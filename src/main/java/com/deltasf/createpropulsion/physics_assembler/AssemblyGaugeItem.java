@@ -3,6 +3,7 @@ package com.deltasf.createpropulsion.physics_assembler;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.network.PropulsionPackets;
 import com.deltasf.createpropulsion.physics_assembler.packets.GaugeUsedPacket;
 import com.deltasf.createpropulsion.physics_assembler.packets.ResetGaugePacket;
@@ -60,9 +61,11 @@ public class AssemblyGaugeItem extends Item {
             nbt.put(NBT_KEY_POS1, NbtUtils.writeBlockPos(targetedPos));
         } else {
             BlockPos posA = NbtUtils.readBlockPos(nbt.getCompound(NBT_KEY_POS1));
-            if (Math.abs(posA.getX() - targetedPos.getX()) > AssemblyUtility.MAX_ASSEMBLY_SIZE
-                || Math.abs(posA.getY() - targetedPos.getY()) > AssemblyUtility.MAX_ASSEMBLY_SIZE
-                || Math.abs(posA.getZ() - targetedPos.getZ()) > AssemblyUtility.MAX_ASSEMBLY_SIZE) {
+            final int maxAssemblySize = PropulsionConfig.ASSEMBLY_GAUGE_MAX_SIZE.get();
+
+            if (Math.abs(posA.getX() - targetedPos.getX()) > maxAssemblySize
+                || Math.abs(posA.getY() - targetedPos.getY()) > maxAssemblySize
+                || Math.abs(posA.getZ() - targetedPos.getZ()) > maxAssemblySize) {
                 return InteractionResult.FAIL;
             }
 

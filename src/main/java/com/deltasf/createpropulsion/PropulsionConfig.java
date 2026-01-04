@@ -27,6 +27,7 @@ public class PropulsionConfig {
     public static final ForgeConfigSpec.ConfigValue<Double> REDSTONE_MAGNET_FORCE_INDUCED_TORQUE_MULTIPLIER;
     //Physics assembler
     public static final ForgeConfigSpec.ConfigValue<Integer> PHYSICS_ASSEMBLER_MAX_MINK_DISTANCE;
+    public static final ForgeConfigSpec.ConfigValue<Integer> ASSEMBLY_GAUGE_MAX_SIZE;
     //Wings
     public static final ForgeConfigSpec.ConfigValue<Double> BASE_WING_LIFT;
     public static final ForgeConfigSpec.ConfigValue<Double> BASE_WING_DRAG;
@@ -107,6 +108,8 @@ public class PropulsionConfig {
         SERVER_BUILDER.push("Physics assembler");
             PHYSICS_ASSEMBLER_MAX_MINK_DISTANCE = SERVER_BUILDER.comment("Maximum distance between region selected with assembly gauge and physics assembler block.")
                 .define("Max distance to region", 3);
+            ASSEMBLY_GAUGE_MAX_SIZE = SERVER_BUILDER.comment("ASSEMBLY_GAUGE_MAX_SIZE")
+                .define("ASSEMBLY_GAUGE_MAX_SIZE", 128);
         SERVER_BUILDER.pop();
 
         SERVER_BUILDER.push("Wing");
