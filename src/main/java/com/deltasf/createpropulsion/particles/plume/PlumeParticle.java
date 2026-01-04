@@ -1,4 +1,4 @@
-package com.deltasf.createpropulsion.particles;
+package com.deltasf.createpropulsion.particles.plume;
 
 import javax.annotation.Nonnull;
 

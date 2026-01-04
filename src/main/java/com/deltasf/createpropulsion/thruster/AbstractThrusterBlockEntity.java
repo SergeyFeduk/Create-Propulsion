@@ -4,7 +4,7 @@ import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.compat.PropulsionCompatibility;
 import com.deltasf.createpropulsion.compat.computercraft.ComputerBehaviour;
 import com.deltasf.createpropulsion.particles.ParticleTypes;
-import com.deltasf.createpropulsion.particles.PlumeParticleData;
+import com.deltasf.createpropulsion.particles.plume.PlumeParticleData;
 import com.deltasf.createpropulsion.utility.GoggleUtils;
 import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.compat.computercraft.AbstractComputerBehaviour;
