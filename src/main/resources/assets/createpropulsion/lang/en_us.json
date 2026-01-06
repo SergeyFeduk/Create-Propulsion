@@ -175,7 +175,7 @@
     "create.gui.goggles.thruster.unit_kn": "kN",
     "create.gui.creative_thruster.power_behaviour": "Generated Thrust",
 
-    "createpropulsion.gui.goggles.redstone_transmission.title": "Transmission Status",
+    "createpropulsion.gui.goggles.redstone_transmission.title": "Transmission Status:",
     "createpropulsion.gui.goggles.redstone_transmission.control_mode" : "Transmission mode:",
     "createpropulsion.gui.goggles.redstone_transmission.internal_shift_title": "Transmission level:",
     "createpropulsion.gui.goggles.redstone_transmission.internal_shift_number": " {0} / {1}",

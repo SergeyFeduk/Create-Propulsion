@@ -76,6 +76,18 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
         }
     }
 
+    public int get_shift_up() {
+        if(level == null) return 0;
+        Direction facing = getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING);
+        return level.getSignal(getBlockPos().relative(facing.getCounterClockWise()), facing.getCounterClockWise());
+    }
+
+    public int get_shift_down() {
+        if(level == null) return 0;
+        Direction facing = getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING);
+        return level.getSignal(getBlockPos().relative(facing.getClockWise()), facing.getClockWise());
+    }
+
     @Override
     public void tick() {
         super.tick();
@@ -89,9 +101,7 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
             return;
         }
         Direction facing = getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING);
-        int shift_up = level.getSignal(getBlockPos().relative(facing.getCounterClockWise()), facing.getCounterClockWise());
-        int shift_down = level.getSignal(getBlockPos().relative(facing.getClockWise()), facing.getClockWise());
-        updateShift(shift_up, shift_down);
+        updateShift(get_shift_up(), get_shift_down());
     }
 
     @Override

@@ -26,8 +26,8 @@ public class RedstoneTransmissionRenderer extends SplitShaftRenderer {
         if (VisualizationManager.supportsVisualization(be.getLevel()) || !(be instanceof RedstoneTransmissionBlockEntity rtbe)) return;
 
         Direction facing = be.getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING);
-        int shift_up = be.getLevel().getSignal(be.getBlockPos().relative(facing.getCounterClockWise()), facing.getCounterClockWise());
-        int shift_down = be.getLevel().getSignal(be.getBlockPos().relative(facing.getClockWise()), facing.getClockWise());
+        int shift_up = rtbe.get_shift_up();
+        int shift_down = rtbe.get_shift_down();
 
         SuperByteBuffer partial_plus = CachedBuffers.partial(PropulsionPartialModels.TRANSMISSION_PLUS, be.getBlockState());
         SuperByteBuffer partial_minus = CachedBuffers.partial(PropulsionPartialModels.TRANSMISSION_MINUS, be.getBlockState());

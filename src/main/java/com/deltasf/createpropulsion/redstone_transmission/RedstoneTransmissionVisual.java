@@ -77,8 +77,8 @@ public class RedstoneTransmissionVisual extends SplitShaftVisual implements Simp
         if (!(blockEntity instanceof RedstoneTransmissionBlockEntity rtbe)) return;
 
         Direction facing = blockEntity.getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING);
-        int shift_up = blockEntity.getLevel().getSignal(blockEntity.getBlockPos().relative(facing.getCounterClockWise()), facing.getCounterClockWise());
-        int shift_down = blockEntity.getLevel().getSignal(blockEntity.getBlockPos().relative(facing.getClockWise()), facing.getClockWise());
+        int shift_up = rtbe.get_shift_up();
+        int shift_down = rtbe.get_shift_down();
         Color up_color = new Color(Color.mixColors(0x470102, 0xCD0000, shift_up / 15f));
         Color down_color = new Color(Color.mixColors(0x470102, 0xCD0000, shift_down / 15f));
 
