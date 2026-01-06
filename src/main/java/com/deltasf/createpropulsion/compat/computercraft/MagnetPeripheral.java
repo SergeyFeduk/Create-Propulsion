@@ -11,13 +11,13 @@ public class MagnetPeripheral extends SyncedPeripheral<RedstoneMagnetBlockEntity
     }
 
     @Override
-    public String getType() {
+    public final String getType() {
         return "redstone_magnet";
     }
 
     //Sets the power of the magnet
     @LuaFunction(mainThread = true)
-    public void setPower(int power) {
+    public final void setPower(int power) {
         int clampedPower = Math.max(Math.min(power, 15), 0);
         blockEntity.overridePower = clampedPower != 0;
         blockEntity.overridenPower = clampedPower;

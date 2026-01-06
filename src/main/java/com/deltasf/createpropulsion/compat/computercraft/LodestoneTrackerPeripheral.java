@@ -12,12 +12,12 @@ public class LodestoneTrackerPeripheral extends SyncedPeripheral<LodestoneTracke
     }
 
     @Override
-    public String getType() {
+    public final String getType() {
         return "lodestone_tracker";
     }
 
     @LuaFunction
-    public float getAngle() {
+    public final float getAngle() {
         return blockEntity.getAngle();
     }
 

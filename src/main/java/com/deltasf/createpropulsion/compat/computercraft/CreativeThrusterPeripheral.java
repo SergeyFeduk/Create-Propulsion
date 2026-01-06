@@ -15,37 +15,37 @@ public class CreativeThrusterPeripheral extends SyncedPeripheral<CreativeThruste
     }
 
     @Override
-    public String getType() {
+    public final String getType() {
         return "creative_thruster";
     }
 
     @LuaFunction
-    public int getObstruction() {
+    public final int getObstruction() {
         return blockEntity.getEmptyBlocks();
     }
 
     @LuaFunction(mainThread = true)
-    public void setPower(double power) {
+    public final void setPower(double power) {
         blockEntity.setDigitalInput((float)power);
     }
 
     @LuaFunction(mainThread = true)
-    public float getPower() {
+    public final float getPower() {
         return blockEntity.getPower();
     }
 
     @LuaFunction(mainThread = true)
-    public void setThrustConfig(int percent) {
+    public final void setThrustConfig(int percent) {
         blockEntity.setThrustConfig(percent);
     }
 
     @LuaFunction
-    public int getThrustConfig() {
+    public final int getThrustConfig() {
         return blockEntity.getThrustConfig();
     }
 
     @LuaFunction
-    public float getTargetThrustKN() {
+    public final float getTargetThrustKN() {
         return blockEntity.getTargetThrustNewtons() / 1000.0f;
     }
 

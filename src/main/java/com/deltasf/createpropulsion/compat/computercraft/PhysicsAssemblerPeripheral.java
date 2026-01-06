@@ -12,12 +12,12 @@ public class PhysicsAssemblerPeripheral extends SyncedPeripheral<PhysicsAssemble
     }
 
     @Override
-    public String getType() {
+    public final String getType() {
         return "physics_assembler";
     }
 
     @LuaFunction(mainThread = true)
-    public void shipify() {
+    public final void shipify() {
         blockEntity.shipify();
     }
 

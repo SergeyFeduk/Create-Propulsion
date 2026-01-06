@@ -24,68 +24,67 @@ public class ThrusterPeripheral extends SyncedPeripheral<ThrusterBlockEntity> {
     }
 
     @Override
-    public String getType() {
+    public final String getType() {
         return "propulsion_thruster";
     }
 
     @LuaFunction
-    public int getObstruction() {
+    public final int getObstruction() {
         return blockEntity.getEmptyBlocks();
     }
 
     @LuaFunction(mainThread = true)
-    public void setPower(double power) {
+    public final void setPower(double power) {
         blockEntity.setDigitalInput((float)power);
     }
 
     @LuaFunction(mainThread = true)
-    public float getPower() {
+    public final float getPower() {
         return blockEntity.getPower();
     }
 
     //Get name of the current fuel
     @LuaFunction(mainThread = true)
-    public String getFuelName() {
+    public final String getFuelName() {
         if (blockEntity.fluidStack().isEmpty()) return "";
         return blockEntity.fluidStack().getDisplayName().getString();
     }
 
     //Get thrust multiplier of current fuel
     @LuaFunction(mainThread = true)
-    public float getFuelThrustMultiplier() {
+    public final float getFuelThrustMultiplier() {
         if (!blockEntity.validFluid()) return 0;
         return blockEntity.getFuelProperties(blockEntity.fluidStack().getRawFluid()).thrustMultiplier;
     }
 
     //Get consumption multiplier of current fuel
     @LuaFunction(mainThread = true)
-    public float getFuelConsumptionMultiplier() {
+    public final float getFuelConsumptionMultiplier() {
         if (!blockEntity.validFluid()) return 0;
         return blockEntity.getFuelProperties(blockEntity.fluidStack().getRawFluid()).consumptionMultiplier;
     }
 
     //IFluidHandler methods passthrough
     @LuaFunction(mainThread = true)
-    public Map<Integer, Map<String, ?>> tanks() throws LuaException {
+    public final Map<Integer, Map<String, ?>> tanks() throws LuaException {
         IFluidHandler handler = getHandler();
         return this.fluidMethods.tanks(handler);
     }
 
     @LuaFunction(mainThread = true)
-    public int pushFluid(IComputerAccess computer, String toName, Optional<Integer> limit, Optional<String> fluidName) throws LuaException {
+    public final int pushFluid(IComputerAccess computer, String toName, Optional<Integer> limit, Optional<String> fluidName) throws LuaException {
         IFluidHandler handler = getHandler();
         return this.fluidMethods.pushFluid(handler, computer, toName, limit, fluidName);
     }
 
     @LuaFunction(mainThread = true)
-    public int pullFluid(IComputerAccess computer, String fromName, Optional<Integer> limit, Optional<String> fluidName) throws LuaException {
+    public final int pullFluid(IComputerAccess computer, String fromName, Optional<Integer> limit, Optional<String> fluidName) throws LuaException {
         IFluidHandler handler = getHandler();
         return this.fluidMethods.pullFluid(handler, computer, fromName, limit, fluidName);
     }
 
-    private IFluidHandler getHandler() throws LuaException {
-        return blockEntity.tank.getCapability()
-            .orElseThrow(() -> new LuaException("Fluid tank not available"));
+    private final IFluidHandler getHandler() throws LuaException {
+        return blockEntity.tank.getCapability().orElseThrow(() -> new LuaException("Fluid tank not available"));
     }
 
     //Boilerplate

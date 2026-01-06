@@ -14,17 +14,17 @@ public class OpticalSensorPeripheral extends SyncedPeripheral<OpticalSensorBlock
     }
 
     @Override
-    public String getType() {
+    public final String getType() {
         return "optical_sensor";
     }
 
     @LuaFunction
-    public float getDistance() {
+    public final float getDistance() {
         return blockEntity.getRaycastDistance();
     }
 
     @LuaFunction(mainThread = true)
-    public void setMaxDistance(int distance) {
+    public final void setMaxDistance(int distance) {
         int clampedDistance = Math.clamp(1, blockEntity.getMaxPossibleRaycastDistance(), distance);
         blockEntity.setMaxDistance(clampedDistance);
     }
