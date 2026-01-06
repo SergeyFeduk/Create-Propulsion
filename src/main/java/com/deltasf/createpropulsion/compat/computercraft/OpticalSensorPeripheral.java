@@ -25,9 +25,7 @@ public class OpticalSensorPeripheral extends SyncedPeripheral<OpticalSensorBlock
 
     @LuaFunction(mainThread = true)
     public void setMaxDistance(int distance) {
-        //Check if distance is in acceptable range
         int clampedDistance = Math.clamp(1, blockEntity.getMaxPossibleRaycastDistance(), distance);
-        //Set the distance and update server and client
         blockEntity.setMaxDistance(clampedDistance);
     }
 

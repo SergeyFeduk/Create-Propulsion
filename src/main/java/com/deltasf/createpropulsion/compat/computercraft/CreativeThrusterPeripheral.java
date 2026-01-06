@@ -1,5 +1,6 @@
 package com.deltasf.createpropulsion.compat.computercraft;
 
+import com.deltasf.createpropulsion.thruster.AbstractThrusterBlockEntity;
 import com.deltasf.createpropulsion.thruster.creative_thruster.CreativeThrusterBlockEntity;
 import com.simibubi.create.compat.computercraft.implementation.peripherals.SyncedPeripheral;
 import dan200.computercraft.api.lua.LuaFunction;
@@ -24,21 +25,13 @@ public class CreativeThrusterPeripheral extends SyncedPeripheral<CreativeThruste
     }
 
     @LuaFunction(mainThread = true)
-    public void setPower(int power) {
-        int clampedPower = Math.max(Math.min(power, 15), 0);
-        
-        if (blockEntity.overridenPower != clampedPower || blockEntity.overridePower != (clampedPower != 0)) {
-            blockEntity.overridePower = clampedPower != 0;
-            blockEntity.overridenPower = clampedPower;
-            blockEntity.dirtyThrust();
-            blockEntity.setChanged();
-            blockEntity.sendData();
-        }
+    public void setPower(double power) {
+        blockEntity.setDigitalInput((float)power);
     }
 
-    @LuaFunction
-    public int getPower() {
-        return blockEntity.getOverriddenPowerOrState(blockEntity.getBlockState());
+    @LuaFunction(mainThread = true)
+    public float getPower() {
+        return blockEntity.getPower();
     }
 
     @LuaFunction(mainThread = true)
@@ -56,6 +49,7 @@ public class CreativeThrusterPeripheral extends SyncedPeripheral<CreativeThruste
         return blockEntity.getTargetThrustNewtons() / 1000.0f;
     }
 
+    //Boilerplate
     @Override
     public boolean equals(IPeripheral other) {
         if (this == other) return true;
@@ -66,14 +60,15 @@ public class CreativeThrusterPeripheral extends SyncedPeripheral<CreativeThruste
     }
 
     @Override
+    public void attach(@NotNull IComputerAccess computer) {
+        super.attach(computer);
+        blockEntity.setControlMode(AbstractThrusterBlockEntity.ControlMode.PERIPHERAL);
+    }
+
+    @Override
     public void detach(@NotNull IComputerAccess computer) {
-        if (blockEntity.overridePower) {
-            blockEntity.overridePower = false;
-            blockEntity.overridenPower = 0;
-            blockEntity.dirtyThrust();
-            blockEntity.setChanged();
-            blockEntity.sendData();
-        }
         super.detach(computer);
+        blockEntity.setDigitalInput(0.0f); 
+        blockEntity.setControlMode(AbstractThrusterBlockEntity.ControlMode.NORMAL);
     }
 }

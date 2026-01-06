@@ -12,6 +12,7 @@ import java.util.Optional;
 
 import org.jetbrains.annotations.NotNull;
 
+import com.deltasf.createpropulsion.thruster.AbstractThrusterBlockEntity;
 import com.deltasf.createpropulsion.thruster.thruster.ThrusterBlockEntity;
 import com.simibubi.create.compat.computercraft.implementation.peripherals.SyncedPeripheral;
 
@@ -27,24 +28,19 @@ public class ThrusterPeripheral extends SyncedPeripheral<ThrusterBlockEntity> {
         return "propulsion_thruster";
     }
 
-    //Returns emptyBlocks
     @LuaFunction
     public int getObstruction() {
         return blockEntity.getEmptyBlocks();
     }
 
-    //Sets power for thruster
     @LuaFunction(mainThread = true)
-    public void setPower(int power) {
-        int clampedPower = Math.max(Math.min(power, 15), 0);
-        
-        if (blockEntity.overridenPower != clampedPower || blockEntity.overridePower != (clampedPower != 0)) {
-            blockEntity.overridePower = clampedPower != 0;
-            blockEntity.overridenPower = clampedPower;
-            blockEntity.dirtyThrust();
-            blockEntity.setChanged();
-            blockEntity.sendData();
-        }
+    public void setPower(double power) {
+        blockEntity.setDigitalInput((float)power);
+    }
+
+    @LuaFunction(mainThread = true)
+    public float getPower() {
+        return blockEntity.getPower();
     }
 
     //Get name of the current fuel
@@ -103,15 +99,15 @@ public class ThrusterPeripheral extends SyncedPeripheral<ThrusterBlockEntity> {
     }
 
     @Override
-	public void detach(@NotNull IComputerAccess computer) {
-		if (blockEntity.overridePower) {
-            blockEntity.overridePower = false;
-            blockEntity.overridenPower = 0;
-            blockEntity.dirtyThrust();
-            blockEntity.setChanged();
-            blockEntity.sendData();
-        }
+    public void attach(@NotNull IComputerAccess computer) {
+        super.attach(computer);
+        blockEntity.setControlMode(AbstractThrusterBlockEntity.ControlMode.PERIPHERAL);
+    }
 
+    @Override
+    public void detach(@NotNull IComputerAccess computer) {
         super.detach(computer);
-	}
+        blockEntity.setDigitalInput(0.0f); 
+        blockEntity.setControlMode(AbstractThrusterBlockEntity.ControlMode.NORMAL);
+    }
 }

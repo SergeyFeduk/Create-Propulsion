@@ -56,18 +56,17 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
     @Override
     public void updateThrust(BlockState currentBlockState) {
         float thrust = 0;
-        int power = getOverriddenPowerOrState(currentBlockState);
+        float currentPower = getPower();
 
         // This thruster only works if it has valid fuel and power
-        if (isWorking() && power > 0) {
+        if (isWorking() && currentPower > 0) {
             var properties = getFuelProperties(fluidStack().getRawFluid());
-            float powerPercentage = power / 15.0f;
             float obstructionEffect = calculateObstructionEffect();
-            float thrustPercentage = Math.min(powerPercentage, obstructionEffect);
+            float thrustPercentage = Math.min(currentPower, obstructionEffect);
 
             if (thrustPercentage > 0 && properties != null) {
                 int tick_rate = PropulsionConfig.THRUSTER_TICKS_PER_UPDATE.get();
-                int consumption = calculateFuelConsumption(powerPercentage, properties.consumptionMultiplier, tick_rate);
+                int consumption = calculateFuelConsumption(currentPower, properties.consumptionMultiplier, tick_rate);
                 FluidStack drainedStack = tank.getPrimaryHandler().drain(consumption, IFluidHandler.FluidAction.EXECUTE);
                 int fuelConsumed = drainedStack.getAmount();
 

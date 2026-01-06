@@ -23,8 +23,6 @@ import java.awt.Color;
 import java.util.Optional;
 
 public class ThrusterDamager extends AbstractAreaDamagerBehaviour {
-    private static final int LOWEST_POWER_THRSHOLD = 5;
-
     private record ThrusterDamageContext(Vec3 nozzlePos, float visualPowerPercent) {}
 
     public ThrusterDamager(SmartBlockEntity be) {
@@ -57,7 +55,12 @@ public class ThrusterDamager extends AbstractAreaDamagerBehaviour {
         AbstractThrusterBlockEntity thruster = getThruster();
         Direction plumeDirection = thruster.getBlockState().getValue(AbstractThrusterBlock.FACING).getOpposite();
 
-        float visualPowerPercent = ((float)Math.max(thruster.getOverriddenPowerOrState(thruster.getBlockState()), LOWEST_POWER_THRSHOLD) - LOWEST_POWER_THRSHOLD) / 15.0f;
+        float currentPower = thruster.getPower();
+        float threshold = AbstractThrusterBlockEntity.LOWEST_POWER_THRESHOLD;
+        if (currentPower < threshold) return Optional.empty();
+
+        float visualPowerPercent = Math.max(0, currentPower - threshold) / (1.0f - threshold);
+
         float distanceByPower = Math.lerp(0.55f, 1.5f, visualPowerPercent);
         double potentialPlumeLength = thruster.getEmptyBlocks() * distanceByPower;
         
@@ -83,7 +86,7 @@ public class ThrusterDamager extends AbstractAreaDamagerBehaviour {
     protected void applyDamage(LivingEntity entity, DamageSource source, DamageZone zone) {
         ThrusterDamageContext context = (ThrusterDamageContext) zone.context();
         
-        float invSqrDistance = context.visualPowerPercent() * 8.0f / (float)java.lang.Math.max(1, entity.position().distanceToSqr(context.nozzlePos()));
+        float invSqrDistance = (context.visualPowerPercent() * 15.0f) * 8.0f / (float)java.lang.Math.max(1, entity.position().distanceToSqr(context.nozzlePos()));
         float damageAmount = 3 + invSqrDistance;
 
         entity.hurt(source, damageAmount);

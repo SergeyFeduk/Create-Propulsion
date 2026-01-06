@@ -23,14 +23,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 @SuppressWarnings("deprecation")
 public abstract class AbstractThrusterBlock extends DirectionalBlock implements EntityBlock {
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
-    public static final IntegerProperty POWER = IntegerProperty.create("redstone_power", 0, 15);
 
     protected AbstractThrusterBlock(Properties properties) {
         super(properties);
@@ -63,7 +61,7 @@ public abstract class AbstractThrusterBlock extends DirectionalBlock implements 
 
     @Override
     protected void createBlockStateDefinition(@Nonnull StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, POWER);
+        builder.add(FACING);
     }
 
     @Nullable
@@ -104,18 +102,11 @@ public abstract class AbstractThrusterBlock extends DirectionalBlock implements 
     }
 
     public void doRedstoneCheck(Level level, BlockState state, BlockPos pos) {
-        int newRedstonePower = level.getBestNeighborSignal(pos);
-        int oldRedstonePower = state.getValue(POWER);
-        if (newRedstonePower == oldRedstonePower) return;
-
-        BlockState newState = state.setValue(POWER, newRedstonePower);
-        level.setBlock(pos, newState, Block.UPDATE_ALL);
-
         BlockEntity blockEntity = level.getBlockEntity(pos);
         if (blockEntity instanceof AbstractThrusterBlockEntity thrusterBlockEntity) {
+            int newRedstonePower = level.getBestNeighborSignal(pos);
+            thrusterBlockEntity.setRedstoneInput(newRedstonePower);
             thrusterBlockEntity.calculateObstruction(level, pos, state.getValue(FACING));
-            thrusterBlockEntity.updateThrust(newState);
-            thrusterBlockEntity.setChanged();
         }
     }
 

@@ -60,12 +60,11 @@ public class CreativeThrusterBlockEntity extends AbstractThrusterBlockEntity {
     @Override
     public void updateThrust(BlockState currentBlockState) {
         float thrust = 0;
-        int power = getOverriddenPowerOrState(currentBlockState);
-        if (power > 0) {
-            float powerPercentage = power / 15.0f;
+        float currentPower = getPower();
+        if (currentPower  > 0) {
             float thrustMultiplier = (float) (double) PropulsionConfig.CREATIVE_THRUSTER_THRUST_MULTIPLIER.get();
             float powerMultiplier = powerBehaviour.getTargetThrust();
-            thrust = thrustMultiplier * powerPercentage * powerMultiplier;
+            thrust = thrustMultiplier * currentPower * powerMultiplier;
         }
         thrusterData.setThrust(thrust);
         isThrustDirty = false;
@@ -122,9 +121,9 @@ public class CreativeThrusterBlockEntity extends AbstractThrusterBlockEntity {
     @Override
     protected void addThrusterDetails(List<Component> tooltip, boolean isPlayerSneaking) {
         float maxThrustKN = powerBehaviour.getTargetThrust() / 1000.0f;
-        int power = getOverriddenPowerOrState(getBlockState());
-        float powerPercentage = power / 15.0f;
-        int currentThrustKN = (int)Math.ceil(maxThrustKN * powerPercentage);
+        float currentPower = getPower();
+        int currentThrustKN = (int)Math.ceil(maxThrustKN * currentPower);
+
         //"Thrust Output: 400/450 kN"
         LangBuilder thrustBuilder = CreateLang.builder();
         thrustBuilder.add(CreateLang.translate("gui.goggles.thruster.thrust_output").text(": "));
@@ -155,10 +154,6 @@ public class CreativeThrusterBlockEntity extends AbstractThrusterBlockEntity {
     }
 
     // CC slop
-
-    public int getOverriddenPowerOrState(BlockState state) {
-        return super.getOverriddenPowerOrState(state);
-    }
 
     public void setThrustConfig(int value) {
         int clamped = Math.max(0, Math.min(value, 99));

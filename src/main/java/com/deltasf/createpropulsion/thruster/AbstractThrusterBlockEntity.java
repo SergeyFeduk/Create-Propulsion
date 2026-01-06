@@ -6,6 +6,7 @@ import com.deltasf.createpropulsion.compat.computercraft.ComputerBehaviour;
 import com.deltasf.createpropulsion.particles.ParticleTypes;
 import com.deltasf.createpropulsion.particles.plume.PlumeParticleData;
 import com.deltasf.createpropulsion.utility.GoggleUtils;
+import com.deltasf.createpropulsion.utility.math.MathUtility;
 import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.compat.computercraft.AbstractComputerBehaviour;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
@@ -39,9 +40,10 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
     // Constants
     protected static final int OBSTRUCTION_LENGTH = 10;
     protected static final int TICKS_PER_ENTITY_CHECK = 5;
-    protected static final int LOWEST_POWER_THRSHOLD = 5;
     private static final float PARTICLE_VELOCITY = 4;
     private static final double SHIP_VELOCITY_INHERITANCE = 0.5;
+    
+    protected static final float LOWEST_POWER_THRESHOLD = 5.0f / 15.0f;
 
     // Common State
     protected ThrusterData thrusterData;
@@ -55,8 +57,14 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
 
     // CC Peripheral
     public AbstractComputerBehaviour computerBehaviour;
-    public boolean overridePower = false;
-    public int overridenPower;
+    public enum ControlMode {
+        NORMAL,
+        PERIPHERAL
+    }
+
+    protected ControlMode controlMode = ControlMode.NORMAL;
+    protected int redstoneInput = 0;
+    protected float digitalInput = 0.0f;
 
     public AbstractThrusterBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
@@ -85,6 +93,48 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
                 ((AbstractThrusterBlock) block).doRedstoneCheck(level, getBlockState(), worldPosition);
             }
         }
+    }
+
+    // Control logic
+
+    public void setRedstoneInput(int power) {
+        if (this.redstoneInput != power) {
+            this.redstoneInput = power;
+            if (this.controlMode == ControlMode.NORMAL) {
+                dirtyThrust();
+                notifyUpdate();
+            }
+        }
+    }
+
+    public void setDigitalInput(float power) {
+        float clamped = org.joml.Math.clamp(0.0f, 1.0f, power);
+        if (java.lang.Math.abs(this.digitalInput - clamped) > 1e-4) {
+            this.digitalInput = clamped;
+            if (this.controlMode == ControlMode.PERIPHERAL) {
+                dirtyThrust();
+                notifyUpdate();
+            }
+        }
+    }
+
+    public void setControlMode(ControlMode mode) {
+        if (this.controlMode != mode) {
+            this.controlMode = mode;
+            dirtyThrust();
+            notifyUpdate();
+        }
+    }
+
+    public float getPower() {
+        if (controlMode == ControlMode.PERIPHERAL) {
+            return digitalInput;
+        }
+        return redstoneInput / 15.0f;
+    }
+
+    public int getLegacyPowerInt() {
+        return (int) Math.round(getPower() * 15);
     }
 
     @Override
@@ -164,18 +214,11 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
     protected void addSpecificGoggleInfo(List<Component> tooltip, boolean isPlayerSneaking) {}
 
     protected boolean isPowered() {
-        return getOverriddenPowerOrState(getBlockState()) > 0;
+        return getPower() > MathUtility.epsilon;
     }
 
     protected float calculateObstructionEffect() {
         return (float) emptyBlocks / (float) OBSTRUCTION_LENGTH;
-    }
-    
-    public int getOverriddenPowerOrState(BlockState currentBlockState) {
-        if (PropulsionCompatibility.CC_ACTIVE && overridePower) {
-            return overridenPower;
-        }
-        return currentBlockState.getValue(AbstractThrusterBlock.POWER);
     }
 
     protected ParticleOptions createParticleOptions() {
@@ -186,13 +229,13 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
 
     public void emitParticles(Level level, BlockPos pos, BlockState state) {
         if (emptyBlocks == 0) return;
-        int power = getOverriddenPowerOrState(state);
+        float power = getPower();
     
         double particleCountMultiplier = org.joml.Math.clamp(0.0, 2.0, PropulsionConfig.THRUSTER_PARTICLE_COUNT_MULTIPLIER.get());
         if (particleCountMultiplier <= 0) return;
     
         clientTick++;
-        if (power < LOWEST_POWER_THRSHOLD && clientTick % 2 == 0) {
+        if (power < LOWEST_POWER_THRESHOLD && clientTick % 2 == 0) {
             clientTick = 0;
             return;
         }
@@ -202,8 +245,9 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
         int particlesToSpawn = (int) this.particleSpawnAccumulator;
         if (particlesToSpawn == 0) return;
     
+        float visualPower = Math.max(power, LOWEST_POWER_THRESHOLD);
+
         this.particleSpawnAccumulator -= particlesToSpawn;
-        float powerPercentage = Math.max(power, LOWEST_POWER_THRSHOLD) / 15.0f;
         Direction direction = state.getValue(AbstractThrusterBlock.FACING);
         Direction oppositeDirection = direction.getOpposite();
     
@@ -237,7 +281,7 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
         double particleZ = pos.getZ() + 0.5 + oppositeDirection.getStepZ() * currentNozzleOffset;
     
         Vector3d particleVelocity = new Vector3d(oppositeDirection.getStepX(), oppositeDirection.getStepY(), oppositeDirection.getStepZ())
-            .mul(PARTICLE_VELOCITY * powerPercentage).add(additionalVel);
+            .mul(PARTICLE_VELOCITY * visualPower).add(additionalVel);
     
         ParticleOptions particleData = createParticleOptions();
 
@@ -294,10 +338,10 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
         super.write(compound, clientPacket);
         compound.putInt("emptyBlocks", emptyBlocks);
         compound.putInt("currentTick", currentTick);
-        if (PropulsionCompatibility.CC_ACTIVE) {
-            compound.putInt("overridenPower", overridenPower);
-            compound.putBoolean("overridePower", overridePower);
-        }
+        
+        compound.putInt("RedstoneInput", redstoneInput);
+        compound.putFloat("DigitalInput", digitalInput);
+        compound.putInt("ControlMode", controlMode.ordinal());
     }
 
     @Override
@@ -305,9 +349,11 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
         super.read(compound, clientPacket);
         emptyBlocks = compound.getInt("emptyBlocks");
         currentTick = compound.getInt("currentTick");
-        if (PropulsionCompatibility.CC_ACTIVE) {
-            overridenPower = compound.getInt("overridenPower");
-            overridePower = compound.getBoolean("overridePower");
+
+        redstoneInput = compound.getInt("RedstoneInput");
+        digitalInput = compound.getFloat("DigitalInput");
+        if (compound.contains("ControlMode")) {
+            controlMode = ControlMode.values()[compound.getInt("ControlMode")];
         }
     }
 }
