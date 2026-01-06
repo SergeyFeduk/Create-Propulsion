@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.deltasf.createpropulsion.propeller.blades.PropellerBladeItem;
 import com.deltasf.createpropulsion.registries.PropulsionItems;
+import com.deltasf.createpropulsion.utility.math.MathUtility;
 import com.simibubi.create.content.equipment.goggles.GogglesItem;
 import com.simibubi.create.content.kinetics.base.IRotate.StressImpact;
 import com.simibubi.create.foundation.item.TooltipHelper;
@@ -18,8 +19,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 
 public class BladeTooltipProvider implements ITooltipProvider {
-    private static final float epsilon = 1e-4f;
-
     @Override
     public void addTooltip(ItemTooltipEvent event, List<Component> tooltipList) {
         ItemStack stack = event.getItemStack();
@@ -72,7 +71,7 @@ public class BladeTooltipProvider implements ITooltipProvider {
             tooltipList.add(stressImpactLine);
             //Optional: if does not produce parasitic torque 
             float parasiticTorque = bladeItem.getTorqueFactor();
-            if (parasiticTorque <= epsilon) {
+            if (parasiticTorque <= MathUtility.epsilon) {
                 Component noTorqueLine = Component.translatable("createpropulsion.tooltip.noTorque").withStyle(ChatFormatting.GREEN);
                 tooltipList.add(noTorqueLine);
             }

@@ -167,6 +167,9 @@
     "createpropulsion.tooltip.waterEfficiency": "Water Efficiency",
     "createpropulsion.tooltip.noTorque": "No Torque Effect",
 
+    "createpropulsion.tooltip.heat.generation": "Heat Generation",
+    "createpropulsion.tooltip.heat.consumption": "Heat Consumption",
+
     "create.gui.goggles.burner.status": "Burner Status",
     "create.gui.goggles.burner.heat.cold": "Cold",
     "create.gui.goggles.burner.heat.warm": "Warm",

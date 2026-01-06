@@ -16,24 +16,41 @@ import net.minecraft.network.chat.Component;
 
 @EventBusSubscriber(modid = CreatePropulsion.ID, value = Dist.CLIENT)
 public class TooltipHandler {
-    private static final List<ITooltipProvider> tooltipProviders = new ArrayList<>();
+    private static final List<ITooltipProvider> topProviders = new ArrayList<>();
+    private static final List<ITooltipProvider> bottomProviders = new ArrayList<>();
+
     static {
-        tooltipProviders.add(new GenericSummaryTooltipProvider());
-        tooltipProviders.add(new FuelTooltipProvider());
-        tooltipProviders.add(new BladeTooltipProvider());
+        topProviders.add(new GenericSummaryTooltipProvider());
+        topProviders.add(new FuelTooltipProvider());
+        topProviders.add(new BladeTooltipProvider());
+
+        bottomProviders.add(new HeatTooltipProvider());
     }
 
-    @SubscribeEvent
+    @SubscribeEvent()
     public static void addToItemTooltip(ItemTooltipEvent event) {
         if (event.getItemStack().isEmpty()) return;
-        List<Component> tooltipList = new ArrayList<>();
+        List<Component> currentTooltip = event.getToolTip();
 
-        for(ITooltipProvider tooltipProvider : tooltipProviders) {
-            tooltipProvider.addTooltip(event, tooltipList);
+        //Handle top list
+        List<Component> topList = new ArrayList<>();
+        for(ITooltipProvider tooltipProvider : topProviders) {
+            tooltipProvider.addTooltip(event, topList);
         }
 
-        if (!tooltipList.isEmpty()) {
-            event.getToolTip().addAll(1, tooltipList);
+        if (!topList.isEmpty()) {
+            int index = currentTooltip.isEmpty() ? 0 : 1; 
+            currentTooltip.addAll(index, topList);
+        }
+
+        //Handle bottom list
+        List<Component> bottomList = new ArrayList<>();
+        for(ITooltipProvider tooltipProvider : bottomProviders) {
+            tooltipProvider.addTooltip(event, bottomList);
+        }
+
+        if (!bottomList.isEmpty()) {
+            currentTooltip.addAll(bottomList);
         }
     }
 
