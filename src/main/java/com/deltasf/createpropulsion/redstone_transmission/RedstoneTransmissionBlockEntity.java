@@ -22,12 +22,12 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 
 import static com.deltasf.createpropulsion.redstone_transmission.RedstoneTransmissionBlock.HORIZONTAL_FACING;
+import static com.simibubi.create.content.kinetics.base.RotatedPillarKineticBlock.AXIS;
 
 public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
     public static final int MAX_VALUE = 255;
@@ -78,13 +78,13 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
 
     public int get_shift_up() {
         if(level == null) return 0;
-        Direction facing = getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING);
+        Direction facing = getBlockState().getValue(HORIZONTAL_FACING);
         return level.getSignal(getBlockPos().relative(facing.getCounterClockWise()), facing.getCounterClockWise());
     }
 
     public int get_shift_down() {
         if(level == null) return 0;
-        Direction facing = getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING);
+        Direction facing = getBlockState().getValue(HORIZONTAL_FACING);
         return level.getSignal(getBlockPos().relative(facing.getClockWise()), facing.getClockWise());
     }
 
@@ -100,7 +100,6 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
         if(level == null || level.isClientSide) {
             return;
         }
-        Direction facing = getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING);
         updateShift(get_shift_up(), get_shift_down());
     }
 
@@ -124,9 +123,13 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
 
         @Override
         public Vec3 getLocalOffset(LevelAccessor level, BlockPos pos, BlockState state) {
+            Vec3 result = getSouthLocation();
+            if (state.getValue(AXIS).isHorizontal()) {
+                result = VecHelper.rotateCentered(result, 270, Direction.Axis.X);
+            }
             Direction side = state.getValue(HORIZONTAL_FACING);
             float horizontalAngle = AngleHelper.horizontalAngle(side);
-            return VecHelper.rotateCentered(getSouthLocation(), horizontalAngle, Direction.Axis.Y);
+            return VecHelper.rotateCentered(result, horizontalAngle, Direction.Axis.Y);
         }
 
         @Override
@@ -134,6 +137,9 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
             Direction facing = state.getValue(HORIZONTAL_FACING);
             float yRot = AngleHelper.horizontalAngle(facing);
             ms.mulPose(com.mojang.math.Axis.YP.rotationDegrees(yRot));
+            if(state.getValue(AXIS).isHorizontal()){
+                ms.mulPose(com.mojang.math.Axis.XP.rotationDegrees(270));
+            }
         }
     }
 

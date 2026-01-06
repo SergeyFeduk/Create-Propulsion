@@ -13,7 +13,9 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+
+import static com.deltasf.createpropulsion.redstone_transmission.RedstoneTransmissionBlock.HORIZONTAL_FACING;
+import static com.simibubi.create.content.kinetics.base.RotatedPillarKineticBlock.AXIS;
 
 public class RedstoneTransmissionRenderer extends SplitShaftRenderer {
     public RedstoneTransmissionRenderer(BlockEntityRendererProvider.Context context) {
@@ -25,23 +27,39 @@ public class RedstoneTransmissionRenderer extends SplitShaftRenderer {
         super.renderSafe(be, partialTicks, ms, buffer, light, overlay);
         if (VisualizationManager.supportsVisualization(be.getLevel()) || !(be instanceof RedstoneTransmissionBlockEntity rtbe)) return;
 
-        Direction facing = be.getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING);
+        Direction facing = be.getBlockState().getValue(HORIZONTAL_FACING);
         int shift_up = rtbe.get_shift_up();
         int shift_down = rtbe.get_shift_down();
 
         SuperByteBuffer partial_plus = CachedBuffers.partial(PropulsionPartialModels.TRANSMISSION_PLUS, be.getBlockState());
         SuperByteBuffer partial_minus = CachedBuffers.partial(PropulsionPartialModels.TRANSMISSION_MINUS, be.getBlockState());
-        SuperByteBuffer dialBuffer = CachedBuffers.partial(AllPartialModels.GAUGE_DIAL, be.getBlockState());
+        SuperByteBuffer dialBuffer = CachedBuffers.partial(AllPartialModels.GAUGE_DIAL, be.getBlockState())
+                .rotateCentered((float) ((-facing.toYRot() - 90) / 180 * Math.PI), Direction.UP);
 
-        dialBuffer
-                .rotateCentered((float) ((-facing.toYRot() - 90) / 180 * Math.PI), Direction.UP)
-                .translate(2f / 16, 5.75f / 16, 5.75f / 16)
+        if(rtbe.getBlockState().getValue(AXIS).isHorizontal()) {
+            partial_plus = partial_plus.rotateCenteredDegrees(90, Direction.Axis.X);
+            partial_minus = partial_minus.rotateCenteredDegrees(90, Direction.Axis.X);
+            dialBuffer = dialBuffer.rotateCenteredDegrees(90, Direction.Axis.Z);
+        }
+
+        dialBuffer.translate(2f / 16, 5.75f / 16, 5.75f / 16)
                 .rotate(rtbe.getGaugeTarget(partialTicks), Direction.EAST)
                 .translate(0, -5.75f / 16, -5.75f / 16)
                 .light(light)
                 .renderInto(ms, buffer.getBuffer(RenderType.solid()));
 
-        partial_plus.light(light).overlay(overlay).color(Color.mixColors(0x470102, 0xCD0000, shift_up / 15f)).renderInto(ms, buffer.getBuffer(RenderType.cutout()));
-        partial_minus.light(light).overlay(overlay).color(Color.mixColors(0x470102, 0xCD0000, shift_down / 15f)).renderInto(ms, buffer.getBuffer(RenderType.cutout()));
+        partial_plus
+                .rotateCentered((float) (facing.toYRot() / 180 * Math.PI), Direction.UP)
+                .light(light)
+                .overlay(overlay)
+                .color(Color.mixColors(0x470102, 0xCD0000, shift_up / 15f))
+                .renderInto(ms, buffer.getBuffer(RenderType.cutout()));
+
+        partial_minus
+                .rotateCentered((float) (facing.toYRot() / 180 * Math.PI), Direction.UP)
+                .light(light)
+                .overlay(overlay)
+                .color(Color.mixColors(0x470102, 0xCD0000, shift_down / 15f))
+                .renderInto(ms, buffer.getBuffer(RenderType.cutout()));
     }
 }

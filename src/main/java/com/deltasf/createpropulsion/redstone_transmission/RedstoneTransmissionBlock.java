@@ -1,32 +1,29 @@
 package com.deltasf.createpropulsion.redstone_transmission;
 
 import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
+import com.mojang.logging.LogUtils;
 import com.simibubi.create.content.kinetics.base.AbstractEncasedShaftBlock;
-import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
+import com.simibubi.create.content.kinetics.base.HorizontalKineticBlock;
 import com.simibubi.create.foundation.block.IBE;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.block.state.properties.Property;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 
 public class RedstoneTransmissionBlock extends AbstractEncasedShaftBlock implements IBE<RedstoneTransmissionBlockEntity> {
-    public static final DirectionProperty HORIZONTAL_FACING = BlockStateProperties.HORIZONTAL_FACING;
+    public static final Property<Direction> HORIZONTAL_FACING = HorizontalKineticBlock.HORIZONTAL_FACING;
 
     public RedstoneTransmissionBlock(Properties properties) {
         super(properties);
-        this.registerDefaultState(this.stateDefinition.any().setValue(AXIS, Direction.Axis.Y).setValue(HORIZONTAL_FACING, Direction.NORTH));
+        this.registerDefaultState(this.defaultBlockState().setValue(HORIZONTAL_FACING, Direction.NORTH));
     }
 
     @Override
@@ -52,12 +49,22 @@ public class RedstoneTransmissionBlock extends AbstractEncasedShaftBlock impleme
 
     @Override
     public BlockState getRotatedBlockState(BlockState originalState, Direction targetedFace) {
-        return originalState.setValue(HORIZONTAL_FACING, originalState.getValue(HORIZONTAL_FACING).getClockWise());
+        BlockState state = super.getRotatedBlockState(originalState, targetedFace);
+        if(state.getValue(AXIS).isHorizontal()) {
+            return state.setValue(AXIS, state.getValue(HORIZONTAL_FACING).getAxis());
+        }
+        return state;
     }
 
     @Override
     public @NotNull BlockState getStateForPlacement(BlockPlaceContext context) {
-        return defaultBlockState().setValue(HORIZONTAL_FACING, context.getHorizontalDirection().getOpposite());
+        Direction.Axis axis;
+        if (context.getNearestLookingDirection().getAxis().isHorizontal()) {
+            axis = Direction.Axis.Y;
+        } else {
+            axis = context.getHorizontalDirection().getAxis();
+        }
+        return defaultBlockState().setValue(HORIZONTAL_FACING, context.getHorizontalDirection().getOpposite()).setValue(AXIS, axis);
     }
 
     @Override
