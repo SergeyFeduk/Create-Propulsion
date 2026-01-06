@@ -125,14 +125,14 @@ public class CreativeThrusterBlockEntity extends AbstractThrusterBlockEntity {
         int power = getOverriddenPowerOrState(getBlockState());
         float powerPercentage = power / 15.0f;
         int currentThrustKN = (int)Math.ceil(maxThrustKN * powerPercentage);
-        // "Thrust Output: 400/450 kN"
+        //"Thrust Output: 400/450 kN"
         LangBuilder thrustBuilder = CreateLang.builder();
         thrustBuilder.add(CreateLang.translate("gui.goggles.thruster.thrust_output").text(": "));
         thrustBuilder.add(CreateLang.number(currentThrustKN).text(" / ").add(CreateLang.number(maxThrustKN)).style(ChatFormatting.GRAY));
         thrustBuilder.space().add(CreateLang.translate("gui.goggles.thruster.unit_kn"));
         thrustBuilder.forGoggles(tooltip);
 
-        // "Particle: Plasma"
+        //"Particle: Plasma"
         LangBuilder particleBuilder = CreateLang.builder()
             .add(CreateLang.translate("gui.goggles.creative_thruster.particle")).text(": ");
 

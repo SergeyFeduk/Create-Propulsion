@@ -26,6 +26,12 @@ public class TooltipModifiers {
             int thrusterStrength = Math.round(ThrusterBlockEntity.BASE_MAX_THRUST / 1000.0f * thrustMultiplier);
             return Component.translatable(payload.path + ".tooltip.summary").getString().replace("{}", String.valueOf(thrusterStrength));
         });
+        //Creative thruster
+        tooltipModificationLookup.put(PropulsionBlocks.CREATIVE_THRUSTER_BLOCK.asItem(), (payload) -> {
+            float thrustMultiplier = (float)(double)PropulsionConfig.CREATIVE_THRUSTER_THRUST_MULTIPLIER.get();
+            int thrusterStrength = Math.round(1000 * thrustMultiplier);
+            return Component.translatable(payload.path + ".tooltip.summary").getString().replace("{}", String.valueOf(thrusterStrength));
+        });
         //Inline optical sensor
         tooltipModificationLookup.put(PropulsionBlocks.INLINE_OPTICAL_SENSOR_BLOCK.asItem(), (payload) -> {
             int raycastDistance = PropulsionConfig.INLINE_OPTICAL_SENSOR_MAX_DISTANCE.get();

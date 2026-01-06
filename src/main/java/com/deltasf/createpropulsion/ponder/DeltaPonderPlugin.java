@@ -17,8 +17,6 @@ import net.minecraft.resources.ResourceLocation;
 
 public class DeltaPonderPlugin implements PonderPlugin {
     //TODO: Stirling engine ponder
-    // Show a solid burner, place a stirling engine on it
-    // Click on solid burner with coal
 
     //TODO: Transmission ponder
 
