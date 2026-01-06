@@ -21,9 +21,12 @@ import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerRenderer;
 import com.deltasf.createpropulsion.propeller.PropellerBlockEntity;
 import com.deltasf.createpropulsion.propeller.rendering.PropellerRenderer;
 import com.deltasf.createpropulsion.propeller.rendering.PropellerVisual;
+import com.deltasf.createpropulsion.redstone_transmission.RedstoneTransmissionRenderer;
+import com.deltasf.createpropulsion.redstone_transmission.RedstoneTransmissionVisual;
 import com.deltasf.createpropulsion.thruster.creative_thruster.CreativeThrusterBlockEntity;
 import com.deltasf.createpropulsion.thruster.creative_thruster.CreativeThrusterRenderer;
 import com.deltasf.createpropulsion.thruster.creative_thruster.CreativeThrusterVisual;
+import com.deltasf.createpropulsion.redstone_transmission.RedstoneTransmissionBlockEntity;
 import com.deltasf.createpropulsion.thruster.thruster.ThrusterBlockEntity;
 import com.deltasf.createpropulsion.tilt_adapter.TiltAdapterBlockEntity;
 import com.deltasf.createpropulsion.tilt_adapter.TiltAdapterRenderer;
@@ -43,7 +46,7 @@ public class PropulsionBlockEntities {
         .validBlocks(PropulsionBlocks.THRUSTER_BLOCK)
         .register();
 
-    public static final BlockEntityEntry<CreativeThrusterBlockEntity> CREATIVE_THRUSTER_BLOCK_ENTITY = 
+    public static final BlockEntityEntry<CreativeThrusterBlockEntity> CREATIVE_THRUSTER_BLOCK_ENTITY =
         REGISTRATE.blockEntity("creative_thruster_block_entity", CreativeThrusterBlockEntity::new)
         .visual(() -> CreativeThrusterVisual::new)
         .validBlocks(PropulsionBlocks.CREATIVE_THRUSTER_BLOCK)
@@ -79,6 +82,13 @@ public class PropulsionBlockEntities {
         .validBlock(PropulsionBlocks.REDSTONE_MAGNET_BLOCK)
         .register();
 
+    public static final BlockEntityEntry<RedstoneTransmissionBlockEntity> REDSTONE_TRANSMISSION_BLOCK_ENTITY =
+            REGISTRATE.blockEntity("redstone_transmission_block_entity", RedstoneTransmissionBlockEntity::new)
+                    .visual(() -> RedstoneTransmissionVisual::new, false)
+                    .validBlock(PropulsionBlocks.REDSTONE_TRANSMISSION_BLOCK)
+                    .renderer(() -> RedstoneTransmissionRenderer::new)
+                    .register();
+
     public static final BlockEntityEntry<HotAirBurnerBlockEntity> HOT_AIR_BURNER_BLOCK_ENTITY =
         REGISTRATE.blockEntity("hot_air_burner_block_entity", HotAirBurnerBlockEntity::new)
         .validBlock(PropulsionBlocks.HOT_AIR_BURNER_BLOCK)
@@ -88,7 +98,7 @@ public class PropulsionBlockEntities {
     @SuppressWarnings("unchecked")
     public static final BlockEntityEntry<KineticBlockEntity> ENVELOPED_SHAFT = REGISTRATE
         .blockEntity("enveloped_shaft_block_entity", KineticBlockEntity::new)
-        .visual(() -> SingleAxisRotatingVisual::shaft, false) 
+        .visual(() -> SingleAxisRotatingVisual::shaft, false)
         .renderer(() -> ShaftRenderer::new)
         .validBlocks(PropulsionBlocks.ENVELOPED_SHAFT_BLOCKS.values().toArray(new BlockEntry[0]))
         .register();
@@ -98,7 +108,7 @@ public class PropulsionBlockEntities {
         .validBlock(PropulsionBlocks.SOLID_BURNER)
         .register();
 
-    public static final BlockEntityEntry<LiquidBurnerBlockEntity> LIQUID_BURNER_BLOCK_ENTITY = 
+    public static final BlockEntityEntry<LiquidBurnerBlockEntity> LIQUID_BURNER_BLOCK_ENTITY =
         REGISTRATE.blockEntity("liquid_burner_block_entity", LiquidBurnerBlockEntity::new)
         .validBlock(PropulsionBlocks.LIQUID_BURNER)
         .renderer(() -> LiquidBurnerRenderer::new)
@@ -124,7 +134,7 @@ public class PropulsionBlockEntities {
         .renderer(() -> StirlingEngineRenderer::new)
         .register();
 
-    public static final BlockEntityEntry<TiltAdapterBlockEntity> TILT_ADAPTER_BLOCK_ENTITY = 
+    public static final BlockEntityEntry<TiltAdapterBlockEntity> TILT_ADAPTER_BLOCK_ENTITY =
         REGISTRATE.blockEntity("tilt_adapter_block_entity", TiltAdapterBlockEntity::new)
         .validBlock(PropulsionBlocks.TILT_ADAPTER_BLOCK)
         .renderer(() -> TiltAdapterRenderer::new)

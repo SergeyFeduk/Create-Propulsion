@@ -7,6 +7,9 @@
     "block.createpropulsion.inline_optical_sensor": "Capteur Optique En Ligne",
     "item.createpropulsion.inline_optical_sensor": "Capteur Optique En Ligne",
 
+    "block.createpropulsion.redstone_transmission": "Redstone Transmission",
+    "item.createpropulsion.redstone_transmission": "Redstone Transmission",
+
     "block.createpropulsion.optical_sensor": "Capteur Optique",
     "item.createpropulsion.optical_sensor": "Capteur Optique",
     "create.gui.optical_sensor.distance_behaviour": "Distance De Raycasting",

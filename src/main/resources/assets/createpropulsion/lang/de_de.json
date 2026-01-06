@@ -7,6 +7,9 @@
     "block.createpropulsion.inline_optical_sensor": "Optischer Inline-Sensor",
     "item.createpropulsion.inline_optical_sensor": "Optischer Inline-Sensor",
 
+    "block.createpropulsion.redstone_transmission": "Redstone Getriebe",
+    "item.createpropulsion.redstone_transmission": "Redstone Getriebe",
+
     "block.createpropulsion.optical_sensor": "Optischer Sensor",
     "item.createpropulsion.optical_sensor": "Optischer Sensor",
     "create.gui.optical_sensor.distance_behaviour": "Raycast Distanz",

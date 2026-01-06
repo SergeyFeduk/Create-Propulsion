@@ -29,6 +29,9 @@ public class PropulsionPartialModels {
     //Creative thruster
     public static final PartialModel CREATIVE_THRUSTER_BRACKET = partial("creative_thruster_bracket");
 
+    public static final PartialModel TRANSMISSION_PLUS = partial("transmission_plus");
+    public static final PartialModel TRANSMISSION_MINUS = partial("transmission_minus");
+
     private static PartialModel partial(String path) {
         return PartialModel.of(ResourceLocation.fromNamespaceAndPath(CreatePropulsion.ID, "partial/" + path));
     }

@@ -7,6 +7,9 @@
     "block.createpropulsion.inline_optical_sensor": "Компактный оптический датчик",
     "item.createpropulsion.inline_optical_sensor": "Компактный оптический датчик",
 
+    "block.createpropulsion.redstone_transmission": "Редстоун Трансмиссия",
+    "item.createpropulsion.redstone_transmission": "Редстоун Трансмиссия",
+
     "block.createpropulsion.optical_sensor": "Оптический датчик",
     "item.createpropulsion.optical_sensor": "Оптический датчик",
     "create.gui.optical_sensor.distance_behaviour": "Дальность действия датчика",

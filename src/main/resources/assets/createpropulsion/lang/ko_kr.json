@@ -7,6 +7,9 @@
     "block.createpropulsion.inline_optical_sensor": "인라인 광학 센서",
     "item.createpropulsion.inline_optical_sensor": "인라인 광학 센서",
 
+    "block.createpropulsion.redstone_transmission": "레드스톤 변속기",
+    "item.createpropulsion.redstone_transmission": "레드스톤 변속기",
+
     "block.createpropulsion.optical_sensor": "광학 센서",
     "item.createpropulsion.optical_sensor": "광학 센서",
     "create.gui.optical_sensor.distance_behaviour": "광선 감지 거리",
