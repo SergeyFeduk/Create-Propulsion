@@ -98,9 +98,9 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
     // Control logic
 
     public void setRedstoneInput(int power) {
-        if (this.redstoneInput != power) {
-            this.redstoneInput = power;
-            if (this.controlMode == ControlMode.NORMAL) {
+        if (redstoneInput != power) {
+            redstoneInput = power;
+            if (controlMode == ControlMode.NORMAL) {
                 dirtyThrust();
                 notifyUpdate();
             }
@@ -109,9 +109,9 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
 
     public void setDigitalInput(float power) {
         float clamped = org.joml.Math.clamp(0.0f, 1.0f, power);
-        if (java.lang.Math.abs(this.digitalInput - clamped) > 1e-4) {
-            this.digitalInput = clamped;
-            if (this.controlMode == ControlMode.PERIPHERAL) {
+        if (java.lang.Math.abs(digitalInput - clamped) > 1e-4) {
+            digitalInput = clamped;
+            if (controlMode == ControlMode.PERIPHERAL) {
                 dirtyThrust();
                 notifyUpdate();
             }
@@ -316,6 +316,10 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
         CreateLang.translate("gui.goggles.thruster.status", new Object[0]).text(":").space().add(getGoggleStatus()).forGoggles(tooltip);
 
         addThrusterDetails(tooltip, isPlayerSneaking);
+
+        if (controlMode == ControlMode.PERIPHERAL) {
+            CreateLang.translate("gui.goggles.thruster.peripheral_controlled", new Object[0]).style(ChatFormatting.GRAY).forGoggles(tooltip);
+        }
 
         return true;
     }
