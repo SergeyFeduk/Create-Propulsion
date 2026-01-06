@@ -31,7 +31,7 @@ import static com.deltasf.createpropulsion.redstone_transmission.RedstoneTransmi
 import static com.simibubi.create.content.kinetics.base.RotatedPillarKineticBlock.AXIS;
 
 public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
-    public static final int MAX_VALUE = 255;
+    public static final int MAX_VALUE = 256;
 
     ScrollOptionBehaviour<TransmissionMode> controlMode;
     private int shift_level = 0;

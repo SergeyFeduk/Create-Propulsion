@@ -17,7 +17,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.joml.Matrix4f;
 
 public class PropulsionIcons extends AllIcons {
-    public static final ResourceLocation ICON_ATLAS = new ResourceLocation(CreatePropulsion.ID, "textures/gui/icons.png");
+    public static final ResourceLocation ICON_ATLAS = ResourceLocation.fromNamespaceAndPath(CreatePropulsion.ID, "textures/gui/icons.png");
     public static final int ICON_ATLAS_SIZE = 32;
 
     protected int iconX;
