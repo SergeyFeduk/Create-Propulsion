@@ -285,7 +285,7 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
             CreateLang.builder().add(CreateLang.translate("gui.goggles.thruster.obstructed", new Object[0])).space().add(CreateLang.text(GoggleUtils.makeObstructionBar(emptyBlocks, OBSTRUCTION_LENGTH))).style(tooltipColor).forGoggles(tooltip);
         }
 
-        CreateLang.builder().add(CreateLang.translate("gui.goggles.thruster.efficiency", new Object[0])).space().add(CreateLang.number(efficiency)).add(CreateLang.text("%")).style(tooltipColor).forGoggles(tooltip);
+        CreateLang.builder().add(CreateLang.translate("gui.goggles.thruster.efficiency", new Object[0])).text(": ").add(CreateLang.number(efficiency)).add(CreateLang.text("%")).style(tooltipColor).forGoggles(tooltip);
     }
 
 

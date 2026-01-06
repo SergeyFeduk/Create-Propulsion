@@ -76,6 +76,11 @@
     "create.gui.goggles.thruster.efficiency": "Efficiency",
     "create.gui.goggles.optical_sensor.lenses": "Lenses",
 
+    "create.gui.goggles.creative_thruster.particle": "Particle",
+    "create.gui.goggles.creative_thruster.particle.plasma": "Plasma",
+    "create.gui.goggles.creative_thruster.particle.plume": "Plume",
+    "create.gui.goggles.creative_thruster.particle.none": "None",
+
     "createpropulsion.inline_optical_sensor.tooltip.summary": "Casts a _ray_ up to _{} blocks long_, detecting blocks.",
     "createpropulsion.inline_optical_sensor.tooltip.condition1": "When block is detected",
     "createpropulsion.inline_optical_sensor.tooltip.behaviour1": "Emits _redstone signal_. Power is stronger for closer blocks.",

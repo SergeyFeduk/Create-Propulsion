@@ -6,7 +6,12 @@ import javax.annotation.Nullable;
 import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
 import com.deltasf.createpropulsion.registries.PropulsionShapes;
 import com.deltasf.createpropulsion.thruster.AbstractThrusterBlock;
+
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntityTicker;
+import com.simibubi.create.content.equipment.wrench.IWrenchable;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -14,7 +19,6 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -23,7 +27,7 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class CreativeThrusterBlock extends AbstractThrusterBlock {
+public class CreativeThrusterBlock extends AbstractThrusterBlock implements IWrenchable {
     public static final DirectionProperty PLACEMENT_FACING = DirectionProperty.create("placement_facing", Direction.values());
 
     public CreativeThrusterBlock(Properties properties) {
@@ -59,6 +63,18 @@ public class CreativeThrusterBlock extends AbstractThrusterBlock {
         Direction direction = pState.getValue(FACING);
         if (direction == Direction.UP || direction == Direction.DOWN) direction = direction.getOpposite();
         return PropulsionShapes.CREATIVE_THRUSTER.get(direction);
+    }
+
+    @Override
+    public InteractionResult onWrenched(BlockState state, UseOnContext context) {
+        if (!context.getLevel().isClientSide) {
+            BlockEntity be = context.getLevel().getBlockEntity(context.getClickedPos());
+            if (be instanceof CreativeThrusterBlockEntity creativeBe) {
+                creativeBe.cyclePlumeType();
+                IWrenchable.playRotateSound(context.getLevel(), context.getClickedPos());
+            }
+        }
+        return InteractionResult.SUCCESS;
     }
 
     @Nullable

@@ -94,7 +94,7 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
 
     @Override
     protected double getNozzleOffsetFromCenter() {
-        return 0.9;
+        return 0.95;
     }
 
     @Override

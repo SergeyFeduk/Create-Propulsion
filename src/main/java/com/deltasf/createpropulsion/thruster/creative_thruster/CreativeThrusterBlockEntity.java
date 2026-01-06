@@ -81,9 +81,19 @@ public class CreativeThrusterBlockEntity extends AbstractThrusterBlockEntity {
 
     //Particles
 
+    public void cyclePlumeType() {
+        int ordinal = plumeType.ordinal() + 1;
+        if (ordinal >= PlumeType.values().length) {
+            ordinal = 0;
+        }
+        plumeType = PlumeType.values()[ordinal];
+        setChanged();
+        sendData();
+    }
+
     @Override
     protected double getNozzleOffsetFromCenter() {
-        return 0.5;
+        return 0.55;
     }
 
     @Override
@@ -116,13 +126,24 @@ public class CreativeThrusterBlockEntity extends AbstractThrusterBlockEntity {
         float powerPercentage = power / 15.0f;
         int currentThrustKN = (int)Math.ceil(maxThrustKN * powerPercentage);
         // "Thrust Output: 400/450 kN"
-        CreateLang.builder()
-            .add(CreateLang.translate("gui.goggles.thruster.thrust_output")).text(": ")
-            .add(CreateLang.number(currentThrustKN)).text(" / ").add(CreateLang.number(maxThrustKN))
-            .space()
-            .add(CreateLang.translate("gui.goggles.thruster.unit_kn"))
-            .style(ChatFormatting.GRAY)
-            .forGoggles(tooltip);
+        LangBuilder thrustBuilder = CreateLang.builder();
+        thrustBuilder.add(CreateLang.translate("gui.goggles.thruster.thrust_output").text(": "));
+        thrustBuilder.add(CreateLang.number(currentThrustKN).text(" / ").add(CreateLang.number(maxThrustKN)).style(ChatFormatting.GRAY));
+        thrustBuilder.space().add(CreateLang.translate("gui.goggles.thruster.unit_kn"));
+        thrustBuilder.forGoggles(tooltip);
+
+        // "Particle: Plasma"
+        LangBuilder particleBuilder = CreateLang.builder()
+            .add(CreateLang.translate("gui.goggles.creative_thruster.particle")).text(": ");
+
+        switch (plumeType) {
+            case PLASMA -> particleBuilder.add(CreateLang.translate("gui.goggles.creative_thruster.particle.plasma").style(ChatFormatting.AQUA));
+            case PLUME -> particleBuilder.add(CreateLang.translate("gui.goggles.creative_thruster.particle.plume").style(ChatFormatting.GOLD));
+            case NONE -> particleBuilder.add(CreateLang.translate("gui.goggles.creative_thruster.particle.none").style(ChatFormatting.DARK_GRAY));
+        }
+
+        particleBuilder.forGoggles(tooltip);
+
     }
 
     @Override
