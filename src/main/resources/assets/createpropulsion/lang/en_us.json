@@ -175,9 +175,11 @@
     "create.gui.goggles.thruster.unit_kn": "kN",
     "create.gui.creative_thruster.power_behaviour": "Generated Thrust",
 
-    "createpropulsion.gui.goggles.redstone_transmission.control_mode" : "Transmission mode",
-    "createpropulsion.gui.goggles.redstone_transmission.internal_shift": "Transmission level: {0} / {1}",
-    "createpropulsion.gui.goggles.redstone_transmission.output": "Transmitted RPM: ",
+    "createpropulsion.gui.goggles.redstone_transmission.title": "Transmission Status",
+    "createpropulsion.gui.goggles.redstone_transmission.control_mode" : "Transmission mode:",
+    "createpropulsion.gui.goggles.redstone_transmission.internal_shift_title": "Transmission level:",
+    "createpropulsion.gui.goggles.redstone_transmission.internal_shift_number": " {0} / {1}",
+    "createpropulsion.gui.goggles.redstone_transmission.output": "Transmitted RPM:",
 
     "createpropulsion.ponder.tilt_adapter.header": "Tilting wings with Tilt Adapter",
     "createpropulsion.ponder.tilt_adapter.text_1": "Tilt Adapter allows tilting the output shaft based on Redstone signals",

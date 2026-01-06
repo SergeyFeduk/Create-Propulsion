@@ -15,8 +15,6 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
-import static com.deltasf.createpropulsion.redstone_transmission.RedstoneTransmissionBlock.SHIFT_LEVEL;
-
 public class RedstoneTransmissionRenderer extends SplitShaftRenderer {
     public RedstoneTransmissionRenderer(BlockEntityRendererProvider.Context context) {
         super(context);

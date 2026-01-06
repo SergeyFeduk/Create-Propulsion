@@ -22,13 +22,11 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nonnull;
 
 public class RedstoneTransmissionBlock extends AbstractEncasedShaftBlock implements IBE<RedstoneTransmissionBlockEntity> {
-    public static final int MAX_VALUE = 255;
     public static final DirectionProperty HORIZONTAL_FACING = BlockStateProperties.HORIZONTAL_FACING;
-    public static final IntegerProperty SHIFT_LEVEL = IntegerProperty.create("shift_level", 0, 255);
 
     public RedstoneTransmissionBlock(Properties properties) {
         super(properties);
-        this.registerDefaultState(this.stateDefinition.any().setValue(AXIS, Direction.Axis.Y).setValue(HORIZONTAL_FACING, Direction.NORTH).setValue(SHIFT_LEVEL, 128));
+        this.registerDefaultState(this.stateDefinition.any().setValue(AXIS, Direction.Axis.Y).setValue(HORIZONTAL_FACING, Direction.NORTH));
     }
 
     @Override
@@ -48,7 +46,7 @@ public class RedstoneTransmissionBlock extends AbstractEncasedShaftBlock impleme
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(HORIZONTAL_FACING, SHIFT_LEVEL);
+        builder.add(HORIZONTAL_FACING);
         super.createBlockStateDefinition(builder);
     }
 

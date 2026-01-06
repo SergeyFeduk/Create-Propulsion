@@ -11,12 +11,12 @@ import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollOp
 import com.simibubi.create.foundation.gui.AllIcons;
 import com.simibubi.create.foundation.utility.CreateLang;
 import net.createmod.catnip.lang.Lang;
-import net.createmod.catnip.lang.LangBuilder;
 import net.createmod.catnip.math.AngleHelper;
 import net.createmod.catnip.math.VecHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.LevelAccessor;
@@ -27,19 +27,31 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 
-import static com.deltasf.createpropulsion.redstone_transmission.RedstoneTransmissionBlock.MAX_VALUE;
-import static com.deltasf.createpropulsion.redstone_transmission.RedstoneTransmissionBlock.SHIFT_LEVEL;
 import static com.deltasf.createpropulsion.redstone_transmission.RedstoneTransmissionBlock.HORIZONTAL_FACING;
 
 public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
+    public static final int MAX_VALUE = 255;
 
     ScrollOptionBehaviour<TransmissionMode> controlMode;
+    private int shift_level = 0;
     private float prevGaugeTarget = 0f;
     private float gaugeTarget = 0f;
 
     public RedstoneTransmissionBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
         setLazyTickRate(10);
+    }
+
+    @Override
+    protected void read(CompoundTag compound, boolean clientPacket) {
+        shift_level = compound.getInt("transmission_shift");
+        super.read(compound, clientPacket);
+    }
+
+    @Override
+    protected void write(CompoundTag compound, boolean clientPacket) {
+        compound.putInt("transmission_shift", shift_level);
+        super.write(compound, clientPacket);
     }
 
     @Override
@@ -50,16 +62,16 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
     }
 
     public void updateShift(int shift_up, int shift_down){
-        int value = getBlockState().getValue(SHIFT_LEVEL);
         int newValue;
         if(controlMode.get() == TransmissionMode.INCREMENTAL) {
-            newValue = Mth.clamp(value + shift_up - shift_down, 0, MAX_VALUE);
+            newValue = Mth.clamp(shift_level + shift_up - shift_down, 0, MAX_VALUE);
         } else {
             newValue = Math.max(shift_up, shift_down) * 17;
         }
-        if (value != newValue) {
+        if (shift_level != newValue) {
             detachKinetics();
-            level.setBlock(getBlockPos(), getBlockState().setValue(SHIFT_LEVEL, newValue), 3);
+            removeSource();
+            shift_level = newValue;
             attachKinetics();
         }
     }
@@ -68,12 +80,12 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
     public void tick() {
         super.tick();
         prevGaugeTarget = gaugeTarget;
-        gaugeTarget += Mth.clamp(Mth.PI / 2 * -getBlockState().getValue(SHIFT_LEVEL) / 255f - gaugeTarget, - Mth.PI / 4, Mth.PI / 4) / 10f;
+        gaugeTarget += Mth.clamp(Mth.PI / 2 * -shift_level / 255f - gaugeTarget, - Mth.PI / 4, Mth.PI / 4) / 10f;
     }
 
     @Override
     public void lazyTick() {
-        if(level == null) {
+        if(level == null || level.isClientSide) {
             return;
         }
         Direction facing = getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING);
@@ -84,8 +96,8 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
 
     @Override
     public float getRotationSpeedModifier(Direction face) {
-        if (getBlockState().getValue(SHIFT_LEVEL) == 0) return 0;
-        if (hasSource() && getSourceFacing() == face) return (float) MAX_VALUE / getBlockState().getValue(SHIFT_LEVEL);
+        if (shift_level == 0) return 0;
+        if (hasSource() && getSourceFacing() == face) return (float) MAX_VALUE / shift_level;
         else return 1;
     }
 
@@ -118,24 +130,54 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
     @Override
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         CreateLang.builder()
-                .add(Component.translatable("createpropulsion.gui.goggles.redstone_transmission.control_mode"))
-                .text(": ")
-                .add(Component.translatable(controlMode.get().getTranslationKey()))
+                .add(Component.translatable("createpropulsion.gui.goggles.redstone_transmission.title"))
                 .forGoggles(tooltip);
-        
+
+        CreateLang.builder()
+                .add(Component.translatable("createpropulsion.gui.goggles.redstone_transmission.control_mode"))
+                .style(ChatFormatting.GRAY)
+                .forGoggles(tooltip);
+
+        //CreateLang newLine ain't working for me...
+        CreateLang.builder()
+                .space()
+                .add(Component.translatable(controlMode.get().getTranslationKey()))
+                .style(ChatFormatting.GRAY)
+                .forGoggles(tooltip);
+
+        CreateLang.builder()
+                .add(Component.translatable("createpropulsion.gui.goggles.redstone_transmission.internal_shift_title"))
+                .style(ChatFormatting.GRAY)
+                .forGoggles(tooltip);
+
+        int max_shift_modified = controlMode.get().equals(TransmissionMode.DIRECT) ? 15 : MAX_VALUE;
+        int shift_modified = shift_level * max_shift_modified / MAX_VALUE;
+        IRotate.SpeedLevel transmitStyle = IRotate.SpeedLevel.NONE;
+        if(shift_level >= MAX_VALUE / 2) {
+            transmitStyle = IRotate.SpeedLevel.FAST;
+        } else if (shift_level >= MAX_VALUE / 4) {
+            transmitStyle = IRotate.SpeedLevel.MEDIUM;
+        } else if (shift_level >= MAX_VALUE / 8) {
+            transmitStyle = IRotate.SpeedLevel.SLOW;
+        }
+
         CreateLang.builder()
                 .add(Component.translatable(
-                                    "createpropulsion.gui.goggles.redstone_transmission.internal_shift",
-                                    getBlockState().getValue(SHIFT_LEVEL) / (controlMode.get().equals(TransmissionMode.DIRECT) ? 17 : 1),
-                                    controlMode.get().equals(TransmissionMode.DIRECT) ? 15 : 255
-                        )
-                )
+                        "createpropulsion.gui.goggles.redstone_transmission.internal_shift_number",
+                        shift_modified,
+                        max_shift_modified
+                        ))
+                .style(transmitStyle.getTextColor())
                 .forGoggles(tooltip);
 
         CreateLang.builder()
                 .add(Component.translatable("createpropulsion.gui.goggles.redstone_transmission.output"))
-                .add(IRotate.SpeedLevel.getFormattedSpeedText(speed, isOverStressed()).component())
+                .style(ChatFormatting.GRAY)
                 .forGoggles(tooltip);
+
+        IRotate.SpeedLevel.getFormattedSpeedText(speed, isOverStressed()).forGoggles(tooltip);
+
+        super.addToGoggleTooltip(tooltip, isPlayerSneaking);
 
         return true;
     }

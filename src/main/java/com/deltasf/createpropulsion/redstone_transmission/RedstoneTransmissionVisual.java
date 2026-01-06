@@ -7,7 +7,6 @@ import com.simibubi.create.content.kinetics.transmission.SplitShaftBlockEntity;
 import com.simibubi.create.content.kinetics.transmission.SplitShaftVisual;
 import dev.engine_room.flywheel.api.instance.Instance;
 import dev.engine_room.flywheel.api.visualization.VisualizationContext;
-import dev.engine_room.flywheel.api.visualization.VisualizationManager;
 import dev.engine_room.flywheel.lib.instance.InstanceTypes;
 import dev.engine_room.flywheel.lib.instance.OrientedInstance;
 import dev.engine_room.flywheel.lib.instance.TransformedInstance;
@@ -19,8 +18,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 import java.util.function.Consumer;
-
-import static com.deltasf.createpropulsion.redstone_transmission.RedstoneTransmissionBlock.SHIFT_LEVEL;
 
 public class RedstoneTransmissionVisual extends SplitShaftVisual implements SimpleDynamicVisual {
 
