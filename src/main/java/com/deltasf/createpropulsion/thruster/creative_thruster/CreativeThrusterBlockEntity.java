@@ -6,6 +6,8 @@ import javax.annotation.Nullable;
 
 import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.compat.PropulsionCompatibility;
+import com.deltasf.createpropulsion.particles.ParticleTypes;
+import com.deltasf.createpropulsion.particles.plasma.PlasmaParticleData;
 import com.deltasf.createpropulsion.thruster.AbstractThrusterBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.utility.CreateLang;
@@ -14,7 +16,11 @@ import net.createmod.catnip.lang.LangBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -23,6 +29,9 @@ import net.minecraftforge.common.util.LazyOptional;
 
 public class CreativeThrusterBlockEntity extends AbstractThrusterBlockEntity {
     private CreativeThrusterPowerScrollValueBehaviour powerBehaviour;
+
+    public enum PlumeType { PLASMA, PLUME, NONE }
+    public PlumeType plumeType = PlumeType.PLASMA;
 
     public CreativeThrusterBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
@@ -70,13 +79,17 @@ public class CreativeThrusterBlockEntity extends AbstractThrusterBlockEntity {
         this.emptyBlocks = OBSTRUCTION_LENGTH;
     }
 
+    //Particles
+
     @Override
     protected double getNozzleOffsetFromCenter() {
-        return 0.7;
+        return 0.5;
     }
 
     @Override
     protected boolean shouldEmitParticles() {
+        if (plumeType == PlumeType.NONE) return false;
+
         if (!isPowered()) return false; 
         Level level = getLevel();
         if (level == null) return false;
@@ -84,6 +97,16 @@ public class CreativeThrusterBlockEntity extends AbstractThrusterBlockEntity {
         Direction facing = getBlockState().getValue(CreativeThrusterBlock.FACING);
         BlockPos plumeOccupiedPosition = worldPosition.relative(facing.getOpposite());
         return !level.getBlockState(plumeOccupiedPosition).isFaceSturdy(level, plumeOccupiedPosition, facing);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    protected ParticleOptions createParticleOptions() {
+        if (plumeType == PlumeType.PLASMA) {
+            return new PlasmaParticleData((ParticleType<PlasmaParticleData>) ParticleTypes.getPlasmaType());
+        }
+        //Default is plume :P
+        return super.createParticleOptions();
     }
 
     @Override
@@ -132,5 +155,22 @@ public class CreativeThrusterBlockEntity extends AbstractThrusterBlockEntity {
 
     public float getTargetThrustNewtons() {
         return powerBehaviour.getTargetThrust();
+    }
+
+    //NBT
+
+    @Override
+    protected void write(CompoundTag compound, boolean clientPacket) {
+        super.write(compound, clientPacket);
+        compound.putInt("plumeType", plumeType.ordinal());
+    }
+
+    @Override
+    protected void read(CompoundTag compound, boolean clientPacket) {
+        super.read(compound, clientPacket);
+        if (compound.contains("plumeType")) {
+            int idx = compound.getInt("plumeType");
+            plumeType = PlumeType.values()[Mth.clamp(idx, 0, PlumeType.values().length - 1)];
+        }
     }
 }

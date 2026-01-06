@@ -3,6 +3,7 @@ package com.deltasf.createpropulsion.particles;
 import java.util.function.Supplier;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
+import com.deltasf.createpropulsion.particles.plasma.PlasmaParticleData;
 import com.deltasf.createpropulsion.particles.plume.PlumeParticleData;
 import com.simibubi.create.foundation.particle.ICustomParticleData;
 
@@ -23,7 +24,8 @@ import net.minecraftforge.registries.RegistryObject;
 //Create actually handles registration so elegantly, this is the only reason I just copied it from their repo
 @EventBusSubscriber(modid = CreatePropulsion.ID, bus = Bus.MOD, value = Dist.CLIENT)
 public enum ParticleTypes {
-    PLUME(PlumeParticleData::new);
+    PLUME(PlumeParticleData::new),
+    PLASMA(PlasmaParticleData::new);
 
     private final ParticleEntry<?> entry;
 
@@ -39,6 +41,10 @@ public enum ParticleTypes {
 
     public static ParticleType<?> getPlumeType() {
         return PLUME.get();
+    }
+
+    public static ParticleType<?> getPlasmaType() {
+        return PLASMA.get();
     }
 
     public static void register(IEventBus modEventBus){

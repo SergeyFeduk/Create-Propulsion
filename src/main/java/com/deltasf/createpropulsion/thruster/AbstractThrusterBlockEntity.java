@@ -16,6 +16,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -52,9 +53,6 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
     private int clientTick = 0;
     private float particleSpawnAccumulator = 0.0f;
 
-    // Particles
-    protected ParticleType<PlumeParticleData> particleType;
-
     // CC Peripheral
     public AbstractComputerBehaviour computerBehaviour;
     public boolean overridePower = false;
@@ -63,7 +61,6 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
     public AbstractThrusterBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
         thrusterData = new ThrusterData();
-        particleType = (ParticleType<PlumeParticleData>) ParticleTypes.getPlumeType();
     }
 
     @SuppressWarnings("null")
@@ -181,6 +178,10 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
         return currentBlockState.getValue(AbstractThrusterBlock.POWER);
     }
 
+    protected ParticleOptions createParticleOptions() {
+        return new PlumeParticleData((ParticleType<PlumeParticleData>) ParticleTypes.getPlumeType());
+    }
+
     protected abstract double getNozzleOffsetFromCenter();
 
     public void emitParticles(Level level, BlockPos pos, BlockState state) {
@@ -238,9 +239,11 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
         Vector3d particleVelocity = new Vector3d(oppositeDirection.getStepX(), oppositeDirection.getStepY(), oppositeDirection.getStepZ())
             .mul(PARTICLE_VELOCITY * powerPercentage).add(additionalVel);
     
+        ParticleOptions particleData = createParticleOptions();
+
         // Spawn the calculated number of particles.
         for (int i = 0; i < particlesToSpawn; i++) {
-            level.addParticle(new PlumeParticleData(particleType), true,
+            level.addParticle(particleData, true,
                 particleX, particleY, particleZ,
                 particleVelocity.x, particleVelocity.y, particleVelocity.z);
         }
