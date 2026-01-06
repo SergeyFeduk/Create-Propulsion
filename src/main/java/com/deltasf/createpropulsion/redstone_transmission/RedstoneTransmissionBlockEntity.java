@@ -1,6 +1,6 @@
 package com.deltasf.createpropulsion.redstone_transmission;
 
-import com.deltasf.createpropulsion.PropulsionAllIcons;
+import com.deltasf.createpropulsion.registries.PropulsionIcons;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.content.kinetics.base.IRotate;
 import com.simibubi.create.content.kinetics.transmission.SplitShaftBlockEntity;
@@ -202,7 +202,7 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
     }
 
     public enum TransmissionMode implements INamedIconOptions {
-        DIRECT(PropulsionAllIcons.DIRECT_CONTROL), INCREMENTAL(PropulsionAllIcons.INCREMENTAL_CONTROL), ;
+        DIRECT(PropulsionIcons.DIRECT_CONTROL), INCREMENTAL(PropulsionIcons.INCREMENTAL_CONTROL), ;
 
         private String translationKey;
         private AllIcons icon;

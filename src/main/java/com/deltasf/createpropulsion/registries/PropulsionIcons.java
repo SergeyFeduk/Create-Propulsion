@@ -1,5 +1,6 @@
-package com.deltasf.createpropulsion;
+package com.deltasf.createpropulsion.registries;
 
+import com.deltasf.createpropulsion.CreatePropulsion;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -15,7 +16,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.joml.Matrix4f;
 
-public class PropulsionAllIcons extends AllIcons {
+public class PropulsionIcons extends AllIcons {
     public static final ResourceLocation ICON_ATLAS = new ResourceLocation(CreatePropulsion.ID, "textures/gui/icons.png");
     public static final int ICON_ATLAS_SIZE = 32;
 
@@ -23,10 +24,10 @@ public class PropulsionAllIcons extends AllIcons {
     protected int iconY;
 
     public static final AllIcons
-        DIRECT_CONTROL = new PropulsionAllIcons(0, 0),
-        INCREMENTAL_CONTROL = new PropulsionAllIcons(1, 0);
+        DIRECT_CONTROL = new PropulsionIcons(0, 0),
+        INCREMENTAL_CONTROL = new PropulsionIcons(1, 0);
 
-    public PropulsionAllIcons(int x, int y) {
+    public PropulsionIcons(int x, int y) {
         super(x, y);
         iconX = x * 16;
         iconY = y * 16;
