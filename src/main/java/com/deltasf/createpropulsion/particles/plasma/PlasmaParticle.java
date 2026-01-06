@@ -27,7 +27,11 @@ public class PlasmaParticle extends SimpleAnimatedParticle {
 
     // Visuals
     private final SpriteSet spriteSet;
-    private static final int PLASMA_SPRITE_COUNT = 10;
+    private static final int PLASMA_SPRITE_COUNT = 9;
+
+    private static final float PLASMA_SHRINK_START = 0.6f;
+    private static final float PLASMA_END_SCALE_MULTIPLIER = 3.0f;
+
     
     private float currentSpeedMultiplier;
     private float baseSize;
@@ -43,7 +47,7 @@ public class PlasmaParticle extends SimpleAnimatedParticle {
         // Initialize plasma state
         this.quadSize *= PLASMA_BASE_QUAD_SIZE;
         this.baseSize = this.quadSize;
-        this.lifetime = PLASMA_BASE_LIFETIME + random.nextInt(5);
+        this.lifetime = PLASMA_BASE_LIFETIME;
         this.friction = PLASMA_FRICTION;
         this.dx = dxSource + getRandomSpread(); 
         this.dy = dySource + getRandomSpread(); 
@@ -70,6 +74,7 @@ public class PlasmaParticle extends SimpleAnimatedParticle {
         this.zo = this.z;
         final double COLLISION_IGNORE_DOT_THRESHOLD = -1.0E-5D;
         
+        //Die young
         if (this.age++ >= this.lifetime) {
             this.remove();
             return;
@@ -187,9 +192,17 @@ public class PlasmaParticle extends SimpleAnimatedParticle {
             }
         }
 
-        // Visual update (Scaling similar to Plume state of PlumeParticle)
+        // Visual update
         float percent = (float)this.age / (float)this.lifetime;
-        this.quadSize = this.baseSize + (float)Math.pow(percent, 0.8f) * 2.0f;
+        
+        if (percent < PLASMA_SHRINK_START) {
+            this.quadSize = this.baseSize + (float)Math.pow(percent, 0.8f) * 2.0f;
+        } else {
+            float sizeAtTransition = this.baseSize + (float)Math.pow(PLASMA_SHRINK_START, 0.8f) * 2.0f;
+            float sizeAtEnd = this.baseSize * PLASMA_END_SCALE_MULTIPLIER;
+            float shrinkProgress = (percent - PLASMA_SHRINK_START) / (1.0f - PLASMA_SHRINK_START);
+            this.quadSize = Mth.lerp(shrinkProgress, sizeAtTransition, sizeAtEnd);
+        }
 
         // Friction
         this.dx *= this.friction;
