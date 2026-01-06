@@ -36,7 +36,7 @@ public class RedstoneTransmissionVisual extends SplitShaftVisual implements Simp
         var msr = TransformStack.of(ms);
         msr.translate(getVisualPosition());
         msr.pushPose();
-        msr.center().translate(0, 0, 2f / 16).rotateTo(Direction.EAST, facing).uncenter();
+        msr.center().rotateTo(Direction.EAST, facing).translate(2f / 16, 0, 0).uncenter();
 
         minus = instancerProvider().instancer(InstanceTypes.ORIENTED, Models.partial(PropulsionPartialModels.TRANSMISSION_MINUS)).createInstance();
         plus = instancerProvider().instancer(InstanceTypes.ORIENTED, Models.partial(PropulsionPartialModels.TRANSMISSION_PLUS)).createInstance();
@@ -90,7 +90,7 @@ public class RedstoneTransmissionVisual extends SplitShaftVisual implements Simp
 
         float dialPivot = 5.75f / 16;
 
-        msr.center().translate(0, 0, 2f / 16).rotateTo(Direction.EAST, facing).uncenter()
+        msr.center().rotateTo(Direction.EAST, facing).translate(2f / 16, 0, 0).uncenter()
                 .translate(0, dialPivot, dialPivot)
                 .rotate(rtbe.getGaugeTarget(context.partialTick()), Direction.EAST)
                 .translate(0, -dialPivot, -dialPivot);;
