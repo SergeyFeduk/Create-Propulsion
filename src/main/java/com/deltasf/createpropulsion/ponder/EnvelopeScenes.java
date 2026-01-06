@@ -185,7 +185,7 @@ public class EnvelopeScenes {
             .placeNearTarget();
         scene.idle(50);
 
-        scene.overlay().showControls(util.vector().blockSurface(burnerPos, Direction.SOUTH), Pointing.RIGHT, 40).rightClick();
+        scene.overlay().showControls(util.vector().blockSurface(burnerPos, Direction.EAST).add(new Vec3(0,0,0.6f)), Pointing.RIGHT, 40).rightClick();
         scene.idle(10);
         
         scene.world().modifyBlockEntityNBT(burnerSelection, HotAirBurnerBlockEntity.class, nbt -> nbt.putInt("leverPosition", 1));
