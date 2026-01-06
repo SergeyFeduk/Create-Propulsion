@@ -1,7 +1,6 @@
 package com.deltasf.createpropulsion.redstone_transmission;
 
 import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
-import com.mojang.logging.LogUtils;
 import com.simibubi.create.content.kinetics.base.AbstractEncasedShaftBlock;
 import com.simibubi.create.content.kinetics.base.HorizontalKineticBlock;
 import com.simibubi.create.foundation.block.IBE;
@@ -15,8 +14,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.Property;
 import org.jetbrains.annotations.NotNull;
-
-import javax.annotation.Nonnull;
 
 public class RedstoneTransmissionBlock extends AbstractEncasedShaftBlock implements IBE<RedstoneTransmissionBlockEntity> {
     public static final Property<Direction> HORIZONTAL_FACING = HorizontalKineticBlock.HORIZONTAL_FACING;
@@ -37,7 +34,7 @@ public class RedstoneTransmissionBlock extends AbstractEncasedShaftBlock impleme
     }
 
     @Override
-    public BlockEntity newBlockEntity(@Nonnull BlockPos pos, @Nonnull BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new RedstoneTransmissionBlockEntity(PropulsionBlockEntities.REDSTONE_TRANSMISSION_BLOCK_ENTITY.get(), pos, state);
     }
 

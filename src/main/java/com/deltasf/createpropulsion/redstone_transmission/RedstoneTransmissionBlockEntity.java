@@ -19,6 +19,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -77,12 +78,14 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
     }
 
     public int get_shift_up() {
+        Level level = getLevel();
         if(level == null) return 0;
         Direction facing = getBlockState().getValue(HORIZONTAL_FACING);
         return level.getSignal(getBlockPos().relative(facing.getCounterClockWise()), facing.getCounterClockWise());
     }
 
     public int get_shift_down() {
+        Level level = getLevel();
         if(level == null) return 0;
         Direction facing = getBlockState().getValue(HORIZONTAL_FACING);
         return level.getSignal(getBlockPos().relative(facing.getClockWise()), facing.getClockWise());
@@ -97,6 +100,7 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
 
     @Override
     public void lazyTick() {
+        Level level = getLevel();
         if(level == null || level.isClientSide) {
             return;
         }
@@ -115,7 +119,6 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
     }
 
     public static class TransmissionValueBox extends ValueBoxTransform.Sided {
-
         @Override
         protected Vec3 getSouthLocation() {
             return VecHelper.voxelSpace(8,8,-0.125);

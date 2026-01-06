@@ -15,7 +15,6 @@ import dev.engine_room.flywheel.lib.transform.TransformStack;
 import dev.engine_room.flywheel.lib.visual.SimpleDynamicVisual;
 import net.createmod.catnip.theme.Color;
 import net.minecraft.core.Direction;
-import net.minecraft.util.Mth;
 
 import java.util.function.Consumer;
 
