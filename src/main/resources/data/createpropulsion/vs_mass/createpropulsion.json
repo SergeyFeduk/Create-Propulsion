@@ -94,5 +94,10 @@
         "block": "createpropulsion:creative_thruster",
         "mass": 10.0,
         "friction": 0.4
+    },
+    {
+        "block": "createpropulsion:redstone_transmission",
+        "mass": 1200.0,
+        "friction": 0.4
     }
 ]

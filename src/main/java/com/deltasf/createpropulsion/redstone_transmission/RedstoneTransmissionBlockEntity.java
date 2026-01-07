@@ -121,7 +121,7 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
     public static class TransmissionValueBox extends ValueBoxTransform.Sided {
         @Override
         protected Vec3 getSouthLocation() {
-            return VecHelper.voxelSpace(8,8,-0.125);
+            return VecHelper.voxelSpace(8,8,0.5f);
         }
 
         @Override
