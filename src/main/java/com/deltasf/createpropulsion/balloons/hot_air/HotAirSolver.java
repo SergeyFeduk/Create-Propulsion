@@ -13,7 +13,7 @@ import com.deltasf.createpropulsion.atmosphere.AtmosphereData;
 import com.deltasf.createpropulsion.atmosphere.DimensionAtmosphereManager;
 import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.HaiGroup;
-import com.deltasf.createpropulsion.balloons.injectors.AbstractHotAirInjectorBlockEntity;
+import com.deltasf.createpropulsion.balloons.injectors.IHotAirInjector;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry;
 import com.deltasf.createpropulsion.balloons.utils.BalloonRegistryUtility;
 
@@ -58,7 +58,7 @@ public class HotAirSolver {
     private static void calculateInjections(SolverContext ctx) {
         //Hai injections
         for(UUID id : ctx.balloon.supportHais) {
-            AbstractHotAirInjectorBlockEntity hai = ctx.registry.getInjector(ctx.level, id);
+            IHotAirInjector hai = ctx.registry.getInjector(ctx.level, id);
             if (hai == null) continue; //May happen on hai destruction, before it got updated in registry
             double injection = hai.getInjectionAmount();
             ctx.hotAirChange += injection;

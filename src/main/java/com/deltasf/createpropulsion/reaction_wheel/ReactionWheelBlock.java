@@ -1,6 +1,6 @@
 package com.deltasf.createpropulsion.reaction_wheel;
 
-import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
+//import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
 import com.simibubi.create.content.kinetics.base.DirectionalKineticBlock;
 import com.simibubi.create.foundation.block.IBE;
 import net.minecraft.core.BlockPos;

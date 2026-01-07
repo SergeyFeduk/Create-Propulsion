@@ -12,7 +12,7 @@ import java.util.Set;
 
 import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.HaiGroup;
-import com.deltasf.createpropulsion.balloons.injectors.AbstractHotAirInjectorBlockEntity;
+import com.deltasf.createpropulsion.balloons.injectors.IHotAirInjector;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry;
 
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
@@ -104,7 +104,7 @@ public class BalloonSerializationUtil {
             }
 
             for(BlockPos haiPos : supportHaiPositions) {
-                if (level.getBlockEntity(haiPos) instanceof AbstractHotAirInjectorBlockEntity injector) {
+                if (level.getBlockEntity(haiPos) instanceof IHotAirInjector injector) {
                     injector.onBalloonLoaded();
                 }
             } 

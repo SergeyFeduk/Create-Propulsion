@@ -19,7 +19,7 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.HaiGroup;
 import com.deltasf.createpropulsion.balloons.events.BalloonVolumeChangeEvent;
-import com.deltasf.createpropulsion.balloons.injectors.AbstractHotAirInjectorBlockEntity;
+import com.deltasf.createpropulsion.balloons.injectors.IHotAirInjector;
 import com.deltasf.createpropulsion.balloons.network.BalloonSyncManager;
 import com.deltasf.createpropulsion.balloons.utils.BalloonRegistryUtility;
 import com.deltasf.createpropulsion.debug.DebugRenderer;
@@ -71,11 +71,11 @@ public class BalloonRegistry {
         return group.getBalloonFor(haiDataMap.get(haiId));
     }
 
-    public AbstractHotAirInjectorBlockEntity getInjector(Level level, UUID id) {
+    public IHotAirInjector getInjector(Level level, UUID id) {
         if (!haiDataMap.containsKey(id)) return null;
         BlockPos injectorPos = haiDataMap.get(id).position();
 
-        if (level.getBlockEntity(injectorPos) instanceof AbstractHotAirInjectorBlockEntity hai) {
+        if (level.getBlockEntity(injectorPos) instanceof IHotAirInjector hai) {
             return hai;
         }
         return null;
@@ -133,7 +133,7 @@ public class BalloonRegistry {
     }
 
     public void startScanFor(UUID haiId, Level level, BlockPos pos) {
-        if (level.getBlockEntity(pos) instanceof AbstractHotAirInjectorBlockEntity) {
+        if (level.getBlockEntity(pos) instanceof IHotAirInjector) {
             registerHai(haiId, level, pos);
         } else {
             unregisterHai(haiId, level);

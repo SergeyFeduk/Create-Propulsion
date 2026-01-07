@@ -7,7 +7,6 @@ import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
-import com.deltasf.createpropulsion.balloons.injectors.AbstractHotAirInjectorBlock;
 import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
 import com.deltasf.createpropulsion.registries.PropulsionShapes;
 import com.deltasf.createpropulsion.utility.burners.BurnerFuelBehaviour;
@@ -28,6 +27,7 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -40,7 +40,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class HotAirBurnerBlock extends AbstractHotAirInjectorBlock {
+public class HotAirBurnerBlock extends Block implements EntityBlock {
     public static final DirectionProperty FACING = DirectionProperty.create("facing", Direction.Plane.HORIZONTAL);
     public static final BooleanProperty LIT = BooleanProperty.create("lit");
 
@@ -119,6 +119,7 @@ public class HotAirBurnerBlock extends AbstractHotAirInjectorBlock {
         return this.defaultBlockState().setValue(FACING, placeDirection);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void onRemove(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull BlockState newState, boolean isMoving) {
         if (state.is(newState.getBlock())) {

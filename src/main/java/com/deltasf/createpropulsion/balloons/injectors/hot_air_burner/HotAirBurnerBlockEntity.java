@@ -1,6 +1,7 @@
 package com.deltasf.createpropulsion.balloons.injectors.hot_air_burner;
 
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Nullable;
 
@@ -16,13 +17,15 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.atmosphere.DimensionAtmosphereManager;
 import com.deltasf.createpropulsion.balloons.Balloon;
-import com.deltasf.createpropulsion.balloons.injectors.AbstractHotAirInjectorBlockEntity;
 import com.deltasf.createpropulsion.balloons.injectors.AirInjectorObstructionBehaviour;
+import com.deltasf.createpropulsion.balloons.injectors.HotAirInjectorBehaviour;
+import com.deltasf.createpropulsion.balloons.injectors.IHotAirInjector;
 import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
 import com.deltasf.createpropulsion.physics_assembler.AssemblyUtility;
 import com.deltasf.createpropulsion.utility.burners.BurnerFuelBehaviour;
 import com.deltasf.createpropulsion.utility.burners.IBurner;
 import com.simibubi.create.AllSpecialTextures;
+import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 
 import net.minecraft.ChatFormatting;
@@ -31,17 +34,21 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 
-public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity implements IHaveGoggleInformation, IBurner {
+public class HotAirBurnerBlockEntity extends SmartBlockEntity implements IHaveGoggleInformation, IBurner, IHotAirInjector {
     public static final double TREND_THRESHOLD = 0.001;
 
+    // Behaviours
+    private HotAirInjectorBehaviour injectorBehaviour;
     private BurnerFuelBehaviour fuelInventory;
     private AirInjectorObstructionBehaviour obstructionBehaviour;
+
     private int burnTime = 0;
     private int leverPosition = 0; // 0-1-2
 
@@ -58,29 +65,36 @@ public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity i
     }
 
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
+        injectorBehaviour = new HotAirInjectorBehaviour(this);
+        behaviours.add(injectorBehaviour);
+
         fuelInventory = new BurnerFuelBehaviour(this, () -> attemptScan());
         behaviours.add(fuelInventory);
+
         obstructionBehaviour = new AirInjectorObstructionBehaviour(this);
         behaviours.add(obstructionBehaviour);
     }
 
-    public void cycleLever(boolean isShiftPressed) {
-        if (isShiftPressed) {
-            leverPosition = Math.max(0, leverPosition - 1);
-        } else {
-            leverPosition = Math.min(2, leverPosition + 1);
-        }
+    // Hot air injector impl
 
-        notifyUpdate();
-        attemptScan();
+    @Override
+    public UUID getId() {
+        return injectorBehaviour.getId();
     }
 
-    public int getLeverPosition() {
-        return leverPosition;
-    }
-
-    public ItemStack getFuelStack() {
-        return fuelInventory.fuelStack;
+    @Override
+    public void attemptScan() {
+        Level level = getLevel();
+        if (level == null || level.isClientSide()) return;
+        if (fuelInventory.fuelStack.isEmpty()) return;
+        //Ship
+        Ship ship = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
+        if (ship == null) return; 
+        //Balloon
+        Balloon balloon = BalloonShipRegistry.forShip(ship.getId(), level).getBalloonOf(getId());
+        if (balloon != null) return; 
+        //Scan
+        injectorBehaviour.performScan();
     }
 
     @Override
@@ -102,27 +116,27 @@ public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity i
     }
 
     @Override
-    public void setBurnTime(int burnTime) {
-        this.burnTime = burnTime;
+    public void onBalloonLoaded() { updateGoggleData(); }
+
+    // Lever and burner logic
+
+    public void cycleLever(boolean isShiftPressed) {
+        if (isShiftPressed) {
+            leverPosition = Math.max(0, leverPosition - 1);
+        } else {
+            leverPosition = Math.min(2, leverPosition + 1);
+        }
+
+        notifyUpdate();
+        attemptScan();
     }
 
-    @SuppressWarnings("null")
-    public void attemptScan() {
-        if (level == null || level.isClientSide()) return;
-        if (fuelInventory.fuelStack.isEmpty()) return; //No fuel - no need to perform scan
-        Ship ship = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
-        if (ship == null) return; //No ship - no balloon possible
+    public int getLeverPosition() { return leverPosition;}
 
-        Balloon balloon = BalloonShipRegistry.forShip(ship.getId(), level).getBalloonOf(this.haiId);
-        if (balloon != null) return; //There is a balloon - no need to rescan
-
-        scan();
-    }
+    public ItemStack getFuelStack() { return fuelInventory.fuelStack;}
 
     @Override
-    public void onBalloonLoaded() {
-        updateGoggleData();
-    }
+    public void setBurnTime(int burnTime) { this.burnTime = burnTime; }
 
     @SuppressWarnings("null")
     @Override
@@ -139,7 +153,7 @@ public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity i
 
         if (burnTime <= 0) {
             Ship ship = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
-            Balloon balloon = (ship != null) ? BalloonShipRegistry.forShip(ship.getId()).getBalloonOf(this.haiId) : null;
+            Balloon balloon = (ship != null) ? BalloonShipRegistry.forShip(ship.getId()).getBalloonOf(getId()) : null;
             if (!fuelInventory.fuelStack.isEmpty() && balloon != null) {
                 if (fuelInventory.tryConsumeFuel()) {
                     notifyUpdate();
@@ -156,7 +170,7 @@ public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity i
         int oldTrend = hotAirTrend;
         Ship ship = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
 
-        Balloon balloon = (ship != null) ? BalloonShipRegistry.forShip(ship.getId()).getBalloonOf(this.haiId) : null;
+        Balloon balloon = (ship != null) ? BalloonShipRegistry.forShip(ship.getId()).getBalloonOf(getId()) : null;
         if (balloon != null) {
             int currentHotAir = (int) balloon.hotAir;
             int currentMaxHotAir = (int) balloon.getVolumeSize();
@@ -302,6 +316,8 @@ public class HotAirBurnerBlockEntity extends AbstractHotAirInjectorBlockEntity i
 
         return true;
     }
+
+    // Caps and nbt
 
     @Override
     public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {

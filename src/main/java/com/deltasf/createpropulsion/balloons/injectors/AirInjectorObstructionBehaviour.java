@@ -59,18 +59,20 @@ public class AirInjectorObstructionBehaviour extends BlockEntityBehaviour {
         Level level = getWorld();
         BlockPos pos = getPos();
 
-        //Find the balloon this burner is associated with
+        // Check ship
         Ship ship = VSGameUtilsKt.getShipManagingPos(level, pos);
         if (ship == null) {
             clearObstructions();
             return;
         }
 
-        if (!(blockEntity instanceof AbstractHotAirInjectorBlockEntity injector)) {
+        // Check implementation
+        if (!(blockEntity instanceof IHotAirInjector injector)) {
             clearObstructions();
             return;
         }
 
+        // Check balloon
         BalloonRegistry registry = BalloonShipRegistry.forShip(ship.getId(), level);
         Balloon balloon = registry.getBalloonOf(injector.getId());
         if (balloon == null) {
@@ -78,7 +80,7 @@ public class AirInjectorObstructionBehaviour extends BlockEntityBehaviour {
             return;
         }
 
-        //Scan upwards
+        // Perform scan
         Set<BlockPos> newObstructions = new HashSet<>();
         for (int i = 1; i <= BalloonScanner.VERTICAL_ANOMALY_SCAN_DISTANCE; i++) {
             BlockPos currentPos = pos.above(i);
@@ -93,7 +95,7 @@ public class AirInjectorObstructionBehaviour extends BlockEntityBehaviour {
             }
         }
 
-        //Update obstruction if changed
+        // Update
         if (!obstructedBlocks.equals(newObstructions)) {
             obstructedBlocks.clear();
             obstructedBlocks.addAll(newObstructions);
@@ -113,9 +115,7 @@ public class AirInjectorObstructionBehaviour extends BlockEntityBehaviour {
     @Override
     public void write(CompoundTag compound, boolean clientPacket) {
         super.write(compound, clientPacket);
-        if (!clientPacket) {
-            return;
-        }
+        if (!clientPacket) return;
         ListTag obstructedList = new ListTag();
         for (BlockPos pos : obstructedBlocks) {
             obstructedList.add(NbtUtils.writeBlockPos(pos));
@@ -126,9 +126,7 @@ public class AirInjectorObstructionBehaviour extends BlockEntityBehaviour {
     @Override
     public void read(CompoundTag compound, boolean clientPacket) {
         super.read(compound, clientPacket);
-        if (!clientPacket) {
-            return;
-        }
+        if (!clientPacket) return;
         obstructedBlocks.clear();
         ListTag obstructedList = compound.getList("ObstructedBlocks", Tag.TAG_COMPOUND);
         for (Tag tag : obstructedList) {
