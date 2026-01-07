@@ -1,5 +1,6 @@
 package com.deltasf.createpropulsion.redstone_transmission;
 
+import com.deltasf.createpropulsion.redstone_transmission.RedstoneTransmissionBlockEntity.TransmissionMode;
 import com.deltasf.createpropulsion.registries.PropulsionPartialModels;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.AllPartialModels;
@@ -22,12 +23,11 @@ import static com.deltasf.createpropulsion.redstone_transmission.RedstoneTransmi
 import static com.simibubi.create.content.kinetics.base.RotatedPillarKineticBlock.AXIS;
 
 public class RedstoneTransmissionVisual extends SplitShaftVisual implements SimpleDynamicVisual {
+    private OrientedInstance minus;
+    private OrientedInstance plus;
+    private TransformedInstance hand;
 
-    OrientedInstance minus;
-    OrientedInstance plus;
-    TransformedInstance hand;
-
-    PoseStack ms;
+    private PoseStack ms;
 
     public RedstoneTransmissionVisual(VisualizationContext modelManager, SplitShaftBlockEntity blockEntity, float partialTick) {
         super(modelManager, blockEntity, partialTick);
@@ -81,12 +81,18 @@ public class RedstoneTransmissionVisual extends SplitShaftVisual implements Simp
 
     @Override
     public void beginFrame(Context context) {
-
         if (!(blockEntity instanceof RedstoneTransmissionBlockEntity rtbe)) return;
 
         Direction facing = blockEntity.getBlockState().getValue(HORIZONTAL_FACING);
         int shift_up = rtbe.get_shift_up();
         int shift_down = rtbe.get_shift_down();
+        //In direct mode both plus and minus sides control the same thing, so they should have the same redstone tint
+        if (rtbe.controlMode.get() == TransmissionMode.DIRECT) {
+            int max_shift = Math.max(shift_up, shift_down);
+            shift_up = max_shift;
+            shift_down = max_shift;
+        }
+
         Color up_color = new Color(Color.mixColors(0x470102, 0xCD0000, shift_up / 15f));
         Color down_color = new Color(Color.mixColors(0x470102, 0xCD0000, shift_down / 15f));
 

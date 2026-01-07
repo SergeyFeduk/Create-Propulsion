@@ -1,5 +1,6 @@
 package com.deltasf.createpropulsion.redstone_transmission;
 
+import com.deltasf.createpropulsion.redstone_transmission.RedstoneTransmissionBlockEntity.TransmissionMode;
 import com.deltasf.createpropulsion.registries.PropulsionPartialModels;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.AllPartialModels;
@@ -34,7 +35,7 @@ public class RedstoneTransmissionRenderer extends SplitShaftRenderer {
         SuperByteBuffer partial_plus = CachedBuffers.partial(PropulsionPartialModels.TRANSMISSION_PLUS, be.getBlockState());
         SuperByteBuffer partial_minus = CachedBuffers.partial(PropulsionPartialModels.TRANSMISSION_MINUS, be.getBlockState());
         SuperByteBuffer dialBuffer = CachedBuffers.partial(AllPartialModels.GAUGE_DIAL, be.getBlockState())
-                .rotateCentered((float) ((-facing.toYRot() - 90) / 180 * Math.PI), Direction.UP);
+            .rotateCentered((float) ((-facing.toYRot() - 90) / 180 * Math.PI), Direction.UP);
 
         if(rtbe.getBlockState().getValue(AXIS).isHorizontal()) {
             partial_plus = partial_plus.rotateCenteredDegrees(90, Direction.Axis.X);
@@ -42,24 +43,31 @@ public class RedstoneTransmissionRenderer extends SplitShaftRenderer {
             dialBuffer = dialBuffer.rotateCenteredDegrees(90, Direction.Axis.Z);
         }
 
+        //In direct mode both plus and minus sides control the same thing, so they should have the same redstone tint
+        if (rtbe.controlMode.get() == TransmissionMode.DIRECT) {
+            int max_shift = Math.max(shift_up, shift_down);
+            shift_up = max_shift;
+            shift_down = max_shift;
+        }
+
         dialBuffer.translate(2f / 16, 5.75f / 16, 5.75f / 16)
-                .rotate(rtbe.getGaugeTarget(partialTicks), Direction.EAST)
-                .translate(0, -5.75f / 16, -5.75f / 16)
-                .light(light)
-                .renderInto(ms, buffer.getBuffer(RenderType.solid()));
+            .rotate(rtbe.getGaugeTarget(partialTicks), Direction.EAST)
+            .translate(0, -5.75f / 16, -5.75f / 16)
+            .light(light)
+            .renderInto(ms, buffer.getBuffer(RenderType.solid()));
 
         partial_plus
-                .rotateCentered((float) (facing.toYRot() / 180 * Math.PI), Direction.UP)
-                .light(light)
-                .overlay(overlay)
-                .color(Color.mixColors(0x470102, 0xCD0000, shift_up / 15f))
-                .renderInto(ms, buffer.getBuffer(RenderType.cutout()));
+            .rotateCentered((float) (facing.toYRot() / 180 * Math.PI), Direction.UP)
+            .light(light)
+            .overlay(overlay)
+            .color(Color.mixColors(0x470102, 0xCD0000, shift_up / 15f))
+            .renderInto(ms, buffer.getBuffer(RenderType.cutout()));
 
         partial_minus
-                .rotateCentered((float) (facing.toYRot() / 180 * Math.PI), Direction.UP)
-                .light(light)
-                .overlay(overlay)
-                .color(Color.mixColors(0x470102, 0xCD0000, shift_down / 15f))
-                .renderInto(ms, buffer.getBuffer(RenderType.cutout()));
+            .rotateCentered((float) (facing.toYRot() / 180 * Math.PI), Direction.UP)
+            .light(light)
+            .overlay(overlay)
+            .color(Color.mixColors(0x470102, 0xCD0000, shift_down / 15f))
+            .renderInto(ms, buffer.getBuffer(RenderType.cutout()));
     }
 }
