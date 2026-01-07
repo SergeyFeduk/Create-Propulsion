@@ -67,7 +67,8 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
         if(controlMode.get() == TransmissionMode.INCREMENTAL) {
             newValue = Mth.clamp(shift_level + shift_up - shift_down, 0, MAX_VALUE);
         } else {
-            newValue = Math.max(shift_up, shift_down) * 17;
+            int signal = Math.max(shift_up, shift_down);
+            newValue = (int) ((signal / 15.0f) * MAX_VALUE);
         }
         if (shift_level != newValue) {
             detachKinetics();
@@ -95,7 +96,7 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
     public void tick() {
         super.tick();
         prevGaugeTarget = gaugeTarget;
-        gaugeTarget += Mth.clamp(Mth.PI / 2 * -shift_level / 255f - gaugeTarget, - Mth.PI / 4, Mth.PI / 4) / 10f;
+        gaugeTarget += Mth.clamp(Mth.PI / 2 * -shift_level / (float) MAX_VALUE - gaugeTarget, - Mth.PI / 4, Mth.PI / 4) / 10f;
     }
 
     @Override
@@ -170,7 +171,7 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
                 .forGoggles(tooltip);
 
         int max_shift_modified = controlMode.get().equals(TransmissionMode.DIRECT) ? 15 : MAX_VALUE;
-        int shift_modified = shift_level * max_shift_modified / MAX_VALUE;
+        int shift_modified = Math.round((float) shift_level / MAX_VALUE * max_shift_modified);
         IRotate.SpeedLevel transmitStyle = IRotate.SpeedLevel.NONE;
         if(shift_level >= MAX_VALUE / 2) {
             transmitStyle = IRotate.SpeedLevel.FAST;

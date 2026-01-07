@@ -83,11 +83,11 @@ public class PropulsionBlockEntities {
         .register();
 
     public static final BlockEntityEntry<RedstoneTransmissionBlockEntity> REDSTONE_TRANSMISSION_BLOCK_ENTITY =
-            REGISTRATE.blockEntity("redstone_transmission_block_entity", RedstoneTransmissionBlockEntity::new)
-                    .visual(() -> RedstoneTransmissionVisual::new, false)
-                    .validBlock(PropulsionBlocks.REDSTONE_TRANSMISSION_BLOCK)
-                    .renderer(() -> RedstoneTransmissionRenderer::new)
-                    .register();
+        REGISTRATE.blockEntity("redstone_transmission_block_entity", RedstoneTransmissionBlockEntity::new)
+        .visual(() -> RedstoneTransmissionVisual::new, false)
+        .validBlock(PropulsionBlocks.REDSTONE_TRANSMISSION_BLOCK)
+        .renderer(() -> RedstoneTransmissionRenderer::new)
+        .register();
 
     public static final BlockEntityEntry<HotAirBurnerBlockEntity> HOT_AIR_BURNER_BLOCK_ENTITY =
         REGISTRATE.blockEntity("hot_air_burner_block_entity", HotAirBurnerBlockEntity::new)
@@ -96,8 +96,8 @@ public class PropulsionBlockEntities {
         .register();
 
     @SuppressWarnings("unchecked")
-    public static final BlockEntityEntry<KineticBlockEntity> ENVELOPED_SHAFT = REGISTRATE
-        .blockEntity("enveloped_shaft_block_entity", KineticBlockEntity::new)
+    public static final BlockEntityEntry<KineticBlockEntity> ENVELOPED_SHAFT = 
+        REGISTRATE.blockEntity("enveloped_shaft_block_entity", KineticBlockEntity::new)
         .visual(() -> SingleAxisRotatingVisual::shaft, false)
         .renderer(() -> ShaftRenderer::new)
         .validBlocks(PropulsionBlocks.ENVELOPED_SHAFT_BLOCKS.values().toArray(new BlockEntry[0]))
