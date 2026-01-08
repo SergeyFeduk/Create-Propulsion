@@ -1,8 +1,12 @@
 package com.deltasf.createpropulsion.redstone_transmission;
 
+import com.deltasf.createpropulsion.registries.PropulsionBlocks;
 import com.deltasf.createpropulsion.registries.PropulsionIcons;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.logging.LogUtils;
+import com.simibubi.create.content.kinetics.RotationPropagator;
 import com.simibubi.create.content.kinetics.base.IRotate;
+import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import com.simibubi.create.content.kinetics.transmission.SplitShaftBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform;
@@ -10,6 +14,7 @@ import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.INamedIc
 import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollOptionBehaviour;
 import com.simibubi.create.foundation.gui.AllIcons;
 import com.simibubi.create.foundation.utility.CreateLang;
+import com.simibubi.create.infrastructure.config.AllConfigs;
 import net.createmod.catnip.lang.Lang;
 import net.createmod.catnip.math.AngleHelper;
 import net.createmod.catnip.math.VecHelper;
@@ -21,6 +26,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -34,7 +40,7 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
     public static final int MAX_VALUE = 256;
 
     ScrollOptionBehaviour<TransmissionMode> controlMode;
-    public int shift_level = 0;
+    private int shift_level = 0;
     private float prevGaugeTarget = 0f;
     private float gaugeTarget = 0f;
 
@@ -45,14 +51,14 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
 
     @Override
     protected void read(CompoundTag compound, boolean clientPacket) {
-        shift_level = compound.getInt("transmission_shift");
         super.read(compound, clientPacket);
+        shift_level = compound.getInt("transmission_shift");
     }
 
     @Override
     protected void write(CompoundTag compound, boolean clientPacket) {
-        compound.putInt("transmission_shift", shift_level);
         super.write(compound, clientPacket);
+        compound.putInt("transmission_shift", shift_level);
     }
 
     @Override
@@ -72,7 +78,6 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
         }
         if (shift_level != newValue) {
             detachKinetics();
-            removeSource();
             shift_level = newValue;
             attachKinetics();
         }
@@ -101,18 +106,30 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
 
     @Override
     public void lazyTick() {
-        Level level = getLevel();
-        if(level == null || level.isClientSide) {
-            return;
-        }
         updateShift(get_shift_up(), get_shift_down());
+        super.lazyTick();
     }
 
     @Override
     public float getRotationSpeedModifier(Direction face) {
-        if (shift_level == 0) return 0;
-        if (hasSource() && getSourceFacing() == face) return (float) MAX_VALUE / shift_level;
-        else return 1;
+        if (!hasSource() || getSourceFacing().equals(face)){
+            return 1;
+        }
+        else if (level.getBlockEntity(getBlockPos().relative(face)) instanceof KineticBlockEntity kbe) {
+            BlockPos prevSource = this.source;
+            this.source = null;
+            float possible_speed = kbe.getTheoreticalSpeed();
+            if(kbe instanceof SplitShaftBlockEntity ssbe) {
+                possible_speed *= ssbe.getRotationSpeedModifier(face.getOpposite());
+            }
+            if(Math.abs(possible_speed) <= Math.abs(getTheoreticalSpeed())) {
+                this.source = prevSource;
+            } else {
+                this.source = getBlockPos().relative(face);
+                return 1;
+            }
+        }
+        return (float) shift_level / MAX_VALUE;
     }
 
     public float getGaugeTarget(float partialTick) {
@@ -195,7 +212,7 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
                 .style(ChatFormatting.GRAY)
                 .forGoggles(tooltip);
 
-        IRotate.SpeedLevel.getFormattedSpeedText(speed, isOverStressed()).forGoggles(tooltip);
+        IRotate.SpeedLevel.getFormattedSpeedText(speed * shift_level / MAX_VALUE, isOverStressed()).forGoggles(tooltip);
 
         super.addToGoggleTooltip(tooltip, isPlayerSneaking);
 

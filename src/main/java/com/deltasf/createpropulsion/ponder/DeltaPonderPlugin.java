@@ -27,6 +27,10 @@ public class DeltaPonderPlugin implements PonderPlugin {
         //Burners
         HELPER.forComponents(PropulsionBlocks.SOLID_BURNER).addStoryBoard("solid_burner", BurnerScenes::solidBurner);
         HELPER.forComponents(PropulsionBlocks.LIQUID_BURNER).addStoryBoard("liquid_burner", BurnerScenes::liquidBurner);
+        //Transmission
+        HELPER.forComponents(PropulsionBlocks.REDSTONE_TRANSMISSION_BLOCK)
+                .addStoryBoard("redstone_transmission", TransmissionScenes::directControl)
+                .addStoryBoard("redstone_transmission", TransmissionScenes::incrementalControl);
         //Envelopes
         List<ItemProviderEntry<?>> envelopePonderables = new ArrayList<>();
         envelopePonderables.add(PropulsionBlocks.HOT_AIR_BURNER_BLOCK);

@@ -4,10 +4,8 @@ import com.deltasf.createpropulsion.redstone_transmission.RedstoneTransmissionBl
 import com.deltasf.createpropulsion.registries.PropulsionPartialModels;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.AllPartialModels;
-import com.simibubi.create.content.kinetics.base.KineticBlockEntityVisual;
-import com.simibubi.create.content.kinetics.base.RotatingInstance;
-import com.simibubi.create.foundation.render.AllInstanceTypes;
-
+import com.simibubi.create.content.kinetics.transmission.SplitShaftBlockEntity;
+import com.simibubi.create.content.kinetics.transmission.SplitShaftVisual;
 import dev.engine_room.flywheel.api.instance.Instance;
 import dev.engine_room.flywheel.api.visualization.VisualizationContext;
 import dev.engine_room.flywheel.lib.instance.InstanceTypes;
@@ -16,47 +14,26 @@ import dev.engine_room.flywheel.lib.instance.TransformedInstance;
 import dev.engine_room.flywheel.lib.model.Models;
 import dev.engine_room.flywheel.lib.transform.TransformStack;
 import dev.engine_room.flywheel.lib.visual.SimpleDynamicVisual;
-import net.createmod.catnip.data.Iterate;
 import net.createmod.catnip.theme.Color;
 import net.minecraft.core.Direction;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Consumer;
 
 import static com.deltasf.createpropulsion.redstone_transmission.RedstoneTransmissionBlock.HORIZONTAL_FACING;
 import static com.simibubi.create.content.kinetics.base.RotatedPillarKineticBlock.AXIS;
 
-public class RedstoneTransmissionVisual extends KineticBlockEntityVisual<RedstoneTransmissionBlockEntity> implements SimpleDynamicVisual {
-    private final List<RotatingInstance> shaftInstances = new ArrayList<>();
+public class RedstoneTransmissionVisual extends SplitShaftVisual implements SimpleDynamicVisual {
     private OrientedInstance minus;
     private OrientedInstance plus;
     private TransformedInstance hand;
 
     private PoseStack ms;
 
-    public RedstoneTransmissionVisual(VisualizationContext modelManager, RedstoneTransmissionBlockEntity blockEntity, float partialTick) {
+    public RedstoneTransmissionVisual(VisualizationContext modelManager, SplitShaftBlockEntity blockEntity, float partialTick) {
         super(modelManager, blockEntity, partialTick);
 
         Direction facing = blockEntity.getBlockState().getValue(HORIZONTAL_FACING);
-        Direction.Axis axis = blockEntity.getBlockState().getValue(AXIS);
 
-        //Shafts
-        for (Direction direction : Iterate.directionsInAxis(axis)) {
-            RotatingInstance instance = instancerProvider()
-                .instancer(AllInstanceTypes.ROTATING, Models.partial(AllPartialModels.SHAFT_HALF))
-                .createInstance();
-            
-            instance.setup(blockEntity)
-                .setPosition(getVisualPosition())
-                .setRotationAxis(Direction.Axis.Z)
-                .rotateToFace(Direction.SOUTH, direction)
-                .setChanged();
-                    
-            shaftInstances.add(instance);
-        }
-
-        //Plus/minus/gauge
         minus = instancerProvider().instancer(InstanceTypes.ORIENTED, Models.partial(PropulsionPartialModels.TRANSMISSION_MINUS)).createInstance();
         plus = instancerProvider().instancer(InstanceTypes.ORIENTED, Models.partial(PropulsionPartialModels.TRANSMISSION_PLUS)).createInstance();
         hand = instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.GAUGE_DIAL)).createInstance();
@@ -65,16 +42,21 @@ public class RedstoneTransmissionVisual extends KineticBlockEntityVisual<Redston
         var msr = TransformStack.of(ms);
         msr.translate(getVisualPosition());
         msr.pushPose();
+
         msr.rotateCenteredDegrees(-facing.toYRot() - 90, Direction.UP);
+        minus.rotateDegrees(-facing.toYRot(), Direction.UP);
+        plus.rotateDegrees(-facing.toYRot(), Direction.UP);
+
         if(blockEntity.getBlockState().getValue(AXIS).isHorizontal()) {
-            minus = minus.rotateTo(Direction.SOUTH, Direction.UP);
-            plus = plus.rotateTo(Direction.SOUTH, Direction.UP);
+            minus.rotateDegrees(90, Direction.Axis.X);
+            plus.rotateDegrees(90, Direction.Axis.X);
             msr.rotateCenteredDegrees(90, Direction.Axis.Z);
         }
+
         msr.translate(2f / 16, 0, 0);
 
-        minus.rotateTo(Direction.SOUTH, facing).position(getVisualPosition()).setChanged();
-        plus.rotateTo(Direction.SOUTH, facing).position(getVisualPosition()).setChanged();
+        minus.position(getVisualPosition()).setChanged();
+        plus.position(getVisualPosition()).setChanged();
         hand.setTransform(ms).setChanged();
 
         msr.popPose();
@@ -82,7 +64,7 @@ public class RedstoneTransmissionVisual extends KineticBlockEntityVisual<Redston
 
     @Override
     protected void _delete() {
-        shaftInstances.forEach(RotatingInstance::delete);
+        super._delete();
         minus.delete();
         plus.delete();
         hand.delete();
@@ -90,13 +72,13 @@ public class RedstoneTransmissionVisual extends KineticBlockEntityVisual<Redston
 
     @Override
     public void updateLight(float partialTick) {
-        shaftInstances.forEach(this::relight);
+        super.updateLight(partialTick);
         relight(minus, plus, hand);
     }
 
     @Override
     public void collectCrumblingInstances(Consumer<Instance> consumer) {
-        shaftInstances.forEach(consumer::accept);
+        super.collectCrumblingInstances(consumer);
         consumer.accept(minus);
         consumer.accept(plus);
         consumer.accept(hand);
@@ -104,34 +86,13 @@ public class RedstoneTransmissionVisual extends KineticBlockEntityVisual<Redston
 
     @Override
     public void beginFrame(Context context) {
+        if (!(blockEntity instanceof RedstoneTransmissionBlockEntity rtbe)) return;
+
         Direction facing = blockEntity.getBlockState().getValue(HORIZONTAL_FACING);
-        Direction.Axis axis = blockEntity.getBlockState().getValue(AXIS);
-        //Shafts
-        int instanceIndex = 0;
-
-        for (Direction direction : Iterate.directionsInAxis(axis)) {
-            if (instanceIndex >= shaftInstances.size()) break;
-
-            RotatingInstance instance = shaftInstances.get(instanceIndex);
-            float speedToApply;
-
-            if (blockEntity.hasSource() && blockEntity.getSourceFacing() == direction) {
-                speedToApply = RedstoneTransmissionRenderer.getNeighborSpeed(blockEntity, direction);
-            } else {
-                speedToApply = blockEntity.getSpeed();
-            }
-            
-            instance.setup(blockEntity, speedToApply).setChanged();
-            instanceIndex++;
-        }
-
-
-
-        //Plus/minus/gauge
-        int shift_up = blockEntity.get_shift_up();
-        int shift_down = blockEntity.get_shift_down();
+        int shift_up = rtbe.get_shift_up();
+        int shift_down = rtbe.get_shift_down();
         //In direct mode both plus and minus sides control the same thing, so they should have the same redstone tint
-        if (blockEntity.controlMode.get() == TransmissionMode.DIRECT) {
+        if (rtbe.controlMode.get() == TransmissionMode.DIRECT) {
             int max_shift = Math.max(shift_up, shift_down);
             shift_up = max_shift;
             shift_down = max_shift;
@@ -149,12 +110,12 @@ public class RedstoneTransmissionVisual extends KineticBlockEntityVisual<Redston
         float dialPivot = 5.75f / 16;
 
         msr.rotateCenteredDegrees(-facing.toYRot() - 90, Direction.UP);
-        if(blockEntity.getBlockState().getValue(AXIS).isHorizontal()) {
+        if(rtbe.getBlockState().getValue(AXIS).isHorizontal()) {
             msr.rotateCenteredDegrees(90, Direction.Axis.Z);
         }
         msr.translate(2f / 16, dialPivot, dialPivot)
-            .rotate(blockEntity.getGaugeTarget(context.partialTick()), Direction.EAST)
-            .translate(0, -dialPivot, -dialPivot);;
+                .rotate(rtbe.getGaugeTarget(context.partialTick()), Direction.EAST)
+                .translate(0, -dialPivot, -dialPivot);;
 
         hand.setTransform(ms).setChanged();
 
