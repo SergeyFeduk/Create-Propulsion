@@ -32,15 +32,17 @@ public class RedstoneTransmissionRenderer extends SplitShaftRenderer {
         int shift_up = rtbe.get_shift_up();
         int shift_down = rtbe.get_shift_down();
 
-        SuperByteBuffer partial_plus = CachedBuffers.partial(PropulsionPartialModels.TRANSMISSION_PLUS, be.getBlockState());
-        SuperByteBuffer partial_minus = CachedBuffers.partial(PropulsionPartialModels.TRANSMISSION_MINUS, be.getBlockState());
+        SuperByteBuffer partial_plus = CachedBuffers.partial(PropulsionPartialModels.TRANSMISSION_PLUS, be.getBlockState())
+                .rotateCentered((float) (-facing.toYRot() / 180 * Math.PI), Direction.UP);
+        SuperByteBuffer partial_minus = CachedBuffers.partial(PropulsionPartialModels.TRANSMISSION_MINUS, be.getBlockState())
+                .rotateCentered((float) (-facing.toYRot() / 180 * Math.PI), Direction.UP);
         SuperByteBuffer dialBuffer = CachedBuffers.partial(AllPartialModels.GAUGE_DIAL, be.getBlockState())
-            .rotateCentered((float) ((-facing.toYRot() - 90) / 180 * Math.PI), Direction.UP);
+                .rotateCentered((float) ((-facing.toYRot() - 90) / 180 * Math.PI), Direction.UP);
 
         if(rtbe.getBlockState().getValue(AXIS).isHorizontal()) {
-            partial_plus = partial_plus.rotateCenteredDegrees(90, Direction.Axis.X);
-            partial_minus = partial_minus.rotateCenteredDegrees(90, Direction.Axis.X);
-            dialBuffer = dialBuffer.rotateCenteredDegrees(90, Direction.Axis.Z);
+            partial_plus.rotateCenteredDegrees(90, Direction.Axis.X);
+            partial_minus.rotateCenteredDegrees(90, Direction.Axis.X);
+            dialBuffer.rotateCenteredDegrees(90, Direction.Axis.Z);
         }
 
         //In direct mode both plus and minus sides control the same thing, so they should have the same redstone tint
@@ -57,14 +59,12 @@ public class RedstoneTransmissionRenderer extends SplitShaftRenderer {
             .renderInto(ms, buffer.getBuffer(RenderType.solid()));
 
         partial_plus
-            .rotateCentered((float) (facing.toYRot() / 180 * Math.PI), Direction.UP)
             .light(light)
             .overlay(overlay)
             .color(Color.mixColors(0x470102, 0xCD0000, shift_up / 15f))
             .renderInto(ms, buffer.getBuffer(RenderType.cutout()));
 
         partial_minus
-            .rotateCentered((float) (facing.toYRot() / 180 * Math.PI), Direction.UP)
             .light(light)
             .overlay(overlay)
             .color(Color.mixColors(0x470102, 0xCD0000, shift_down / 15f))

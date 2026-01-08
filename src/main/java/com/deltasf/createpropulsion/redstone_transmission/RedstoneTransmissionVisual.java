@@ -42,16 +42,21 @@ public class RedstoneTransmissionVisual extends SplitShaftVisual implements Simp
         var msr = TransformStack.of(ms);
         msr.translate(getVisualPosition());
         msr.pushPose();
+
         msr.rotateCenteredDegrees(-facing.toYRot() - 90, Direction.UP);
+        minus.rotateDegrees(-facing.toYRot(), Direction.UP);
+        plus.rotateDegrees(-facing.toYRot(), Direction.UP);
+
         if(blockEntity.getBlockState().getValue(AXIS).isHorizontal()) {
-            minus = minus.rotateTo(Direction.SOUTH, Direction.UP);
-            plus = plus.rotateTo(Direction.SOUTH, Direction.UP);
+            minus.rotateDegrees(90, Direction.Axis.X);
+            plus.rotateDegrees(90, Direction.Axis.X);
             msr.rotateCenteredDegrees(90, Direction.Axis.Z);
         }
+
         msr.translate(2f / 16, 0, 0);
 
-        minus.rotateTo(Direction.SOUTH, facing).position(getVisualPosition()).setChanged();
-        plus.rotateTo(Direction.SOUTH, facing).position(getVisualPosition()).setChanged();
+        minus.position(getVisualPosition()).setChanged();
+        plus.position(getVisualPosition()).setChanged();
         hand.setTransform(ms).setChanged();
 
         msr.popPose();
