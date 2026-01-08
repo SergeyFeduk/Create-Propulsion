@@ -63,6 +63,7 @@ public class PropulsionCreativeTab {
                 //From 0.3
                 output.accept(PropulsionBlocks.getEnvelope(EnvelopeColor.WHITE));
                 output.accept(PropulsionBlocks.HOT_AIR_BURNER_BLOCK);
+                output.accept(PropulsionBlocks.HOT_AIR_PUMP_BLOCK);
                 output.accept(PropulsionBlocks.SOLID_BURNER);
                 output.accept(PropulsionBlocks.LIQUID_BURNER);
                 output.accept(PropulsionBlocks.TILT_ADAPTER_BLOCK);

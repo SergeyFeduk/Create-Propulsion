@@ -28,9 +28,13 @@ public class PropulsionPartialModels {
     public static final PartialModel TILT_ADAPTER_SIDE_INDICATOR = partial("tilt_adapter_side_overlay");
     //Creative thruster
     public static final PartialModel CREATIVE_THRUSTER_BRACKET = partial("creative_thruster_bracket");
-
+    //Transmission
     public static final PartialModel TRANSMISSION_PLUS = partial("transmission_plus");
     public static final PartialModel TRANSMISSION_MINUS = partial("transmission_minus");
+    //Hot air pump
+    public static final PartialModel HOT_AIR_PUMP_COG = partial("hot_air_pump_cogwheel");
+    public static final PartialModel HOT_AIR_PUMP_MEMBRANE = partial("hot_air_pump_membrane");
+    public static final PartialModel HOT_AIR_PUMP_MESH = partial("hot_air_pump_mesh");
 
     private static PartialModel partial(String path) {
         return PartialModel.of(ResourceLocation.fromNamespaceAndPath(CreatePropulsion.ID, "partial/" + path));

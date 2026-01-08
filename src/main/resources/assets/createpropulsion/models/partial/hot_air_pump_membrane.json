@@ -1,0 +1,59 @@
+{
+	"format_version": "1.9.0",
+	"credit": "Made with Blockbench",
+	"parent": "create:block/large_wheels",
+	"texture_size": [64, 64],
+	"textures": {
+		"0": "createpropulsion:block/hot_air_pump",
+		"particle": "createpropulsion:block/cogwheel"
+	},
+	"elements": [
+		{
+			"from": [1.7, 13, 1.7],
+			"to": [14.3, 22, 14.3],
+			"rotation": {"angle": 0, "axis": "y", "origin": [3, 21, 4]},
+			"faces": {
+				"north": {"uv": [11, 8.75, 14, 11], "texture": "#0"},
+				"east": {"uv": [11, 8.75, 14, 11], "texture": "#0"},
+				"south": {"uv": [11, 8.75, 14, 11], "texture": "#0"},
+				"west": {"uv": [11, 8.75, 14, 11], "texture": "#0"}
+			}
+		},
+		{
+			"from": [14, 13, 2],
+			"to": [14, 22, 14],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 21, 8]},
+			"faces": {
+				"east": {"uv": [8, 8.75, 11, 11], "texture": "#0"},
+				"west": {"uv": [8, 8.75, 11, 11], "texture": "#0"}
+			}
+		},
+		{
+			"from": [2, 13, 2],
+			"to": [2, 22, 14],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 21, 8]},
+			"faces": {
+				"east": {"uv": [8, 8.75, 11, 11], "texture": "#0"},
+				"west": {"uv": [8, 8.75, 11, 11], "texture": "#0"}
+			}
+		},
+		{
+			"from": [2, 13, 2],
+			"to": [14, 22, 2],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 21, 8]},
+			"faces": {
+				"north": {"uv": [8, 8.75, 11, 11], "texture": "#0"},
+				"south": {"uv": [8, 8.75, 11, 11], "texture": "#0"}
+			}
+		},
+		{
+			"from": [2, 13, 14],
+			"to": [14, 22, 14],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 21, 8]},
+			"faces": {
+				"north": {"uv": [8, 8.75, 11, 11], "texture": "#0"},
+				"south": {"uv": [8, 8.75, 11, 11], "texture": "#0"}
+			}
+		}
+	]
+}

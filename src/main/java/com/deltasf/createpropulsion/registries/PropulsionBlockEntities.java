@@ -3,6 +3,8 @@ package com.deltasf.createpropulsion.registries;
 import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.balloons.injectors.hot_air_burner.HotAirBurnerBlockEntity;
 import com.deltasf.createpropulsion.balloons.injectors.hot_air_burner.HotAirBurnerRenderer;
+import com.deltasf.createpropulsion.balloons.injectors.hot_air_pump.HotAirPumpBlockEntity;
+import com.deltasf.createpropulsion.balloons.injectors.hot_air_pump.HotAirPumpRenderer;
 import com.deltasf.createpropulsion.heat.burners.liquid.LiquidBurnerBlockEntity;
 import com.deltasf.createpropulsion.heat.burners.liquid.LiquidBurnerRenderer;
 import com.deltasf.createpropulsion.heat.burners.solid.SolidBurnerBlockEntity;
@@ -93,6 +95,12 @@ public class PropulsionBlockEntities {
         REGISTRATE.blockEntity("hot_air_burner_block_entity", HotAirBurnerBlockEntity::new)
         .validBlock(PropulsionBlocks.HOT_AIR_BURNER_BLOCK)
         .renderer(() -> HotAirBurnerRenderer::new)
+        .register();
+
+    public static final BlockEntityEntry<HotAirPumpBlockEntity> HOT_AIR_PUMP_BLOCK_ENTITY =
+        REGISTRATE.blockEntity("hot_air_pump_block_entity", HotAirPumpBlockEntity::new)
+        .validBlock(PropulsionBlocks.HOT_AIR_PUMP_BLOCK)
+        .renderer(() -> HotAirPumpRenderer::new)
         .register();
 
     @SuppressWarnings("unchecked")
