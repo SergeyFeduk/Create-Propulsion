@@ -40,7 +40,7 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
     public static final int MAX_VALUE = 256;
 
     ScrollOptionBehaviour<TransmissionMode> controlMode;
-    public int shift_level = 0;
+    private int shift_level = 0;
     private float prevGaugeTarget = 0f;
     private float gaugeTarget = 0f;
 
