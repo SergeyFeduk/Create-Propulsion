@@ -1,8 +1,6 @@
 package com.deltasf.createpropulsion.ponder;
 
 import com.deltasf.createpropulsion.redstone_transmission.RedstoneTransmissionBlockEntity;
-import com.simibubi.create.AllBlocks;
-import com.simibubi.create.content.kinetics.gauge.GaugeBlock;
 import com.simibubi.create.content.redstone.analogLever.AnalogLeverBlockEntity;
 import com.simibubi.create.foundation.ponder.CreateSceneBuilder;
 import net.createmod.ponder.api.scene.SceneBuilder;

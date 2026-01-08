@@ -1,10 +1,7 @@
 package com.deltasf.createpropulsion.redstone_transmission;
 
-import com.deltasf.createpropulsion.registries.PropulsionBlocks;
 import com.deltasf.createpropulsion.registries.PropulsionIcons;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.logging.LogUtils;
-import com.simibubi.create.content.kinetics.RotationPropagator;
 import com.simibubi.create.content.kinetics.base.IRotate;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import com.simibubi.create.content.kinetics.transmission.SplitShaftBlockEntity;
@@ -14,7 +11,6 @@ import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.INamedIc
 import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollOptionBehaviour;
 import com.simibubi.create.foundation.gui.AllIcons;
 import com.simibubi.create.foundation.utility.CreateLang;
-import com.simibubi.create.infrastructure.config.AllConfigs;
 import net.createmod.catnip.lang.Lang;
 import net.createmod.catnip.math.AngleHelper;
 import net.createmod.catnip.math.VecHelper;
@@ -26,7 +22,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -110,12 +105,12 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
         super.lazyTick();
     }
 
+    @SuppressWarnings("null")
     @Override
     public float getRotationSpeedModifier(Direction face) {
         if (!hasSource() || getSourceFacing().equals(face)){
             return 1;
-        }
-        else if (level.getBlockEntity(getBlockPos().relative(face)) instanceof KineticBlockEntity kbe) {
+        } else if (level.getBlockEntity(getBlockPos().relative(face)) instanceof KineticBlockEntity kbe) {
             BlockPos prevSource = this.source;
             this.source = null;
             float possible_speed = kbe.getTheoreticalSpeed();
