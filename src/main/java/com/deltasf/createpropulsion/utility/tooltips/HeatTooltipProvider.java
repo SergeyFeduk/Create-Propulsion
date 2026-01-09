@@ -29,6 +29,7 @@ public class HeatTooltipProvider implements ITooltipProvider {
         registerHeatTooltip(PropulsionBlocks.SOLID_BURNER, new HeatInfo(true, HeatAmount.MODERATE));
         registerHeatTooltip(PropulsionBlocks.LIQUID_BURNER, new HeatInfo(true, HeatAmount.HIGH));
         registerHeatTooltip(PropulsionBlocks.STIRLING_ENGINE_BLOCK, new HeatInfo(false, HeatAmount.MODERATE));
+        registerHeatTooltip(PropulsionBlocks.HOT_AIR_PUMP_BLOCK, new HeatInfo(false, HeatAmount.HIGH));
     }
 
     @Override

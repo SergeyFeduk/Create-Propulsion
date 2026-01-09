@@ -40,6 +40,16 @@ public class AirInjectorObstructionBehaviour extends BlockEntityBehaviour {
         return obstructedBlocks;
     }
 
+    public double getEfficiency() {
+        int count = obstructedBlocks.size();
+        switch (count) {
+            case 0: return 1.0;
+            case 1: return 2.0 / 3.0;
+            case 2: return 1.0 / 3.0;
+            default: return 0.0;
+        }
+    }
+
     @Override
     public void tick() {
         super.tick();

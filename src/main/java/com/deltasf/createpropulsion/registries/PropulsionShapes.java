@@ -12,7 +12,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.function.BiFunction;
 
-import static net.minecraft.core.Direction.UP;
+import static net.minecraft.core.Direction.NORTH;
 
 public class PropulsionShapes {
     public static final VoxelShaper
@@ -20,41 +20,45 @@ public class PropulsionShapes {
             .add(Block.box(2, 2, 0, 14, 14, 2))
             .add(Block.box(1, 1, 2, 15, 15, 14))
             .add(Block.box(3, 3, 14, 13, 13, 16))
-            .forDirectional(Direction.NORTH),
+            .forDirectional(),
 
         CREATIVE_THRUSTER = ShapeBuilder.shape()
             .add(Block.box(3, 3, 0, 13, 13, 10))
             .add(Block.box(4, 4, 10, 12, 12, 12))
-            .forDirectional(Direction.NORTH),
+            .forDirectional(),
 
         INLINE_OPTICAL_SENSOR = ShapeBuilder.shape()
             .add(Block.box(4, 4, 10, 12, 12, 16))
-            .forDirectional(Direction.NORTH),
+            .forDirectional(),
 
         OPTICAL_SENSOR = ShapeBuilder.shape()
             .add(Block.box(0, 0, 4, 16, 16, 16))
             .add(Block.box(4, 4, 0, 12, 12, 4))
-            .forDirectional(Direction.NORTH),
+            .forDirectional(),
 
         LODESTONE_TRACKER = ShapeBuilder.shape()
             .add(Block.box(1, 0, 1, 15, 2, 15))
             .add(Block.box(2, 2, 2, 14, 9, 14))
             .add(Block.box(0, 9, 0, 16, 14, 16))
-            .forDirectional(Direction.NORTH),
+            .forDirectional(),
 
         PHYSICS_ASSEMBLER = ShapeBuilder.shape()
             .add(Block.box(0, 0, 0, 16, 14, 16))
             .add(Block.box(1, 14, 1, 15, 16, 15))
-            .forDirectional(Direction.NORTH),
+            .forDirectional(),
         
         PROPELLER = ShapeBuilder.shape()
             .add(Block.box(0, 0, 4, 16, 16, 16))
-            .forDirectional(Direction.NORTH),
+            .forDirectional(),
 
         HOT_AIR_BURNER = ShapeBuilder.shape()
             .add(Block.box(0, 0, 0, 16, 4, 16))
             .add(Block.box(2, 4, 0, 14, 9, 16))
-            .forDirectional(Direction.NORTH),
+            .forDirectional(),
+
+        HOT_AIR_PUMP = ShapeBuilder.shape()
+            .add(Block.box(0, 0, 0, 16, 13, 16))
+            .forDirectional(),
 
         STIRLING_ENGINE = ShapeBuilder.shape()
             .add(Block.box(0, 0, 0, 16, 3, 16))
@@ -64,7 +68,7 @@ public class PropulsionShapes {
 
         TILT_ADAPTER = ShapeBuilder.shape()
             .add(Block.box(0, 0, 3, 16, 16, 16))
-            .forDirectional(Direction.NORTH),
+            .forDirectional(),
 
         WING = getWingShape(4),
         WING_8 = getWingShape(8),
@@ -140,7 +144,7 @@ public class PropulsionShapes {
         }
     
         public VoxelShaper forDirectional() {
-            return forDirectional(UP);
+            return forDirectional(NORTH);
         }
     }
 }

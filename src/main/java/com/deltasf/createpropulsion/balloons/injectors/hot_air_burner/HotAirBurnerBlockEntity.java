@@ -18,6 +18,7 @@ import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.atmosphere.DimensionAtmosphereManager;
 import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.injectors.AirInjectorObstructionBehaviour;
+import com.deltasf.createpropulsion.balloons.injectors.BalloonInfoBehaviour;
 import com.deltasf.createpropulsion.balloons.injectors.HotAirInjectorBehaviour;
 import com.deltasf.createpropulsion.balloons.injectors.IHotAirInjector;
 import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
@@ -48,17 +49,10 @@ public class HotAirBurnerBlockEntity extends SmartBlockEntity implements IHaveGo
     private HotAirInjectorBehaviour injectorBehaviour;
     private BurnerFuelBehaviour fuelInventory;
     private AirInjectorObstructionBehaviour obstructionBehaviour;
+    private BalloonInfoBehaviour balloonInfoBehaviour;
 
     private int burnTime = 0;
     private int leverPosition = 0; // 0-1-2
-
-    //Goggle display data
-    private double lastTickBalloonHotAir = -1;
-    private int hotAirTrend = 0;
-    private boolean isBalloonPresent = false;
-    private int balloonHotAir = 0;
-    private int balloonMaxHotAir = 0;
-    private int balloonHotAirPercentage = 0;
 
     public HotAirBurnerBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
@@ -73,6 +67,9 @@ public class HotAirBurnerBlockEntity extends SmartBlockEntity implements IHaveGo
 
         obstructionBehaviour = new AirInjectorObstructionBehaviour(this);
         behaviours.add(obstructionBehaviour);
+
+        balloonInfoBehaviour = new BalloonInfoBehaviour(this, this::getId);
+        behaviours.add(balloonInfoBehaviour);
     }
 
     // Hot air injector impl
@@ -102,21 +99,12 @@ public class HotAirBurnerBlockEntity extends SmartBlockEntity implements IHaveGo
         if (burnTime <= 0) return 0; //Not burning = not producing hot air
         //Injection amount due to lever position
         double baseInjection = (leverPosition + 1) / 3.0;
-
-        //Injection penalty due to obstruction
-        int obstructions = obstructionBehaviour.getObstructedBlocks().size();
-        double efficiency;
-        switch (obstructions) {
-            case 0:  efficiency = 1.0; break;
-            case 1:  efficiency = 2.0 / 3.0; break;
-            case 2:  efficiency = 1.0 / 3.0; break;
-            default: efficiency = 0.0; break;
-        }
+        double efficiency = obstructionBehaviour.getEfficiency();
         return baseInjection * efficiency * PropulsionConfig.HOT_AIR_BURNER_PRODUCTION_MULTIPLIER.get();
     }
 
     @Override
-    public void onBalloonLoaded() { updateGoggleData(); }
+    public void onBalloonLoaded() { balloonInfoBehaviour.performUpdate(); }
 
     // Lever and burner logic
 
@@ -144,8 +132,6 @@ public class HotAirBurnerBlockEntity extends SmartBlockEntity implements IHaveGo
         super.tick();
         if (level.isClientSide()) return;
 
-        updateGoggleData();
-
         //Burning logic
         if (burnTime > 0) {
             burnTime--;
@@ -164,56 +150,6 @@ public class HotAirBurnerBlockEntity extends SmartBlockEntity implements IHaveGo
         updateBlockState();
     }
 
-    private void updateGoggleData() {
-        boolean needsSync = false;
-        //Trend logic
-        int oldTrend = hotAirTrend;
-        Ship ship = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
-
-        Balloon balloon = (ship != null) ? BalloonShipRegistry.forShip(ship.getId()).getBalloonOf(getId()) : null;
-        if (balloon != null) {
-            int currentHotAir = (int) balloon.hotAir;
-            int currentMaxHotAir = (int) balloon.getVolumeSize();
-            double percentage = currentMaxHotAir > 0 ? (balloon.hotAir / currentMaxHotAir) : 0;
-            int currentPercentage = (int) (percentage * 100);
-
-            //Update trend
-            if (lastTickBalloonHotAir != -1) {
-                double delta = balloon.hotAir - lastTickBalloonHotAir;
-                if (Math.abs(delta) < HotAirBurnerBlockEntity.TREND_THRESHOLD) hotAirTrend = 0;
-                else if (delta > 0) hotAirTrend = 1;
-                else hotAirTrend = -1;
-            } else {
-                hotAirTrend = 0;
-            }
-            lastTickBalloonHotAir = balloon.hotAir;
-
-            //Check if something changed
-            if (!isBalloonPresent || balloonHotAir != currentHotAir || balloonMaxHotAir != currentMaxHotAir 
-                || balloonHotAirPercentage != currentPercentage || hotAirTrend != oldTrend) {
-                needsSync = true;
-            }
-
-            //Update state
-            isBalloonPresent = true;
-            balloonHotAir = currentHotAir;
-            balloonMaxHotAir = currentMaxHotAir;
-            balloonHotAirPercentage = currentPercentage;
-        } else {
-            if (isBalloonPresent) {
-                needsSync = true;
-            }
-
-            isBalloonPresent = false;
-            lastTickBalloonHotAir = -1;
-            hotAirTrend = 0;
-        }
-
-        if (needsSync) {
-            notifyUpdate();
-        }
-    }
-
     @SuppressWarnings("null")
     private void updateBlockState() {
         boolean isBurning = burnTime > 0;
@@ -227,6 +163,7 @@ public class HotAirBurnerBlockEntity extends SmartBlockEntity implements IHaveGo
         boolean hasFuel = !fuelInventory.fuelStack.isEmpty();
         boolean isBurning = burnTime > 0;
         boolean isAirless = level != null && DimensionAtmosphereManager.getData(level).isAirless();
+        boolean isBalloonPresent = balloonInfoBehaviour.isBalloonPresent();
 
         //Status
         String key = "";
@@ -274,40 +211,16 @@ public class HotAirBurnerBlockEntity extends SmartBlockEntity implements IHaveGo
         }
 
         //Balloon section
-        if (!isBalloonPresent || isAirless) {
+        if (isAirless) {
             return true;
         }
 
-        if (hasFuel) {
+        if (hasFuel && isBalloonPresent) {
             CreateLang.text("").forGoggles(tooltip);
         }
 
-        CreateLang.builder()
-            .translate("gui.goggles.hot_air_burner.balloon.status")
-            .forGoggles(tooltip);
+        balloonInfoBehaviour.addBalloonTooltip(tooltip, isPlayerSneaking);
 
-        Component trendSymbol;
-        switch (hotAirTrend) {
-            case 1 -> trendSymbol = CreateLang.text("▲").style(ChatFormatting.GREEN).component();
-            case -1 -> trendSymbol = CreateLang.text("▼").style(ChatFormatting.RED).component();
-            default -> trendSymbol = CreateLang.text("■").style(ChatFormatting.DARK_GRAY).component();
-        }
-
-        var hotAirBuilder = CreateLang.builder()
-            .translate("gui.goggles.hot_air_burner.balloon.hot_air")
-            .text(String.format(": %d / %d", balloonHotAir, balloonMaxHotAir));
-        
-        if (isPlayerSneaking) {
-            hotAirBuilder.text(String.format(" (%d%%)", balloonHotAirPercentage));
-        }
-
-        hotAirBuilder.text(" ")
-            .add(CreateLang.text("[").style(ChatFormatting.DARK_GRAY))
-            .add(trendSymbol)
-            .add(CreateLang.text("]").style(ChatFormatting.DARK_GRAY))
-            .forGoggles(tooltip);
-
-        //Obstruction overlay
         Outline.OutlineParams outline = Outliner.getInstance().showCluster("HotAirBurnerObstruction", obstructionBehaviour.getObstructedBlocks());
         outline.colored(AssemblyUtility.CANCEL_COLOR);
         outline.lineWidth(1/16f);
@@ -331,14 +244,6 @@ public class HotAirBurnerBlockEntity extends SmartBlockEntity implements IHaveGo
         super.write(tag, isClient);
         tag.putInt("leverPosition", leverPosition);
         tag.putInt("burnTime", burnTime);
-
-        if (isClient) {
-            tag.putInt("hotAirTrend", hotAirTrend);
-            tag.putBoolean("isBalloonPresent", isBalloonPresent);
-            tag.putInt("balloonHotAir", balloonHotAir);
-            tag.putInt("balloonMaxHotAir", balloonMaxHotAir);
-            tag.putInt("balloonHotAirPercentage", balloonHotAirPercentage);
-        }
     }
 
     @Override
@@ -346,13 +251,5 @@ public class HotAirBurnerBlockEntity extends SmartBlockEntity implements IHaveGo
         super.read(tag, isClient);
         leverPosition = tag.getInt("leverPosition");
         burnTime = tag.getInt("burnTime");
-
-        if (isClient) {
-            hotAirTrend = tag.getInt("hotAirTrend");
-            isBalloonPresent = tag.getBoolean("isBalloonPresent");
-            balloonHotAir = tag.getInt("balloonHotAir");
-            balloonMaxHotAir = tag.getInt("balloonMaxHotAir");
-            balloonHotAirPercentage = tag.getInt("balloonHotAirPercentage");
-        }
     }
 }

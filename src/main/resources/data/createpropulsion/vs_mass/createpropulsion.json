@@ -99,5 +99,10 @@
         "block": "createpropulsion:redstone_transmission",
         "mass": 1200.0,
         "friction": 0.4
+    },
+    {
+        "block": "createpropulsion:hot_air_pump",
+        "mass": 800.0,
+        "friction": 0.4
     }
 ]

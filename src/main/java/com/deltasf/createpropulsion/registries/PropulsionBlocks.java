@@ -196,6 +196,7 @@ public class PropulsionBlocks {
         .properties(p -> p.requiresCorrectToolForDrops())
         .properties(p -> p.strength(2.5F, 2.0F))
         .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+        .transform(PropulsionDefaultStress.setImpact(4))
         .blockstate(FUCK_OFF())
         .item().model(FUCK_OFF_ITEM()).build()
         .setData(ProviderType.LANG, FUCK_OFF_LANG())

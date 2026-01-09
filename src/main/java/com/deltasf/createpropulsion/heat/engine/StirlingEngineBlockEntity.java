@@ -98,7 +98,7 @@ public class StirlingEngineBlockEntity extends GeneratingKineticBlockEntity impl
         return toConsume;
     }
 
-     @Override
+    @Override
     public float getGeneratedSpeed() {
         if (activeTicks <= 0) return 0f;
         int generatedRPM = targetSpeedBehaviour.getRPM();
