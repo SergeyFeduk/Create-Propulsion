@@ -29,6 +29,7 @@ public class TransmissionScenes {
         scene.idle(20);
         scene.overlay().showText(80)
                         .text("Transmission has 2 control mode, and direct mode is the default setting when placed.")
+                        .placeNearTarget()
                         .pointAt(util.vector().blockSurface(util.grid().at(2, 2, 2), Direction.WEST));
         scene.idle(100);
 
