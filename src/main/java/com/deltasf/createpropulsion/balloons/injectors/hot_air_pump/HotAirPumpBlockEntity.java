@@ -16,17 +16,13 @@ import com.deltasf.createpropulsion.balloons.injectors.HotAirInjectorBehaviour;
 import com.deltasf.createpropulsion.balloons.injectors.IHotAirInjector;
 import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
 import com.deltasf.createpropulsion.heat.IHeatConsumer;
-import com.deltasf.createpropulsion.physics_assembler.AssemblyUtility;
 import com.deltasf.createpropulsion.registries.PropulsionCapabilities;
 import com.deltasf.createpropulsion.utility.math.MathUtility;
-import com.simibubi.create.AllSpecialTextures;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.utility.CreateLang;
 
 import net.createmod.catnip.lang.LangBuilder;
-import net.createmod.catnip.outliner.Outline;
-import net.createmod.catnip.outliner.Outliner;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -167,57 +163,77 @@ public class HotAirPumpBlockEntity extends KineticBlockEntity implements IHotAir
     @Override
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         boolean isAirless = level != null && DimensionAtmosphereManager.getData(level).isAirless();
+        boolean isOnShip = VSGameUtilsKt.isBlockInShipyard(getLevel(), getBlockPos());
         boolean isBalloonPresent = balloonInfoBehaviour.isBalloonPresent();
-        
-        LangBuilder status = CreateLang.builder().add(CreateLang.translate("gui.goggles.hot_air_burner.status")).text(": ");
-        
-        if (isAirless) {
-            status.add(CreateLang.translate("gui.goggles.hot_air_burner.status.airless").style(ChatFormatting.RED));
-        } else if (Math.abs(getSpeed()) == 0) {
-             status.add(Component.translatable("create.tooltip.speedRequirement.stopped").withStyle(ChatFormatting.GRAY));
-        } else if (lastHeatConsumed < 0.1f) {
-             status.add(Component.literal("Cold").withStyle(ChatFormatting.BLUE));
-        } else {
-             status.add(Component.literal("Pumping").withStyle(ChatFormatting.GREEN));
-        }
-        status.forGoggles(tooltip);
+        boolean hasRPM = Math.abs(getSpeed()) > 0;
+        boolean hasHeat = lastHeatConsumed >= OPERATING_THRESHOLD;
 
-        // Heat Info
+        //Status
+        String key = "";
+        ChatFormatting color = null;
+
+        if (isAirless) {
+            key = "gui.goggles.hot_air_burner.status.airless";
+            color = ChatFormatting.RED;
+        } else if (!isOnShip) {
+            key = "gui.goggles.hot_air_burner.status.not_shipified";
+            color = ChatFormatting.RED;
+        } else if (!isBalloonPresent) {
+            //No RPM -> No Heat -> No Balloon
+            if (!hasRPM) {
+                key = "gui.goggles.hot_air_pump.status.no_rpm";
+                color = ChatFormatting.GRAY;
+            } else if (!hasHeat) {
+                key = "gui.goggles.hot_air_pump.status.no_heat";
+                color = ChatFormatting.GOLD;
+            } else {
+                key = "gui.goggles.hot_air_burner.status.no_balloon";
+                color = ChatFormatting.DARK_GRAY;
+            }
+        } else {
+            //Balloon is present
+            if (hasRPM && hasHeat) {
+                key = "gui.goggles.hot_air_burner.status.on";
+                color = ChatFormatting.GREEN;
+            } else if (!hasRPM) {
+                key = "gui.goggles.hot_air_pump.status.no_rpm";
+                color = ChatFormatting.GRAY;
+            } else {
+                key = "gui.goggles.hot_air_pump.status.no_heat";
+                color = ChatFormatting.GOLD;
+            }
+        }
+
         CreateLang.builder()
-            .add(Component.literal("Heat Intake: ").withStyle(ChatFormatting.GRAY))
-            .add(Component.literal(String.format("%.1f / %.1f HU", lastHeatConsumed, MAX_HEAT_CONSUMPTION)).withStyle(ChatFormatting.GOLD))
+            .add(CreateLang.translate("gui.goggles.hot_air_pump.status"))
+            .text(": ")
+            .add(CreateLang.translate(key).style(color))
             .forGoggles(tooltip);
 
-        // Injection Info
-        double injection = getInjectionAmount();
-        if (injection > 0) {
-            CreateLang.builder()
-                .add(Component.literal("Injection: ").withStyle(ChatFormatting.GRAY))
-                .add(Component.literal(String.format("%.2f", injection)).withStyle(ChatFormatting.AQUA))
-                .forGoggles(tooltip);
+        //Injection
+        if (!isAirless && isOnShip && isBalloonPresent) {
+            double currentInjection = getInjectionAmount();
+            int percentage = (int) ((currentInjection / BASE_INJECTION_AMOUNT) * 100);
+
+            LangBuilder injectionBuilder = CreateLang.builder()
+                .translate("gui.goggles.hot_air_pump.injection")
+                .text(": ")
+                .add(CreateLang.text(percentage + "%").style(ChatFormatting.AQUA));
+
+            if (isPlayerSneaking) {
+                injectionBuilder.add(CreateLang.text(String.format(" (%.2f)", currentInjection)).style(ChatFormatting.AQUA));
+            }
+            
+            injectionBuilder.forGoggles(tooltip);
         }
 
+        //Balloon
         if (!isAirless && isBalloonPresent) {
             CreateLang.text("").forGoggles(tooltip);
-        }
-
-        if (!isAirless) {
             balloonInfoBehaviour.addBalloonTooltip(tooltip, isPlayerSneaking);
         }
 
-        // Obstruction Overlay
-        if (!obstructionBehaviour.getObstructedBlocks().isEmpty()) {
-            Outline.OutlineParams outline = Outliner.getInstance().showCluster("HotAirPumpObstruction", obstructionBehaviour.getObstructedBlocks());
-            outline.colored(AssemblyUtility.CANCEL_COLOR);
-            outline.lineWidth(1/16f);
-            outline.withFaceTexture(AllSpecialTextures.CHECKERED);
-            outline.disableLineNormals();
-            
-            CreateLang.builder()
-                .add(Component.literal("Obstruction Detected!").withStyle(ChatFormatting.RED))
-                .forGoggles(tooltip);
-        }
-
+        obstructionBehaviour.displayObstructionOutline("HotAirPumpObstruction");
         return true;
     }
 

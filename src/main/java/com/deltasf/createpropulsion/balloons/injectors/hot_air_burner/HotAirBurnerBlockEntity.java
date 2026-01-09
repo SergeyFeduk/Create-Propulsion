@@ -8,8 +8,6 @@ import javax.annotation.Nullable;
 import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.foundation.utility.CreateLang;
 import net.createmod.catnip.lang.LangBuilder;
-import net.createmod.catnip.outliner.Outline;
-import net.createmod.catnip.outliner.Outliner;
 import org.jetbrains.annotations.NotNull;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
@@ -22,10 +20,8 @@ import com.deltasf.createpropulsion.balloons.injectors.BalloonInfoBehaviour;
 import com.deltasf.createpropulsion.balloons.injectors.HotAirInjectorBehaviour;
 import com.deltasf.createpropulsion.balloons.injectors.IHotAirInjector;
 import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
-import com.deltasf.createpropulsion.physics_assembler.AssemblyUtility;
 import com.deltasf.createpropulsion.utility.burners.BurnerFuelBehaviour;
 import com.deltasf.createpropulsion.utility.burners.IBurner;
-import com.simibubi.create.AllSpecialTextures;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 
@@ -220,13 +216,7 @@ public class HotAirBurnerBlockEntity extends SmartBlockEntity implements IHaveGo
         }
 
         balloonInfoBehaviour.addBalloonTooltip(tooltip, isPlayerSneaking);
-
-        Outline.OutlineParams outline = Outliner.getInstance().showCluster("HotAirBurnerObstruction", obstructionBehaviour.getObstructedBlocks());
-        outline.colored(AssemblyUtility.CANCEL_COLOR);
-        outline.lineWidth(1/16f);
-        outline.withFaceTexture(AllSpecialTextures.CHECKERED);
-        outline.disableLineNormals();
-
+        obstructionBehaviour.displayObstructionOutline("HotAirBurnerObstruction");
         return true;
     }
 

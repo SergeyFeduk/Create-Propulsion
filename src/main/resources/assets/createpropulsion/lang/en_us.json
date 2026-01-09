@@ -186,6 +186,11 @@
     "create.gui.goggles.burner.thermostat.on": "On",
     "create.gui.goggles.burner.thermostat.off": "Off",
 
+    "create.gui.goggles.hot_air_pump.status": "Hot Air Pump Status",
+    "create.gui.goggles.hot_air_pump.status.no_rpm": "No RPM",
+    "create.gui.goggles.hot_air_pump.status.no_heat": "No Heat",
+    "create.gui.goggles.hot_air_pump.injection": "Injection Rate",
+
     "create.gui.goggles.hot_air_burner.status": "Hot Air Burner Status",
     "create.gui.goggles.hot_air_burner.status.airless": "No Atmosphere",
     "create.gui.goggles.hot_air_burner.status.no_balloon": "No Balloon",

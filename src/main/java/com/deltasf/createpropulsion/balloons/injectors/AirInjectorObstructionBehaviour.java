@@ -11,10 +11,14 @@ import com.deltasf.createpropulsion.balloons.HaiGroup;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry;
 import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
 import com.deltasf.createpropulsion.balloons.utils.BalloonScanner;
+import com.deltasf.createpropulsion.physics_assembler.AssemblyUtility;
+import com.simibubi.create.AllSpecialTextures;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BehaviourType;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 
+import net.createmod.catnip.outliner.Outline;
+import net.createmod.catnip.outliner.Outliner;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -47,6 +51,16 @@ public class AirInjectorObstructionBehaviour extends BlockEntityBehaviour {
             case 1: return 2.0 / 3.0;
             case 2: return 1.0 / 3.0;
             default: return 0.0;
+        }
+    }
+
+    public void displayObstructionOutline(String key) {
+        if (!getObstructedBlocks().isEmpty()) {
+            Outline.OutlineParams outline = Outliner.getInstance().showCluster(key, getObstructedBlocks());
+            outline.colored(AssemblyUtility.CANCEL_COLOR);
+            outline.lineWidth(1/16f);
+            outline.withFaceTexture(AllSpecialTextures.CHECKERED);
+            outline.disableLineNormals();
         }
     }
 
