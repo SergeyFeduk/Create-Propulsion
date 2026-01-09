@@ -200,10 +200,25 @@
     "create.gui.creative_thruster.power_behaviour": "Generated Thrust",
 
     "createpropulsion.gui.goggles.redstone_transmission.title": "Transmission Status:",
-    "createpropulsion.gui.goggles.redstone_transmission.control_mode" : "Control mode:",
-    "createpropulsion.gui.goggles.redstone_transmission.internal_shift_title": "Shift level:",
+    "createpropulsion.gui.goggles.redstone_transmission.control_mode" : "Control Mode:",
+    "createpropulsion.gui.goggles.redstone_transmission.internal_shift_title": "Shift Level:",
     "createpropulsion.gui.goggles.redstone_transmission.internal_shift_number": " {0} / {1}",
     "createpropulsion.gui.goggles.redstone_transmission.output": "Transmitted RPM:",
+
+    "createpropulsion.ponder.shared.rpm" : "%.2f RPM",
+
+    "createpropulsion.ponder.redstone_transmission_direct.header" : "Transmission Control Mode: Direct",
+    "createpropulsion.ponder.redstone_transmission_direct.text_1" : "Transmission has 2 control mode, and direct mode is the default setting when placed.",
+    "createpropulsion.ponder.redstone_transmission_direct.text_2" : "In direct control, transmission will output RPM proportional to the redstone input to either side.",
+    "createpropulsion.ponder.redstone_transmission_direct.text_3" : "Note that the output speed will be scaled between 0 to input speed",
+
+    "createpropulsion.ponder.redstone_transmission_incremental.header" : "Transmission Control Mode: Incremental",
+    "createpropulsion.ponder.redstone_transmission_incremental.text_1" : "Transmission in incremental control mode will output speed proportional to the internal shift level.",
+    "createpropulsion.ponder.redstone_transmission_incremental.text_2" : "You can change the control mode with a scroll selection box at the back of the transmission.",
+    "createpropulsion.ponder.redstone_transmission_incremental.text_3" : "Redstone signal given to the side with + (plus) sign will increase the shift level.",
+    "createpropulsion.ponder.redstone_transmission_incremental.text_4" : "Redstone signal given to the side with - (minus) sign will decrease the shift level.",
+    "createpropulsion.ponder.redstone_transmission_incremental.text_5" : "If the signal is given to the both side...",
+    "createpropulsion.ponder.redstone_transmission_incremental.text_6" : "...the transmission will do both addition and subtraction.",
 
     "createpropulsion.ponder.tilt_adapter.header": "Tilting wings with Tilt Adapter",
     "createpropulsion.ponder.tilt_adapter.text_1": "Tilt Adapter allows tilting the output shaft based on Redstone signals",
