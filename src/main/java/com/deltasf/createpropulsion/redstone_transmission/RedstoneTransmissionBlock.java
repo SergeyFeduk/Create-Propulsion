@@ -55,13 +55,16 @@ public class RedstoneTransmissionBlock extends AbstractEncasedShaftBlock impleme
 
     @Override
     public @NotNull BlockState getStateForPlacement(BlockPlaceContext context) {
-        Direction.Axis axis;
-        if (context.getNearestLookingDirection().getAxis().isHorizontal()) {
-            axis = Direction.Axis.Y;
-        } else {
-            axis = context.getHorizontalDirection().getAxis();
+        BlockState result = super.getStateForPlacement(context);
+        Direction[] directions = context.getNearestLookingDirections();
+        Direction facing = Direction.NORTH;
+        Direction.Axis shaft = result.getValue(AXIS);
+        for (int i = 0; i < directions.length; i++) {
+            facing = directions[i].getOpposite();
+            Direction.Axis faceAxis = facing.getAxis();
+            if(faceAxis.isHorizontal() && (shaft.isVertical() || faceAxis.equals(shaft))) break;
         }
-        return defaultBlockState().setValue(HORIZONTAL_FACING, context.getHorizontalDirection().getOpposite()).setValue(AXIS, axis);
+        return result.setValue(HORIZONTAL_FACING, facing);
     }
 
     @Override
