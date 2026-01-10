@@ -92,6 +92,10 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
         return level.getSignal(getBlockPos().relative(facing.getClockWise()), facing.getClockWise());
     }
 
+    public int get_current_shift() {
+        return shift_level;
+    }
+
     @Override
     public void tick() {
         super.tick();
