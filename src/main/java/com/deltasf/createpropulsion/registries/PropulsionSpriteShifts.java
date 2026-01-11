@@ -6,6 +6,8 @@ import com.simibubi.create.foundation.block.connected.CTSpriteShiftEntry;
 import com.simibubi.create.foundation.block.connected.CTSpriteShifter;
 import com.simibubi.create.foundation.block.connected.CTType;
 
+import net.createmod.catnip.render.SpriteShiftEntry;
+import net.createmod.catnip.render.SpriteShifter;
 import net.minecraft.resources.ResourceLocation;
 
 public class PropulsionSpriteShifts {
@@ -19,4 +21,12 @@ public class PropulsionSpriteShifts {
         );
     }
 
+    public static final SpriteShiftEntry HOT_AIR_PUMP = get("hot_air_pump", "hot_air_pump");
+
+    private static SpriteShiftEntry get(String original, String target) {
+        return SpriteShifter.get(
+            ResourceLocation.fromNamespaceAndPath(CreatePropulsion.ID, "block/" + original),
+            ResourceLocation.fromNamespaceAndPath(CreatePropulsion.ID, "block/" + target)
+        );
+    }
 }

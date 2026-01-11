@@ -163,17 +163,17 @@ public class HotAirPumpBlockEntity extends KineticBlockEntity implements IHotAir
     @Override
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         boolean isAirless = level != null && DimensionAtmosphereManager.getData(level).isAirless();
-        boolean isOnShip = VSGameUtilsKt.isBlockInShipyard(getLevel(), getBlockPos());
         boolean isBalloonPresent = balloonInfoBehaviour.isBalloonPresent();
         boolean hasRPM = Math.abs(getSpeed()) > 0;
         boolean hasHeat = lastHeatConsumed >= OPERATING_THRESHOLD;
+        boolean isOnShip = VSGameUtilsKt.isBlockInShipyard(getLevel(), getBlockPos());
 
         //Status
         String key = "";
         ChatFormatting color = null;
 
         if (isAirless) {
-            key = "gui.goggles.hot_air_burner.status.airless";
+            key = "gui.goggles.hot_air_pump.status.airless";
             color = ChatFormatting.RED;
         } else if (!isOnShip) {
             key = "gui.goggles.hot_air_burner.status.not_shipified";
