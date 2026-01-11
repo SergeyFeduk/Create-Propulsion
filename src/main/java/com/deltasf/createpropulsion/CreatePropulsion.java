@@ -4,6 +4,7 @@ import com.deltasf.createpropulsion.balloons.hot_air.BalloonAttachment;
 import com.deltasf.createpropulsion.magnet.MagnetForceAttachment;
 import com.deltasf.createpropulsion.propeller.PropellerAttachment;
 import com.deltasf.createpropulsion.reaction_wheel.ReactionWheelAttachment;
+import com.deltasf.createpropulsion.registries.*;
 import com.deltasf.createpropulsion.thruster.ThrusterForceAttachment;
 import com.simibubi.create.api.boiler.BoilerHeater;
 import com.simibubi.create.api.stress.BlockStressValues;
@@ -16,13 +17,6 @@ import com.deltasf.createpropulsion.impact_sensor.ImpactSensorAttachment;
 import com.deltasf.createpropulsion.impact_sensor.ImpactSensorSystem;
 import com.deltasf.createpropulsion.network.PropulsionPackets;
 import com.deltasf.createpropulsion.particles.ParticleTypes;
-import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
-import com.deltasf.createpropulsion.registries.PropulsionBlocks;
-import com.deltasf.createpropulsion.registries.PropulsionCreativeTab;
-import com.deltasf.createpropulsion.registries.PropulsionDefaultStress;
-import com.deltasf.createpropulsion.registries.PropulsionFluids;
-import com.deltasf.createpropulsion.registries.PropulsionItems;
-import com.deltasf.createpropulsion.registries.PropulsionPartialModels;
 import com.simibubi.create.compat.Mods;
 import com.simibubi.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import com.simibubi.create.foundation.data.CreateRegistrate;
@@ -56,6 +50,7 @@ public class CreatePropulsion {
         PropulsionPartialModels.register();
         PropulsionCreativeTab.register(modBus);
         PropulsionPackets.register();
+        PropulsionDisplaySources.register();
         
         // VS Init
         VsApi api = ValkyrienSkies.api();

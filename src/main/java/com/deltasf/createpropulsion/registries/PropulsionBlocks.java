@@ -66,6 +66,7 @@ import net.minecraftforge.client.model.generators.BlockModelBuilder;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
 import net.minecraftforge.client.model.generators.ModelFile;
 
+import static com.simibubi.create.api.behaviour.display.DisplaySource.displaySource;
 import static com.simibubi.create.foundation.data.CreateRegistrate.connectedTextures;
 
 import static com.simibubi.create.foundation.data.TagGen.axeOrPickaxe;
@@ -171,6 +172,7 @@ public class PropulsionBlocks {
         .properties(p -> p.noOcclusion())
         .transform(PropulsionDefaultStress.setNoImpact())
         .transform(axeOrPickaxe())
+        .transform(displaySource(PropulsionDisplaySources.REDSTONE_TRANSMISSION))
         .blockstate((c, p) -> BlockStateGen.axisBlock(c, p, AssetLookup.forPowered(c, p)))
         .item().model(FUCK_OFF_ITEM()).build()
         .setData(ProviderType.LANG, FUCK_OFF_LANG())
