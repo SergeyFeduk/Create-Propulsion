@@ -6,6 +6,7 @@ import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
 import com.deltasf.createpropulsion.debug.PropulsionDebug;
 import com.deltasf.createpropulsion.magnet.MagnetRegistry;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 
@@ -21,6 +22,14 @@ public class PropulsionCommands {
         LiteralArgumentBuilder<CommandSourceStack> debugNode = PropulsionDebug.registerCommands();
         propulsionCommand.then(debugNode);
 
+        LiteralArgumentBuilder<CommandSourceStack> varNode = Commands.literal("var");
+        for (String key : PropulsionDebug.getFloatKeys()) {
+            varNode.then(Commands.literal(key)
+                .then(Commands.argument("val", FloatArgumentType.floatArg())
+                .executes(ctx -> setVar(key, FloatArgumentType.getFloat(ctx, "val")))));
+        }
+        propulsionCommand.then(varNode);
+
         //Magnet registry cleanup command
         propulsionCommand
             .then(Commands.literal("clearMagnetRegistry")
@@ -31,6 +40,11 @@ public class PropulsionCommands {
             .executes(PropulsionCommands::fillBalloons));
 
         dispatcher.register(propulsionCommand);
+    }
+
+    private static int setVar(String key, float val) {
+        PropulsionDebug.registerFloat(key, val);
+        return 1;
     }
 
     private static int clearMagnetRegistry(CommandContext<CommandSourceStack> context) {

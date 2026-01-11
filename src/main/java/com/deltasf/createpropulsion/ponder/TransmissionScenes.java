@@ -35,6 +35,7 @@ public class TransmissionScenes {
 
         scene.idle(20);
         scene.overlay().showText(80)
+                .attachKeyFrame()
                 .text("Transmission in direct control mode will output speed proportional to the redstone input to either side.")
                 .placeNearTarget()
                 .pointAt(util.vector().blockSurface(util.grid().at(2, 2, 2), Direction.WEST));

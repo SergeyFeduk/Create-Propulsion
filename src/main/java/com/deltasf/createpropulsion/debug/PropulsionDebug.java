@@ -1,6 +1,7 @@
 package com.deltasf.createpropulsion.debug;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.deltasf.createpropulsion.debug.routes.MainDebugRoute;
@@ -14,6 +15,19 @@ import net.minecraft.commands.Commands;
 
 public class PropulsionDebug {
     private static final Map<IDebugRoute, Boolean> activeDebugStates = new ConcurrentHashMap<>();
+    private static final Map<String, Float> floatVars = new ConcurrentHashMap<>();
+
+    public static void registerFloat(String name, float defaultValue) {
+        floatVars.put(name, defaultValue);
+    }
+
+    public static float getFloat(String name) {
+        return floatVars.getOrDefault(name, 0f);
+    }
+
+    public static Set<String> getFloatKeys() {
+        return floatVars.keySet();
+    }
 
     public static boolean isDebug(IDebugRoute route) {
         return activeDebugStates.getOrDefault(route, false);
