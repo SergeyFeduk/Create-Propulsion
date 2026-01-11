@@ -13,6 +13,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.valkyrienskies.mod.api.ValkyrienSkies;
+
 import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.HaiGroup;
@@ -67,7 +69,7 @@ public class BalloonUpdater {
         //Phase 2: Resolve all elements in each group
         for(EventGroup group : eventGroups) {
             //Phase 2.1: Produce final subgroups
-            List<EventSubGroup> subGroups = prefilterAndSubgroupEvents(group, allHaiGroups);
+            List<EventSubGroup> subGroups = prefilterAndSubgroupEvents(group, allHaiGroups, level);
             
             //Phase 2.2: Perform scan on each subgroup
             for (EventSubGroup subGroup : subGroups) {
@@ -423,24 +425,24 @@ public class BalloonUpdater {
         return supportersToRemove;
     }
 
-    private List<EventSubGroup> prefilterAndSubgroupEvents(EventGroup group, List<HaiGroup> allHaiGroups) {
+    private List<EventSubGroup> prefilterAndSubgroupEvents(EventGroup group, List<HaiGroup> allHaiGroups, Level level) {
         Map<HaiGroup, Map<BlockPos, Set<Balloon>>> subGroupBuilders = new HashMap<>();
         //Obtain all haiGroups (now accessed from allHaiGroups field)
         //TODO: Probably use fastQuery when impl'd
         //TODO: obtain them all PER SHIP as this will reduce the amount of BalloonRegistry to 1. But note that events may occur on different ships, so its not that simple
+        String dimension = ValkyrienSkies.api().getDimensionId(level);
 
         for (BlockPos pos : group.positions()) {
+            //Skip all non-shipyard events
+            if (!ValkyrienSkies.api().getServerShipWorld().isBlockInShipyard(pos.getX(), pos.getY(), pos.getZ(), dimension)) continue;
+
             //Obtain haiGroup managing the given event position
             HaiGroup parentHaiGroup = null;
             for (HaiGroup haiGroup : allHaiGroups) {
-                //Broad phase 
-                boolean broadPhase = (haiGroup.groupAABB == null) || haiGroup.groupAABB.contains(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
-                if (broadPhase) {
-                    //Narrow phase
-                    if (haiGroup.isInsideRleVolume(pos)) {
-                        parentHaiGroup = haiGroup;
-                        break; //Event can affect only one haiGroup, so early exit
-                    }
+                if (haiGroup.getShip().getShipAABB() == null) continue; //Guh??
+                if (haiGroup.isInsideRleVolume(pos)) {
+                    parentHaiGroup = haiGroup;
+                    break; //Event can affect only one haiGroup, so early exit
                 }
             }
 
