@@ -15,7 +15,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import com.simibubi.create.content.kinetics.base.RotatedPillarKineticBlock;
 
-//TODO: Add flicker tally protection
+//TODO: Add flicker tally protection via FlickerAwareTicker but figure out how to entagle it with prediction logic correctly
 public class TiltAdapterBlockEntity extends SplitShaftBlockEntity {
     public static final float SIGNAL_RANGE = 15.0f;
 

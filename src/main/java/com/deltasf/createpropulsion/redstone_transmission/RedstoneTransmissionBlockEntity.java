@@ -1,6 +1,7 @@
 package com.deltasf.createpropulsion.redstone_transmission;
 
 import com.deltasf.createpropulsion.registries.PropulsionIcons;
+import com.deltasf.createpropulsion.utility.FlickerAwareTicker;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.content.kinetics.base.IRotate;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
@@ -39,9 +40,12 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
     private float prevGaugeTarget = 0f;
     private float gaugeTarget = 0f;
 
+    private static final int FLICKER_THRESHOLD = 100;
+    private FlickerAwareTicker ticker;
+    private int tickCounter = 0;
+
     public RedstoneTransmissionBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
-        setLazyTickRate(10);
     }
 
     @Override
@@ -59,39 +63,35 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
         super.addBehaviours(behaviours);
+
+        ticker = new FlickerAwareTicker(this, FLICKER_THRESHOLD);
+        behaviours.add(ticker);
+
         controlMode = new ScrollOptionBehaviour<>(TransmissionMode.class, Component.translatable("createpropulsion.redstone_transmission.control_mode"), this, new TransmissionValueBox());
         
         controlMode.withCallback(i -> {
             if (TransmissionMode.values()[i] == TransmissionMode.INCREMENTAL) {
-                detachKinetics();
-                shift_level = 0;
-                attachKinetics();
-                setChanged();
-                sendData();
-                if (level != null)
-                    level.updateNeighbourForOutputSignal(getBlockPos(), getBlockState().getBlock());
+                ticker.scheduleUpdate(() -> attemptShiftUpdate(0));
             }
         });
             
         behaviours.add(controlMode);
     }
 
-    public void updateShift(int shift_up, int shift_down){
-        int newValue;
-        if(controlMode.get() == TransmissionMode.INCREMENTAL) {
-            newValue = Mth.clamp(shift_level + shift_up - shift_down, 0, MAX_VALUE);
-        } else {
-            int signal = Math.max(shift_up, shift_down);
-            newValue = (int) ((signal / 15.0f) * MAX_VALUE);
-        }
-        if (shift_level != newValue) {
-            detachKinetics();
-            shift_level = newValue;
-            attachKinetics();
+    private boolean attemptShiftUpdate(int newLevel) {
+        if (shift_level == newLevel) return false;
 
-            if (level != null)
-                level.updateNeighbourForOutputSignal(getBlockPos(), getBlockState().getBlock());
-        }
+        if (getFlickerScore() > ticker.getThreshold()) return false;
+
+        detachKinetics();
+        shift_level = newLevel;
+        attachKinetics();
+        setChanged();
+        sendData();
+        if (level != null)
+            level.updateNeighbourForOutputSignal(getBlockPos(), getBlockState().getBlock());
+        
+        return true;
     }
 
     public int get_shift_up() {
@@ -117,12 +117,31 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
         super.tick();
         prevGaugeTarget = gaugeTarget;
         gaugeTarget += Mth.clamp(Mth.PI / 2 * -shift_level / (float) MAX_VALUE - gaugeTarget, - Mth.PI / 4, Mth.PI / 4) / 10f;
-    }
 
-    @Override
-    public void lazyTick() {
-        updateShift(get_shift_up(), get_shift_down());
-        super.lazyTick();
+        Level level = getLevel();
+        if (level == null || level.isClientSide) return;
+
+        int shiftUp = get_shift_up();
+        int shiftDown = get_shift_down();
+
+        if (controlMode.get() == TransmissionMode.DIRECT) {
+            int signal = Math.max(shiftUp, shiftDown);
+            int target = (int) ((signal / 15.0f) * MAX_VALUE);
+            
+            attemptShiftUpdate(target);
+            
+        } else {
+            tickCounter++;
+            int target = Mth.clamp(shift_level + shiftUp - shiftDown, 0, MAX_VALUE);
+            boolean atBottomEdge = shift_level == 0 && shiftUp > 0;
+            boolean atTopEdge = shift_level == MAX_VALUE && shiftDown > 0;
+            boolean isIdle = tickCounter >= 10;
+            if (atBottomEdge || atTopEdge || isIdle) {
+                if (attemptShiftUpdate(target)) {
+                    tickCounter = 0;
+                }
+            }
+        }
     }
 
     public int getComparatorOutput() {
