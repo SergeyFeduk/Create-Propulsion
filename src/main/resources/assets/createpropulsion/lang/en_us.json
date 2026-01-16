@@ -148,8 +148,8 @@
 
     "createpropulsion.stirling.generated_speed": "Generated Speed in RPM",
     "createpropulsion.redstone_transmission.control_mode": "Transmission Control Mode",
-    "createpropulsion.redstone_transmission.control_mode.direct": "Direct Control",
-    "createpropulsion.redstone_transmission.control_mode.incremental": "Incremental Control",
+    "createpropulsion.redstone_transmission.control_mode.direct": "Direct",
+    "createpropulsion.redstone_transmission.control_mode.incremental": "Incremental",
 
     "createpropulsion.optical_lens.tooltip.summary": "Optical lens that can be _colored_ to tint an _optical sensor_'s beam.",
     "createpropulsion.fluid_lens.tooltip.summary": "Enables an _optical sensor_ to detect _fluids_.",
@@ -198,7 +198,7 @@
     "create.gui.goggles.hot_air_burner.status.no_fuel": "No Fuel",
     "create.gui.goggles.hot_air_burner.status.on": "On",
     "create.gui.goggles.hot_air_burner.status.ready": "Ready",
-    "create.gui.goggles.hot_air_burner.balloon.status": "Balloon Info:",
+    "create.gui.goggles.hot_air_burner.balloon.status": "Balloon Info",
     "create.gui.goggles.hot_air_burner.balloon.hot_air": "Hot Air",
 
     "create.gui.goggles.thruster.thrust_output": "Thrust Output",
@@ -207,11 +207,10 @@
 
     "createpropulsion.display_source.redstone_transmission_shift": "Current Shift Level",
 
-    "createpropulsion.gui.goggles.redstone_transmission.title": "Transmission Status:",
-    "createpropulsion.gui.goggles.redstone_transmission.control_mode" : "Control Mode:",
-    "createpropulsion.gui.goggles.redstone_transmission.internal_shift_title": "Shift Level:",
+    "createpropulsion.gui.goggles.redstone_transmission.title": "Transmission Mode",
+    "createpropulsion.gui.goggles.redstone_transmission.internal_shift_title": "Shift Level",
     "createpropulsion.gui.goggles.redstone_transmission.internal_shift_number": " {0} / {1}",
-    "createpropulsion.gui.goggles.redstone_transmission.output": "Transmitted RPM:",
+    "createpropulsion.gui.goggles.redstone_transmission.output": "Transmitted RPM",
 
     "createpropulsion.ponder.shared.rpm" : "%.2f RPM",
 

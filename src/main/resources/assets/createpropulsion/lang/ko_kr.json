@@ -173,7 +173,7 @@
     "create.gui.goggles.hot_air_burner.status.no_fuel": "연료가 없습니다.",
     "create.gui.goggles.hot_air_burner.status.on": "켜짐",
     "create.gui.goggles.hot_air_burner.status.ready": "준비됨",
-    "create.gui.goggles.hot_air_burner.balloon.status": "풍선 정보:",
+    "create.gui.goggles.hot_air_burner.balloon.status": "풍선 정보",
     "create.gui.goggles.hot_air_burner.balloon.hot_air": "가열된 공기",
 
     "create.gui.goggles.thruster.thrust_output": "추진력",

@@ -13,7 +13,7 @@ import java.util.List;
 public abstract class InstancedInstancerMixin implements IInstancedInstancerExposer {
 
     @Shadow
-    abstract List<?> draws();
+    public abstract List<?> draws();
     
 
     @Override

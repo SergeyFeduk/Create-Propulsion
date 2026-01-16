@@ -106,6 +106,7 @@ public class BalloonInfoBehaviour extends BlockEntityBehaviour {
 
         CreateLang.builder()
             .translate("gui.goggles.hot_air_burner.balloon.status")
+            .text(":")
             .forGoggles(tooltip);
 
         Component trendSymbol;

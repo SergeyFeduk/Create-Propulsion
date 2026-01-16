@@ -174,7 +174,7 @@
     "create.gui.goggles.hot_air_burner.status.no_fuel": "Нет топлива",
     "create.gui.goggles.hot_air_burner.status.on": "Работает",
     "create.gui.goggles.hot_air_burner.status.ready": "Готов",
-    "create.gui.goggles.hot_air_burner.balloon.status": "Информация о шаре:",
+    "create.gui.goggles.hot_air_burner.balloon.status": "Информация о шаре",
     "create.gui.goggles.hot_air_burner.balloon.hot_air": "Горячий воздух",
 
     "create.gui.goggles.thruster.thrust_output": "Тяга",

@@ -3,16 +3,22 @@ package com.deltasf.createpropulsion.redstone_transmission;
 import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
 import com.simibubi.create.content.kinetics.base.AbstractEncasedShaftBlock;
 import com.simibubi.create.content.kinetics.base.HorizontalKineticBlock;
+import com.simibubi.create.content.kinetics.base.RotatedPillarKineticBlock;
 import com.simibubi.create.foundation.block.IBE;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.Property;
+
+import javax.annotation.Nonnull;
+
 import org.jetbrains.annotations.NotNull;
 
 public class RedstoneTransmissionBlock extends AbstractEncasedShaftBlock implements IBE<RedstoneTransmissionBlockEntity> {
@@ -55,20 +61,54 @@ public class RedstoneTransmissionBlock extends AbstractEncasedShaftBlock impleme
 
     @Override
     public @NotNull BlockState getStateForPlacement(BlockPlaceContext context) {
-        BlockState result = super.getStateForPlacement(context);
-        Direction[] directions = context.getNearestLookingDirections();
-        Direction facing = Direction.NORTH;
-        Direction.Axis shaft = result.getValue(AXIS);
-        for (int i = 0; i < directions.length; i++) {
-            facing = directions[i].getOpposite();
-            Direction.Axis faceAxis = facing.getAxis();
-            if(faceAxis.isHorizontal() && (shaft.isVertical() || faceAxis.equals(shaft))) break;
+        Direction.Axis preferredAxis = RotatedPillarKineticBlock.getPreferredAxis(context);
+        Direction.Axis axis;
+
+       Player player = context.getPlayer();
+        if (preferredAxis != null && (player == null || !player.isShiftKeyDown())) {
+            axis = preferredAxis;
+        } else {
+            //Non shaft-aware reversed
+            if (context.getNearestLookingDirection().getAxis().isVertical()) {
+                axis = context.getHorizontalDirection().getAxis();
+            } else {
+                axis = Direction.Axis.Y;
+            }
         }
-        return result.setValue(HORIZONTAL_FACING, facing);
+
+        BlockState state = this.defaultBlockState().setValue(AXIS, axis);
+        Direction facing = Direction.NORTH;
+        
+        if (axis.isVertical()) {
+            facing = context.getHorizontalDirection().getOpposite();
+        } else {
+            for (Direction dir : context.getNearestLookingDirections()) {
+                Direction candidate = dir.getOpposite();
+                if (candidate.getAxis().isHorizontal() && candidate.getAxis() == axis) {
+                    facing = candidate;
+                    break;
+                }
+            }
+        }
+
+        return state.setValue(HORIZONTAL_FACING, facing);
     }
 
     @Override
     protected boolean areStatesKineticallyEquivalent(BlockState oldState, BlockState newState) {
         return false;
+    }
+
+    @Override
+    public boolean hasAnalogOutputSignal(@Nonnull BlockState state) {
+        return true;
+    }
+
+    @Override
+    public int getAnalogOutputSignal(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos) {
+        if (level.getBlockEntity(pos) instanceof RedstoneTransmissionBlockEntity rtbe) {
+            return rtbe.getComparatorOutput();
+        }
+        return 0;
     }
 }

@@ -60,6 +60,19 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
         super.addBehaviours(behaviours);
         controlMode = new ScrollOptionBehaviour<>(TransmissionMode.class, Component.translatable("createpropulsion.redstone_transmission.control_mode"), this, new TransmissionValueBox());
+        
+        controlMode.withCallback(i -> {
+            if (TransmissionMode.values()[i] == TransmissionMode.INCREMENTAL) {
+                detachKinetics();
+                shift_level = 0;
+                attachKinetics();
+                setChanged();
+                sendData();
+                if (level != null)
+                    level.updateNeighbourForOutputSignal(getBlockPos(), getBlockState().getBlock());
+            }
+        });
+            
         behaviours.add(controlMode);
     }
 
@@ -75,6 +88,9 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
             detachKinetics();
             shift_level = newValue;
             attachKinetics();
+
+            if (level != null)
+                level.updateNeighbourForOutputSignal(getBlockPos(), getBlockState().getBlock());
         }
     }
 
@@ -107,6 +123,10 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
     public void lazyTick() {
         updateShift(get_shift_up(), get_shift_down());
         super.lazyTick();
+    }
+
+    public int getComparatorOutput() {
+        return Math.round((float) shift_level / MAX_VALUE * 15);
     }
 
     @SuppressWarnings("null")
@@ -165,26 +185,19 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
 
     @Override
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
+        //"Transmission Mode: Direct"
+        Component selectedMode = Component.translatable(controlMode.get().getTranslationKey());
         CreateLang.builder()
-                .add(Component.translatable("createpropulsion.gui.goggles.redstone_transmission.title"))
-                .forGoggles(tooltip);
+            .add(Component.translatable("createpropulsion.gui.goggles.redstone_transmission.title"))
+            .text(": ")
+            .add(selectedMode)
+            .forGoggles(tooltip);
 
         CreateLang.builder()
-                .add(Component.translatable("createpropulsion.gui.goggles.redstone_transmission.control_mode"))
-                .style(ChatFormatting.GRAY)
-                .forGoggles(tooltip);
-
-        //CreateLang newLine ain't working for me...
-        CreateLang.builder()
-                .space()
-                .add(Component.translatable(controlMode.get().getTranslationKey()))
-                .style(ChatFormatting.GRAY)
-                .forGoggles(tooltip);
-
-        CreateLang.builder()
-                .add(Component.translatable("createpropulsion.gui.goggles.redstone_transmission.internal_shift_title"))
-                .style(ChatFormatting.GRAY)
-                .forGoggles(tooltip);
+            .add(Component.translatable("createpropulsion.gui.goggles.redstone_transmission.internal_shift_title"))
+            .text(":")
+            .style(ChatFormatting.GRAY)
+            .forGoggles(tooltip);
 
         int max_shift_modified = controlMode.get().equals(TransmissionMode.DIRECT) ? 15 : MAX_VALUE;
         int shift_modified = Math.round((float) shift_level / MAX_VALUE * max_shift_modified);
@@ -198,23 +211,23 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
         }
 
         CreateLang.builder()
-                .add(Component.translatable(
-                        "createpropulsion.gui.goggles.redstone_transmission.internal_shift_number",
-                        shift_modified,
-                        max_shift_modified
-                        ))
-                .style(transmitStyle.getTextColor())
-                .forGoggles(tooltip);
+            .add(Component.translatable(
+                    "createpropulsion.gui.goggles.redstone_transmission.internal_shift_number",
+                    shift_modified,
+                    max_shift_modified
+                    ))
+            .style(transmitStyle.getTextColor())
+            .forGoggles(tooltip);
 
         CreateLang.builder()
-                .add(Component.translatable("createpropulsion.gui.goggles.redstone_transmission.output"))
-                .style(ChatFormatting.GRAY)
-                .forGoggles(tooltip);
+            .add(Component.translatable("createpropulsion.gui.goggles.redstone_transmission.output"))
+            .text(":")
+            .style(ChatFormatting.GRAY)
+            .forGoggles(tooltip);
 
         IRotate.SpeedLevel.getFormattedSpeedText(speed * shift_level / MAX_VALUE, isOverStressed()).forGoggles(tooltip);
 
         super.addToGoggleTooltip(tooltip, isPlayerSneaking);
-
         return true;
     }
 

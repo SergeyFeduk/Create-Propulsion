@@ -173,7 +173,7 @@
     "create.gui.goggles.hot_air_burner.status.no_fuel": "燃料不足",
     "create.gui.goggles.hot_air_burner.status.on": "工作中",
     "create.gui.goggles.hot_air_burner.status.ready": "就绪",
-    "create.gui.goggles.hot_air_burner.balloon.status": "气球信息：",
+    "create.gui.goggles.hot_air_burner.balloon.status": "气球信息",
     "create.gui.goggles.hot_air_burner.balloon.hot_air": "热空气",
 
     "create.gui.goggles.thruster.thrust_output": "推力输出",
