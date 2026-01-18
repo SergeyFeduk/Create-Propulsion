@@ -37,7 +37,7 @@ public class Balloon implements Iterable<BlockPos> {
     private final ConcurrentHashMap<ChunkKey, BalloonForceChunk> chunkMap = new ConcurrentHashMap<>();
     private final Set<ChunkKey> dirtyChunks = new HashSet<>();
     //Validation data
-    public Set<UUID> supportHais;
+    private Set<UUID> supportHais;
     private Set<BlockPos> holes = new HashSet<>();
     //Gameplay data
     public volatile double hotAir = 0;
@@ -249,6 +249,48 @@ public class Balloon implements Iterable<BlockPos> {
             @Override
             public BlockPos next() { return unpackPos(it.nextLong()); }
         };
+    }
+
+    //Support hais api
+
+    public boolean isSupportHaisEmpty() {
+        return supportHais.isEmpty();
+    }
+
+    public void clearSupportHais() {
+        supportHais.clear();
+    }
+
+    public void setSupportHais(Set<UUID> managedSet) {
+        supportHais = managedSet;
+    }
+
+    public Set<UUID> copySupportHais() {
+        return new HashSet<>(supportHais);
+    }
+
+    public void addAllToSupportHais(Set<UUID> toAdd) {
+        supportHais.addAll(toAdd);
+    }
+
+    public void addToSupportHais(UUID toAdd) {
+        supportHais.add(toAdd);
+    }
+
+    public void removeAllFromSupportHais(Collection<UUID> toRemove) {
+        supportHais.removeAll(toRemove);
+    }
+
+    public void removeFromSupportHais(UUID toRemove) {
+        supportHais.remove(toRemove);
+    }
+
+    public Iterable<UUID> getSupportHais() {
+        return supportHais;
+    }
+
+    public Set<UUID> getSupportHaisSet() {
+        return supportHais;
     }
 
     //Incremental bounds

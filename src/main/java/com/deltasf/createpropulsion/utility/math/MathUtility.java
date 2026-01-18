@@ -96,4 +96,10 @@ public class MathUtility {
     public static Vec3i AbsComponents(Vec3i value) {
         return new Vec3i(Math.abs(value.getX()), Math.abs(value.getY()), Math.abs(value.getZ()));
     }
+
+    public static float sineInRange(float time, float bottom, float top) {
+        float sin = (float) Math.sin(time);
+        float normalized = (sin + 1.0f) * 0.5f;
+        return bottom + normalized * (top - bottom);
+    }
 }

@@ -26,6 +26,7 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+//TODO: IBE
 @SuppressWarnings("deprecation")
 public abstract class AbstractThrusterBlock extends DirectionalBlock implements EntityBlock {
     public static final DirectionProperty FACING = BlockStateProperties.FACING;

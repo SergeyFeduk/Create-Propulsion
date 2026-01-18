@@ -52,6 +52,13 @@ public class HotAirPumpBlockEntity extends KineticBlockEntity implements IHotAir
     private float heatConsumedThisTick = 0;
     private float lastHeatConsumed = 0;
     private boolean isAboveHeatThreshold = false;
+    private int scanTally = 0;
+
+    //Visuals
+    public float fanAngle = 0;
+    public float membraneTime = (float) (Math.PI / 2.0); //Full extent after placment
+    public float membraneSpeed = 0;
+    public float lastRenderTime = -1;
 
     public HotAirPumpBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
@@ -77,7 +84,6 @@ public class HotAirPumpBlockEntity extends KineticBlockEntity implements IHotAir
         super.onSpeedChanged(previousSpeed);
         if (Math.abs(previousSpeed - getSpeed()) > MathUtility.epsilon) {
             attemptScan();
-            notifyUpdate();
         }
     }
 
@@ -86,6 +92,10 @@ public class HotAirPumpBlockEntity extends KineticBlockEntity implements IHotAir
         super.tick();
         Level level = getLevel();
         if (level == null || level.isClientSide()) return;
+        
+        if (scanTally > 0) {
+            scanTally--;
+        }
 
         lastHeatConsumed = heatConsumedThisTick;
         heatConsumedThisTick = 0;
@@ -94,7 +104,6 @@ public class HotAirPumpBlockEntity extends KineticBlockEntity implements IHotAir
         if (currentlyHot != isAboveHeatThreshold) {
             isAboveHeatThreshold = currentlyHot;
             attemptScan();
-            notifyUpdate();
         }
     }
 
@@ -108,8 +117,8 @@ public class HotAirPumpBlockEntity extends KineticBlockEntity implements IHotAir
     @Override
     public void attemptScan() {
         Level level = getLevel();
-        if (level == null || level.isClientSide()) return;
-        
+        if (level == null || level.isClientSide() || scanTally > 0) return;
+        scanTally = 5;
         // Ship check
         Ship ship = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
         if (ship == null) return;
@@ -120,12 +129,18 @@ public class HotAirPumpBlockEntity extends KineticBlockEntity implements IHotAir
         
         // Perform scan via behaviour
         injectorBehaviour.performScan();
+        notifyUpdate();
     }
 
     @Override
     public double getInjectionAmount() {
         float rpmPercentage = Math.abs(getSpeed()) / MAX_RPM;
-        double injection = BASE_INJECTION_AMOUNT * rpmPercentage * lastHeatConsumed;
+        double effectiveHeat = lastHeatConsumed;
+        //Fallback, so first tick of injection uses heat from this tick, not previous
+        if (effectiveHeat <= MathUtility.epsilon && heatConsumedThisTick > MathUtility.epsilon) {
+            effectiveHeat = heatConsumedThisTick;
+        }
+        double injection = BASE_INJECTION_AMOUNT * rpmPercentage * effectiveHeat;
         double efficiency = obstructionBehaviour.getEfficiency();
         return injection * efficiency;
     }
@@ -134,6 +149,10 @@ public class HotAirPumpBlockEntity extends KineticBlockEntity implements IHotAir
     public void onBalloonLoaded() { balloonInfoBehaviour.performUpdate(); }
 
     // IHeatConsumer impl
+
+    public float getLastHeatConsumed() {
+        return lastHeatConsumed;
+    }
 
     @Override
     public boolean isActive() {

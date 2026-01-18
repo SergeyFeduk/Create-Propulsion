@@ -388,7 +388,7 @@ public class BalloonUpdater {
         //Find and kill orphans
         List<UUID> supportersToRemove = findOrphanedSupporters(balloon, group.hais);
         if (!supportersToRemove.isEmpty()) {
-            balloon.supportHais.removeAll(supportersToRemove);
+            balloon.removeAllFromSupportHais(supportersToRemove);
         }
     }
 
@@ -400,7 +400,7 @@ public class BalloonUpdater {
             haiDataMap.put(hai.id(), hai);
         }
 
-        for (UUID haiId : balloon.supportHais) {
+        for (UUID haiId : balloon.getSupportHais()) {
             HaiData haiData = haiDataMap.get(haiId);
             if (haiData == null) {
                 supportersToRemove.add(haiId);

@@ -1,6 +1,11 @@
 package com.deltasf.createpropulsion.registries;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import com.deltasf.createpropulsion.balloons.Balloon;
+import com.deltasf.createpropulsion.balloons.HaiGroup;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry;
 import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
 import com.deltasf.createpropulsion.debug.PropulsionDebug;
@@ -12,6 +17,7 @@ import com.mojang.brigadier.context.CommandContext;
 
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
 
 public class PropulsionCommands {
 
@@ -22,13 +28,16 @@ public class PropulsionCommands {
         LiteralArgumentBuilder<CommandSourceStack> debugNode = PropulsionDebug.registerCommands();
         propulsionCommand.then(debugNode);
 
-        LiteralArgumentBuilder<CommandSourceStack> varNode = Commands.literal("var");
-        for (String key : PropulsionDebug.getFloatKeys()) {
-            varNode.then(Commands.literal(key)
-                .then(Commands.argument("val", FloatArgumentType.floatArg())
-                .executes(ctx -> setVar(key, FloatArgumentType.getFloat(ctx, "val")))));
+        Set<String> floatKeys = PropulsionDebug.getFloatKeys();
+        if (floatKeys.size() > 0) {
+            LiteralArgumentBuilder<CommandSourceStack> varNode = Commands.literal("var");
+            for (String key : floatKeys) {
+                varNode.then(Commands.literal(key)
+                    .then(Commands.argument("val", FloatArgumentType.floatArg())
+                    .executes(ctx -> setVar(key, FloatArgumentType.getFloat(ctx, "val")))));
+            }
+            propulsionCommand.then(varNode);
         }
-        propulsionCommand.then(varNode);
 
         //Magnet registry cleanup command
         propulsionCommand
@@ -38,6 +47,10 @@ public class PropulsionCommands {
         propulsionCommand
             .then(Commands.literal("fill-balloons")
             .executes(PropulsionCommands::fillBalloons));
+
+        propulsionCommand
+            .then(Commands.literal("kill-orphans")
+            .executes(PropulsionCommands::killOrphans));
 
         dispatcher.register(propulsionCommand);
     }
@@ -57,6 +70,35 @@ public class PropulsionCommands {
             for (Balloon balloon : registry.getBalloons()) {
                 balloon.hotAir = balloon.getVolumeSize();
             }
+        }
+        return 1;
+    }
+
+    private static int killOrphans(CommandContext<CommandSourceStack> context) {
+        int deadOrphans = 0;
+
+        for(BalloonRegistry registry : BalloonShipRegistry.get().getRegistries()) {
+            for(HaiGroup group : registry.getHaiGroups()) {
+                final List<Balloon> balloonsToKill = new ArrayList<>();
+                for(Balloon balloon : group.balloons) {
+                    if (balloon.isSupportHaisEmpty()) { 
+                        balloonsToKill.add(balloon);
+                        deadOrphans++;
+                    }
+                }
+                synchronized(group.balloons) {
+                    for(Balloon balloon : balloonsToKill) {
+                        group.killBalloon(balloon, registry);
+                    }
+                }
+            }
+        }
+        if (deadOrphans > 0) {
+            String orphanCount = String.valueOf(deadOrphans);
+            String postfix = deadOrphans <= 1 ? "!" : "s!";
+            context.getSource().sendSuccess(() -> Component.literal("Killed " + orphanCount + " orphan" + postfix), false);
+        } else {
+            context.getSource().sendFailure(Component.literal("No orphans to kill :("));
         }
         return 1;
     }

@@ -1,0 +1,31 @@
+{
+    "type":"create:mechanical_crafting",
+    "acceptMirrored":false,
+    "key":{
+        "S":{
+            "item":"create:sturdy_sheet"
+        },
+        "C":{
+            "item":"create:copper_sheet"
+        },
+        "W":{
+            "item":"create:cogwheel"
+        },
+        "P":{
+            "item":"create:propeller"
+        },
+        "M":{
+            "item":"minecraft:phantom_membrane"
+        }
+    },
+    "pattern":[
+        "  M  ",
+        " SPS ",
+        " SWS ",
+        " CCC "
+    ],
+    "result":{
+        "count":1,
+        "item":"createpropulsion:hot_air_pump"
+    }
+}

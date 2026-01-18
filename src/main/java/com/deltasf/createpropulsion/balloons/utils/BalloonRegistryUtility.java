@@ -103,10 +103,10 @@ public class BalloonRegistryUtility {
         targetGroup.regenerateRLEVolume(level);
         
         synchronized(targetGroup.balloons) {
-            for (Balloon b : targetGroup.balloons) {
-                for (int d = 1; d <= HaiGroup.HAI_TO_BALLOON_DIST; d++) {
-                    if (b.contains(haiPos.above(d))) {
-                        b.supportHais.add(data.id());
+            for (Balloon balloon : targetGroup.balloons) {
+                for (int d = 0; d <= HaiGroup.HAI_TO_BALLOON_DIST; d++) {
+                    if (balloon.contains(haiPos.above(d))) {
+                        balloon.addToSupportHais(data.id());
                         break;
                     }
                 }
@@ -191,7 +191,9 @@ public class BalloonRegistryUtility {
 
         //Rule 1: balloon is fully contained within its group
         if (group.groupAABB != null) {
-            if (!isInside(group.groupAABB, balloon.getAABB())) return false;
+            if (!isInside(group.groupAABB, balloon.getAABB())) {
+                return false;
+            }
         }
 
         //Rule 2: there must be at least one hai block below balloons bottom
@@ -199,7 +201,7 @@ public class BalloonRegistryUtility {
         // if they run out of heat, or if they are just floating storage.
         if (!group.hais.isEmpty()) {
             Set<UUID> currentGroupHais = group.hais.stream().map(HaiData::id).collect(Collectors.toSet());
-            if (!balloon.supportHais.isEmpty() && Collections.disjoint(balloon.supportHais, currentGroupHais)) {
+            if (!balloon.isSupportHaisEmpty() && Collections.disjoint(balloon.getSupportHaisSet(), currentGroupHais)) {
                 return false;
             }
         }
@@ -211,7 +213,7 @@ public class BalloonRegistryUtility {
         if (outerBox == null || innerBox == null) return false;
 
         return outerBox.minX <= innerBox.minX &&
-               outerBox.minY <= innerBox.minY &&
+               outerBox.minY <= innerBox.minY && //TODO: Revert after I figure out that 1 block volume extension downwards after scans (happens both at initial and expansion scans)
                outerBox.minZ <= innerBox.minZ &&
                outerBox.maxX >= innerBox.maxX &&
                outerBox.maxY >= innerBox.maxY &&

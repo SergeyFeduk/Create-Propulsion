@@ -137,6 +137,13 @@ public  class BalloonScanner {
         BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
         boolean hasLeak = false;
 
+        if (HaiGroup.isHab(origin, level)) {
+            return new BlobScanResult(volume, false);
+        }
+        if (!state.group.isInsideRleVolume(origin)) {
+            return new BlobScanResult(volume, true);
+        }
+
         queue.add(origin);
         volume.add(origin);
 

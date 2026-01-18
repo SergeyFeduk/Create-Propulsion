@@ -117,7 +117,7 @@ public class HaiGroup {
     }
 
     public static BlockPos getSeedFromHai(HaiData data, Level level) {
-        for(int d = 0; d < BalloonScanner.VERTICAL_ANOMALY_SCAN_DISTANCE; d++) {
+        for(int d = 1; d < BalloonScanner.VERTICAL_ANOMALY_SCAN_DISTANCE; d++) {
             if (isHab(data.position().above(d), level)) {
                 BlockPos seed = data.position().above(d-1);
                 return seed;
@@ -130,7 +130,7 @@ public class HaiGroup {
     public void killBalloon(Balloon balloon, BalloonRegistry registry) {
         synchronized (balloons)  {
             if (balloons.remove(balloon)) {
-                balloon.supportHais.clear();
+                balloon.clearSupportHais();
 
                 if (registry != null) {
                     registry.dispatchBalloonEvent(balloon, balloon.getAABB(), BalloonVolumeChangeEvent.Type.DESTROYED);
@@ -149,7 +149,7 @@ public class HaiGroup {
         int newId = registry.nextBalloonId();
         Balloon balloon = new Balloon(newId, volume, null);
         Set<UUID> managedSet = new ManagedHaiSet(balloon, this.haiToBalloonMap, new HashSet<>(supportHais));
-        balloon.supportHais = managedSet;
+        balloon.setSupportHais(managedSet);
 
         synchronized(balloons) {
             this.balloons.add(balloon);
@@ -177,7 +177,7 @@ public class HaiGroup {
 
         synchronized(balloons) {
             Set<UUID> managedSet = new ManagedHaiSet(balloon, this.haiToBalloonMap, supportHaiIds);
-            balloon.supportHais = managedSet;
+            balloon.setSupportHais(managedSet);
             this.balloons.add(balloon);
         }
 
@@ -187,13 +187,13 @@ public class HaiGroup {
     }
 
     public void adoptOrphanBalloon(Balloon orphan, BalloonRegistry registry) {
-        Set<UUID> currentSupporterIds = new HashSet<>(orphan.supportHais);
+        Set<UUID> currentSupporterIds = orphan.copySupportHais();
         synchronized (balloons) {
             this.balloons.add(orphan);
         }
 
         Set<UUID> managedSet = new ManagedHaiSet(orphan, this.haiToBalloonMap, currentSupporterIds);
-        orphan.supportHais = managedSet;
+        orphan.setSupportHais(managedSet);
     }
 
     private void generateBalloons(List<DiscoveredVolume> discoveredVolumes, BalloonRegistry registry) {
@@ -261,8 +261,8 @@ public class HaiGroup {
                         }
                         connectedBalloons.add(stolen);
                         
-                        Set<UUID> oldIds = new HashSet<>(stolen.supportHais);
-                        stolen.supportHais = new ManagedHaiSet(stolen, this.haiToBalloonMap, oldIds);
+                        Set<UUID> oldIds = stolen.copySupportHais();
+                        stolen.setSupportHais(new ManagedHaiSet(stolen, this.haiToBalloonMap, oldIds));
                     }
                 }
             }
@@ -274,14 +274,14 @@ public class HaiGroup {
                 Balloon targetBalloon = connectedBalloons.iterator().next();
 
                 targetBalloon.addAll(discoveredVolume.volume());
-                targetBalloon.supportHais.addAll(supportHais); 
+                targetBalloon.addAllToSupportHais(supportHais);
                 targetBalloon.resolveHolesAfterMerge();
             } else {
                 List<Balloon> balloonsToMerge = new ArrayList<>(connectedBalloons);
                 Balloon targetBalloon = balloonsToMerge.get(0);
 
                 targetBalloon.addAll(discoveredVolume.volume());
-                targetBalloon.supportHais.addAll(supportHais);
+                targetBalloon.addAllToSupportHais(supportHais);
 
                 for (int i = 1; i < balloonsToMerge.size(); i++) {
                     Balloon sourceBalloon = balloonsToMerge.get(i);
@@ -296,7 +296,7 @@ public class HaiGroup {
     private Set<UUID> findSupportHaisForVolume(Set<BlockPos> volume) {
         Set<UUID> supporters = new HashSet<>();
         for (HaiData hai : this.hais) {
-            for (int d = 1; d <= HAI_TO_BALLOON_DIST; d++) {
+            for (int d = 0; d <= HAI_TO_BALLOON_DIST; d++) {
                 BlockPos probePos = hai.position().above(d);
                 if (volume.contains(probePos)) {
                     supporters.add(hai.id());

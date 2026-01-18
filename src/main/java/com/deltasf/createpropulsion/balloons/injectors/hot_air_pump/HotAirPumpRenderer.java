@@ -2,6 +2,7 @@ package com.deltasf.createpropulsion.balloons.injectors.hot_air_pump;
 
 import com.deltasf.createpropulsion.registries.PropulsionPartialModels;
 import com.deltasf.createpropulsion.registries.PropulsionSpriteShifts;
+import com.deltasf.createpropulsion.utility.math.MathUtility;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntityRenderer;
@@ -28,19 +29,21 @@ public class HotAirPumpRenderer extends KineticBlockEntityRenderer<HotAirPumpBlo
     private static final float MIN_INTERPOLATION_VALUE = 0.53f;
     private static final float MAX_INTERPOLATION_VALUE = 1f;
 
+    private static final float MAX_VISUAL_SPEED = 0.75f; 
+    private static final float MAX_RPM = 256.0f;
+    private static final float FAN_SPEED_MULTIPLIER = 1.0f;
+    private static final float MIN_VISUAL_SPEED = 0.075f;
+
+    private static final float MEMBRANE_DECAY = 0.2f;
+
     public HotAirPumpRenderer(BlockEntityRendererProvider.Context context) {
         super(context);
     }
 
-    //TODO: Fan movement (proportionla to heat input) & membrane movement (proportional to RPM)
     @Override
     protected void renderSafe(HotAirPumpBlockEntity be, float partialTicks, PoseStack ms, MultiBufferSource buffer, int light, int overlay) {
         Level level = be.getLevel();
         if (level == null) return;
-
-        float time = AnimationTickHolder.getRenderTime(level) / 5.0f;
-        float t = sineInRange(time, MIN_INTERPOLATION_VALUE, MAX_INTERPOLATION_VALUE);
-        float tRaw = sineInRange(time, 0, MAX_INTERPOLATION_VALUE);
         
         BlockState state = be.getBlockState();
 
@@ -52,21 +55,50 @@ public class HotAirPumpRenderer extends KineticBlockEntityRenderer<HotAirPumpBlo
         VertexConsumer cutoutBuffer = buffer.getBuffer(RenderType.cutout());
         VertexConsumer solidBuffer = buffer.getBuffer(RenderType.solid());
         
+        //Time
+        float time = AnimationTickHolder.getRenderTime(level);
+        if (be.lastRenderTime == -1) be.lastRenderTime = time;
+        float dt = time - be.lastRenderTime;
+        be.lastRenderTime = time;
+
         //Cog
         standardKineticRotationTransform(cogModel, be, light).renderInto(ms, solidBuffer);
 
         //Fan
+        float heat = be.getLastHeatConsumed();
+        if (heat > 0) {
+            be.fanAngle += (heat * FAN_SPEED_MULTIPLIER) * dt;
+            be.fanAngle %= (float) (Math.PI * 2);
+        }
+
         fanModel
             .translate(2/16.0f,12/16.0f,0)
             .rotate(Axis.Z, -(float)Math.PI / 2.0f)
             .translate(0.5f,6/16.0f,0.5f)
-            .rotate(Axis.X, time)
+            .rotate(Axis.X, be.fanAngle)
             .translate(-0.5f,-6/16.0f,-0.5f)
             .light(light)
             .overlay(overlay)
             .renderInto(ms, solidBuffer);
 
         //Membrane
+        float currentRpm = Math.abs(be.getSpeed());
+        float targetMembraneSpeed;
+
+        if (currentRpm <= 0) {
+            targetMembraneSpeed = 0;
+        } else {
+            float tRpm = Math.min(currentRpm / MAX_RPM, 1.0f);
+            float speedCurve = tRpm * tRpm * tRpm * (tRpm * (tRpm * 6 - 15) + 10); //Smoothstep
+            targetMembraneSpeed = MIN_VISUAL_SPEED + (MAX_VISUAL_SPEED - MIN_VISUAL_SPEED) * speedCurve;
+        }
+
+        be.membraneSpeed = MathUtility.expDecay(be.membraneSpeed, targetMembraneSpeed, MEMBRANE_DECAY, dt);
+        be.membraneTime += be.membraneSpeed * dt;
+
+        float t = MathUtility.sineInRange(be.membraneTime, MIN_INTERPOLATION_VALUE, MAX_INTERPOLATION_VALUE);
+        float tRaw = MathUtility.sineInRange(be.membraneTime, 0, MAX_INTERPOLATION_VALUE);
+
         float scaleY = 0.5f + (0.5f * t);
         float translateY = (2.0f / 16.0f) * (1.0f - t);
         SpriteShiftEntry worldSpaceShift = new SpriteShiftEntry() {
@@ -105,9 +137,5 @@ public class HotAirPumpRenderer extends KineticBlockEntityRenderer<HotAirPumpBlo
 
     }
 
-    public static float sineInRange(float time, float bottom, float top) {
-        float sin = (float) Math.sin(time);
-        float normalized = (sin + 1.0f) * 0.5f;
-        return bottom + normalized * (top - bottom);
-    }
+    
 }

@@ -64,7 +64,6 @@ public class HotAirInjectorBehaviour extends BlockEntityBehaviour {
     private void unregister() {
         Level level = getWorld();
         if (level == null || level.isClientSide) return;
-        
         Ship ship = VSGameUtilsKt.getShipManagingPos(level, getPos());
         if (ship != null && this.haiId != null) {
             BalloonShipRegistry.forShip(ship.getId(), level).unregisterHai(haiId, level);

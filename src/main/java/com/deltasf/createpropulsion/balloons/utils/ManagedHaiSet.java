@@ -33,7 +33,7 @@ public class ManagedHaiSet implements Set<UUID>{
         return changed;
     }
 
-     @Override
+    @Override
     public boolean remove(Object o) {
         boolean changed = delegate.remove(o);
         if (changed && o instanceof UUID) {
@@ -43,7 +43,7 @@ public class ManagedHaiSet implements Set<UUID>{
         return changed;
     }
 
-     @Override
+    @Override
     public void clear() {
         for (UUID haiId : delegate) {
             map.remove(haiId, owner);

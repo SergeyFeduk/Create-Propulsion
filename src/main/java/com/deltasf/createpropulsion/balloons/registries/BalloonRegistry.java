@@ -175,7 +175,7 @@ public class BalloonRegistry {
 
         // Revalidate all balloons
         for (Balloon balloon : affectedGroup.balloons) {
-            balloon.supportHais.remove(id);
+            balloon.removeFromSupportHais(id);
             if (!BalloonRegistryUtility.isBalloonValid(balloon, affectedGroup)) {
                 balloon.isInvalid = true;
             }
@@ -190,12 +190,12 @@ public class BalloonRegistry {
         List<HaiGroup> newGroups = BalloonRegistryUtility.splitAndRecreateGroups(affectedGroup.hais, haiGroups, haiGroupMap, level);
 
         for(Balloon orphan : orphanedBalloons) {
-            orphan.supportHais.remove(id);
+            orphan.removeFromSupportHais(id);
             
             boolean adopted = false;
             for(HaiGroup potentialOwner : newGroups) {
                 Set<UUID> ownerHaiIds = potentialOwner.hais.stream().map(HaiData::id).collect(Collectors.toSet());
-                if (!Collections.disjoint(orphan.supportHais, ownerHaiIds)) {
+                if (!Collections.disjoint(orphan.getSupportHaisSet(), ownerHaiIds)) {
                     if (BalloonRegistryUtility.isBalloonValid(orphan, potentialOwner)) {
                         potentialOwner.adoptOrphanBalloon(orphan, this);
                         adopted = true;

@@ -10,7 +10,7 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
 import com.deltasf.createpropulsion.registries.PropulsionShapes;
 import com.deltasf.createpropulsion.utility.burners.BurnerFuelBehaviour;
-import com.simibubi.create.foundation.blockEntity.SmartBlockEntityTicker;
+import com.simibubi.create.foundation.block.IBE;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -27,9 +27,7 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -40,7 +38,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class HotAirBurnerBlock extends Block implements EntityBlock {
+public class HotAirBurnerBlock extends Block implements IBE<HotAirBurnerBlockEntity> {
     public static final DirectionProperty FACING = DirectionProperty.create("facing", Direction.Plane.HORIZONTAL);
     public static final BooleanProperty LIT = BooleanProperty.create("lit");
 
@@ -122,6 +120,8 @@ public class HotAirBurnerBlock extends Block implements EntityBlock {
     @SuppressWarnings("deprecation")
     @Override
     public void onRemove(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull BlockState newState, boolean isMoving) {
+        IBE.onRemove(state, level, pos, newState);
+        
         if (state.is(newState.getBlock())) {
             super.onRemove(state, level, pos, newState, isMoving);
             return;
@@ -166,15 +166,12 @@ public class HotAirBurnerBlock extends Block implements EntityBlock {
     }
 
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(@Nonnull Level level, @Nonnull BlockState state, @Nonnull BlockEntityType<T> type) {
-        if (type == PropulsionBlockEntities.HOT_AIR_BURNER_BLOCK_ENTITY.get()) {
-            return new SmartBlockEntityTicker<>();
-        }
-        return null;
+    public Class<HotAirBurnerBlockEntity> getBlockEntityClass() {
+        return HotAirBurnerBlockEntity.class;
     }
 
     @Override
-    public BlockEntity newBlockEntity(@Nonnull BlockPos pPos, @Nonnull BlockState pState) {
-        return new HotAirBurnerBlockEntity(PropulsionBlockEntities.HOT_AIR_BURNER_BLOCK_ENTITY.get(), pPos, pState);
+    public BlockEntityType<? extends HotAirBurnerBlockEntity> getBlockEntityType() {
+        return PropulsionBlockEntities.HOT_AIR_BURNER_BLOCK_ENTITY.get();
     }
 }

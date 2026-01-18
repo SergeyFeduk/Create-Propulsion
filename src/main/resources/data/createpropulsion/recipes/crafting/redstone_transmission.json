@@ -1,0 +1,25 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "BSB",
+        "RCR",
+        "   "
+    ],
+    "key": {
+        "B": {
+            "item": "create:brass_ingot"
+        },
+        "S": {
+            "item": "create:speedometer"
+        },
+        "R": {
+            "item": "minecraft:redstone"
+        },
+        "C": {
+            "item": "create:rotation_speed_controller"
+        }
+    },
+    "result": {
+        "item": "createpropulsion:redstone_transmission"
+    }
+}

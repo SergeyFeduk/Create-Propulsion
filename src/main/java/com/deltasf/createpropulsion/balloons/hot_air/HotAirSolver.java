@@ -57,7 +57,7 @@ public class HotAirSolver {
 
     private static void calculateInjections(SolverContext ctx) {
         //Hai injections
-        for(UUID id : ctx.balloon.supportHais) {
+        for(UUID id : ctx.balloon.getSupportHais()) {
             IHotAirInjector hai = ctx.registry.getInjector(ctx.level, id);
             if (hai == null) continue; //May happen on hai destruction, before it got updated in registry
             double injection = hai.getInjectionAmount();
@@ -90,10 +90,19 @@ public class HotAirSolver {
     private static void calculateHoleLeak(SolverContext ctx) {
         //Hole leak based on y coordinate of each hole. We assume that hot air is evenlt distributed along all y levels
         double activeHoleCount = 0;
+        double minY = ctx.balloon.getAABB().minY;
+
         for (BlockPos holePos : ctx.balloon.getHoles()) {
             double interpolationValue = (holePos.getY() + 1.0) - ctx.pressureFloor;
             double activityFraction = org.joml.Math.clamp(0.0, 1.0, interpolationValue);
-            activeHoleCount += activityFraction;
+
+            double relativePos = 0.0;
+            if (ctx.height > 0) {
+                relativePos = (holePos.getY() - minY) / ctx.height;
+            }
+            double heightBoost = 1.0 + org.joml.Math.clamp(0.0, 1.0, relativePos); //Relative height factor (higher the hole in balloon -> higher the leak factor)
+
+            activeHoleCount += activityFraction * heightBoost;
         }
         if (activeHoleCount > 0) {
             ctx.hotAirChange -= PropulsionConfig.BALLOON_HOLE_LEAK_FACTOR.get() * Math.pow(activeHoleCount, holeFactorExponent) * ctx.fullness;
@@ -113,8 +122,8 @@ public class HotAirSolver {
         } else {
             // Re-check validity against the group
             boolean isValid = BalloonRegistryUtility.isBalloonValid(ctx.balloon, ctx.group);
-            
-            if (isValid && ctx.balloon.supportHais.isEmpty()) {
+
+            if (isValid && ctx.balloon.isSupportHaisEmpty() && ctx.group.hais.isEmpty()) {
                 if (ctx.hotAirAmount <= epsilon) { 
                     isValid = false;
                 }
