@@ -213,7 +213,7 @@ public class BalloonRegistryUtility {
         if (outerBox == null || innerBox == null) return false;
 
         return outerBox.minX <= innerBox.minX &&
-               outerBox.minY <= innerBox.minY && //TODO: Revert after I figure out that 1 block volume extension downwards after scans (happens both at initial and expansion scans)
+               outerBox.minY <= innerBox.minY &&
                outerBox.minZ <= innerBox.minZ &&
                outerBox.maxX >= innerBox.maxX &&
                outerBox.maxY >= innerBox.maxY &&
