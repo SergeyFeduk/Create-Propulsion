@@ -5,7 +5,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.deltasf.createpropulsion.balloons.ClientBalloon;
+import com.deltasf.createpropulsion.balloons.particles.BalloonParticleSystem;
+import com.deltasf.createpropulsion.balloons.particles.ShipParticleHandler;
 
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -31,12 +34,16 @@ public class ClientBalloonRegistry {
         ClientBalloon balloon = shipBalloons.computeIfAbsent(shipId, k -> new HashMap<>())
                                             .computeIfAbsent(balloonId, id -> new ClientBalloon(id));
         balloon.setContent(volume, holes);
+
+        triggerParticleUpdate(shipId, balloon);
     }
 
     public static void onDeltaPacket(long shipId, int balloonId, long[] added, long[] removed, long[] addedHoles, long[] removedHoles) {
         Map<Integer, ClientBalloon> map = shipBalloons.computeIfAbsent(shipId, k -> new HashMap<>());
         ClientBalloon balloon = map.computeIfAbsent(balloonId, id -> new ClientBalloon(id));
         balloon.applyDelta(added, removed, addedHoles, removedHoles);
+
+        triggerParticleUpdate(shipId, balloon);
     }
 
     public static void onDestroyPacket(long shipId, int balloonId) {
@@ -50,6 +57,17 @@ public class ClientBalloonRegistry {
     @SubscribeEvent
     public static void onClientLogout(ClientPlayerNetworkEvent.LoggingOut event) {
         shipBalloons.clear();
+    }
+
+    private static void triggerParticleUpdate(long shipId, ClientBalloon balloon) {
+        // Only update if the handler exists and is active (near player)
+        ShipParticleHandler handler = BalloonParticleSystem.getHandler(shipId);
+        if (handler != null) {
+            Minecraft mc = Minecraft.getInstance();
+            if (mc.level != null) {
+                handler.updateHoleEffectors(mc.level, balloon);
+            }
+        }
     }
 
     //TODO: This likely causes the issue with client balloon persistence
