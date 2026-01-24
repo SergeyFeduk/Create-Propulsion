@@ -4,6 +4,7 @@ import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.balloons.network.BalloonDeltaPacket;
 import com.deltasf.createpropulsion.balloons.network.BalloonDestroyPacket;
 import com.deltasf.createpropulsion.balloons.network.BalloonStructureSyncPacket;
+import com.deltasf.createpropulsion.balloons.network.BalloonUpdatePacket;
 import com.deltasf.createpropulsion.physics_assembler.packets.AssemblyFailedPacket;
 import com.deltasf.createpropulsion.physics_assembler.packets.GaugeInsertionErrorPacket;
 import com.deltasf.createpropulsion.physics_assembler.packets.GaugeUsedPacket;
@@ -80,6 +81,11 @@ public class PropulsionPackets {
             .consumerMainThread(BalloonDestroyPacket::handle)
             .add();
 
+        INSTANCE.messageBuilder(BalloonUpdatePacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+            .encoder(BalloonUpdatePacket::encode)
+            .decoder(BalloonUpdatePacket::decode)
+            .consumerMainThread(BalloonUpdatePacket::handle)
+            .add();
     }
 
     public static <MSG> void sendToPlayer(MSG message, ServerPlayer player) {

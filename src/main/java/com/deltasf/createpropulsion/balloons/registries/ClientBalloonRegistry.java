@@ -69,6 +69,13 @@ public class ClientBalloonRegistry {
         }
     }
 
+    public static void onUpdatePacket(long shipId, int balloonId, float hotAir) {
+        Int2ObjectMap<ClientBalloon> map = shipBalloons.get(shipId);
+        ClientBalloon balloon = map.computeIfAbsent(balloonId, ClientBalloon::new);
+
+        balloon.hotAir = hotAir;
+    }
+
     public static void onDestroyPacket(long shipId, int balloonId) {
         Int2ObjectMap<ClientBalloon> map = shipBalloons.get(shipId);
         if (map != null) {

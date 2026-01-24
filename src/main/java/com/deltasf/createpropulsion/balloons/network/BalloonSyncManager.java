@@ -31,6 +31,10 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(modid = CreatePropulsion.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class BalloonSyncManager {
 
+    //For periodic updates
+    private static int tickCounter = 0;
+    private static final int UPDATE_INTERVAL = 5;
+
     private static final Map<Long, Set<UUID>> syncedPlayers = new ConcurrentHashMap<>();
     private static final Map<Long, Set<Integer>> pendingDestroys = new ConcurrentHashMap<>();
 
@@ -45,6 +49,9 @@ public class BalloonSyncManager {
     @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
+
+        tickCounter++;
+        boolean shouldSendUpdates = (tickCounter % UPDATE_INTERVAL == 0);
 
         var shipRegistry = BalloonShipRegistry.get();
         var shipRegistries = shipRegistry.getShipRegistries();
@@ -66,7 +73,7 @@ public class BalloonSyncManager {
             }
         }
 
-        //Handle Syncing
+        //Handle Syncing & Ticking
         for(long shipId : shipRegistries.keySet()) {
             BalloonRegistry balloonRegistry = shipRegistries.get(shipId);
             ServerLevel level = levelMap.get(shipId);
@@ -76,7 +83,7 @@ public class BalloonSyncManager {
                 continue;
             }
 
-            Ship ship  = ValkyrienSkies.api().getServerShipWorld().getLoadedShips().getById(shipId);
+            Ship ship = ValkyrienSkies.api().getServerShipWorld().getLoadedShips().getById(shipId);
             if (!(ship instanceof LoadedServerShip loadedShip)) {
                 syncedPlayers.remove(shipId);
                 continue;
@@ -84,8 +91,23 @@ public class BalloonSyncManager {
 
             syncNewWatchers(shipId, loadedShip, balloonRegistry, level);
 
+            List<ServerPlayer> currentWatchers = null;
+            if (shouldSendUpdates) {
+                currentWatchers = getPlayersInRange(level, loadedShip.getTransform().getPosition());
+            }
+
             for(Balloon balloon : balloonRegistry.getBalloons()) {
+                //Delta
                 flushBalloon(shipId, balloon, level);
+
+                //Updates synced every N ticks
+                if (shouldSendUpdates && currentWatchers != null && !currentWatchers.isEmpty()) {
+                    BalloonUpdatePacket updatePacket = new BalloonUpdatePacket(shipId, balloon.id, (float)balloon.hotAir );
+                    
+                    for (ServerPlayer player : currentWatchers) {
+                        PropulsionPackets.sendToPlayer(updatePacket, player);
+                    }
+                }
             }
         }
     }

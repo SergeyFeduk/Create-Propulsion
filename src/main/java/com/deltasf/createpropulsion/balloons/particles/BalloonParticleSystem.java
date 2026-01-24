@@ -1,7 +1,6 @@
 package com.deltasf.createpropulsion.balloons.particles;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.joml.Matrix4dc;
@@ -35,7 +34,7 @@ public class BalloonParticleSystem {
     private static final double SPAWN_RADIUS = 32.0;
     
     // Temp
-    private static final List<ClientBalloon> intersectingBalloons = new ArrayList<>();
+    private static final Map<ClientBalloon, AABB> perBalloonIntersections = new HashMap<>();
     private static final Vector3d tmpMin = new Vector3d();
     private static final Vector3d tmpMax = new Vector3d();
 
@@ -84,8 +83,7 @@ public class BalloonParticleSystem {
             if (!shipWorldAABB.intersects(playerBounds)) continue;
 
             // Aggregate Balloons
-            intersectingBalloons.clear();
-            AABB intersectionAABB = null;
+            perBalloonIntersections.clear();
 
             Matrix4dc worldToShip = ship.getTransform().getWorldToShip();
             worldToShip.transformAab(
@@ -98,20 +96,18 @@ public class BalloonParticleSystem {
 
             for (ClientBalloon b : allBalloons.values()) {
                 if (b.getBounds().intersects(playerInShip)) {
-                    intersectingBalloons.add(b);
-                    // Calculate intersection of balloon bounds and player bounds
+                    // Calculate specific intersection
                     AABB intersect = b.getBounds().intersect(playerInShip);
-                    if (intersectionAABB == null) intersectionAABB = intersect;
-                    else intersectionAABB = intersectionAABB.minmax(intersect);
+                    perBalloonIntersections.put(b, intersect);
                 }
             }
 
             // Delegate to handler
-            if (!intersectingBalloons.isEmpty() || handlers.containsKey(shipId)) {
+            if (!perBalloonIntersections.isEmpty() || handlers.containsKey(shipId)) {
                 ShipParticleHandler handler = getOrCreateHandler(shipId);
-                handler.tick(ship, allBalloons, intersectingBalloons, intersectionAABB);
+                handler.tick(ship, allBalloons, perBalloonIntersections);
 
-                if (handler.isEmpty() && intersectingBalloons.isEmpty()) {
+                if (handler.isEmpty() && perBalloonIntersections.isEmpty()) {
                     handlers.remove(shipId);
                 }
             }

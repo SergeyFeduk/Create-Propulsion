@@ -10,6 +10,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.AABB;
 
 public class ClientBalloon {
+    public float hotAir = 0.0f;
+
     public final int id;
     public final LongOpenHashSet volume = new LongOpenHashSet();
     public final Set<BlockPos> holes = new HashSet<>();
@@ -25,6 +27,11 @@ public class ClientBalloon {
 
     public ClientBalloon(int id) {
         this.id = id;
+    }
+
+    public float getFullness() {
+        if (volume.size() == 0) return 0;
+        return hotAir / volume.size();
     }
 
     public AABB getBounds() {

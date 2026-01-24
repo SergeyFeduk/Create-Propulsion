@@ -1,6 +1,6 @@
 package com.deltasf.createpropulsion.balloons.particles;
 
-import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import org.joml.Vector3f;
@@ -19,6 +19,8 @@ public class ShipParticleHandler {
 
     private static final float DRAG_VOLUME = 0.90f;
     private static final float DRAG_LEAK = 0.98f; 
+
+    private static final float BASE_SPAWN_CHANCE = 0.33f;
 
     public final HapData data;
     public final ShipEffectorHandler effectors;
@@ -57,9 +59,15 @@ public class ShipParticleHandler {
         data.spawn((float)(absX - anchorX), (float)(absY - anchorY), (float)(absZ - anchorZ), state, balloonId);
     }
 
-    public void tick(ClientShip ship, Int2ObjectMap<ClientBalloon> allBalloons, List<ClientBalloon> spawnCandidates, AABB intersectionBounds) {
+    public void tick(ClientShip ship, Int2ObjectMap<ClientBalloon> allBalloons, Map<ClientBalloon, AABB> intersections) {
         tickCounter++;
-        spawnVolumeParticles(spawnCandidates, intersectionBounds);
+        // Anchor is initialized based on the first available intersection
+        if (!initialized && !intersections.isEmpty()) {
+            AABB first = intersections.values().iterator().next();
+            ensureInitialized(first.getCenter().x, first.getCenter().y, first.getCenter().z);
+        }
+
+        spawnVolumeParticles(intersections);
 
         if (data.count == 0) return;
 
@@ -92,7 +100,7 @@ public class ShipParticleHandler {
             float fx = 0, fy = 0, fz = 0;
 
             if (data.state[i] == HapData.STATE_LEAK) {
-                // LEAK: No effectors, just simple rise
+                //TODO: Apply force in world space (precompute per ship)
                 fy += 0.02f;
             } else {
                 // VOLUME: Effectors + Turbulence
@@ -168,38 +176,51 @@ public class ShipParticleHandler {
         data.cfz[i] = tmpForce.z;
     }
 
-    private void spawnVolumeParticles(List<ClientBalloon> spawnCandidates, AABB intersectionBounds) {
-        if (spawnCandidates.isEmpty() || intersectionBounds == null) return;
+    private void spawnVolumeParticles(Map<ClientBalloon, AABB> intersections) {
+        if (intersections.isEmpty()) return;
         
-        ensureInitialized(intersectionBounds.getCenter().x, intersectionBounds.getCenter().y, intersectionBounds.getCenter().z);
-
-        int spawnAttempts = 5; 
+        int attemptsPerBalloon = 2; 
         
-        for (int k = 0; k < spawnAttempts; k++) {
+        for (Map.Entry<ClientBalloon, AABB> entry : intersections.entrySet()) {
             if (data.count >= data.capacity) break;
-
-            double rx = intersectionBounds.minX + (intersectionBounds.maxX - intersectionBounds.minX) * random.nextDouble();
-            double ry = intersectionBounds.minY + (intersectionBounds.maxY - intersectionBounds.minY) * random.nextDouble();
-            double rz = intersectionBounds.minZ + (intersectionBounds.maxZ - intersectionBounds.minZ) * random.nextDouble();
             
-            long packed = packPos(rx, ry, rz);
-            int foundId = -1;
+            ClientBalloon b = entry.getKey();
+            AABB bounds = entry.getValue();
+            
+            //Base threshold once per balloon
+            float baseThreshold = b.getFullness() * BASE_SPAWN_CHANCE;
 
-            // Only check candidates for spawning
-            for (ClientBalloon b : spawnCandidates) {
-                if (b.volume.contains(packed)) {
-                    foundId = b.id;
-                    break;
+            for (int k = 0; k < attemptsPerBalloon; k++) {
+                if (data.count >= data.capacity) break;
+
+                double rx = bounds.minX + (bounds.maxX - bounds.minX) * random.nextDouble();
+                double ry = bounds.minY + (bounds.maxY - bounds.minY) * random.nextDouble();
+                double rz = bounds.minZ + (bounds.maxZ - bounds.minZ) * random.nextDouble();
+                
+                boolean shouldSpawn = false;
+
+                if (random.nextFloat() < baseThreshold) {
+                    shouldSpawn = true;
+                } else {
+                    long packed = packPos(rx, ry, rz);
+                    EffectorBucket bucket = effectors.getBucket(packed);
+                    
+                    if (bucket != null && bucket.hasHole) {
+                        shouldSpawn = true; // Force spawn due to hole
+                    }
                 }
-            }
 
-            if (foundId != -1) {
-                // Store Relative
-                int id = data.spawn((float)(rx - anchorX), (float)(ry - anchorY), (float)(rz - anchorZ), HapData.STATE_VOLUME, foundId);
-                if (id != -1) {
-                    data.life[id] = 0.5f + random.nextFloat() * 0.5f;
-                    data.x[id] += (random.nextFloat() - 0.5f);
-                    data.z[id] += (random.nextFloat() - 0.5f);
+                if (shouldSpawn) {
+                    long packed = packPos(rx, ry, rz); 
+                    
+                    if (b.volume.contains(packed)) {
+                        int id = data.spawn((float)(rx - anchorX), (float)(ry - anchorY), (float)(rz - anchorZ), HapData.STATE_VOLUME, b.id);
+                        if (id != -1) {
+                            data.life[id] = 0.5f + random.nextFloat() * 0.5f;
+                            data.x[id] += (random.nextFloat() - 0.5f) * 0.2f;
+                            data.z[id] += (random.nextFloat() - 0.5f) * 0.2f;
+                        }
+                    }
                 }
             }
         }
