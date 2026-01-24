@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.joml.Matrix4dc;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
@@ -35,6 +36,8 @@ public class BalloonParticleSystem {
     
     // Temp
     private static final List<ClientBalloon> intersectingBalloons = new ArrayList<>();
+    private static final Vector3d tmpMin = new Vector3d();
+    private static final Vector3d tmpMax = new Vector3d();
 
     public static ShipParticleHandler getHandler(long shipId) {
         return handlers.get(shipId);
@@ -70,31 +73,28 @@ public class BalloonParticleSystem {
 
         Player player = mc.player;
         if (player == null) return;
-        AABB playerBounds = player.getBoundingBox().inflate(SPAWN_RADIUS); //TODO: Guh this is broken, try rotated ship
-        //DebugRenderer.drawBox(player.toString(), playerBounds, 50);
+        AABB playerBounds = player.getBoundingBox().inflate(SPAWN_RADIUS);
 
         // Iterate over loaded ships
         for (ClientShip ship : VSGameUtilsKt.getShipObjectWorld(mc.level).getLoadedShips()) {
             long shipId = ship.getId();
             Int2ObjectMap<ClientBalloon> allBalloons = ClientBalloonRegistry.getBalloonsForShip(shipId);
             
-            AABB shipWorldAABB = VectorConversionsMCKt.toMinecraft(ship.getRenderAABB()) ; // Approx world AABB
+            AABB shipWorldAABB = VectorConversionsMCKt.toMinecraft(ship.getRenderAABB());
             if (!shipWorldAABB.intersects(playerBounds)) continue;
 
             // Aggregate Balloons
             intersectingBalloons.clear();
             AABB intersectionAABB = null;
 
-            // Transform Player AABB to Ship Space for precise check
-            Vector3d minW = new Vector3d(playerBounds.minX, playerBounds.minY, playerBounds.minZ);
-            Vector3d maxW = new Vector3d(playerBounds.maxX, playerBounds.maxY, playerBounds.maxZ);
-            ship.getTransform().getWorldToShip().transformPosition(minW);
-            ship.getTransform().getWorldToShip().transformPosition(maxW);
-            // Re-align AABB in ship space
-            AABB playerInShip = new AABB(
-                Math.min(minW.x, maxW.x), Math.min(minW.y, maxW.y), Math.min(minW.z, maxW.z),
-                Math.max(minW.x, maxW.x), Math.max(minW.y, maxW.y), Math.max(minW.z, maxW.z)
+            Matrix4dc worldToShip = ship.getTransform().getWorldToShip();
+            worldToShip.transformAab(
+                playerBounds.minX, playerBounds.minY, playerBounds.minZ,
+                playerBounds.maxX, playerBounds.maxY, playerBounds.maxZ,
+                tmpMin, tmpMax
             );
+
+            AABB playerInShip = new AABB(tmpMin.x, tmpMin.y, tmpMin.z, tmpMax.x, tmpMax.y, tmpMax.z);
 
             for (ClientBalloon b : allBalloons.values()) {
                 if (b.getBounds().intersects(playerInShip)) {
