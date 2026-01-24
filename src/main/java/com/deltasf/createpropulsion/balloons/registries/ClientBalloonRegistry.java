@@ -1,14 +1,16 @@
 package com.deltasf.createpropulsion.balloons.registries;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.deltasf.createpropulsion.balloons.ClientBalloon;
 import com.deltasf.createpropulsion.balloons.particles.BalloonParticleSystem;
 import com.deltasf.createpropulsion.balloons.particles.ShipParticleHandler;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -16,38 +18,59 @@ import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(value = Dist.CLIENT)
 public class ClientBalloonRegistry {
-    private static final Map<Long, Map<Integer, ClientBalloon>> shipBalloons = new HashMap<>();
+    private static final Long2ObjectMap<Int2ObjectMap<ClientBalloon>> shipBalloons = new Long2ObjectOpenHashMap<>();
 
     public static ClientBalloon getBalloon(long shipId, int balloonId) {
-        return shipBalloons.computeIfAbsent(shipId, k -> new HashMap<>()).get(balloonId);
+        return shipBalloons.computeIfAbsent(shipId, k -> new Int2ObjectOpenHashMap<>()).get(balloonId);
     }
 
-    public static Map<Long, Map<Integer, ClientBalloon>> getAllShipBalloons() {
-        return Collections.unmodifiableMap(shipBalloons);
+    public static Long2ObjectMap<Int2ObjectMap<ClientBalloon>> getAllShipBalloons() {
+        return Long2ObjectMaps.unmodifiable(shipBalloons);
     }
     
-    public static Map<Integer, ClientBalloon> getBalloonsForShip(long shipId) {
-        return shipBalloons.getOrDefault(shipId, new HashMap<>());
+    public static Int2ObjectMap<ClientBalloon> getBalloonsForShip(long shipId) {
+        return shipBalloons.getOrDefault(shipId, new Int2ObjectOpenHashMap<>());
     }
 
     public static void onStructurePacket(long shipId, int balloonId, long[] volume, long[] holes) {
-        ClientBalloon balloon = shipBalloons.computeIfAbsent(shipId, k -> new HashMap<>())
-                                            .computeIfAbsent(balloonId, id -> new ClientBalloon(id));
+        Int2ObjectMap<ClientBalloon> map = shipBalloons.computeIfAbsent(shipId, k -> new Int2ObjectOpenHashMap<>());
+        ClientBalloon balloon = map.computeIfAbsent(balloonId, ClientBalloon::new);
         balloon.setContent(volume, holes);
 
-        triggerParticleUpdate(shipId, balloon);
+        //Trigger full particle update
+        ShipParticleHandler handler = BalloonParticleSystem.getHandler(shipId);
+        if (handler != null) {
+            Minecraft mc = Minecraft.getInstance();
+            if (mc.level != null) {
+                // Initialize handler if this is the first balloon loaded so effectors can attach
+                if (!balloon.volume.isEmpty()) {
+                    BlockPos first = BlockPos.of(balloon.volume.iterator().nextLong());
+                    handler.ensureInitialized(first.getX(), first.getY(), first.getZ());
+                }
+                handler.effectors.onStructureUpdate(mc.level, balloon);
+            }
+        }
     }
 
     public static void onDeltaPacket(long shipId, int balloonId, long[] added, long[] removed, long[] addedHoles, long[] removedHoles) {
-        Map<Integer, ClientBalloon> map = shipBalloons.computeIfAbsent(shipId, k -> new HashMap<>());
-        ClientBalloon balloon = map.computeIfAbsent(balloonId, id -> new ClientBalloon(id));
+        Int2ObjectMap<ClientBalloon> map = shipBalloons.computeIfAbsent(shipId, k -> new Int2ObjectOpenHashMap<>());
+        ClientBalloon balloon = map.computeIfAbsent(balloonId, ClientBalloon::new);
         balloon.applyDelta(added, removed, addedHoles, removedHoles);
 
-        triggerParticleUpdate(shipId, balloon);
+        //Update effectors incrementally
+        if (addedHoles.length > 0 || removedHoles.length > 0) {
+            ShipParticleHandler handler = BalloonParticleSystem.getHandler(shipId);
+            if (handler != null) {
+                Minecraft mc = Minecraft.getInstance();
+                if (mc.level != null) {
+                    handler.effectors.onDeltaUpdate(mc.level, balloon, addedHoles, removedHoles);
+                }
+            }
+        }
     }
 
     public static void onDestroyPacket(long shipId, int balloonId) {
-        Map<Integer, ClientBalloon> map = shipBalloons.get(shipId);
+        Int2ObjectMap<ClientBalloon> map = shipBalloons.get(shipId);
         if (map != null) {
             map.remove(balloonId);
             if (map.isEmpty()) shipBalloons.remove(shipId);
@@ -57,17 +80,6 @@ public class ClientBalloonRegistry {
     @SubscribeEvent
     public static void onClientLogout(ClientPlayerNetworkEvent.LoggingOut event) {
         shipBalloons.clear();
-    }
-
-    private static void triggerParticleUpdate(long shipId, ClientBalloon balloon) {
-        // Only update if the handler exists and is active (near player)
-        ShipParticleHandler handler = BalloonParticleSystem.getHandler(shipId);
-        if (handler != null) {
-            Minecraft mc = Minecraft.getInstance();
-            if (mc.level != null) {
-                handler.updateHoleEffectors(mc.level, balloon);
-            }
-        }
     }
 
     //TODO: This likely causes the issue with client balloon persistence

@@ -14,6 +14,8 @@ import com.deltasf.createpropulsion.debug.DebugRenderer;
 import com.deltasf.createpropulsion.debug.PropulsionDebug;
 import com.deltasf.createpropulsion.debug.routes.BalloonDebugRoute;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.LongIterator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.AABB;
@@ -40,15 +42,15 @@ public class BalloonDebug {
         new Color(255, 0, 255)
     };
 
-     @SubscribeEvent
+    @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         if (!IS_ENABLED || event.phase != TickEvent.Phase.END) return;
 
-        Map<Long, Map<Integer, ClientBalloon>> allData = ClientBalloonRegistry.getAllShipBalloons();
+        Long2ObjectMap<Int2ObjectMap<ClientBalloon>> allData = ClientBalloonRegistry.getAllShipBalloons();
         if (allData.isEmpty()) return;
 
-        for (Map.Entry<Long, Map<Integer, ClientBalloon>> entry : allData.entrySet()) {
-            long shipId = entry.getKey();
+        for (var entry : allData.long2ObjectEntrySet()) {
+            long shipId = entry.getLongKey();
             Map<Integer, ClientBalloon> shipBalloons = entry.getValue();
             for (ClientBalloon balloon : shipBalloons.values()) {
                 // Use ID for stable coloring

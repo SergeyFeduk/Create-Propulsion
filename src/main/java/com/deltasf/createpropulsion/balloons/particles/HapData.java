@@ -1,5 +1,7 @@
 package com.deltasf.createpropulsion.balloons.particles;
 
+import com.deltasf.createpropulsion.balloons.particles.effectors.EffectorBucket;
+
 //Data-Oriented ?!?!?
 public class HapData {
     public final int capacity;
@@ -20,6 +22,11 @@ public class HapData {
     public final byte[] state; // 0 = Volume, 1 = Stream, 2 = Leak
     public final float[] scale;
 
+    //Acceleration
+    public final int[] balloonId;
+    public final long[] lastBlockPosKey;
+    public final EffectorBucket[] cachedBucket;
+
     public static final byte STATE_VOLUME = 0;
     public static final byte STATE_STREAM = 1;
     public static final byte STATE_LEAK = 2;
@@ -34,9 +41,12 @@ public class HapData {
         this.maxLife = new float[capacity];
         this.state = new byte[capacity];
         this.scale = new float[capacity];
+        this.balloonId = new int[capacity];
+        this.lastBlockPosKey = new long[capacity];
+        this.cachedBucket = new EffectorBucket[capacity];
     }
     
-    public int spawn(float startX, float startY, float startZ, byte startState) {
+    public int spawn(float startX, float startY, float startZ, byte startState, int bId) {
         if (count >= capacity) return -1;
         int i = count++;
         x[i] = startX; y[i] = startY; z[i] = startZ;
@@ -47,6 +57,9 @@ public class HapData {
         maxLife[i] = 1.0f;
         state[i] = startState;
         scale[i] = 1.0f; 
+        balloonId[i] = bId;
+        lastBlockPosKey[i] = Long.MIN_VALUE;
+        cachedBucket[i] = null;
         return i;
     }
     
@@ -63,11 +76,17 @@ public class HapData {
             maxLife[index] = maxLife[last];
             state[index] = state[last];
             scale[index] = scale[last];
+            balloonId[index] = balloonId[last];
+            lastBlockPosKey[index] = lastBlockPosKey[last];
+            cachedBucket[index] = cachedBucket[last];
         }
+        cachedBucket[last] = null;
+
         count--;
     }
     
     public void clear() {
+        for(int i = 0; i < count; i++) cachedBucket[i] = null;
         count = 0;
     }
 }

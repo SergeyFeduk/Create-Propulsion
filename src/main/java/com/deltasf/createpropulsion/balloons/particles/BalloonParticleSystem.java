@@ -14,6 +14,7 @@ import com.deltasf.createpropulsion.balloons.ClientBalloon;
 import com.deltasf.createpropulsion.balloons.particles.rendering.InstancedParticleRenderer;
 import com.deltasf.createpropulsion.balloons.registries.ClientBalloonRegistry;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.client.Minecraft;
@@ -53,13 +54,12 @@ public class BalloonParticleSystem {
         if (mc.level != null) {
             Map<Integer, ClientBalloon> balloons = ClientBalloonRegistry.getBalloonsForShip(shipId);
             for (ClientBalloon balloon : balloons.values()) {
-                newHandler.updateHoleEffectors(mc.level, balloon);
+                newHandler.effectors.onStructureUpdate(mc.level, balloon);
             }
         }
         
         return newHandler;
     }
-
 
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
@@ -76,17 +76,10 @@ public class BalloonParticleSystem {
         // Iterate over loaded ships
         for (ClientShip ship : VSGameUtilsKt.getShipObjectWorld(mc.level).getLoadedShips()) {
             long shipId = ship.getId();
+            Int2ObjectMap<ClientBalloon> allBalloons = ClientBalloonRegistry.getBalloonsForShip(shipId);
             
             AABB shipWorldAABB = VectorConversionsMCKt.toMinecraft(ship.getRenderAABB()) ; // Approx world AABB
-            if (!shipWorldAABB.intersects(playerBounds)) {
-                //TODO: Remove this
-                ShipParticleHandler existing = handlers.get(shipId);
-                if (existing != null) {
-                    existing.tick(ship, List.of(), null);
-                    if (existing.isEmpty()) handlers.remove(shipId);
-                }
-                continue;
-            }
+            if (!shipWorldAABB.intersects(playerBounds)) continue;
 
             // Aggregate Balloons
             intersectingBalloons.clear();
@@ -103,8 +96,7 @@ public class BalloonParticleSystem {
                 Math.max(minW.x, maxW.x), Math.max(minW.y, maxW.y), Math.max(minW.z, maxW.z)
             );
 
-            Map<Integer, ClientBalloon> balloons = ClientBalloonRegistry.getBalloonsForShip(shipId);
-            for (ClientBalloon b : balloons.values()) {
+            for (ClientBalloon b : allBalloons.values()) {
                 if (b.getBounds().intersects(playerInShip)) {
                     intersectingBalloons.add(b);
                     // Calculate intersection of balloon bounds and player bounds
@@ -117,7 +109,7 @@ public class BalloonParticleSystem {
             // Delegate to handler
             if (!intersectingBalloons.isEmpty() || handlers.containsKey(shipId)) {
                 ShipParticleHandler handler = getOrCreateHandler(shipId);
-                handler.tick(ship, intersectingBalloons, intersectionAABB);
+                handler.tick(ship, allBalloons, intersectingBalloons, intersectionAABB);
 
                 if (handler.isEmpty() && intersectingBalloons.isEmpty()) {
                     handlers.remove(shipId);
