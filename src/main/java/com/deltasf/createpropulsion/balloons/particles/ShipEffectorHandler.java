@@ -37,39 +37,29 @@ public class ShipEffectorHandler {
         return effectors.computeIfAbsent(key, k -> new EffectorBucket());
     }
 
-    // --- Structural Update (Full Sync) ---
-
     public void onStructureUpdate(Level level, ClientBalloon balloon) {
-        // 1. Clean up old effectors for this balloon
         removeEffectorsForBalloon(balloon.id);
 
         if (balloon.holes.isEmpty()) return;
         
-        // 2. Re-calculate all holes
         for (BlockPos hole : balloon.holes) {
             addHoleEffectorInternal(level, balloon, hole);
         }
     }
 
-    // --- Incremental Updates (Delta) ---
-
     public void onDeltaUpdate(Level level, ClientBalloon balloon, long[] addedHoles, long[] removedHoles) {
-        // 1. Remove old holes
         if (removedHoles.length > 0) {
             for (long packed : removedHoles) {
                 removeHoleEffectorInternal(balloon.id, BlockPos.of(packed));
             }
         }
 
-        // 2. Add new holes
         if (addedHoles.length > 0) {
             for (long packed : addedHoles) {
                 addHoleEffectorInternal(level, balloon, BlockPos.of(packed));
             }
         }
     }
-
-    // --- Internal Logic ---
 
     private void addHoleEffectorInternal(Level level, ClientBalloon balloon, BlockPos hole) {
         Vector3f dirAccumulator = calculateHoleDirection(level, balloon, hole);
@@ -99,7 +89,6 @@ public class ShipEffectorHandler {
 
     private void removeHoleEffectorInternal(int balloonId, BlockPos hole) {
         BlockPos.MutableBlockPos mut = new BlockPos.MutableBlockPos();
-        // We must check the same radius used in addition to clear the buckets
         for (int x = -EFFECTOR_RADIUS; x <= EFFECTOR_RADIUS; x++) {
             for (int y = -EFFECTOR_RADIUS; y <= EFFECTOR_RADIUS; y++) {
                 for (int z = -EFFECTOR_RADIUS; z <= EFFECTOR_RADIUS; z++) {
@@ -144,21 +133,16 @@ public class ShipEffectorHandler {
             neighborPos.setWithOffset(hole, d);
             long neighborPacked = neighborPos.asLong();
             
-            // Rule 2: Volume block - Push AWAY (Inverse of D)
             if (balloon.volume.contains(neighborPacked)) {
                 dirAccumulator.add(-d.getStepX() * 1.0f, -d.getStepY() * 1.0f, -d.getStepZ() * 1.0f);
             } 
-            // Rule 1: Another Hole - Pull slightly
             else if (balloon.holes.contains(neighborPos)) {
                 dirAccumulator.add(d.getStepX() * 0.1f, d.getStepY() * 0.1f, d.getStepZ() * 0.1f);
             } 
-            // Rule 3 & 4: Check World Block
             else {
                 boolean isEnvelope = HaiGroup.isHab(neighborPos, level);
                 
-                // Rule 4: Envelope - No effect
-                if (!isEnvelope) {
-                    // Rule 3: Air/Obstruction - Pull towards
+                if (!isEnvelope && balloon.getBounds().contains(neighborPos.getCenter())) {
                     dirAccumulator.add(d.getStepX() * 1.0f, d.getStepY() * 1.0f, d.getStepZ() * 1.0f);
                 }
             }

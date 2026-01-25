@@ -31,7 +31,8 @@ import net.minecraftforge.fml.common.Mod;
 public class BalloonParticleSystem {
 
     private static final Long2ObjectMap<ShipParticleHandler> handlers = new Long2ObjectOpenHashMap<>();
-    private static final double SPAWN_RADIUS = 32.0;
+    public static final double SPAWN_RADIUS = 32.0;
+    public static final double SPAWN_RADIUS_SQ = SPAWN_RADIUS * SPAWN_RADIUS;
     
     // Temp
     private static final Map<ClientBalloon, AABB> perBalloonIntersections = new HashMap<>();

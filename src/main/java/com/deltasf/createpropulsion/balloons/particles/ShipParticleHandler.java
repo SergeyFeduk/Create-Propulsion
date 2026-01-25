@@ -17,8 +17,9 @@ public class ShipParticleHandler {
     private static final int MAX_PARTICLES = 4096;
     private static final int SAMPLE_INTERVAL = 5;
 
-    private static final float DRAG_VOLUME = 0.90f;
-    private static final float DRAG_LEAK = 0.98f; 
+    private static final float DRAG_VOLUME = 0.95f;
+    private static final float DRAG_LEAK = 0.98f;
+    private static final float DRAG_STREAM = 0.99f;
 
     private static final float BASE_SPAWN_CHANCE = 0.33f;
 
@@ -57,6 +58,17 @@ public class ShipParticleHandler {
     public void spawnManual(double absX, double absY, double absZ, byte state, int balloonId) {
         ensureInitialized(absX, absY, absZ);
         data.spawn((float)(absX - anchorX), (float)(absY - anchorY), (float)(absZ - anchorZ), state, balloonId);
+    }
+
+    public void spawnStream(double absX, double absY, double absZ, double vy, int balloonId) {
+        ensureInitialized(absX, absY, absZ);
+        int id = data.spawn((float)(absX - anchorX), (float)(absY - anchorY), (float)(absZ - anchorZ), HapData.STATE_STREAM, balloonId);
+        if (id != -1) {
+            data.vx[id] = (random.nextFloat() - 0.5f) * 0.05f;
+            data.vy[id] = (float) vy;
+            data.vz[id] = (random.nextFloat() - 0.5f) * 0.05f;
+            data.life[id] = 1.0f;
+        }
     }
 
     public void tick(ClientShip ship, Int2ObjectMap<ClientBalloon> allBalloons, Map<ClientBalloon, AABB> intersections) {
@@ -102,6 +114,14 @@ public class ShipParticleHandler {
             if (data.state[i] == HapData.STATE_LEAK) {
                 //TODO: Apply force in world space (precompute per ship)
                 fy += 0.02f;
+            } else if (data.state[i] == HapData.STATE_STREAM) {
+                fy += 0.08f; 
+                
+                int bId = data.balloonId[i];
+                ClientBalloon balloon = allBalloons.get(bId);
+                if (balloon != null && balloon.volume.contains(packPos(absX, absY, absZ))) {
+                    data.state[i] = HapData.STATE_VOLUME;
+                }
             } else {
                 // VOLUME: Effectors + Turbulence
                 if (isSamplingTick) {
@@ -131,7 +151,11 @@ public class ShipParticleHandler {
             data.z[i] += data.vz[i] * dt;
 
             // Drag
-            float drag = (data.state[i] == HapData.STATE_LEAK) ? DRAG_LEAK : DRAG_VOLUME;
+            float drag;
+            if (data.state[i] == HapData.STATE_LEAK) drag = DRAG_LEAK;
+            else if (data.state[i] == HapData.STATE_STREAM) drag = DRAG_STREAM;
+            else drag = DRAG_VOLUME;
+
             data.vx[i] *= drag;
             data.vy[i] *= drag;
             data.vz[i] *= drag;

@@ -2,6 +2,9 @@ package com.deltasf.createpropulsion.balloons;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
+
+import com.deltasf.createpropulsion.balloons.registries.ClientBalloonRegistry;
 
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
@@ -16,6 +19,8 @@ public class ClientBalloon {
     public final LongOpenHashSet volume = new LongOpenHashSet();
     public final Set<BlockPos> holes = new HashSet<>();
     
+    public final Set<UUID> connectedHais = new HashSet<>();
+
     //Incremental bounds
     private final Int2IntMap countAtX = new Int2IntOpenHashMap();
     private final Int2IntMap countAtY = new Int2IntOpenHashMap();
@@ -39,7 +44,7 @@ public class ClientBalloon {
         return cachedBounds;
     }
 
-    public void applyDelta(long[] added, long[] removed, long[] addedHoles, long[] removedHoles) {
+    public void applyDelta(long[] added, long[] removed, long[] addedHoles, long[] removedHoles, UUID[] addedHais, UUID[] removedHais) {
         for (long p : removed) {
             if (volume.remove(p)) {
                 onRemoveCoords(BlockPos.getX(p), BlockPos.getY(p), BlockPos.getZ(p));
@@ -54,11 +59,34 @@ public class ClientBalloon {
         
         for (long p : removedHoles) holes.remove(BlockPos.of(p));
         for (long p : addedHoles) holes.add(BlockPos.of(p));
+
+        if (removedHais != null) {
+            for (UUID uid : removedHais) {
+                if (connectedHais.remove(uid)) {
+                    ClientBalloonRegistry.updateHaiIndex(uid, -1);
+                }
+            }
+        }
+        
+        if (addedHais != null) {
+            for (UUID uid : addedHais) {
+                if (connectedHais.add(uid)) {
+                    ClientBalloonRegistry.updateHaiIndex(uid, this.id);
+                }
+            }
+        }
+
     }
     
-    public void setContent(long[] newVolume, long[] newHoles) {
+    public void setContent(long[] newVolume, long[] newHoles, UUID[] newHais) {
         volume.clear();
         holes.clear();
+
+        for(UUID uid : connectedHais) {
+            ClientBalloonRegistry.updateHaiIndex(uid, -1);
+        }
+
+        connectedHais.clear();
         
         countAtX.clear();
         countAtY.clear();
@@ -71,6 +99,12 @@ public class ClientBalloon {
         }
         
         for(long p : newHoles) holes.add(BlockPos.of(p));
+
+        for(UUID h : newHais) connectedHais.add(h);
+
+        for(UUID uid : connectedHais) {
+            ClientBalloonRegistry.updateHaiIndex(uid, this.id);
+        }
         
         updateBoundsCache();
     }

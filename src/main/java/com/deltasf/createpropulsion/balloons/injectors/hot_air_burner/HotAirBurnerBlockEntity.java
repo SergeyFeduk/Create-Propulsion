@@ -19,17 +19,22 @@ import com.deltasf.createpropulsion.balloons.injectors.AirInjectorObstructionBeh
 import com.deltasf.createpropulsion.balloons.injectors.BalloonInfoBehaviour;
 import com.deltasf.createpropulsion.balloons.injectors.HotAirInjectorBehaviour;
 import com.deltasf.createpropulsion.balloons.injectors.IHotAirInjector;
+import com.deltasf.createpropulsion.balloons.particles.BalloonParticleSystem;
+import com.deltasf.createpropulsion.balloons.particles.ShipParticleHandler;
 import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
+import com.deltasf.createpropulsion.balloons.registries.ClientBalloonRegistry;
 import com.deltasf.createpropulsion.utility.burners.BurnerFuelBehaviour;
 import com.deltasf.createpropulsion.utility.burners.IBurner;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -40,6 +45,7 @@ import net.minecraftforge.common.util.LazyOptional;
 
 public class HotAirBurnerBlockEntity extends SmartBlockEntity implements IHaveGoggleInformation, IBurner, IHotAirInjector {
     public static final double TREND_THRESHOLD = 0.001;
+    private static final float PARTICLE_SPAWN_MULTIPLIER = 0.1f;
 
     // Behaviours
     private HotAirInjectorBehaviour injectorBehaviour;
@@ -49,6 +55,7 @@ public class HotAirBurnerBlockEntity extends SmartBlockEntity implements IHaveGo
 
     private int burnTime = 0;
     private int leverPosition = 0; // 0-1-2
+    private float particleAccumulator = 0;
 
     public HotAirBurnerBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
@@ -126,7 +133,10 @@ public class HotAirBurnerBlockEntity extends SmartBlockEntity implements IHaveGo
     @Override
     public void tick() {
         super.tick();
-        if (level.isClientSide()) return;
+        if (level.isClientSide()) {
+            spawnParticles(level);
+            return;
+        }
 
         //Burning logic
         if (burnTime > 0) {
@@ -144,6 +154,78 @@ public class HotAirBurnerBlockEntity extends SmartBlockEntity implements IHaveGo
         }
         
         updateBlockState();
+    }
+
+    private void spawnParticles(Level level) {
+        double amount = getInjectionAmount();
+        if (amount <= 0) return;
+
+        Player player = Minecraft.getInstance().player;
+        if (player == null || player.distanceToSqr(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ()) > BalloonParticleSystem.SPAWN_RADIUS_SQ) {
+            return;
+        }
+        
+        int targetBalloonId = ClientBalloonRegistry.getBalloonIdForHai(getId());
+        if (targetBalloonId == -1) return;
+        
+        particleAccumulator += amount * PARTICLE_SPAWN_MULTIPLIER;
+        
+        if (particleAccumulator >= 1.0f) {
+            Ship ship = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
+            if (ship != null) {
+                ShipParticleHandler handler = BalloonParticleSystem.getHandler(ship.getId());
+                if (handler != null) {
+                    
+                    final float Y_MIN = 0.6f;
+                    final float Y_MAX = 0.9f;
+                    final float R_IN = 3.0f / 16.0f;
+                    final float R_OUT = 7.0f / 16.0f;
+
+                    float width = R_OUT - R_IN;
+                    float wTopBot = 2.0f * R_OUT * width;
+                    float wLeftRight = 2.0f * R_IN * width;
+                    float totalArea = (2 * wTopBot) + (2 * wLeftRight);
+
+                    double centerX = worldPosition.getX() + 0.5;
+                    double centerY = worldPosition.getY();
+                    double centerZ = worldPosition.getZ() + 0.5;
+                    
+                    while (particleAccumulator >= 1.0f) {
+                        double localY = Y_MIN + level.random.nextFloat() * (Y_MAX - Y_MIN);
+                        double offsetX, offsetZ;
+                        float r = level.random.nextFloat() * totalArea;
+
+                        if (r < wTopBot) {
+                            // Top rect
+                            offsetX = (level.random.nextFloat() * 2 * R_OUT) - R_OUT;
+                            offsetZ = -R_OUT + (level.random.nextFloat() * width);
+                        } else if (r < 2 * wTopBot) {
+                            // Bottom rect
+                            offsetX = (level.random.nextFloat() * 2 * R_OUT) - R_OUT;
+                            offsetZ = R_IN + (level.random.nextFloat() * width);
+                        } else if (r < 2 * wTopBot + wLeftRight) {
+                            // Left rect
+                            offsetX = -R_OUT + (level.random.nextFloat() * width);
+                            offsetZ = (level.random.nextFloat() * 2 * R_IN) - R_IN;
+                        } else {
+                            // Right rect
+                            offsetX = R_IN + (level.random.nextFloat() * width);
+                            offsetZ = (level.random.nextFloat() * 2 * R_IN) - R_IN;
+                        }
+                        
+                        handler.spawnStream(
+                            centerX + offsetX, 
+                            centerY + localY, 
+                            centerZ + offsetZ, 
+                            0.2,
+                            targetBalloonId
+                        );
+                        particleAccumulator -= 1.0f;
+                    }
+                }
+            }
+            if (particleAccumulator > 5.0f) particleAccumulator = 5.0f;
+        }
     }
 
     @SuppressWarnings("null")

@@ -123,16 +123,22 @@ public class BalloonSyncManager {
             byte[] rh = BalloonCompressor.compress(delta.removedHoles());
 
             if (delta.addedBlocks().isEmpty() && delta.removedBlocks().isEmpty() && 
-                delta.addedHoles().isEmpty() && delta.removedHoles().isEmpty()) {
+                delta.addedHoles().isEmpty() && delta.removedHoles().isEmpty() &&
+                delta.addedHais().isEmpty() && delta.removedHais().isEmpty()) {
                 return;
             }
+
+            // Hais
+            UUID[] addedHais = delta.addedHais().toArray(new UUID[0]);
+            UUID[] removedHais = delta.removedHais().toArray(new UUID[0]);
 
             BalloonDeltaPacket packet = new BalloonDeltaPacket(
                 shipId, balloon.id,
                 ab, delta.addedBlocks().size(),
                 rb, delta.removedBlocks().size(),
                 ah, delta.addedHoles().size(),
-                rh, delta.removedHoles().size()
+                rh, delta.removedHoles().size(), 
+                addedHais, removedHais
             );
 
             sendToWatchers(shipId, level, packet);
@@ -180,6 +186,9 @@ public class BalloonSyncManager {
             }
             byte[] compressedHoles = BalloonCompressor.compress(holeLongs);
 
+            //Hais
+            UUID[] hais = balloon.getSupportHaisSet().toArray(new UUID[0]);
+
             // Construct Packet
             BalloonStructureSyncPacket packet = new BalloonStructureSyncPacket(
                 shipId, 
@@ -187,7 +196,8 @@ public class BalloonSyncManager {
                 compressedVolume, 
                 volumeSet.size(), 
                 compressedHoles, 
-                holes.size()
+                holes.size(),
+                hais
             );
 
             PropulsionPackets.sendToPlayer(packet, player);

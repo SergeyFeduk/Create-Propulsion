@@ -49,6 +49,8 @@ public class Balloon implements Iterable<BlockPos> {
     private final LongOpenHashSet transientRemovedBlocks = new LongOpenHashSet();
     private final LongOpenHashSet transientAddedHoles = new LongOpenHashSet();
     private final LongOpenHashSet transientRemovedHoles = new LongOpenHashSet();
+    private final Set<UUID> transientAddedHais = new HashSet<>();
+    private final Set<UUID> transientRemovedHais = new HashSet<>();
     private final Object dirtyLock = new Object();
 
     public Balloon(int id, Collection<BlockPos> initialVolume, AABB initialBounds) {
@@ -258,10 +260,21 @@ public class Balloon implements Iterable<BlockPos> {
     }
 
     public void clearSupportHais() {
+        synchronized(dirtyLock) {
+            transientRemovedHais.addAll(supportHais);
+            transientAddedHais.clear();
+        }
         supportHais.clear();
     }
 
     public void setSupportHais(Set<UUID> managedSet) {
+        synchronized(dirtyLock) {
+            transientRemovedHais.addAll(supportHais);
+            transientAddedHais.addAll(managedSet);
+            //Resolve overlap
+            transientRemovedHais.removeAll(managedSet);
+            transientAddedHais.removeAll(supportHais);
+        }
         supportHais = managedSet;
     }
 
@@ -270,19 +283,31 @@ public class Balloon implements Iterable<BlockPos> {
     }
 
     public void addAllToSupportHais(Set<UUID> toAdd) {
-        supportHais.addAll(toAdd);
+        for(UUID id : toAdd) addToSupportHais(id);
     }
 
     public void addToSupportHais(UUID toAdd) {
-        supportHais.add(toAdd);
+        if (supportHais.add(toAdd)) {
+            synchronized(dirtyLock) {
+                if (!transientRemovedHais.remove(toAdd)) {
+                    transientAddedHais.add(toAdd);
+                }
+            }
+        }
     }
 
     public void removeAllFromSupportHais(Collection<UUID> toRemove) {
-        supportHais.removeAll(toRemove);
+        for(UUID id : toRemove) removeFromSupportHais(id);
     }
 
     public void removeFromSupportHais(UUID toRemove) {
-        supportHais.remove(toRemove);
+        if (supportHais.remove(toRemove)) {
+            synchronized(dirtyLock) {
+                if (!transientAddedHais.remove(toRemove)) {
+                    transientRemovedHais.add(toRemove);
+                }
+            }
+        }
     }
 
     public Iterable<UUID> getSupportHais() {
@@ -531,7 +556,8 @@ public class Balloon implements Iterable<BlockPos> {
     public DeltaData popDeltas() {
         synchronized(dirtyLock) {
             if (transientAddedBlocks.isEmpty() && transientRemovedBlocks.isEmpty() &&
-                transientAddedHoles.isEmpty() && transientRemovedHoles.isEmpty()) {
+                transientAddedHoles.isEmpty() && transientRemovedHoles.isEmpty() &&
+                transientAddedHais.isEmpty() && transientRemovedHais.isEmpty()) {
                 return null;
             }
 
@@ -539,19 +565,24 @@ public class Balloon implements Iterable<BlockPos> {
                 transientAddedBlocks.clone(),
                 transientRemovedBlocks.clone(),
                 transientAddedHoles.clone(),
-                transientRemovedHoles.clone()
+                transientRemovedHoles.clone(),
+                new HashSet<>(transientAddedHais),
+                new HashSet<>(transientRemovedHais)
             );
 
             transientAddedBlocks.clear();
             transientRemovedBlocks.clear();
             transientAddedHoles.clear();
             transientRemovedHoles.clear();
+            transientAddedHais.clear();
+            transientRemovedHais.clear();
             return data;
         }
     }
 
     public record DeltaData(
         LongOpenHashSet addedBlocks, LongOpenHashSet removedBlocks,
-        LongOpenHashSet addedHoles, LongOpenHashSet removedHoles
+        LongOpenHashSet addedHoles, LongOpenHashSet removedHoles,
+        Set<UUID> addedHais, Set<UUID> removedHais
     ) {}
 }

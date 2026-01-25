@@ -59,6 +59,8 @@ public class HotAirPumpBlockEntity extends KineticBlockEntity implements IHotAir
     public float membraneTime = (float) (Math.PI / 2.0); //Full extent after placment
     public float membraneSpeed = 0;
     public float lastRenderTime = -1;
+    public float clientParticleBuffer = 0;
+    public float clientLastVisualT = 0;
 
     public HotAirPumpBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
