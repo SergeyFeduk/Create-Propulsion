@@ -25,11 +25,15 @@ public class ShipParticleHandler {
 
     private static final float BASE_SPAWN_CHANCE = 0.33f;
 
+    private static final float INERTIA_SCALE = 0.5f;
+
+    //Reference values for calculating stochastic amount of samples per unit of volume to maintain density of full 130 volume balloon with 2 attempts
     private static final double REFERENCE_VOLUME = 130.0;
     private static final double BASE_ATTEMPTS = 2.0;
 
     public final HapData data;
     public final ShipEffectorHandler effectors;
+    private final ClientShipMotionAnalyzer motionAnalyzer;
     private final Random random = new Random();
     
     private double anchorX, anchorY, anchorZ;
@@ -41,6 +45,7 @@ public class ShipParticleHandler {
     public ShipParticleHandler() {
         this.data = new HapData(MAX_PARTICLES);
         this.effectors = new ShipEffectorHandler(this);
+        this.motionAnalyzer = new ClientShipMotionAnalyzer();
     }
     
     public boolean isEmpty() {
@@ -78,6 +83,7 @@ public class ShipParticleHandler {
 
     public void tick(ClientLevel level, ClientShip ship, Int2ObjectMap<ClientBalloon> allBalloons, Map<ClientBalloon, AABB> intersections) {
         tickCounter++;
+
         // Anchor is initialized based on the first available intersection
         if (!initialized && !intersections.isEmpty()) {
             AABB first = intersections.values().iterator().next();
@@ -88,7 +94,16 @@ public class ShipParticleHandler {
 
         if (data.count == 0) return;
 
-        float dt = 0.05f; 
+        float dt = 0.05f;
+
+        //Precompute inertial vectors
+        motionAnalyzer.tick(ship);
+        float inertiaLinearX = motionAnalyzer.linearInertia.x * INERTIA_SCALE;
+        float inertiaLinearY = motionAnalyzer.linearInertia.y * INERTIA_SCALE;
+        float inertiaLinearZ = motionAnalyzer.linearInertia.z * INERTIA_SCALE;
+        float inertiaAngularX = motionAnalyzer.angularInertia.x * INERTIA_SCALE;
+        float inertiaAngularY = motionAnalyzer.angularInertia.y * INERTIA_SCALE;
+        float inertiaAngularZ = motionAnalyzer.angularInertia.z * INERTIA_SCALE;
 
         for (int i = 0; i < data.count; i++) {
             float rx = data.x[i];
@@ -119,6 +134,14 @@ public class ShipParticleHandler {
             }
 
             float fx = 0, fy = 0, fz = 0;
+
+            fx += inertiaLinearX;
+            fy += inertiaLinearY;
+            fz += inertiaLinearZ;
+
+            fx += (inertiaAngularY * rz - inertiaAngularZ * ry);
+            fy += (inertiaAngularZ * rx - inertiaAngularX * rz);
+            fz += (inertiaAngularX * ry - inertiaAngularY * rx);
 
             if (data.state[i] == HapData.STATE_LEAK) {
                 //TODO: Apply force in world space (precompute per ship)
