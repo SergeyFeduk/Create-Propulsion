@@ -18,7 +18,7 @@ public class StreamEffector implements HapEffector {
 
     private static final float MAX_RADIUS_SQ = 2.0f;
     private static final float BASE_STRENGTH = 0.5f;
-    private static final float CENTERING_STRENGTH = 0.125f;
+    private static final float CENTERING_STRENGTH = 0.15f;
 
     public StreamEffector(BlockPos origin, double anchorX, double anchorY, double anchorZ, int balloonId) {
         this.originX = origin.getX();

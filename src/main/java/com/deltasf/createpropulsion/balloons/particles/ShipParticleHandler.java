@@ -26,6 +26,7 @@ public class ShipParticleHandler {
     private static final float BASE_SPAWN_CHANCE = 0.33f;
 
     private static final float INERTIA_SCALE = 0.5f;
+    private static final float LEAK_FORCE_MULTIPLIER = 0.03f;
 
     //Reference values for calculating stochastic amount of samples per unit of volume to maintain density of full 130 volume balloon with 2 attempts
     private static final double REFERENCE_VOLUME = 130.0;
@@ -104,6 +105,10 @@ public class ShipParticleHandler {
         float inertiaAngularX = motionAnalyzer.angularInertia.x * INERTIA_SCALE;
         float inertiaAngularY = motionAnalyzer.angularInertia.y * INERTIA_SCALE;
         float inertiaAngularZ = motionAnalyzer.angularInertia.z * INERTIA_SCALE;
+        //Precompute leak upwards force        
+        float leakForceX = motionAnalyzer.worldUpInLocal.x * LEAK_FORCE_MULTIPLIER;
+        float leakForceY = motionAnalyzer.worldUpInLocal.y * LEAK_FORCE_MULTIPLIER;
+        float leakForceZ = motionAnalyzer.worldUpInLocal.z * LEAK_FORCE_MULTIPLIER;
 
         for (int i = 0; i < data.count; i++) {
             float rx = data.x[i];
@@ -144,8 +149,9 @@ public class ShipParticleHandler {
             fz += (inertiaAngularX * ry - inertiaAngularY * rx);
 
             if (data.state[i] == HapData.STATE_LEAK) {
-                //TODO: Apply force in world space (precompute per ship)
-                fy += 0.02f;
+                fx += leakForceX;
+                fy += leakForceY;
+                fz += leakForceZ;
             } else if (data.state[i] == HapData.STATE_STREAM) {
                 if (isSamplingTick) {
                     sampleEnvironment(i, absX, absY, absZ);

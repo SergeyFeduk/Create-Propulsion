@@ -22,6 +22,7 @@ public class ClientShipMotionAnalyzer {
     //Outputs
     public final Vector3f linearInertia = new Vector3f();
     public final Vector3f angularInertia = new Vector3f();
+    public final Vector3f worldUpInLocal = new Vector3f();
     
     //Cache
     private final Vector3d tmpLinearAcceleration = new Vector3d();
@@ -29,6 +30,7 @@ public class ClientShipMotionAnalyzer {
     private final Vector3d tmpAverageLinear = new Vector3d();
     private final Vector3d tmpAverageAngular = new Vector3d();
     private final Quaterniond tmpQuaternion = new Quaterniond();
+    private final Vector3d tmpUp = new Vector3d();
 
     public ClientShipMotionAnalyzer() {
         for (int i = 0; i < SMOOTHING_WINDOW; i++) {
@@ -76,5 +78,10 @@ public class ClientShipMotionAnalyzer {
 
         previousVelocity.set(ship.getVelocity());
         previousOmega.set(ship.getAngularVelocity());
+
+        //Local world-space upwards
+        tmpUp.set(0.0, 1.0, 0.0);
+        tmpQuaternion.transform(tmpUp);
+        worldUpInLocal.set((float)tmpUp.x, (float)tmpUp.y, (float)tmpUp.z);
     }
 }
