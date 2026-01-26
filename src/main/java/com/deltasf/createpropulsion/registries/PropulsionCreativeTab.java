@@ -66,7 +66,6 @@ public class PropulsionCreativeTab {
                 output.accept(PropulsionBlocks.HOT_AIR_PUMP_BLOCK);
                 output.accept(PropulsionBlocks.SOLID_BURNER);
                 output.accept(PropulsionBlocks.LIQUID_BURNER);
-                output.accept(PropulsionBlocks.TILT_ADAPTER_BLOCK);
                 //output.accept(PropulsionBlocks.REACTION_WHEEL_BLOCK);
                 output.accept(PropulsionBlocks.STIRLING_ENGINE_BLOCK);
                 output.accept(PropulsionBlocks.PROPELLER_BLOCK);
@@ -74,6 +73,8 @@ public class PropulsionCreativeTab {
                 output.accept(PropulsionItems.WOODEN_BLADE);
                 output.accept(PropulsionItems.COPPER_BLADE);
                 output.accept(PropulsionItems.ANDESITE_BLADE);
+
+                output.accept(PropulsionBlocks.TILT_ADAPTER_BLOCK);
             }
         }
 }
