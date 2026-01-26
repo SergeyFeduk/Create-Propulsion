@@ -7,9 +7,11 @@ import org.joml.Vector3f;
 import org.valkyrienskies.core.api.ships.ClientShip;
 
 import com.deltasf.createpropulsion.balloons.ClientBalloon;
+import com.deltasf.createpropulsion.balloons.HaiGroup;
 import com.deltasf.createpropulsion.balloons.particles.effectors.EffectorBucket;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.AABB;
 
@@ -22,6 +24,9 @@ public class ShipParticleHandler {
     private static final float DRAG_STREAM = 0.99f;
 
     private static final float BASE_SPAWN_CHANCE = 0.33f;
+
+    private static final double REFERENCE_VOLUME = 130.0;
+    private static final double BASE_ATTEMPTS = 2.0;
 
     public final HapData data;
     public final ShipEffectorHandler effectors;
@@ -60,18 +65,18 @@ public class ShipParticleHandler {
         data.spawn((float)(absX - anchorX), (float)(absY - anchorY), (float)(absZ - anchorZ), state, balloonId);
     }
 
-    public void spawnStream(double absX, double absY, double absZ, double vy, int balloonId) {
+    public void spawnStream(double absX, double absY, double absZ, float vy, float vyDeviation, float life, float lifeDeviation, int balloonId) {
         ensureInitialized(absX, absY, absZ);
         int id = data.spawn((float)(absX - anchorX), (float)(absY - anchorY), (float)(absZ - anchorZ), HapData.STATE_STREAM, balloonId);
         if (id != -1) {
             data.vx[id] = (random.nextFloat() - 0.5f) * 0.05f;
-            data.vy[id] = (float) vy;
+            data.vy[id] = vy + (random.nextFloat() - 0.5f) * vyDeviation;
             data.vz[id] = (random.nextFloat() - 0.5f) * 0.05f;
-            data.life[id] = 1.0f;
+            data.life[id] = life + (random.nextFloat() - 0.5f) * lifeDeviation;
         }
     }
 
-    public void tick(ClientShip ship, Int2ObjectMap<ClientBalloon> allBalloons, Map<ClientBalloon, AABB> intersections) {
+    public void tick(ClientLevel level, ClientShip ship, Int2ObjectMap<ClientBalloon> allBalloons, Map<ClientBalloon, AABB> intersections) {
         tickCounter++;
         // Anchor is initialized based on the first available intersection
         if (!initialized && !intersections.isEmpty()) {
@@ -98,15 +103,19 @@ public class ShipParticleHandler {
             
             // Wall check
             if ((i + tickCounter) % 2 == 0) {
-                 if (data.state[i] == HapData.STATE_VOLUME) {
+                if (data.state[i] == HapData.STATE_VOLUME) {
                     int bId = data.balloonId[i];
                     ClientBalloon balloon = allBalloons.get(bId);
                     if (balloon == null || !balloon.volume.contains(packPos(absX, absY, absZ))) {
-                        data.state[i] = HapData.STATE_LEAK;
-                        data.life[i] += 0.2f; 
-                        if (data.life[i] > 1.0f) data.life[i] = 1.0f;
+                        if (HaiGroup.isHab(Mth.floor(absX), Mth.floor(absY), Mth.floor(absZ), level)) {
+                            data.life[i] = 0;
+                        } else {
+                            data.state[i] = HapData.STATE_LEAK;
+                            data.life[i] += 0.2f; 
+                            if (data.life[i] > 1.0f) data.life[i] = 1.0f;
+                        }
                     }
-                 }
+                }
             }
 
             float fx = 0, fy = 0, fz = 0;
@@ -115,15 +124,20 @@ public class ShipParticleHandler {
                 //TODO: Apply force in world space (precompute per ship)
                 fy += 0.02f;
             } else if (data.state[i] == HapData.STATE_STREAM) {
-                fy += 0.08f; 
-                
+                if (isSamplingTick) {
+                    sampleEnvironment(i, absX, absY, absZ);
+                }
+
+                fx += data.cfx[i];
+                fy += data.cfy[i];
+                fz += data.cfz[i];
+
                 int bId = data.balloonId[i];
                 ClientBalloon balloon = allBalloons.get(bId);
                 if (balloon != null && balloon.volume.contains(packPos(absX, absY, absZ))) {
                     data.state[i] = HapData.STATE_VOLUME;
                 }
             } else {
-                // VOLUME: Effectors + Turbulence
                 if (isSamplingTick) {
                     sampleEnvironment(i, absX, absY, absZ);
                 }
@@ -203,18 +217,26 @@ public class ShipParticleHandler {
     private void spawnVolumeParticles(Map<ClientBalloon, AABB> intersections) {
         if (intersections.isEmpty()) return;
         
-        int attemptsPerBalloon = 2; 
-        
         for (Map.Entry<ClientBalloon, AABB> entry : intersections.entrySet()) {
             if (data.count >= data.capacity) break;
             
-            ClientBalloon b = entry.getKey();
+            ClientBalloon balloon = entry.getKey();
             AABB bounds = entry.getValue();
+            double spawnVolume = (bounds.maxX - bounds.minX) * (bounds.maxY - bounds.minY) * (bounds.maxZ - bounds.minZ);
             
-            //Base threshold once per balloon
-            float baseThreshold = b.getFullness() * BASE_SPAWN_CHANCE;
+            //Density normalization
+            double targetAttempts = BASE_ATTEMPTS * (spawnVolume / REFERENCE_VOLUME);
 
-            for (int k = 0; k < attemptsPerBalloon; k++) {
+            //Rounding done stochastically. Not perfect but does not require additional state :P
+            int attempts = (int) targetAttempts;
+            if (random.nextDouble() < (targetAttempts - attempts)) {
+                attempts++;
+            }
+
+            if (attempts == 0) continue;
+            
+            float baseThreshold = balloon.getFullness() * BASE_SPAWN_CHANCE;
+            for (int k = 0; k < attempts; k++) {
                 if (data.count >= data.capacity) break;
 
                 double rx = bounds.minX + (bounds.maxX - bounds.minX) * random.nextDouble();
@@ -237,8 +259,8 @@ public class ShipParticleHandler {
                 if (shouldSpawn) {
                     long packed = packPos(rx, ry, rz); 
                     
-                    if (b.volume.contains(packed)) {
-                        int id = data.spawn((float)(rx - anchorX), (float)(ry - anchorY), (float)(rz - anchorZ), HapData.STATE_VOLUME, b.id);
+                    if (balloon.volume.contains(packed)) {
+                        int id = data.spawn((float)(rx - anchorX), (float)(ry - anchorY), (float)(rz - anchorZ), HapData.STATE_VOLUME, balloon.id);
                         if (id != -1) {
                             data.life[id] = 0.5f + random.nextFloat() * 0.5f;
                             data.x[id] += (random.nextFloat() - 0.5f) * 0.2f;

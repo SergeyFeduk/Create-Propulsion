@@ -11,7 +11,6 @@ import com.deltasf.createpropulsion.balloons.injectors.hot_air_pump.HotAirPumpBl
 import com.deltasf.createpropulsion.heat.burners.liquid.LiquidBurnerBlock;
 import com.deltasf.createpropulsion.heat.burners.solid.SolidBurnerBlock;
 import com.deltasf.createpropulsion.heat.engine.StirlingEngineBlock;
-import com.deltasf.createpropulsion.impact_sensor.ImpactSensorBlock;
 import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerBlock;
 import com.deltasf.createpropulsion.magnet.RedstoneMagnetBlock;
 import com.deltasf.createpropulsion.optical_sensors.InlineOpticalSensorBlock;
@@ -274,7 +273,7 @@ public class PropulsionBlocks {
         .setData(ProviderType.LANG, FUCK_OFF_LANG())
         .register();
 
-    public static final BlockEntry<ImpactSensorBlock> IMPACT_SENSOR_BLOCK = REGISTRATE.block("impact_sensor", ImpactSensorBlock::new)
+    /*public static final BlockEntry<ImpactSensorBlock> IMPACT_SENSOR_BLOCK = REGISTRATE.block("impact_sensor", ImpactSensorBlock::new)
         .properties(p -> p.mapColor(MapColor.WOOD))
         .properties(p -> p.sound(SoundType.WOOD))
         .properties(p -> p.requiresCorrectToolForDrops())
@@ -284,7 +283,7 @@ public class PropulsionBlocks {
         .blockstate(FUCK_OFF())
         .item().model(FUCK_OFF_ITEM()).build()
         .setData(ProviderType.LANG, FUCK_OFF_LANG())
-        .register();
+        .register();*/
     
     //All wings
     public static final BlockEntry<WingBlock> WING_BLOCK = registerGenericWing("wing", PropulsionSpriteShifts.WING_TEXTURE);

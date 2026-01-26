@@ -22,6 +22,25 @@ public class EffectorBucket {
         }
     }
 
+    public void remove(HapEffector e) {
+        for (int i = 0; i < count; i++) {
+            if (effectors[i] == e) {
+                if (e instanceof HoleEffector) {
+                    holeCount--;
+                    hasHole = holeCount > 0;
+                }
+                
+                int last = count - 1;
+                if (i != last) {
+                    effectors[i] = effectors[last];
+                }
+                effectors[last] = null;
+                count--;
+                return;
+            }
+        }
+    }
+
     public void removeByBalloonId(int id) {
         for (int i = 0; i < count; i++) {
             if (effectors[i].getBalloonId() == id) {

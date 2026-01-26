@@ -3,8 +3,6 @@ package com.deltasf.createpropulsion.impact_sensor;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -35,19 +33,20 @@ public class ImpactSensorBlock extends Block implements EntityBlock {
     }
 
     public BlockEntity newBlockEntity(@Nonnull BlockPos pos, @Nonnull BlockState state) {
-        return new ImpactSensorBlockEntity(PropulsionBlockEntities.IMPACT_SENSOR_BLOCK_ENTITY.get(), pos, state);
+        return null;
+        //return new ImpactSensorBlockEntity(PropulsionBlockEntities.IMPACT_SENSOR_BLOCK_ENTITY.get(), pos, state);
     }
 
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(@Nonnull Level level, @Nonnull BlockState state, @Nonnull BlockEntityType<T> type) {
-        if (type == PropulsionBlockEntities.IMPACT_SENSOR_BLOCK_ENTITY.get()) {
+        /*if (type == PropulsionBlockEntities.IMPACT_SENSOR_BLOCK_ENTITY.get()) {
             return (lvl, pos, st, be) -> {
                 if (be instanceof ImpactSensorBlockEntity sensorBe) {
                     sensorBe.tick();
                 }
             };
-        }
+        }*/
         return null;
     }
 }

@@ -217,7 +217,10 @@ public class HotAirBurnerBlockEntity extends SmartBlockEntity implements IHaveGo
                             centerX + offsetX, 
                             centerY + localY, 
                             centerZ + offsetZ, 
-                            0.2,
+                            0.2f,
+                            0.1f,
+                            1.0f,
+                            0.1f,
                             targetBalloonId
                         );
                         particleAccumulator -= 1.0f;

@@ -11,7 +11,6 @@ import com.deltasf.createpropulsion.heat.burners.solid.SolidBurnerBlockEntity;
 import com.deltasf.createpropulsion.heat.engine.StirlingEngineBlockEntity;
 import com.deltasf.createpropulsion.heat.engine.StirlingEngineRenderer;
 import com.deltasf.createpropulsion.heat.engine.StirlingEngineVisual;
-import com.deltasf.createpropulsion.impact_sensor.ImpactSensorBlockEntity;
 import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerBlockEntity;
 import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerRenderer;
 import com.deltasf.createpropulsion.magnet.RedstoneMagnetBlockEntity;
@@ -148,8 +147,8 @@ public class PropulsionBlockEntities {
         .renderer(() -> TiltAdapterRenderer::new)
         .register();
 
-    public static final BlockEntityEntry<ImpactSensorBlockEntity> IMPACT_SENSOR_BLOCK_ENTITY = 
+    /*public static final BlockEntityEntry<ImpactSensorBlockEntity> IMPACT_SENSOR_BLOCK_ENTITY = 
         REGISTRATE.blockEntity("impact_sensor_block_entity", ImpactSensorBlockEntity::new)
         .validBlock(PropulsionBlocks.IMPACT_SENSOR_BLOCK)
-        .register();
+        .register();*/
 }

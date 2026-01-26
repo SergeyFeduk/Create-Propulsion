@@ -48,7 +48,6 @@ public class BalloonParticleSystem {
             return handlers.get(shipId);
         }
         
-        // Handler created for the first time
         ShipParticleHandler newHandler = new ShipParticleHandler();
         handlers.put(shipId, newHandler);
         
@@ -75,7 +74,7 @@ public class BalloonParticleSystem {
         if (player == null) return;
         AABB playerBounds = player.getBoundingBox().inflate(SPAWN_RADIUS);
 
-        // Iterate over loaded ships
+        //Iterate over loaded ships
         for (ClientShip ship : VSGameUtilsKt.getShipObjectWorld(mc.level).getLoadedShips()) {
             long shipId = ship.getId();
             Int2ObjectMap<ClientBalloon> allBalloons = ClientBalloonRegistry.getBalloonsForShip(shipId);
@@ -83,7 +82,7 @@ public class BalloonParticleSystem {
             AABB shipWorldAABB = VectorConversionsMCKt.toMinecraft(ship.getRenderAABB());
             if (!shipWorldAABB.intersects(playerBounds)) continue;
 
-            // Aggregate Balloons
+            //Aggregate balloons
             perBalloonIntersections.clear();
 
             Matrix4dc worldToShip = ship.getTransform().getWorldToShip();
@@ -95,18 +94,18 @@ public class BalloonParticleSystem {
 
             AABB playerInShip = new AABB(tmpMin.x, tmpMin.y, tmpMin.z, tmpMax.x, tmpMax.y, tmpMax.z);
 
-            for (ClientBalloon b : allBalloons.values()) {
-                if (b.getBounds().intersects(playerInShip)) {
-                    // Calculate specific intersection
-                    AABB intersect = b.getBounds().intersect(playerInShip);
-                    perBalloonIntersections.put(b, intersect);
+            for (ClientBalloon balloon : allBalloons.values()) {
+                if (balloon.getBounds().intersects(playerInShip)) {
+                    //Calculate specific intersection
+                    AABB intersect = balloon.getBounds().intersect(playerInShip);
+                    perBalloonIntersections.put(balloon, intersect);
                 }
             }
 
-            // Delegate to handler
+            //Delegate to handler
             if (!perBalloonIntersections.isEmpty() || handlers.containsKey(shipId)) {
                 ShipParticleHandler handler = getOrCreateHandler(shipId);
-                handler.tick(ship, allBalloons, perBalloonIntersections);
+                handler.tick(mc.level, ship, allBalloons, perBalloonIntersections);
 
                 if (handler.isEmpty() && perBalloonIntersections.isEmpty()) {
                     handlers.remove(shipId);

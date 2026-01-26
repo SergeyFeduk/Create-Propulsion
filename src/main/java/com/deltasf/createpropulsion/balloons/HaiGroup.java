@@ -116,6 +116,14 @@ public class HaiGroup {
         return ((IEnvelope)state.getBlock()).isEnvelope();
     }
 
+    public static boolean isHab(int x, int y, int z, Level level) {
+        LevelChunk chunk = level.getChunk(x >> 4, z >> 4);
+        LevelChunkSection section = chunk.getSection(chunk.getSectionIndex(y));
+        if (section.hasOnlyAir()) return false;
+        BlockState state = section.getBlockState(x & 15, y & 15, z & 15);
+        return ((IEnvelope)state.getBlock()).isEnvelope();
+    }
+
     public static BlockPos getSeedFromHai(HaiData data, Level level) {
         for(int d = 1; d < BalloonScanner.VERTICAL_ANOMALY_SCAN_DISTANCE; d++) {
             if (isHab(data.position().above(d), level)) {

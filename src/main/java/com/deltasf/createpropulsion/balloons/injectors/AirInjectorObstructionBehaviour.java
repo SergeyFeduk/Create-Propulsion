@@ -10,7 +10,6 @@ import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.HaiGroup;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry;
 import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
-import com.deltasf.createpropulsion.balloons.utils.BalloonScanner;
 import com.deltasf.createpropulsion.physics_assembler.AssemblyUtility;
 import com.simibubi.create.AllSpecialTextures;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
@@ -25,15 +24,18 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
 
 public class AirInjectorObstructionBehaviour extends BlockEntityBehaviour {
     public static final BehaviourType<AirInjectorObstructionBehaviour> TYPE = new BehaviourType<>();
 
     private static final int SCAN_COOLDOWN_TICKS = 20; //TODO: Config
+    private static final int SCAN_DISTANCE = 8;
 
     private int scanCooldown;
     private final Set<BlockPos> obstructedBlocks = new HashSet<>();
+    private int streamHeight = 0;
+    
+    private boolean clientDataDirty = false;
 
     public AirInjectorObstructionBehaviour(SmartBlockEntity be) {
         super(be);
@@ -42,6 +44,10 @@ public class AirInjectorObstructionBehaviour extends BlockEntityBehaviour {
 
     public Set<BlockPos> getObstructedBlocks() {
         return obstructedBlocks;
+    }
+    
+    public int getStreamHeight() {
+        return streamHeight;
     }
 
     public double getEfficiency() {
@@ -69,6 +75,13 @@ public class AirInjectorObstructionBehaviour extends BlockEntityBehaviour {
         super.tick();
         Level level = getWorld();
         if (level.isClientSide()) {
+            if (clientDataDirty) {
+                clientDataDirty = false;
+                HotAirInjectorBehaviour injector = blockEntity.getBehaviour(HotAirInjectorBehaviour.TYPE);
+                if (injector != null) {
+                    injector.onObstructionUpdate(streamHeight);
+                }
+            }
             return;
         }
 
@@ -90,13 +103,11 @@ public class AirInjectorObstructionBehaviour extends BlockEntityBehaviour {
             return;
         }
 
-        // Check implementation
         if (!(blockEntity instanceof IHotAirInjector injector)) {
             clearObstructions();
             return;
         }
 
-        // Check balloon
         BalloonRegistry registry = BalloonShipRegistry.forShip(ship.getId(), level);
         Balloon balloon = registry.getBalloonOf(injector.getId());
         if (balloon == null) {
@@ -104,57 +115,90 @@ public class AirInjectorObstructionBehaviour extends BlockEntityBehaviour {
             return;
         }
 
-        // Perform scan
         Set<BlockPos> newObstructions = new HashSet<>();
-        for (int i = 1; i <= BalloonScanner.VERTICAL_ANOMALY_SCAN_DISTANCE; i++) {
-            BlockPos currentPos = pos.above(i);
+        int newStreamHeight = 0;
+        
+        boolean hitBalloon = false; 
+        boolean hitHab= false;
 
-            BlockState state = level.getBlockState(currentPos);
-            if (!state.getCollisionShape(level, currentPos).isEmpty() && !HaiGroup.isHab(currentPos, level)) {
-                newObstructions.add(currentPos.immutable());
+        for (int y = 1; y <= SCAN_DISTANCE; y++) {
+            BlockPos currentPos = pos.above(y);
+
+            boolean isBalloonVolume = balloon.contains(currentPos);
+            boolean isHab = HaiGroup.isHab(currentPos, level);
+
+            //Track pre-balloon obstructions
+            if (!hitBalloon) {
+                if (isBalloonVolume) {
+                    hitBalloon = true;
+                }
+                if (!hitBalloon && isHab) {
+                    newObstructions.add(currentPos);
+                }
             }
-
-            if (balloon.contains(currentPos)) {
-                break;
+            //Track hab hit
+            if (!hitHab && isHab) {
+                hitHab = true;
+                newStreamHeight = y - 1;
             }
         }
 
-        // Update
+        boolean changed = false;
         if (!obstructedBlocks.equals(newObstructions)) {
             obstructedBlocks.clear();
             obstructedBlocks.addAll(newObstructions);
+            changed = true;
+        }
+        
+        if (streamHeight != newStreamHeight) {
+            streamHeight = newStreamHeight;
+            changed = true;
+        }
+
+        if (changed) {
             blockEntity.notifyUpdate();
         }
     }
 
     private void clearObstructions() {
-        if (!obstructedBlocks.isEmpty()) {
+        boolean changed = !obstructedBlocks.isEmpty() || streamHeight != 0;
+        if (changed) {
             obstructedBlocks.clear();
+            streamHeight = 0;
             blockEntity.notifyUpdate();
         }
     }
-
-    //NBT
 
     @Override
     public void write(CompoundTag compound, boolean clientPacket) {
         super.write(compound, clientPacket);
         if (!clientPacket) return;
+        
         ListTag obstructedList = new ListTag();
         for (BlockPos pos : obstructedBlocks) {
             obstructedList.add(NbtUtils.writeBlockPos(pos));
         }
-        compound.put("ObstructedBlocks", obstructedList);
+        compound.put("obstructedList", obstructedList);
+        compound.putInt("streamHeight", streamHeight);
     }
 
     @Override
     public void read(CompoundTag compound, boolean clientPacket) {
         super.read(compound, clientPacket);
         if (!clientPacket) return;
+        
+        Set<BlockPos> oldSet = new HashSet<>(obstructedBlocks);
+        int oldHeight = streamHeight;
+        
         obstructedBlocks.clear();
-        ListTag obstructedList = compound.getList("ObstructedBlocks", Tag.TAG_COMPOUND);
+        ListTag obstructedList = compound.getList("obstructedList", Tag.TAG_COMPOUND);
         for (Tag tag : obstructedList) {
             obstructedBlocks.add(NbtUtils.readBlockPos((CompoundTag) tag));
+        }
+        streamHeight = compound.getInt("streamHeight");
+        
+        if (!oldSet.equals(obstructedBlocks) || oldHeight != streamHeight) {
+            clientDataDirty = true;
         }
     }
 

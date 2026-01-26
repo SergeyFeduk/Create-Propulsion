@@ -7,6 +7,7 @@ import com.deltasf.createpropulsion.balloons.HaiGroup;
 import com.deltasf.createpropulsion.balloons.particles.effectors.EffectorBucket;
 import com.deltasf.createpropulsion.balloons.particles.effectors.HapEffector;
 import com.deltasf.createpropulsion.balloons.particles.effectors.HoleEffector;
+import com.deltasf.createpropulsion.balloons.particles.effectors.StreamEffector;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.core.BlockPos;
@@ -19,7 +20,7 @@ public class ShipEffectorHandler {
     
     // Config constants
     private static final float HOLE_EJECT_STRENGTH = 2.8f;
-    private static final int EFFECTOR_RADIUS = 2; // 5x5x5
+    private static final int HOLE_EFFECTOR_RADIUS = 2; // 5x5x5
 
     public ShipEffectorHandler(ShipParticleHandler parent) {
         this.parent = parent;
@@ -74,11 +75,11 @@ public class ShipEffectorHandler {
                 HOLE_EJECT_STRENGTH
             );
 
-            // Register in 5x5 area
+            // Register in cubic area
             BlockPos.MutableBlockPos mut = new BlockPos.MutableBlockPos();
-            for (int x = -EFFECTOR_RADIUS; x <= EFFECTOR_RADIUS; x++) {
-                for (int y = -EFFECTOR_RADIUS; y <= EFFECTOR_RADIUS; y++) {
-                    for (int z = -EFFECTOR_RADIUS; z <= EFFECTOR_RADIUS; z++) {
+            for (int x = -HOLE_EFFECTOR_RADIUS; x <= HOLE_EFFECTOR_RADIUS; x++) {
+                for (int y = -HOLE_EFFECTOR_RADIUS; y <= HOLE_EFFECTOR_RADIUS; y++) {
+                    for (int z = -HOLE_EFFECTOR_RADIUS; z <= HOLE_EFFECTOR_RADIUS; z++) {
                         mut.set(hole.getX() + x, hole.getY() + y, hole.getZ() + z);
                         addEffectorToBucket(mut, holeEffector);
                     }
@@ -89,9 +90,9 @@ public class ShipEffectorHandler {
 
     private void removeHoleEffectorInternal(int balloonId, BlockPos hole) {
         BlockPos.MutableBlockPos mut = new BlockPos.MutableBlockPos();
-        for (int x = -EFFECTOR_RADIUS; x <= EFFECTOR_RADIUS; x++) {
-            for (int y = -EFFECTOR_RADIUS; y <= EFFECTOR_RADIUS; y++) {
-                for (int z = -EFFECTOR_RADIUS; z <= EFFECTOR_RADIUS; z++) {
+        for (int x = -HOLE_EFFECTOR_RADIUS; x <= HOLE_EFFECTOR_RADIUS; x++) {
+            for (int y = -HOLE_EFFECTOR_RADIUS; y <= HOLE_EFFECTOR_RADIUS; y++) {
+                for (int z = -HOLE_EFFECTOR_RADIUS; z <= HOLE_EFFECTOR_RADIUS; z++) {
                     mut.set(hole.getX() + x, hole.getY() + y, hole.getZ() + z);
                     
                     long key = mut.asLong();
@@ -148,5 +149,41 @@ public class ShipEffectorHandler {
             }
         }
         return dirAccumulator;
+    }
+
+    public void updateStream(StreamEffector effector, int newHeight) {
+        if (effector.getHeight() == newHeight && !effector.occupiedBuckets.isEmpty()) return;
+
+        removeStream(effector);
+        effector.setHeight(newHeight);
+
+        int ox = effector.getOriginX();
+        int oy = effector.getOriginY();
+        int oz = effector.getOriginZ();
+
+        for (int y = 0; y <= newHeight; y++) {
+            for (int x = -1; x <= 1; x++) {
+                for (int z = -1; z <= 1; z++) {
+                    long key = BlockPos.asLong(ox + x, oy + y, oz + z);
+                    //String q = String.valueOf(key);
+                    //DebugRenderer.drawBox(q, new BlockPos(ox + x, oy + y, oz + z), 100);
+                    EffectorBucket bucket = effectors.computeIfAbsent(key, k -> new EffectorBucket());
+                    bucket.add(effector);
+                    effector.occupiedBuckets.add(key);
+                }
+            }
+        }
+    }
+
+    public void removeStream(StreamEffector effector) {
+        if (effector.occupiedBuckets.isEmpty()) return;
+        
+        for (long key : effector.occupiedBuckets) {
+            EffectorBucket bucket = effectors.get(key);
+            if (bucket != null) {
+                bucket.remove(effector);
+            }
+        }
+        effector.occupiedBuckets.clear();
     }
 }

@@ -44,7 +44,7 @@ public class HotAirPumpRenderer extends KineticBlockEntityRenderer<HotAirPumpBlo
 
     private static final float MEMBRANE_DECAY = 0.2f;
 
-    private static final float PARTICLE_SPAWN_MULTIPLIER = 0.2f; 
+    private static final float PARTICLE_SPAWN_MULTIPLIER = 0.15f; 
 
     public HotAirPumpRenderer(BlockEntityRendererProvider.Context context) {
         super(context);
@@ -191,6 +191,7 @@ public class HotAirPumpRenderer extends KineticBlockEntityRenderer<HotAirPumpBlo
         double centerZ = be.getBlockPos().getZ() + 0.5;
 
         float speed = Math.min(be.membraneSpeed * 2.666f, 1.5f);
+        float life = Math.min(0.8f / speed, 1);
 
         for (int i = 0; i < count; i++) {
             double localY = Y_MIN + level.random.nextFloat() * (Y_MAX - Y_MIN);
@@ -201,7 +202,10 @@ public class HotAirPumpRenderer extends KineticBlockEntityRenderer<HotAirPumpBlo
                 centerX + offsetX, 
                 centerY + localY, 
                 centerZ + offsetZ, 
-                speed, 
+                speed,
+                0.3f,
+                life,
+                0.2f,
                 targetBalloonId
             );
         }
