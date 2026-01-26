@@ -117,12 +117,7 @@ public class InstancedParticleRenderer {
 
         Minecraft mc = Minecraft.getInstance();
         
-        //Backup state
-        int prevProgram = GL33.glGetInteger(GL33.GL_CURRENT_PROGRAM);
-        int prevVAO = GL33.glGetInteger(GL33.GL_VERTEX_ARRAY_BINDING);
-        int prevTexture = GL33.glGetInteger(GL33.GL_TEXTURE_BINDING_2D);
-
-        // Prepare state
+        //Prepare state
         RenderSystem.depthMask(false);
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
@@ -224,11 +219,12 @@ public class InstancedParticleRenderer {
             GL33.glDrawArraysInstanced(GL33.GL_TRIANGLE_FAN, 0, 4, count);
         }
 
-        // Restore state
+        //Tidy up after outselves
+        GL33.glBindVertexArray(0);
+        GL33.glUseProgram(0);
+
         GL33.glBindBuffer(GL33.GL_ARRAY_BUFFER, 0); 
-        GL33.glBindVertexArray(prevVAO);
-        GL33.glUseProgram(prevProgram);
-        GL33.glBindTexture(GL33.GL_TEXTURE_2D, prevTexture);
+        GL33.glBindTexture(GL33.GL_TEXTURE_2D, 0);
 
         RenderSystem.depthMask(true); 
         RenderSystem.disableBlend();
