@@ -76,34 +76,41 @@ public class BalloonParticleSystem {
 
         //Iterate over loaded ships
         for (ClientShip ship : VSGameUtilsKt.getShipObjectWorld(mc.level).getLoadedShips()) {
-            long shipId = ship.getId();
-            Int2ObjectMap<ClientBalloon> allBalloons = ClientBalloonRegistry.getBalloonsForShip(shipId);
-            
             AABB shipWorldAABB = VectorConversionsMCKt.toMinecraft(ship.getRenderAABB());
             if (!shipWorldAABB.intersects(playerBounds)) continue;
+
+            long shipId = ship.getId();
+            Int2ObjectMap<ClientBalloon> allBalloons = ClientBalloonRegistry.getBalloonsForShip(shipId);
+
+            boolean hasBalloons = allBalloons != null && !allBalloons.isEmpty();
+            boolean hasHandler = handlers.containsKey(shipId);
+            
+            if (allBalloons == null || (!hasBalloons && !hasHandler)) continue;
 
             //Aggregate balloons
             perBalloonIntersections.clear();
 
-            Matrix4dc worldToShip = ship.getTransform().getWorldToShip();
-            worldToShip.transformAab(
-                playerBounds.minX, playerBounds.minY, playerBounds.minZ,
-                playerBounds.maxX, playerBounds.maxY, playerBounds.maxZ,
-                tmpMin, tmpMax
-            );
+            if (hasBalloons) {
+                Matrix4dc worldToShip = ship.getTransform().getWorldToShip();
+                worldToShip.transformAab(
+                    playerBounds.minX, playerBounds.minY, playerBounds.minZ,
+                    playerBounds.maxX, playerBounds.maxY, playerBounds.maxZ,
+                    tmpMin, tmpMax
+                );
 
-            AABB playerInShip = new AABB(tmpMin.x, tmpMin.y, tmpMin.z, tmpMax.x, tmpMax.y, tmpMax.z);
+                AABB playerInShip = new AABB(tmpMin.x, tmpMin.y, tmpMin.z, tmpMax.x, tmpMax.y, tmpMax.z);
 
-            for (ClientBalloon balloon : allBalloons.values()) {
-                if (balloon.getBounds().intersects(playerInShip)) {
-                    //Calculate specific intersection
-                    AABB intersect = balloon.getBounds().intersect(playerInShip);
-                    perBalloonIntersections.put(balloon, intersect);
+                for (ClientBalloon balloon : allBalloons.values()) {
+                    if (balloon.getBounds().intersects(playerInShip)) {
+                        //Calculate specific intersection
+                        AABB intersect = balloon.getBounds().intersect(playerInShip);
+                        perBalloonIntersections.put(balloon, intersect);
+                    }
                 }
             }
 
             //Delegate to handler
-            if (!perBalloonIntersections.isEmpty() || handlers.containsKey(shipId)) {
+            if (!perBalloonIntersections.isEmpty() || hasHandler) {
                 ShipParticleHandler handler = getOrCreateHandler(shipId);
                 handler.tick(mc.level, ship, allBalloons, perBalloonIntersections);
 
