@@ -45,7 +45,6 @@ import net.minecraftforge.common.util.LazyOptional;
 
 public class HotAirBurnerBlockEntity extends SmartBlockEntity implements IHaveGoggleInformation, IBurner, IHotAirInjector {
     public static final double TREND_THRESHOLD = 0.001;
-    private static final float PARTICLE_SPAWN_MULTIPLIER = 0.1f;
 
     //Behaviours
     private HotAirInjectorBehaviour injectorBehaviour;
@@ -171,7 +170,8 @@ public class HotAirBurnerBlockEntity extends SmartBlockEntity implements IHaveGo
         int targetBalloonId = ClientBalloonRegistry.getBalloonIdForHai(getId());
         if (targetBalloonId == -1) return;
         
-        particleAccumulator += amount * PARTICLE_SPAWN_MULTIPLIER;
+        float multiplier = PropulsionConfig.HOT_AIR_BURNER_PARTICLE_SPAWN_MULTIPLIER.get().floatValue();
+        particleAccumulator += amount * multiplier;
         
         if (particleAccumulator >= 1.0f) {
             Ship ship = VSGameUtilsKt.getShipManagingPos(level, worldPosition);

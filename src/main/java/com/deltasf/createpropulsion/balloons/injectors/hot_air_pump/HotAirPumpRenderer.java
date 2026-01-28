@@ -3,6 +3,7 @@ package com.deltasf.createpropulsion.balloons.injectors.hot_air_pump;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
+import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.balloons.particles.BalloonParticleSystem;
 import com.deltasf.createpropulsion.balloons.particles.ShipParticleHandler;
 import com.deltasf.createpropulsion.balloons.registries.ClientBalloonRegistry;
@@ -39,12 +40,10 @@ public class HotAirPumpRenderer extends KineticBlockEntityRenderer<HotAirPumpBlo
 
     private static final float MAX_VISUAL_SPEED = 0.75f; 
     private static final float MAX_RPM = 256.0f;
-    private static final float FAN_SPEED_MULTIPLIER = 1.0f;
+    private static final float FAN_SPEED_MULTIPLIER = 0.5f;
     private static final float MIN_VISUAL_SPEED = 0.075f;
 
     private static final float MEMBRANE_DECAY = 0.2f;
-
-    private static final float PARTICLE_SPAWN_MULTIPLIER = 0.15f; 
 
     public HotAirPumpRenderer(BlockEntityRendererProvider.Context context) {
         super(context);
@@ -122,7 +121,8 @@ public class HotAirPumpRenderer extends KineticBlockEntityRenderer<HotAirPumpBlo
                 //Inhale
                 double amount = be.getInjectionAmount();
                 if (amount > 0) {
-                    be.clientParticleBuffer += amount * PARTICLE_SPAWN_MULTIPLIER * dt;
+                    float multiplier = PropulsionConfig.HOT_AIR_PUMP_PARTICLE_SPAWN_MULTIPLIER.get().floatValue();
+                    be.clientParticleBuffer += amount * multiplier * dt;
                 }
             } else {
                 //Exhale
@@ -210,5 +210,4 @@ public class HotAirPumpRenderer extends KineticBlockEntityRenderer<HotAirPumpBlo
             );
         }
     }
-
 }

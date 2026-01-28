@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
+import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.atmosphere.DimensionAtmosphereManager;
 import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.injectors.AirInjectorObstructionBehaviour;
@@ -38,10 +39,8 @@ public class HotAirPumpBlockEntity extends KineticBlockEntity implements IHotAir
     public static final float MAX_RPM = 256.0f;
     public static final float MAX_HEAT_CONSUMPTION = 2.0f;
 
-    public static final float OPERATING_THRESHOLD = 0.3f; 
-    public static final float BASE_INJECTION_AMOUNT = 6.0f; //TODO: Config
-
-    public static final float MIN_VISUAL_INJECTION = 0.4f;
+    public static final float OPERATING_THRESHOLD = 0.3f;
+    public static final float MIN_VISUAL_INJECTION = 0.5f;
 
     //Behaviours
     private HotAirInjectorBehaviour injectorBehaviour;
@@ -158,14 +157,16 @@ public class HotAirPumpBlockEntity extends KineticBlockEntity implements IHotAir
         if (effectiveHeat <= MathUtility.epsilon && heatConsumedThisTick > MathUtility.epsilon) {
             effectiveHeat = heatConsumedThisTick;
         }
-        double injection = BASE_INJECTION_AMOUNT * rpmPercentage * effectiveHeat;
+        double baseInjection = PropulsionConfig.HOT_AIR_PUMP_BASE_INJECTION_AMOUNT.get();
+        double injection = baseInjection * rpmPercentage * effectiveHeat;
         double efficiency = obstructionBehaviour.getEfficiency();
         return injection * efficiency;
     }
 
     @Override
     public float getVisualInjectionIntencity() { 
-        float ratio = (float) (getInjectionAmount() / HotAirPumpBlockEntity.BASE_INJECTION_AMOUNT);
+        double baseInjection = PropulsionConfig.HOT_AIR_PUMP_BASE_INJECTION_AMOUNT.get();
+        float ratio = (float) (getInjectionAmount() / baseInjection);
         if (ratio <= MathUtility.epsilon) return 0;
         return Math.max(ratio, MIN_VISUAL_INJECTION); 
     }
@@ -256,7 +257,8 @@ public class HotAirPumpBlockEntity extends KineticBlockEntity implements IHotAir
         //Injection
         if (!isAirless && isOnShip && isBalloonPresent) {
             double currentInjection = getInjectionAmount();
-            int percentage = (int) ((currentInjection / BASE_INJECTION_AMOUNT) * 100);
+            double baseInjection = PropulsionConfig.HOT_AIR_PUMP_BASE_INJECTION_AMOUNT.get();
+            int percentage = (int) ((currentInjection / baseInjection) * 100);
 
             LangBuilder injectionBuilder = CreateLang.builder()
                 .translate("gui.goggles.hot_air_pump.injection")
