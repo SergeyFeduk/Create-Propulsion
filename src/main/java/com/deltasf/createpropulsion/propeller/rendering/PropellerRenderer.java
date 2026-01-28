@@ -196,8 +196,8 @@ public class PropellerRenderer extends KineticBlockEntityRenderer<PropellerBlock
     private void renderBlades(PropellerBlockEntity be, PoseStack ms, VertexConsumer vb, int light, int overlay, SuperByteBuffer bladeModel, Direction direction, float kineticAngle, List<Float> placementAngles, int alpha) {
         if (placementAngles.isEmpty() || bladeModel == null) return;
         
-        double bladeAngle = PropulsionConfig.PROPELLER_BLADE_ANGLE.get();
-        float pitchAngle = (float)bladeAngle * (be.IsClockwise() ? -1.0f : 1.0f);
+        float bladeAngle = PropulsionConfig.PROPELLER_BLADE_ANGLE.get().floatValue();
+        float pitchAngle = bladeAngle * (be.IsClockwise() ? -1.0f : 1.0f);
 
         for (float currentAngle : placementAngles) {
             ms.pushPose();

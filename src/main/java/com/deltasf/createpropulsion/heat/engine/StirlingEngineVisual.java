@@ -71,14 +71,13 @@ public class StirlingEngineVisual extends KineticBlockEntityVisual<StirlingEngin
         float speed = Math.abs(blockEntity.getSpeed() / StirlingEngineBlockEntity.MAX_GENERATED_RPM);
         float effectiveRevolutionPeriod = Float.MAX_VALUE;
         if (speed > MathUtility.epsilon) {
-            double revolutionPeriod = PropulsionConfig.STIRLING_REVOLUTION_PERIOD.get();
-            effectiveRevolutionPeriod = (float) revolutionPeriod / speed;
+            effectiveRevolutionPeriod = PropulsionConfig.STIRLING_REVOLUTION_PERIOD.get().floatValue() / speed;
         }
 
-        double crankRadius = PropulsionConfig.STIRLING_CRANK_RADIUS.get();
-        double conrodLength = PropulsionConfig.STIRLING_CONROD_LENGTH.get();
+        float crankRadius = PropulsionConfig.STIRLING_CRANK_RADIUS.get().floatValue();
+        float conrodLength = PropulsionConfig.STIRLING_CONROD_LENGTH.get().floatValue();
 
-        Vector4f normalizedExtensions = StirlingEngineRenderer.calculateExtensions(timeSeconds, (float) crankRadius, (float) conrodLength, effectiveRevolutionPeriod);
+        Vector4f normalizedExtensions = StirlingEngineRenderer.calculateExtensions(timeSeconds, crankRadius, conrodLength, effectiveRevolutionPeriod);
 
         final float offsetDistance = 2 / 16.0f;
         for (int i = 0; i < 4; i++) {

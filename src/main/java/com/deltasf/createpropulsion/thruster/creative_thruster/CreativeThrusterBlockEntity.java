@@ -62,7 +62,7 @@ public class CreativeThrusterBlockEntity extends AbstractThrusterBlockEntity {
         float thrust = 0;
         float currentPower = getPower();
         if (currentPower  > 0) {
-            float thrustMultiplier = (float) (double) PropulsionConfig.CREATIVE_THRUSTER_THRUST_MULTIPLIER.get();
+            float thrustMultiplier = PropulsionConfig.CREATIVE_THRUSTER_THRUST_MULTIPLIER.get().floatValue();
             float powerMultiplier = powerBehaviour.getTargetThrust();
             thrust = thrustMultiplier * currentPower * powerMultiplier;
         }

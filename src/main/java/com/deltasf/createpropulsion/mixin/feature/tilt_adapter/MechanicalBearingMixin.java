@@ -70,8 +70,8 @@ public abstract class MechanicalBearingMixin extends KineticBlockEntity {
             shouldSnapOnStop = false;
             float absAngle = Math.abs(angle);
 
-            double tiltAdapterRange = PropulsionConfig.TILT_ADAPTER_ANGLE_RANGE.get();
-            float threshold = Math.max(0.333f, (1 / 15.0f * (float)tiltAdapterRange) - 0.25f);
+            float tiltAdapterRange = PropulsionConfig.TILT_ADAPTER_ANGLE_RANGE.get().floatValue();
+            float threshold = Math.max(0.333f, (1 / 15.0f * tiltAdapterRange) - 0.25f);
             
             if (absAngle < threshold || absAngle > (360 - threshold)) {
                 angle = 0;

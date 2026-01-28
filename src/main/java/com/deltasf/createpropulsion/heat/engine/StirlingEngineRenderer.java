@@ -53,12 +53,11 @@ public class StirlingEngineRenderer extends KineticBlockEntityRenderer<StirlingE
         float timeSeconds = time / 20.0f;
         float effectiveRevolutionPeriod = Float.MAX_VALUE;
         if (speed > MathUtility.epsilon) {
-            double revolutionPeriod = PropulsionConfig.STIRLING_REVOLUTION_PERIOD.get();
-            effectiveRevolutionPeriod = (float)revolutionPeriod / speed;
+            effectiveRevolutionPeriod = PropulsionConfig.STIRLING_REVOLUTION_PERIOD.get().floatValue() / speed;
         }
-        double crankRadius = PropulsionConfig.STIRLING_CRANK_RADIUS.get();
-        double conrodLength = PropulsionConfig.STIRLING_CONROD_LENGTH.get();
-        Vector4f normalizedExtensions = calculateExtensions(timeSeconds, (float)crankRadius, (float)conrodLength, effectiveRevolutionPeriod);
+        float crankRadius = PropulsionConfig.STIRLING_CRANK_RADIUS.get().floatValue();
+        float conrodLength = PropulsionConfig.STIRLING_CONROD_LENGTH.get().floatValue();
+        Vector4f normalizedExtensions = calculateExtensions(timeSeconds, crankRadius, conrodLength, effectiveRevolutionPeriod);
 
         for (int i = 0; i < 4; i++) {
             float normalized;

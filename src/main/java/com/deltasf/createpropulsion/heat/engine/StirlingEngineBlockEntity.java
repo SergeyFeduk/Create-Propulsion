@@ -112,8 +112,7 @@ public class StirlingEngineBlockEntity extends GeneratingKineticBlockEntity impl
         if (rpm == 0) return 0f; 
 
         float stressFactor = MAX_GENERATED_RPM / rpm;
-        double generatedSU = PropulsionConfig.STIRLING_GENERATED_SU.get();
-        float capacity = stressFactor * (float)generatedSU;
+        float capacity = stressFactor * PropulsionConfig.STIRLING_GENERATED_SU.get().floatValue();
 
         this.lastCapacityProvided = capacity;
         return capacity;

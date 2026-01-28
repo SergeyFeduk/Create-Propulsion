@@ -72,8 +72,7 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
 
                 if (fuelConsumed > 0) {
                     float consumptionRatio = (float) fuelConsumed / (float) consumption;
-
-                    float thrustMultiplier = (float) (double) PropulsionConfig.THRUSTER_THRUST_MULTIPLIER.get();
+                    float thrustMultiplier = PropulsionConfig.THRUSTER_THRUST_MULTIPLIER.get().floatValue();
                     thrust = BASE_MAX_THRUST * thrustMultiplier * thrustPercentage * properties.thrustMultiplier * consumptionRatio;
                 }
             }
@@ -131,7 +130,7 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
     }
 
     private int calculateFuelConsumption(float powerPercentage, float fluidPropertiesConsumptionMultiplier, int tick_rate) {
-        float base_consumption = BASE_FUEL_CONSUMPTION * (float) (double) PropulsionConfig.THRUSTER_CONSUMPTION_MULTIPLIER.get();
+        float base_consumption = BASE_FUEL_CONSUMPTION * PropulsionConfig.THRUSTER_CONSUMPTION_MULTIPLIER.get().floatValue();
         return (int) Math.ceil(base_consumption * powerPercentage * fluidPropertiesConsumptionMultiplier * tick_rate);
     }
 }
