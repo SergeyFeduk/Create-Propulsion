@@ -9,13 +9,13 @@ public class PropulsionConfig {
     public static final ForgeConfigSpec CLIENT_SPEC;
 
     //Thruster
-    public static final ForgeConfigSpec.ConfigValue<Double> THRUSTER_THRUST_MULTIPLIER;
-    public static final ForgeConfigSpec.ConfigValue<Double> THRUSTER_CONSUMPTION_MULTIPLIER;
+    public static final ForgeConfigSpec.ConfigValue<Double>  THRUSTER_THRUST_MULTIPLIER;
+    public static final ForgeConfigSpec.ConfigValue<Double>  THRUSTER_CONSUMPTION_MULTIPLIER;
     public static final ForgeConfigSpec.ConfigValue<Integer> THRUSTER_MAX_SPEED;
     public static final ForgeConfigSpec.ConfigValue<Integer> THRUSTER_TICKS_PER_UPDATE;
     public static final ForgeConfigSpec.ConfigValue<Boolean> THRUSTER_DAMAGE_ENTITIES;
-    public static final ForgeConfigSpec.ConfigValue<Double> THRUSTER_PARTICLE_OFFSET_INCOMING_VEL_MODIFIER;
-    public static final ForgeConfigSpec.ConfigValue<Double> THRUSTER_PARTICLE_COUNT_MULTIPLIER;
+    public static final ForgeConfigSpec.ConfigValue<Double>  THRUSTER_PARTICLE_OFFSET_INCOMING_VEL_MODIFIER;
+    public static final ForgeConfigSpec.ConfigValue<Double>  THRUSTER_PARTICLE_COUNT_MULTIPLIER;
     //Creative Thruster
     public static final ForgeConfigSpec.ConfigValue<Double> CREATIVE_THRUSTER_THRUST_MULTIPLIER;
     //Optical sensors
@@ -65,10 +65,10 @@ public class PropulsionConfig {
 
     public static final ForgeConfigSpec.ConfigValue<Boolean> PROPELLER_ENABLE_BLUR;
     public static final ForgeConfigSpec.ConfigValue<Integer> PROPELLER_BLUR_MAX_INSTANCES;
-    public static final ForgeConfigSpec.ConfigValue<Double> PROPELLER_BLUR_SAMPLE_RATE;
-    public static final ForgeConfigSpec.ConfigValue<Double> PROPELLER_LOD_DISTANCE;
-    public static final ForgeConfigSpec.ConfigValue<Double> PROPELLER_EXPOSURE_TIME;
-    public static final ForgeConfigSpec.ConfigValue<Double> PROPELLER_BLADE_ANGLE;
+    public static final ForgeConfigSpec.ConfigValue<Double>  PROPELLER_BLUR_SAMPLE_RATE;
+    public static final ForgeConfigSpec.ConfigValue<Double>  PROPELLER_LOD_DISTANCE;
+    public static final ForgeConfigSpec.ConfigValue<Double>  PROPELLER_EXPOSURE_TIME;
+    public static final ForgeConfigSpec.ConfigValue<Double>  PROPELLER_BLADE_ANGLE;
     //Stirling engine
     public static final ForgeConfigSpec.ConfigValue<Double> STIRLING_GENERATED_SU;
 
@@ -122,8 +122,8 @@ public class PropulsionConfig {
         SERVER_BUILDER.push("Physics assembler");
             PHYSICS_ASSEMBLER_MAX_MINK_DISTANCE = SERVER_BUILDER.comment("Maximum distance between region selected with assembly gauge and physics assembler block.")
                 .define("Max distance to region", 3);
-            ASSEMBLY_GAUGE_MAX_SIZE = SERVER_BUILDER.comment("ASSEMBLY_GAUGE_MAX_SIZE")
-                .define("ASSEMBLY_GAUGE_MAX_SIZE", 128);
+            ASSEMBLY_GAUGE_MAX_SIZE = SERVER_BUILDER.comment("Maximum size of the region that can be selected with assembly gauge.")
+                .define("Max size", 128);
         SERVER_BUILDER.pop();
 
         SERVER_BUILDER.push("Wing");
@@ -161,15 +161,15 @@ public class PropulsionConfig {
                 .define("Surface leak factor", 1e-2);
             BALLOON_HOLE_LEAK_FACTOR = SERVER_BUILDER.comment("The higher this values is - the more hot air leaks out of holes in balloon.")
                 .define("Hole leak factor", 0.25);
-            BALLOON_HOLE_LAYER_REMOVAL_THRESHOLD = SERVER_BUILDER.comment("BALLOON_HOLE_LAYER_REMOVAL_THRESHOLD")
-                .define("BALLOON_HOLE_LAYER_REMOVAL_THRESHOLD", 0.5);
+            BALLOON_HOLE_LAYER_REMOVAL_THRESHOLD = SERVER_BUILDER.comment("This value controls how many holes need to be made on one balloon layer to remove it from balloon's volume.")
+                .define("Hole layer removal threshold", 0.5);
         SERVER_BUILDER.pop();
 
         SERVER_BUILDER.push("Propeller");
             PROPELLER_MAX_SPEED = SERVER_BUILDER.comment("Propellers stop accelerating ships upon reaching this speed. Defined in blocks per second")
                 .defineInRange("Max speed", 40.0, 10.0, 100.0);
             PROPELLER_POWER_MULTIPLIER = SERVER_BUILDER.comment("Propeller force and torque are multiplied by this number")
-                .defineInRange("Power multiplier", 6.0, 0.01, 100.0); //TODO: Figure out better value
+                .defineInRange("Power multiplier", 6.0, 0.01, 100.0);
             PROPELLER_WATER_POWER_MULTIPLIER = SERVER_BUILDER.comment("Propeller force when it is underwater is multiplied by this number")
                 .defineInRange("Underwater power multiplier", 1.0, 0.01, 100.0);
             PROPELLER_TORQUE_EFFECT_MULTIPLIER = SERVER_BUILDER.comment("Propeller torque is multiplied by this number")
@@ -177,22 +177,22 @@ public class PropulsionConfig {
         SERVER_BUILDER.pop();
 
         SERVER_BUILDER.push("Stirling Engine");
-            STIRLING_GENERATED_SU = SERVER_BUILDER.comment("STIRLING_GENERATED_SU")
-                .defineInRange("STIRLING_GENERATED_SU", 16.0, 1.0, 64.0); //TODO: Figure out better value
+            STIRLING_GENERATED_SU = SERVER_BUILDER.comment("Change this value to modify the amount of stress units produced by stirling engine. Value of 16 corresponds to 4096 SU.")
+                .defineInRange("Generated stress units", 16.0, 1.0, 64.0);
         SERVER_BUILDER.pop();
 
         SERVER_BUILDER.push("Tilt Adapter");
-            TILT_ADAPTER_ANGLE_RANGE = SERVER_BUILDER.comment("TILT_ADAPTER_ANGLE_RANGE")
-                .defineInRange("TILT_ADAPTER_ANGLE_RANGE", 30.0, 10.0, 60.0); 
+            TILT_ADAPTER_ANGLE_RANGE = SERVER_BUILDER.comment("Angle range of the tilt adapter. Better leave it close to 30.")
+                .defineInRange("Angle range", 30.0, 10.0, 60.0); 
         SERVER_BUILDER.pop();
 
         SERVER_BUILDER.push("Atmosphere");
-            ATMOSPHERE_HEIGHT_FACTOR = SERVER_BUILDER.comment("ATMOSPHERE_HEIGHT_FACTOR")
-                .define("ATMOSPHERE_HEIGHT_FACTOR", 1.0);
-            ATMOSPHERE_NOISE_MAGNITUDE = SERVER_BUILDER.comment("ATMOSPHERE_NOISE_MAGNITUDE")
-                .define("ATMOSPHERE_NOISE_MAGNITUDE", 1.0);
-            ATMOSPHERE_NOISE_TIME_FACTOR = SERVER_BUILDER.comment("ATMOSPHERE_NOISE_TIME_FACTOR")
-                .define("ATMOSPHERE_NOISE_TIME_FACTOR", 1.0);
+            ATMOSPHERE_HEIGHT_FACTOR = SERVER_BUILDER.comment("Height factor of the atmosphere. Increase this value if balloons are flying too low.")
+                .define("Height factor", 1.0);
+            ATMOSPHERE_NOISE_MAGNITUDE = SERVER_BUILDER.comment("Magnitude of the perlin noise of the atmosphere. Higher values result in higher turulence and less control over the altitude.")
+                .define("Noise magnitude", 1.0);
+            ATMOSPHERE_NOISE_TIME_FACTOR = SERVER_BUILDER.comment("Speed of atmospheric perlin noise change. Higher values make atmosphere (and therefore balloons and propellers) more unstable.")
+                .define("Noise time factor", 1.0);
         SERVER_BUILDER.pop();
 
         SERVER_SPEC = SERVER_BUILDER.build();
@@ -209,9 +209,9 @@ public class PropulsionConfig {
             PROPELLER_ENABLE_BLUR = CLIENT_BUILDER.comment("Should fast-rotating propeller blades be blurred. Disable this if you experience visual issues with fast-rotating propellers")
                 .define("Enable blur", true);
             PROPELLER_BLUR_MAX_INSTANCES = CLIENT_BUILDER.comment("Maximum amount of blurred models rendered. Decrease this value if your fps drops when near a lot of propellers.")
-                .define("Max blur instances", 64); //Set to 32
+                .define("Max blur instances", 64);
             PROPELLER_BLUR_SAMPLE_RATE = CLIENT_BUILDER.comment("How slow propeller blades start to become blurry")
-                .define("Sample rate", 2.0); //Set to 3
+                .define("Sample rate", 2.0);
             PROPELLER_LOD_DISTANCE = CLIENT_BUILDER.comment("Distance at which propllers no longer blur")
                 .define("LOD", 128.0);
             PROPELLER_EXPOSURE_TIME = CLIENT_BUILDER.comment("Simulated exposure time. Set to 1/120 by default")
@@ -221,12 +221,12 @@ public class PropulsionConfig {
         CLIENT_BUILDER.pop();
 
         CLIENT_BUILDER.push("Stirling Engine");
-            STIRLING_REVOLUTION_PERIOD = CLIENT_BUILDER.comment("STIRLING_REVOLUTION_PERIOD.")
-                .define("STIRLING_REVOLUTION_PERIOD", 0.2);
-            STIRLING_CRANK_RADIUS = CLIENT_BUILDER.comment("STIRLING_CRANK_RADIUS.")
-                .define("STIRLING_CRANK_RADIUS", 0.125);
-            STIRLING_CONROD_LENGTH = CLIENT_BUILDER.comment("STIRLING_CONROD_LENGTH.")
-                .define("STIRLING_CONROD_LENGTH", 0.5);
+            STIRLING_REVOLUTION_PERIOD = CLIENT_BUILDER.comment("Revolution period of the simulated shaft (affects only piston movement).")
+                .define("Revolution period", 0.2);
+            STIRLING_CRANK_RADIUS = CLIENT_BUILDER.comment("Radius of the simulated crank.")
+                .define("Crank radius", 0.125);
+            STIRLING_CONROD_LENGTH = CLIENT_BUILDER.comment("Length of the simulated conrod.")
+                .define("Conrod length", 0.5);
         CLIENT_BUILDER.pop();
         
         CLIENT_BUILDER.push("Hot air balloons");
