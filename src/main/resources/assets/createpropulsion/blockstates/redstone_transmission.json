@@ -33,6 +33,24 @@
       "model": "createpropulsion:block/redstone_transmission",
       "x": 270,
       "y": 270
+    },
+    "facing=north,axis=x": {
+      "model": "createpropulsion:block/redstone_transmission",
+      "x": 270,
+      "y": 90
+    },
+    "facing=south,axis=x": {
+      "model": "createpropulsion:block/redstone_transmission",
+      "x": 270,
+      "y": 90
+    },
+    "facing=west,axis=z": {
+      "model": "createpropulsion:block/redstone_transmission",
+      "x": 270
+    },
+    "facing=east,axis=z": {
+      "model": "createpropulsion:block/redstone_transmission",
+      "x": 270
     }
   }
 }

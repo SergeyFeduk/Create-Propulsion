@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 public class PropulsionMixinPlugin implements IMixinConfigPlugin {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final Map<String, Supplier<Boolean>> CONDITIONS = new HashMap<>();
+    private static final boolean LOG_MIXINS = false;
 
     static {
         CONDITIONS.put("is_vsaddition_not_loaded", () -> FMLLoader.getLoadingModList().getModFileById("vs_addition") == null);
@@ -41,7 +42,7 @@ public class PropulsionMixinPlugin implements IMixinConfigPlugin {
             if (conditionSupplier == null) {
                 throw new RuntimeException("Unknown mixin condition '" + condition + "' for mixin " + mixinClassName);
             }
-            LOGGER.info("Mixin " + mixinClassName + "is " + (conditionSupplier.get() ? "applied" : "not applied"));
+            if (LOG_MIXINS) LOGGER.info("Mixin " + mixinClassName + "is " + (conditionSupplier.get() ? "applied" : "not applied"));
             return conditionSupplier.get();
         } catch (IOException e) {
             throw new RuntimeException("Could not read mixin class " + mixinClassName, e);

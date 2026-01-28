@@ -1,7 +1,6 @@
 package com.deltasf.createpropulsion.registries;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
-import com.deltasf.createpropulsion.design_goggles.DesignGogglesItem;
 import com.deltasf.createpropulsion.optical_sensors.OpticalLensItem;
 import com.deltasf.createpropulsion.physics_assembler.AssemblyGaugeItem;
 import com.deltasf.createpropulsion.propeller.blades.AndesitePropellerBladeItem;
@@ -84,10 +83,10 @@ public class PropulsionItems {
         .setData(ProviderType.LANG, FUCK_OFF_LANG())
         .register();
 
-    public static final ItemEntry<DesignGogglesItem> DESIGN_GOGGLES = REGISTRATE.item("design_goggles", DesignGogglesItem::new)
+    /*public static final ItemEntry<DesignGogglesItem> DESIGN_GOGGLES = REGISTRATE.item("design_goggles", DesignGogglesItem::new)
         .model(FUCK_OFF_ITEM())
         .setData(ProviderType.LANG, FUCK_OFF_LANG())
-        .register();
+        .register();*/
     public static final ItemEntry<AssemblyGaugeItem> ASSEMBLY_GAUGE = REGISTRATE.item("assembly_gauge", AssemblyGaugeItem::new)
         .model(FUCK_OFF_ITEM())
         .setData(ProviderType.LANG, FUCK_OFF_LANG())
