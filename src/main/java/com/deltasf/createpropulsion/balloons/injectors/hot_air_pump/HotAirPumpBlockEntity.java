@@ -61,6 +61,7 @@ public class HotAirPumpBlockEntity extends KineticBlockEntity implements IHotAir
     public float lastRenderTime = -1;
     public float clientParticleBuffer = 0;
     public float clientLastVisualT = 0;
+    private float lastSyncedHeat = -1;
 
     public HotAirPumpBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
@@ -103,9 +104,22 @@ public class HotAirPumpBlockEntity extends KineticBlockEntity implements IHotAir
         heatConsumedThisTick = 0;
 
         boolean currentlyHot = lastHeatConsumed > 0;
+        boolean syncNeeded = false;
+
         if (currentlyHot != isAboveHeatThreshold) {
             isAboveHeatThreshold = currentlyHot;
             attemptScan();
+
+            syncNeeded = true;
+        }
+
+        if (Math.abs(lastHeatConsumed - lastSyncedHeat) > MathUtility.epsilon) {
+            syncNeeded = true;
+        }
+
+        if (syncNeeded) {
+            lastSyncedHeat = lastHeatConsumed;
+            notifyUpdate();
         }
     }
 
