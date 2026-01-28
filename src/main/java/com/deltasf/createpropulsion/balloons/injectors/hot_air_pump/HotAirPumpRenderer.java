@@ -114,7 +114,7 @@ public class HotAirPumpRenderer extends KineticBlockEntityRenderer<HotAirPumpBlo
         float meshTranslateY = -(9.0f / 16.0f) * (1.0f - tRaw);
 
         Player player = Minecraft.getInstance().player;
-        if (player != null && player.distanceToSqr(be.getBlockPos().getX(), be.getBlockPos().getY(), be.getBlockPos().getZ()) < BalloonParticleSystem.SPAWN_RADIUS_SQ) {
+        if (player != null && player.distanceToSqr(be.getBlockPos().getX(), be.getBlockPos().getY(), be.getBlockPos().getZ()) < BalloonParticleSystem.getSpawnRadiusSqared()) {
             float deltaT = t - be.clientLastVisualT;
             be.clientLastVisualT = t;
             

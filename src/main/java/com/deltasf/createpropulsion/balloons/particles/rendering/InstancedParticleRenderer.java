@@ -1,5 +1,6 @@
 package com.deltasf.createpropulsion.balloons.particles.rendering;
 
+import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.balloons.particles.BalloonParticleSystem;
 import com.deltasf.createpropulsion.balloons.particles.HapData;
 import com.deltasf.createpropulsion.balloons.particles.ShipParticleHandler;
@@ -25,7 +26,6 @@ public class InstancedParticleRenderer {
     private static final int R = 225;
     private static final int G = 225;
     private static final int B = 225;
-    private static final int A = 100;
 
     private static boolean initialized = false;
     private static int programId;
@@ -150,6 +150,8 @@ public class InstancedParticleRenderer {
 
         Vector3d camPos = new Vector3d(camera.getPosition().x, camera.getPosition().y, camera.getPosition().z);
 
+        byte alpha = PropulsionConfig.BALLOON_PARTICLES_ALPHA.get().byteValue();
+
         //Rendering
         Long2ObjectMap<ShipParticleHandler> handlers = BalloonParticleSystem.getAllHandlers();
         for (Long2ObjectMap.Entry<ShipParticleHandler> entry : handlers.long2ObjectEntrySet()) {
@@ -179,7 +181,7 @@ public class InstancedParticleRenderer {
                 instanceBuffer.put((byte) R);
                 instanceBuffer.put((byte) G);
                 instanceBuffer.put((byte) B);
-                instanceBuffer.put((byte) A);
+                instanceBuffer.put(   alpha);
 
                 //Scale
                 float scale = data.scale[i];

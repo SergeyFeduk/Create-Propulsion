@@ -6,6 +6,7 @@ import java.util.Random;
 import org.joml.Vector3f;
 import org.valkyrienskies.core.api.ships.ClientShip;
 
+import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.balloons.ClientBalloon;
 import com.deltasf.createpropulsion.balloons.HaiGroup;
 import com.deltasf.createpropulsion.balloons.particles.effectors.EffectorBucket;
@@ -24,8 +25,6 @@ public class ShipParticleHandler {
     private static final float DRAG_STREAM = 0.99f;
 
     private static final float BASE_SPAWN_CHANCE = 0.33f;
-
-    private static final float INERTIA_SCALE = 0.5f;
     private static final float LEAK_FORCE_MULTIPLIER = 0.03f;
 
     //Reference values for calculating stochastic amount of samples per unit of volume to maintain density of full 130 volume balloon with 2 attempts
@@ -98,13 +97,14 @@ public class ShipParticleHandler {
         float dt = 0.05f;
 
         //Precompute inertial vectors
+        float inertiaScale = PropulsionConfig.BALLOON_PARTICLES_INERTIA_SCALE.get().floatValue();
         motionAnalyzer.tick(ship);
-        float inertiaLinearX = motionAnalyzer.linearInertia.x * INERTIA_SCALE;
-        float inertiaLinearY = motionAnalyzer.linearInertia.y * INERTIA_SCALE;
-        float inertiaLinearZ = motionAnalyzer.linearInertia.z * INERTIA_SCALE;
-        float inertiaAngularX = motionAnalyzer.angularInertia.x * INERTIA_SCALE;
-        float inertiaAngularY = motionAnalyzer.angularInertia.y * INERTIA_SCALE;
-        float inertiaAngularZ = motionAnalyzer.angularInertia.z * INERTIA_SCALE;
+        float inertiaLinearX = motionAnalyzer.linearInertia.x * inertiaScale;
+        float inertiaLinearY = motionAnalyzer.linearInertia.y * inertiaScale;
+        float inertiaLinearZ = motionAnalyzer.linearInertia.z * inertiaScale;
+        float inertiaAngularX = motionAnalyzer.angularInertia.x * inertiaScale;
+        float inertiaAngularY = motionAnalyzer.angularInertia.y * inertiaScale;
+        float inertiaAngularZ = motionAnalyzer.angularInertia.z * inertiaScale;
         //Precompute leak upwards force        
         float leakForceX = motionAnalyzer.worldUpInLocal.x * LEAK_FORCE_MULTIPLIER;
         float leakForceY = motionAnalyzer.worldUpInLocal.y * LEAK_FORCE_MULTIPLIER;
@@ -246,6 +246,8 @@ public class ShipParticleHandler {
     private void spawnVolumeParticles(Map<ClientBalloon, AABB> intersections) {
         if (intersections.isEmpty()) return;
         
+        double spawnMultiplier = PropulsionConfig.BALLOON_PARTICLES_VOLUME_SPAWN_RATE.get();
+
         for (Map.Entry<ClientBalloon, AABB> entry : intersections.entrySet()) {
             if (data.count >= data.capacity) break;
             
@@ -254,7 +256,7 @@ public class ShipParticleHandler {
             double spawnVolume = (bounds.maxX - bounds.minX) * (bounds.maxY - bounds.minY) * (bounds.maxZ - bounds.minZ);
             
             //Density normalization
-            double targetAttempts = BASE_ATTEMPTS * (spawnVolume / REFERENCE_VOLUME);
+            double targetAttempts = BASE_ATTEMPTS * spawnMultiplier * (spawnVolume / REFERENCE_VOLUME);
 
             //Rounding done stochastically. Not perfect but does not require additional state :P
             int attempts = (int) targetAttempts;

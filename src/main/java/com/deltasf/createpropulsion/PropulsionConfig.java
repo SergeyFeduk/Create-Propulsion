@@ -40,6 +40,14 @@ public class PropulsionConfig {
     public static final ForgeConfigSpec.ConfigValue<Double> BALLOON_SURFACE_LEAK_FACTOR;
     public static final ForgeConfigSpec.ConfigValue<Double> BALLOON_HOLE_LEAK_FACTOR;
     public static final ForgeConfigSpec.ConfigValue<Double> BALLOON_HOLE_LAYER_REMOVAL_THRESHOLD;
+
+    public static final ForgeConfigSpec.ConfigValue<Boolean> BALLOON_PARTICLES_ENABLED;
+    public static final ForgeConfigSpec.ConfigValue<Double>  BALLOON_PARTICLES_VOLUME_SPAWN_RATE;
+    public static final ForgeConfigSpec.ConfigValue<Double>  BALLOON_PARTICLES_SPAWN_RADIUS;
+    public static final ForgeConfigSpec.ConfigValue<Double>  BALLOON_PARTICLES_HOLE_STRENGTH;
+    public static final ForgeConfigSpec.ConfigValue<Double>  BALLOON_PARTICLES_INERTIA_SCALE;
+    public static final ForgeConfigSpec.ConfigValue<Integer> BALLOON_PARTICLES_ALPHA;
+
     //Hot air burner
     public static final ForgeConfigSpec.ConfigValue<Double> HOT_AIR_BURNER_PRODUCTION_MULTIPLIER;
 
@@ -209,6 +217,22 @@ public class PropulsionConfig {
             STIRLING_CONROD_LENGTH = CLIENT_BUILDER.comment("STIRLING_CONROD_LENGTH.")
                 .define("STIRLING_CONROD_LENGTH", 0.5);
         CLIENT_BUILDER.pop();
+        
+        CLIENT_BUILDER.push("Hot air balloons");
+            BALLOON_PARTICLES_ENABLED = CLIENT_BUILDER.comment("BALLOON_PARTICLES_ENABLED")
+                .define("BALLOON_PARTICLES_ENABLED", true);
+            BALLOON_PARTICLES_VOLUME_SPAWN_RATE = CLIENT_BUILDER.comment("BALLOON_PARTICLES_VOLUME_SPAWN_RATE")
+                .define("BALLOON_PARTICLES_VOLUME_SPAWN_RATE", 1.0);
+            BALLOON_PARTICLES_SPAWN_RADIUS = CLIENT_BUILDER.comment("BALLOON_PARTICLES_SPAWN_RADIUS")
+                .defineInRange("BALLOON_PARTICLES_SPAWN_RADIUS", 32.0, 16.0, 128.0);
+            BALLOON_PARTICLES_HOLE_STRENGTH = CLIENT_BUILDER.comment("BALLOON_PARTICLES_HOLE_STRENGTH")
+                .define("BALLOON_PARTICLES_HOLE_STRENGTH", 2.8);
+            BALLOON_PARTICLES_INERTIA_SCALE = CLIENT_BUILDER.comment("BALLOON_PARTICLES_INERTIA_SCALE")
+                .define("BALLOON_PARTICLES_INERTIA_SCALE", 0.5);
+            BALLOON_PARTICLES_ALPHA = CLIENT_BUILDER.comment("BALLOON_PARTICLES_ALPHA")
+                .defineInRange("BALLOON_PARTICLES_ALPHA", 100, 0, 255);
+        CLIENT_BUILDER.pop();
+
         CLIENT_SPEC = CLIENT_BUILDER.build();
         //#endregion
     }

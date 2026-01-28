@@ -2,6 +2,7 @@ package com.deltasf.createpropulsion.balloons.particles;
 
 import org.joml.Vector3f;
 
+import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.balloons.ClientBalloon;
 import com.deltasf.createpropulsion.balloons.HaiGroup;
 import com.deltasf.createpropulsion.balloons.particles.effectors.EffectorBucket;
@@ -18,8 +19,6 @@ public class ShipEffectorHandler {
     private final Long2ObjectOpenHashMap<EffectorBucket> effectors = new Long2ObjectOpenHashMap<>();
     private final ShipParticleHandler parent;
     
-    //Config constants
-    private static final float HOLE_EJECT_STRENGTH = 2.8f;
     private static final int HOLE_EFFECTOR_RADIUS = 2; //5x5x5
 
     public ShipEffectorHandler(ShipParticleHandler parent) {
@@ -64,6 +63,7 @@ public class ShipEffectorHandler {
 
     private void addHoleEffectorInternal(Level level, ClientBalloon balloon, BlockPos hole) {
         Vector3f dirAccumulator = calculateHoleDirection(level, balloon, hole);
+        float strength = PropulsionConfig.BALLOON_PARTICLES_HOLE_STRENGTH.get().floatValue();
 
         //Only register if we have a valid flow direction
         if (dirAccumulator.lengthSquared() > 0.001f) {
@@ -72,7 +72,7 @@ public class ShipEffectorHandler {
                 parent.getAnchorX(), parent.getAnchorY(), parent.getAnchorZ(),
                 hole.getX(), hole.getY(), hole.getZ(),
                 dirAccumulator, 
-                HOLE_EJECT_STRENGTH
+                strength
             );
 
             //Register in cubic area

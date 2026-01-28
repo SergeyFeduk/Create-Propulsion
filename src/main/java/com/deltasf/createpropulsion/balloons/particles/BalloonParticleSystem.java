@@ -10,6 +10,7 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
+import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.balloons.ClientBalloon;
 import com.deltasf.createpropulsion.balloons.particles.rendering.InstancedParticleRenderer;
 import com.deltasf.createpropulsion.balloons.registries.ClientBalloonRegistry;
@@ -29,10 +30,7 @@ import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = CreatePropulsion.ID, value = Dist.CLIENT)
 public class BalloonParticleSystem {
-
     private static final Long2ObjectMap<ShipParticleHandler> handlers = new Long2ObjectOpenHashMap<>();
-    public static final double SPAWN_RADIUS = 32.0;
-    public static final double SPAWN_RADIUS_SQ = SPAWN_RADIUS * SPAWN_RADIUS;
     
     //Temp
     private static final Map<ClientBalloon, AABB> perBalloonIntersections = new HashMap<>();
@@ -41,6 +39,11 @@ public class BalloonParticleSystem {
 
     public static ShipParticleHandler getHandler(long shipId) {
         return handlers.get(shipId);
+    }
+
+    public static float getSpawnRadiusSqared() {
+        float radius = PropulsionConfig.BALLOON_PARTICLES_SPAWN_RADIUS.get().floatValue();
+        return radius * radius;
     }
     
     public static ShipParticleHandler getOrCreateHandler(long shipId) {
@@ -66,13 +69,20 @@ public class BalloonParticleSystem {
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
+
+        if (!PropulsionConfig.BALLOON_PARTICLES_ENABLED.get()) {
+            if (!handlers.isEmpty()) handlers.clear();
+            return;
+        }
+
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null) return;
         if (mc.isPaused()) return;
 
         Player player = mc.player;
         if (player == null) return;
-        AABB playerBounds = player.getBoundingBox().inflate(SPAWN_RADIUS);
+        double radius = PropulsionConfig.BALLOON_PARTICLES_SPAWN_RADIUS.get();
+        AABB playerBounds = player.getBoundingBox().inflate(radius);
 
         //Iterate over loaded ships
         for (ClientShip ship : VSGameUtilsKt.getShipObjectWorld(mc.level).getLoadedShips()) {
@@ -124,6 +134,7 @@ public class BalloonParticleSystem {
     @SubscribeEvent
     public static void onRenderLevelStage(RenderLevelStageEvent event) {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS) return;
+        if (!PropulsionConfig.BALLOON_PARTICLES_ENABLED.get()) return;
 
         InstancedParticleRenderer.render(
             event.getPoseStack(), 

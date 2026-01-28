@@ -164,7 +164,7 @@ public class HotAirBurnerBlockEntity extends SmartBlockEntity implements IHaveGo
         if (amount <= 0) return;
 
         Player player = Minecraft.getInstance().player;
-        if (player == null || player.distanceToSqr(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ()) > BalloonParticleSystem.SPAWN_RADIUS_SQ) {
+        if (player == null || player.distanceToSqr(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ()) > BalloonParticleSystem.getSpawnRadiusSqared()) {
             return;
         }
         
