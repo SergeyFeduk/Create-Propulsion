@@ -1,5 +1,6 @@
 package com.deltasf.createpropulsion.registries;
 
+import com.simibubi.create.api.stress.BlockStressValues;
 import com.tterrag.registrate.builders.BlockBuilder;
 import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
 import net.createmod.catnip.platform.CatnipServices;
@@ -12,6 +13,11 @@ import java.util.function.DoubleSupplier;
 
 public class PropulsionDefaultStress {
     public static final Map<ResourceLocation, Double> DEFAULT_IMPACTS = new HashMap<>();
+
+    public static void register() {
+        //TODO: make stress values configurable
+        BlockStressValues.IMPACTS.registerProvider(PropulsionDefaultStress::getImpact);
+    }
 
     public static DoubleSupplier getImpact(Block block) {
         ResourceLocation id = CatnipServices.REGISTRIES.getKeyOrThrow(block);

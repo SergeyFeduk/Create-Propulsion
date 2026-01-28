@@ -1,36 +1,19 @@
 package com.deltasf.createpropulsion;
 
-import com.deltasf.createpropulsion.balloons.hot_air.BalloonAttachment;
-import com.deltasf.createpropulsion.magnet.MagnetForceAttachment;
-import com.deltasf.createpropulsion.propeller.PropellerAttachment;
-import com.deltasf.createpropulsion.reaction_wheel.ReactionWheelAttachment;
 import com.deltasf.createpropulsion.registries.*;
-import com.deltasf.createpropulsion.thruster.ThrusterForceAttachment;
-import com.simibubi.create.api.boiler.BoilerHeater;
-import com.simibubi.create.api.stress.BlockStressValues;
 
-import com.deltasf.createpropulsion.balloons.serialization.BalloonSerializationHandler;
 import com.deltasf.createpropulsion.compat.computercraft.CCProxy;
 import com.deltasf.createpropulsion.events.ModClientEvents;
-import com.deltasf.createpropulsion.heat.burners.AbstractBurnerBlock;
-import com.deltasf.createpropulsion.impact_sensor.ImpactSensorAttachment;
-import com.deltasf.createpropulsion.impact_sensor.ImpactSensorSystem;
 import com.deltasf.createpropulsion.network.PropulsionPackets;
 import com.deltasf.createpropulsion.particles.ParticleTypes;
 import com.simibubi.create.compat.Mods;
-import com.simibubi.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.ModLoadingContext;
-
-import org.valkyrienskies.core.api.ships.LoadedServerShip;
-import org.valkyrienskies.mod.api.ValkyrienSkies;
-import org.valkyrienskies.mod.api.VsApi;
 
 @Mod(CreatePropulsion.ID)
 public class CreatePropulsion {
@@ -51,91 +34,15 @@ public class CreatePropulsion {
         PropulsionCreativeTab.register(modBus);
         PropulsionPackets.register();
         PropulsionDisplaySources.register();
-        
-        //VS Init
-        VsApi api = ValkyrienSkies.api();
-        api.registerAttachment(api.newAttachmentRegistrationBuilder(ThrusterForceAttachment.class)
-            .useLegacySerializer()
-            .build()
-        );
-        api.registerAttachment(api.newAttachmentRegistrationBuilder(BalloonAttachment.class)
-            .useLegacySerializer()
-            .build()
-        );
-        api.registerAttachment(api.newAttachmentRegistrationBuilder(MagnetForceAttachment.class)
-            .useLegacySerializer()
-            .build()
-        );
-        api.registerAttachment(api.newAttachmentRegistrationBuilder(PropellerAttachment.class)
-            .useLegacySerializer()
-            .build()
-        );
-        api.registerAttachment(api.newAttachmentRegistrationBuilder(ReactionWheelAttachment.class)
-            .useLegacySerializer()
-            .build()
-        );
-        api.registerAttachment(api.newAttachmentRegistrationBuilder(ImpactSensorAttachment.class)
-            .useLegacySerializer()
-            .build()
-        );
-
-
-        ImpactSensorSystem.register();
+        PropulsionDefaultStress.register();
+        PropulsionValkyrien.init();
 
         //Compat
         Mods.COMPUTERCRAFT.executeIfInstalled(() -> CCProxy::register);
         //Config
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, PropulsionConfig.SERVER_SPEC, ID + "-server.toml");
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, PropulsionConfig.CLIENT_SPEC, ID + "-client.toml");
-        //Registrate
+        
         REGISTRATE.registerEventListeners(modBus);
-
-        //TODO: Move this in correct place
-        //Query ships for deserialization with balloons
-        ValkyrienSkies.api().getShipLoadEvent().on((e) -> {
-            //time to commit a war crime
-            LoadedServerShip ship = e.getShip();
-            if (ship.getAttachment(BalloonAttachment.class) != null) {
-                BalloonSerializationHandler.queryShipLoad(ship);
-            }
-        });
-
-        //TODO: make stress values configurable
-        BlockStressValues.IMPACTS.registerProvider(PropulsionDefaultStress::getImpact);
-
-        modBus.addListener(CreatePropulsion::init);
-    }
-
-    public static void init(final FMLCommonSetupEvent event) {
-        //TODO: Move this in correct place and mayhaps do in a more adequate way?
-        //Registers solid burner as heater
-        event.enqueueWork(() -> {
-            BoilerHeater.REGISTRY.register(PropulsionBlocks.SOLID_BURNER.get(), (level, pos, state) -> {
-                HeatLevel value = state.getValue(AbstractBurnerBlock.HEAT);
-                if (value == HeatLevel.NONE) {
-                    return -1;
-                }
-                if (value == HeatLevel.SEETHING) {
-                    return 2;
-                }
-                if (value.isAtLeast(HeatLevel.FADING)) {
-                    return 1;
-                }
-                return 0;
-            });
-            BoilerHeater.REGISTRY.register(PropulsionBlocks.LIQUID_BURNER.get(), (level, pos, state) -> {
-                HeatLevel value = state.getValue(AbstractBurnerBlock.HEAT);
-                if (value == HeatLevel.NONE) {
-                    return -1;
-                }
-                if (value == HeatLevel.SEETHING) {
-                    return 4;
-                }
-                if (value.isAtLeast(HeatLevel.FADING)) {
-                    return 2;
-                }
-                return 0;
-            });
-        });
     }
 }

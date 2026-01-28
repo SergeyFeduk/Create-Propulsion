@@ -17,6 +17,9 @@ import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import com.deltasf.createpropulsion.heat.burners.AbstractBurnerBlock;
+import com.simibubi.create.api.boiler.BoilerHeater;
+import com.simibubi.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 
 @Mod.EventBusSubscriber(modid = CreatePropulsion.ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModEvents {
@@ -28,6 +31,7 @@ public class ModEvents {
             CauldronInteraction.WATER.put(PropulsionItems.OPTICAL_LENS.get(), CauldronInteraction.DYED_ITEM);
             populateEnvelopeCauldronInteractions();
         });
+        registerBoilerHeatSources(event);
     }
 
     private static void populateEnvelopeCauldronInteractions() {
@@ -56,4 +60,36 @@ public class ModEvents {
 
         return InteractionResult.sidedSuccess(level.isClientSide);
     };
+
+    private static void registerBoilerHeatSources(final FMLCommonSetupEvent event) {
+        //Registers solid burner as heater
+        event.enqueueWork(() -> {
+            BoilerHeater.REGISTRY.register(PropulsionBlocks.SOLID_BURNER.get(), (level, pos, state) -> {
+                HeatLevel value = state.getValue(AbstractBurnerBlock.HEAT);
+                if (value == HeatLevel.NONE) {
+                    return -1;
+                }
+                if (value == HeatLevel.SEETHING) {
+                    return 2;
+                }
+                if (value.isAtLeast(HeatLevel.FADING)) {
+                    return 1;
+                }
+                return 0;
+            });
+            BoilerHeater.REGISTRY.register(PropulsionBlocks.LIQUID_BURNER.get(), (level, pos, state) -> {
+                HeatLevel value = state.getValue(AbstractBurnerBlock.HEAT);
+                if (value == HeatLevel.NONE) {
+                    return -1;
+                }
+                if (value == HeatLevel.SEETHING) {
+                    return 4;
+                }
+                if (value.isAtLeast(HeatLevel.FADING)) {
+                    return 2;
+                }
+                return 0;
+            });
+        });
+    }
 }
