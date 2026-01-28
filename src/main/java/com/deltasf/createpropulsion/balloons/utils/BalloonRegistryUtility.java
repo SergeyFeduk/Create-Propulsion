@@ -115,9 +115,6 @@ public class BalloonRegistryUtility {
     }
 
     //Slop it is
-    public static AABB calculateGroupAABB(List<HaiData> group) {
-        return calculateGroupAABBFromHais(group);
-    }
 
     public static AABB calculateGroupAABBFromHais(List<HaiData> group) {
         if (group == null || group.isEmpty()) {
@@ -128,7 +125,7 @@ public class BalloonRegistryUtility {
             HaiData currentHai = group.get(i);
             combinedAABB = combinedAABB.minmax(currentHai.aabb());
         }
-        return combinedAABB;
+        return combinedAABB.inflate(0, 1, 0);
     }
 
     public static AABB calculateGroupAABBFromBalloons(List<Balloon> balloons) {
@@ -197,8 +194,7 @@ public class BalloonRegistryUtility {
         }
 
         //Rule 2: there must be at least one hai block below balloons bottom
-        // This rule only applies to NORMAL groups. Zombie balloons (no HAIs) rely on HotAirSolver to kill them
-        // if they run out of heat, or if they are just floating storage.
+        // This rule only applies to NORMAL groups. Zombie balloons rely on HotAirSolver to kill them
         if (!group.hais.isEmpty()) {
             Set<UUID> currentGroupHais = group.hais.stream().map(HaiData::id).collect(Collectors.toSet());
             if (!balloon.isSupportHaisEmpty() && Collections.disjoint(balloon.getSupportHaisSet(), currentGroupHais)) {

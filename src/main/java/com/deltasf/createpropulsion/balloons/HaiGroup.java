@@ -60,7 +60,7 @@ public class HaiGroup {
     }
 
     public void regenerateRLEVolume(Level level) {
-        groupAABB = BalloonRegistryUtility.calculateGroupAABB(hais);
+        groupAABB = BalloonRegistryUtility.calculateGroupAABBFromHais(hais);
         if (ship == null) {
             if (!hais.isEmpty()) {
                 ship = (ServerShip)VSGameUtilsKt.getShipManagingPos(level, hais.get(0).position());
