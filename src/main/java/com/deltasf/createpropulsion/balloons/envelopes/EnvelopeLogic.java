@@ -62,7 +62,7 @@ public class EnvelopeLogic {
         if (targetColor == null) return InteractionResult.PASS; //Huh
 
         Block targetBlock = isShaft ? PropulsionBlocks.getEnvelopedShaft(targetColor).get() : PropulsionBlocks.getEnvelope(targetColor).get();
-        // Do not waste dye on the same color
+        //Do not waste dye on the same color
         if (state.is(targetBlock)) return InteractionResult.PASS;
 
         BlockState newState = targetBlock.defaultBlockState();
@@ -70,11 +70,11 @@ public class EnvelopeLogic {
             newState = newState.setValue(RotatedPillarKineticBlock.AXIS, state.getValue(RotatedPillarKineticBlock.AXIS));
         }
 
-        // Apply changes
+        //Apply changes
         if (!player.isCreative()) heldItem.shrink(1);
         level.setBlock(pos, newState, 3);
         
-        // Effects
+        //Effects
         level.playLocalSound(pos, SoundEvents.WOOL_PLACE, SoundSource.BLOCKS, 1, 1, false);
         if (level.isClientSide) {
             for(int i = 0; i < 20; i++) {

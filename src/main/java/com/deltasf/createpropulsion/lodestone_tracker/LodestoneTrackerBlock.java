@@ -82,7 +82,7 @@ public class LodestoneTrackerBlock extends Block implements EntityBlock, IWrench
         boolean playerHoldingCompass = heldStack.getItem() == Items.COMPASS;
 
         if (playerHoldingCompass && !trackerHasCompass) {
-            // Player has compass, tracker is empty -> Place compass
+            //Player has compass, tracker is empty -> Place compass
             ItemStack compassToPlace = heldStack.split(1);
 
             //Determine insertion direction
@@ -109,7 +109,7 @@ public class LodestoneTrackerBlock extends Block implements EntityBlock, IWrench
             return InteractionResult.CONSUME;
 
         } else if (heldStack.isEmpty() && trackerHasCompass) {
-            // Player has empty hand, tracker has compass -> Take compass
+            //Player has empty hand, tracker has compass -> Take compass
             ItemStack takenCompass = trackerBlockEntity.removeCompass();
             player.getInventory().placeItemBackInInventory(takenCompass);
             level.playSound(null, pos, SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, 0.2f, 1.0f);

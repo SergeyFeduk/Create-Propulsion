@@ -25,7 +25,7 @@ public class BalloonInfoBehaviour extends BlockEntityBehaviour {
 
     private final Supplier<UUID> idSupplier;
 
-    // Display data
+    //Display data
     private double lastTickBalloonHotAir = -1;
     private int hotAirTrend = 0;
     private boolean isBalloonPresent = false;
@@ -64,7 +64,7 @@ public class BalloonInfoBehaviour extends BlockEntityBehaviour {
             double percentage = currentMaxHotAir > 0 ? (balloon.hotAir / currentMaxHotAir) : 0;
             int currentPercentage = (int) (percentage * 100);
 
-            // Update trend
+            //Update trend
             if (lastTickBalloonHotAir != -1) {
                 double delta = balloon.hotAir - lastTickBalloonHotAir;
                 if (Math.abs(delta) < TREND_THRESHOLD) hotAirTrend = 0;
@@ -75,13 +75,13 @@ public class BalloonInfoBehaviour extends BlockEntityBehaviour {
             }
             lastTickBalloonHotAir = balloon.hotAir;
 
-            // Check if something changed
+            //Check if something changed
             if (!isBalloonPresent || balloonHotAir != currentHotAir || balloonMaxHotAir != currentMaxHotAir 
                 || balloonHotAirPercentage != currentPercentage || hotAirTrend != oldTrend) {
                 needsSync = true;
             }
 
-            // Update state
+            //Update state
             isBalloonPresent = true;
             balloonHotAir = currentHotAir;
             balloonMaxHotAir = currentMaxHotAir;

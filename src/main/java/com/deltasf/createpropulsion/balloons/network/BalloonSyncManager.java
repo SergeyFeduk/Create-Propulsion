@@ -128,7 +128,7 @@ public class BalloonSyncManager {
                 return;
             }
 
-            // Hais
+            //Hais
             UUID[] addedHais = delta.addedHais().toArray(new UUID[0]);
             UUID[] removedHais = delta.removedHais().toArray(new UUID[0]);
 
@@ -174,10 +174,10 @@ public class BalloonSyncManager {
         try {
             LongOpenHashSet volumeSet = balloon.getVolumeForSerialization();
             
-            // Compress Volume
+            //Compress Volume
             byte[] compressedVolume = BalloonCompressor.compress(volumeSet);
 
-            // Compress Holes
+            //Compress Holes
             Set<BlockPos> holes = balloon.getHoles();
             long[] holeLongs = new long[holes.size()];
             int i = 0;
@@ -189,7 +189,7 @@ public class BalloonSyncManager {
             //Hais
             UUID[] hais = balloon.getSupportHaisSet().toArray(new UUID[0]);
 
-            // Construct Packet
+            //Construct Packet
             BalloonStructureSyncPacket packet = new BalloonStructureSyncPacket(
                 shipId, 
                 balloon.id, 

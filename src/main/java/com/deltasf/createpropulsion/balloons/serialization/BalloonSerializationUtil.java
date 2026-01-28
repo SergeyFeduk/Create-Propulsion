@@ -77,7 +77,7 @@ public class BalloonSerializationUtil {
 
             //We are zombie, do geometric overlap check
             if (group == null) {
-                // Calculate AABB of the balloon being loaded
+                //Calculate AABB of the balloon being loaded
                 AABB balloonAABB = calculateAABB(decompressedVolume);
                 
                 if (balloonAABB != null) {

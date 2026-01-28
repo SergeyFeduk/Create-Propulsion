@@ -99,7 +99,7 @@ public class BalloonRegistryUtility {
         }
 
         haiGroupMap.put(data.id(), targetGroup);
-        // This will trigger logic to switch to Normal Mode if it was Zombie
+        //This will trigger logic to switch to Normal Mode if it was Zombie
         targetGroup.regenerateRLEVolume(level);
         
         synchronized(targetGroup.balloons) {
@@ -194,7 +194,7 @@ public class BalloonRegistryUtility {
         }
 
         //Rule 2: there must be at least one hai block below balloons bottom
-        // This rule only applies to NORMAL groups. Zombie balloons rely on HotAirSolver to kill them
+        //This rule only applies to NORMAL groups. Zombie balloons rely on HotAirSolver to kill them
         if (!group.hais.isEmpty()) {
             Set<UUID> currentGroupHais = group.hais.stream().map(HaiData::id).collect(Collectors.toSet());
             if (!balloon.isSupportHaisEmpty() && Collections.disjoint(balloon.getSupportHaisSet(), currentGroupHais)) {

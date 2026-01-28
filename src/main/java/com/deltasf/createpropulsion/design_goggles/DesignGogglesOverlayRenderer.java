@@ -90,7 +90,7 @@ import net.minecraftforge.client.gui.overlay.IGuiOverlay;*/
         //TODO: If looking at sphere located at COM - display tooltip with ship mass
         /*
         //TODO: Target not just reachable blocks, but blocks in larger range (3x base reach range?)
-        // Or do the check with a very large distance and render stuff based on heuristics(shipAABBSize, distanceToShip) -> bool
+        //Or do the check with a very large distance and render stuff based on heuristics(shipAABBSize, distanceToShip) -> bool
         HitResult objectMouseOver = mc.hitResult;
         if (!(objectMouseOver instanceof BlockHitResult result)) {
             lastHovered = null;
@@ -116,9 +116,9 @@ import net.minecraftforge.client.gui.overlay.IGuiOverlay;*/
             }
             
             //TODO: Replace with custom implementation that allows to:
-            // Have custome render type (to skip depth check)
-            // Render the whole outline in ship space (so it follows ship smoothly)
-            // Rotate the aabb to follow ships rotation
+            //Have custome render type (to skip depth check)
+            //Render the whole outline in ship space (so it follows ship smoothly)
+            //Rotate the aabb to follow ships rotation
             CreateClient.OUTLINER.showAABB(mc.player, AABB.ofSize(VectorConversionsMCKt.toMinecraft(COMPos), 5, 5, 5))
                 .colored(0x68c586)
                 .disableLineNormals()

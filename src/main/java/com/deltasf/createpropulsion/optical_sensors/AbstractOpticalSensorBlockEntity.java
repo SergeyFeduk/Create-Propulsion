@@ -43,7 +43,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraft.world.phys.HitResult;
 
 public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity implements IHaveGoggleInformation {
-    private int currentTick = -1; // -1 to run raycast immediately after placement/load
+    private int currentTick = -1; //-1 to run raycast immediately after placement/load
     protected float raycastDistance = 0;
 
     @OnlyIn(Dist.CLIENT)
@@ -51,7 +51,7 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
 
     @OnlyIn(Dist.CLIENT)
     public BeamRenderData getClientBeamRenderData() {
-        // Initialize lazily on first access on the client
+        //Initialize lazily on first access on the client
         if (this.beamRenderData == null) {
             this.beamRenderData = new BeamRenderData();
         }
@@ -94,7 +94,7 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
         currentTick++;
         if (currentTick % PropulsionConfig.OPTICAL_SENSOR_TICKS_PER_UPDATE.get() != 0) return;
 
-        // Reset tick counter to prevent overflow
+        //Reset tick counter to prevent overflow
         if (currentTick >= PropulsionConfig.OPTICAL_SENSOR_TICKS_PER_UPDATE.get()) {
             currentTick = 0;
         }
@@ -122,12 +122,12 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
         Vec3 worldFrom = raycastPositions.getFirst();
         Vec3 worldTo = raycastPositions.getSecond();
 
-        // Perform raycast using world coordinates
+        //Perform raycast using world coordinates
         ClipContext.Fluid clipFluid = hasLens(PropulsionItems.FLUID_LENS.get()) ? ClipContext.Fluid.ANY : ClipContext.Fluid.NONE;
         ClipContext context = new ClipContext(worldFrom, worldTo, ClipContext.Block.COLLIDER, clipFluid, null);
         BlockHitResult hit = level.clip(context);
 
-        // Calculate power based on world distance
+        //Calculate power based on world distance
         int rawNewPower = 0;
         float distance = effectiveMaxDistance;
         BlockPos hitBlockPos = null;
@@ -190,7 +190,7 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
         return new Pair<>(worldFrom, worldTo);
     }
 
-    // Lenses
+    //Lenses
     public NonNullList<ItemStack> getLenses() {
         return lenses;
     }
@@ -211,9 +211,9 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
 
     public boolean canInsertLens(ItemStack lensStack) {
         if (lensStack.isEmpty() || !(lensStack.is(PropulsionItems.OPTICAL_LENS_TAG))) {
-            return false; // Not a lens or empty stack
+            return false; //Not a lens or empty stack
         }
-        return hasSpaceForLens(); // Check if there's space
+        return hasSpaceForLens(); //Check if there's space
     }
 
     @SuppressWarnings("null")
@@ -228,7 +228,7 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
                 stackToInsert.setCount(1);
                 this.lenses.set(i, stackToInsert);
 
-                // sync
+                //sync
                 setChanged();
                 level.sendBlockUpdated(this.worldPosition, getBlockState(), getBlockState(), Block.UPDATE_ALL);
 
@@ -236,7 +236,7 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
                 return true;
             }
         }
-        return false; // Should not happen
+        return false; //Should not happen
     }
 
     public boolean canExtractLens() {
@@ -254,14 +254,14 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
                 ItemStack extractedStack = this.lenses.get(i);
                 this.lenses.set(i, ItemStack.EMPTY);
 
-                // sync
+                //sync
                 setChanged();
                 level.sendBlockUpdated(this.worldPosition, getBlockState(), getBlockState(), Block.UPDATE_ALL);
 
                 return extractedStack;
             }
         }
-        return ItemStack.EMPTY; // Should not happen
+        return ItemStack.EMPTY; //Should not happen
     }
 
     public boolean hasLens(Item lensItem) {
@@ -278,7 +278,7 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
 
     @Override
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
-        if (getCurrentLensCount() == 0) return false; // No lenses - no need for goggle info
+        if (getCurrentLensCount() == 0) return false; //No lenses - no need for goggle info
         //Lenses: 1/2
         CreateLang.builder()
             .add(CreateLang.translate("gui.goggles.optical_sensor.lenses", new Object[0]))
@@ -303,7 +303,7 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
         return true;
     }
 
-    // Networking and nbt
+    //Networking and nbt
 
     @Override
     public CompoundTag getUpdateTag() {
@@ -353,7 +353,7 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
         if (tag.contains(NBT_LENSES_KEY, CompoundTag.TAG_LIST)) {
             ListTag lensesTag = tag.getList(NBT_LENSES_KEY, CompoundTag.TAG_COMPOUND);
             for (int i = 0; i < lensesTag.size(); i++) {
-                if (i < this.lenses.size()) { // Only load up to the current limit
+                if (i < this.lenses.size()) { //Only load up to the current limit
                     CompoundTag itemTag = lensesTag.getCompound(i);
                     this.lenses.set(i, ItemStack.of(itemTag));
                 }

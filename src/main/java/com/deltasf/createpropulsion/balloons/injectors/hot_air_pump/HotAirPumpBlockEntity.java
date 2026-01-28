@@ -123,7 +123,7 @@ public class HotAirPumpBlockEntity extends KineticBlockEntity implements IHotAir
         }
     }
 
-    // Hot air injector impl
+    //Hot air injector impl
 
     @Override
     public UUID getId() {
@@ -135,15 +135,15 @@ public class HotAirPumpBlockEntity extends KineticBlockEntity implements IHotAir
         Level level = getLevel();
         if (level == null || level.isClientSide() || scanTally > 0) return;
         scanTally = 5;
-        // Ship check
+        //Ship check
         Ship ship = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
         if (ship == null) return;
         
-        // Balloon check
+        //Balloon check
         Balloon balloon = BalloonShipRegistry.forShip(ship.getId(), level).getBalloonOf(getId());
         if (balloon != null) return;
         
-        // Perform scan via behaviour
+        //Perform scan via behaviour
         injectorBehaviour.performScan();
         notifyUpdate();
     }
@@ -164,7 +164,7 @@ public class HotAirPumpBlockEntity extends KineticBlockEntity implements IHotAir
     @Override
     public void onBalloonLoaded() { balloonInfoBehaviour.performUpdate(); }
 
-    // IHeatConsumer impl
+    //IHeatConsumer impl
 
     public float getLastHeatConsumed() {
         return lastHeatConsumed;
@@ -173,7 +173,6 @@ public class HotAirPumpBlockEntity extends KineticBlockEntity implements IHotAir
     @Override
     public boolean isActive() {
         return Math.abs(getSpeed()) > 0; //Not rotating -> Do not waste fuel
-        //return true;
     }
 
     @Override

@@ -96,7 +96,7 @@ public class AirInjectorObstructionBehaviour extends BlockEntityBehaviour {
         Level level = getWorld();
         BlockPos pos = getPos();
 
-        // Check ship
+        //Check ship
         Ship ship = VSGameUtilsKt.getShipManagingPos(level, pos);
         if (ship == null) {
             clearObstructions();

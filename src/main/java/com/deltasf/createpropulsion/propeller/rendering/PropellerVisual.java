@@ -71,14 +71,14 @@ public class PropellerVisual extends KineticBlockEntityVisual<PropellerBlockEnti
         sharpBlades = new SmartRecycler<>(model -> 
             instancerProvider().instancer(InstanceTypes.ORIENTED, Models.partial(model)).createInstance());
 
-        // Post-translucent instancers
+        //Post-translucent instancers
         blurHeadOIT = new SmartRecycler<>(key ->
             instancerProvider().instancer(PropulsionInstanceTypes.PROPELLER_OIT_BLUR, PropellerModels.getOITBlurred(PropulsionPartialModels.PROPELLER_HEAD)).createInstance());
 
         blurBladesOIT = new SmartRecycler<>(model -> 
             instancerProvider().instancer(PropulsionInstanceTypes.PROPELLER_OIT_BLUR, PropellerModels.getOITBlurred(model)).createInstance());
 
-        // Pre-translucent instancers
+        //Pre-translucent instancers
         blurHeadStd = new SmartRecycler<>(key ->
             instancerProvider().instancer(PropulsionInstanceTypes.PROPELLER_BLUR, PropellerModels.getBlurred(PropulsionPartialModels.PROPELLER_HEAD)).createInstance());
 

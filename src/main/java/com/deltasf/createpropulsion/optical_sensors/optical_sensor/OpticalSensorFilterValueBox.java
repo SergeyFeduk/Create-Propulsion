@@ -21,7 +21,7 @@ public class OpticalSensorFilterValueBox extends ValueBoxTransform.Sided {
 
     private Direction getPrimaryDirection(BlockState state) {
         if (!state.hasProperty(FACING)) {
-            // Fallback if FACING is missing because of bit flip due to cosmic rays (must account for that)
+            //Fallback if FACING is missing because of bit flip due to cosmic rays (must account for that)
             System.err.println("Warning: BlockState missing FACING property for OrientableTopBottomValueBoxTransform!");
             return primaryIsRelativeTop ? Direction.UP : Direction.DOWN;
         }

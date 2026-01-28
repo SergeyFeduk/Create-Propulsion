@@ -65,7 +65,7 @@ public class HaiGroup {
             if (!hais.isEmpty()) {
                 ship = (ServerShip)VSGameUtilsKt.getShipManagingPos(level, hais.get(0).position());
             } else if (!balloons.isEmpty()) {
-                // Fallback for zombie groups
+                //Fallback for zombie groups
                 Balloon b = balloons.get(0);
                 if (!b.isEmpty()) {
                     ship = (ServerShip)VSGameUtilsKt.getShipManagingPos(level, b.iterator().next());
@@ -224,11 +224,11 @@ public class HaiGroup {
             //Find zombie balloons in this group
             synchronized(this.balloons) {
                 for (Balloon candidate : this.balloons) {
-                    if (connectedBalloons.contains(candidate)) continue; // Already found via id
+                    if (connectedBalloons.contains(candidate)) continue; //Already found via id
                     
                     if (!candidate.getAABB().intersects(dvBounds)) continue;
 
-                    // Check for block overlap
+                    //Check for block overlap
                     for (BlockPos p : discoveredVolume.volume()) {
                         if (candidate.contains(p)) {
                             connectedBalloons.add(candidate);
@@ -243,7 +243,7 @@ public class HaiGroup {
             synchronized(allGroups) {
                 for (HaiGroup otherGroup : allGroups) {
                     if (otherGroup == this) continue; 
-                    if (!otherGroup.hais.isEmpty()) continue; // Only steal from zombie groups
+                    if (!otherGroup.hais.isEmpty()) continue; //Only steal from zombie groups
 
                     List<Balloon> balloonsToSteal = new ArrayList<>();
                     synchronized(otherGroup.balloons) {
@@ -318,7 +318,7 @@ public class HaiGroup {
     public boolean isInsideRleVolume(BlockPos pos) {
         if (groupAABB == null) return false;
 
-        // Fast Fail
+        //Fast Fail
         if (!groupAABB.contains(pos.getX(), pos.getY(), pos.getZ())) {
             return false;
         }
@@ -331,7 +331,7 @@ public class HaiGroup {
                 return true; 
             }
         } 
-        // Zombie Mode
+        //Zombie Mode
         return true;
     }
 

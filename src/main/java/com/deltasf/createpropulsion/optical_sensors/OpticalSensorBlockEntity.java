@@ -61,7 +61,7 @@ public class OpticalSensorBlockEntity extends AbstractOpticalSensorBlockEntity {
 
     @Override
     public float getZAxisOffset(){
-        return 0.625f; // 0.5 + 2/16
+        return 0.625f; //0.5 + 2/16
     }
 
     @Override

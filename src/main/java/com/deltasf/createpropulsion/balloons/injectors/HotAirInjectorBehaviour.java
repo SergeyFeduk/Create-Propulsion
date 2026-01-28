@@ -161,7 +161,7 @@ public class HotAirInjectorBehaviour extends BlockEntityBehaviour {
         BlockPos pos = getPos();
         if (level == null || level.isClientSide) return;
 
-        // Ensure ID exists
+        //Ensure ID exists
         getId(); 
 
         Ship ship = VSGameUtilsKt.getShipManagingPos(level, pos);

@@ -63,7 +63,7 @@ public class BalloonStitcher {
         final double originalVolumeSize = originalBalloon.getVolumeSize();
         final double hotAirDensity = (originalVolumeSize > 0) ? originalHotAir / originalVolumeSize : 0;
 
-        // Prepare seeds for splitting
+        //Prepare seeds for splitting
         originalBalloon.remove(splitPos);
 
         AABB shrunkBounds = new AABB(splitPos);
@@ -77,14 +77,14 @@ public class BalloonStitcher {
             }
         }
 
-        // Early Exit: No split is possible if there is only one seed
+        //Early Exit: No split is possible if there is only one seed
         if (neighborSeeds.size() <= 1) {
             validateHoles(originalBalloon);
             return;
         }
 
         //TODO: Maybe just replace with direct bfs component check? it should be much faster
-        // Construct DSU
+        //Construct DSU
         DisjointSetUnion dsu = new DisjointSetUnion();
         Map<BlockPos, Integer> posToId = new HashMap<>();
         List<BlockPos> idToPos = originalBalloon.toList();
@@ -95,7 +95,7 @@ public class BalloonStitcher {
 
         for (BlockPos pos : originalBalloon) {
             int posId = posToId.get(pos);
-            // Check 3 neighbors to avoid redundant checks (mirrored)
+            //Check 3 neighbors to avoid redundant checks (mirrored)
             for (Direction dir : new Direction[]{Direction.EAST, Direction.UP, Direction.SOUTH}) {
                 BlockPos neighbor = pos.relative(dir);
                 if (originalBalloon.contains(neighbor)) {
@@ -104,14 +104,14 @@ public class BalloonStitcher {
             }
         }
 
-        // Identify component of the seed
+        //Identify component of the seed
         Map<Integer, List<BlockPos>> rootToSeeds = new HashMap<>();
         for (BlockPos seed : neighborSeeds) {
             int rootId = dsu.find(posToId.get(seed));
             rootToSeeds.computeIfAbsent(rootId, k -> new ArrayList<>()).add(seed);
         }
 
-        // All neighbors are still connected therefore no split occurred
+        //All neighbors are still connected therefore no split occurred
         if (rootToSeeds.size() <= 1) {
             validateHoles(originalBalloon);
             return;
@@ -150,7 +150,7 @@ public class BalloonStitcher {
         }
     }
 
-    // Helpers
+    //Helpers
 
     public static Set<Balloon> findOverlappingBalloons(DiscoveredVolume dv, HaiGroup owner, Set<Balloon> excludedBalloons) {
         Set<Balloon> overlapping = new HashSet<>();

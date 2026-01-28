@@ -86,7 +86,7 @@ public class ThrusterFuelManager extends SimpleJsonResourceReloadListener {
             ResourceLocation file = entry.getKey();
             JsonElement json = entry.getValue();
 
-            // Parse fuel def
+            //Parse fuel def
             ThrusterFuelDefinition.CODEC.parse(JsonOps.INSTANCE, json)
                 .resultOrPartial(error -> {LOGGER.error("[{}] Failed to parse thruster fuel definition from {}: {}", CreatePropulsion.ID, file, error);})
                 .ifPresent(definition -> {

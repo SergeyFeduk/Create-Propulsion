@@ -2,7 +2,7 @@ package com.deltasf.createpropulsion.utility.math;
 
 import java.util.List;
 
-// Based on: https://gist.github.com/alksily/7a85a1898e65c936f861ee93516e397d perlin noise implementation by alksily
+//Based on: https://gist.github.com/alksily/7a85a1898e65c936f861ee93516e397d perlin noise implementation by alksily
 
 public final class PerlinNoise {
     private PerlinNoise() {}

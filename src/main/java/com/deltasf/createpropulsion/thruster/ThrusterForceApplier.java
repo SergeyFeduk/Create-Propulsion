@@ -23,7 +23,7 @@ public class ThrusterForceApplier {
         this.data = data;
     }
 
-    // Jackson constructor
+    //Jackson constructor
     public ThrusterForceApplier() {}
 
     //Cached vectors to reduce allocations on physics thread
@@ -81,7 +81,7 @@ public class ThrusterForceApplier {
 
         var pipeline = VSGameUtilsKt.getVsPipeline(currentServer);
         double physTps = pipeline.computePhysTps();
-        if (physTps <= 0) return; // Sometimes physics runs backwards and this results in timeline splitting, we try to avoid that with this line
+        if (physTps <= 0) return; //Sometimes physics runs backwards and this results in timeline splitting, we try to avoid that with this line
         double deltaTime = 1.0 / physTps;
         double mass = ship.getMass();
         if (mass <= 0) return; //Same with tps but in case of negative mass we can accidentally create alcubierre bubble

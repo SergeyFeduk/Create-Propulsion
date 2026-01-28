@@ -33,10 +33,10 @@ public class MathUtility {
         double w = qw * invLength;
         double roll, pitch, yaw;
 
-        // Singularity check
+        //Singularity check
         double sinp = 2.0 * (w * y - z * x);
 
-        if (Math.abs(sinp) > 0.999999) { // Gimbal lock prevention
+        if (Math.abs(sinp) > 0.999999) { //Gimbal lock prevention
             pitch = Math.PI / 2.0 * Math.signum(sinp);
             roll = Math.atan2(2.0 * (x * y + w * z), 1.0 - 2.0 * (y * y + z * z));
             yaw = 0.0;

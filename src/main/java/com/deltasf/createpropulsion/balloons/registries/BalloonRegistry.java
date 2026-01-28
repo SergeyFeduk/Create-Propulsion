@@ -170,10 +170,10 @@ public class BalloonRegistry {
     }
 
     private void handleShrinkedGroup(UUID id, HaiGroup affectedGroup, Level level) {
-        // Recalculate AABB
+        //Recalculate AABB
         affectedGroup.regenerateRLEVolume(level);
 
-        // Revalidate all balloons
+        //Revalidate all balloons
         for (Balloon balloon : affectedGroup.balloons) {
             balloon.removeFromSupportHais(id);
             if (!BalloonRegistryUtility.isBalloonValid(balloon, affectedGroup)) {

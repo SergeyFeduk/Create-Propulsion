@@ -16,7 +16,7 @@ import java.util.Map;
 @Mixin(EngineImpl.class)
 public class EngineImplMixin {
 
-    /// This mixin forces EngineImpl to hide specific draws during first rendering stage
+    ///This mixin forces EngineImpl to hide specific draws during first rendering stage
 
     @Shadow(remap = false) @Final private DrawManager<? extends AbstractInstancer<?>> drawManager;
 

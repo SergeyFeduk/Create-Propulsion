@@ -52,7 +52,7 @@ public class CreatePropulsion {
         PropulsionPackets.register();
         PropulsionDisplaySources.register();
         
-        // VS Init
+        //VS Init
         VsApi api = ValkyrienSkies.api();
         api.registerAttachment(api.newAttachmentRegistrationBuilder(ThrusterForceAttachment.class)
             .useLegacySerializer()

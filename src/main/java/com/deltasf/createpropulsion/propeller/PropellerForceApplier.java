@@ -40,7 +40,7 @@ public class PropellerForceApplier {
         this.data = data;
     }
 
-    // Jackson constructor
+    //Jackson constructor
     public PropellerForceApplier() {}
 
     public void applyForces(BlockPos pos, PhysShipImpl ship) {

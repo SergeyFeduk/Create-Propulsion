@@ -90,7 +90,7 @@ public  class BalloonScanner {
                         state.anomalySources.computeIfAbsent(node.id, k -> new HashSet<>()).add(anomalyPos);
                     }
 
-                    // If an anomaly probe found a leak, we can stop checking for other anomalies
+                    //If an anomaly probe found a leak, we can stop checking for other anomalies
                     if (node.hasFatalLeak) {
                         break;
                     }
@@ -370,5 +370,5 @@ public  class BalloonScanner {
     //Replacing BlockPos decreases GC load and improves performance a little. I tried it, but it is questionable so I scraped this for now
     
     //I: I had early exit planned (if out of RLE volume - stop the scan immediately), but need to impl it still. I also need to be very fucking accurate cus
-    // naive implementation won't work as we are seeding downwards and will still rediscover most of the volume if done naively
+    //naive implementation won't work as we are seeding downwards and will still rediscover most of the volume if done naively
 }

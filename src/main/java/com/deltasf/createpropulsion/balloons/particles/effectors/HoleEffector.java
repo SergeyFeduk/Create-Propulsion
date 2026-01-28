@@ -10,7 +10,7 @@ public class HoleEffector implements HapEffector {
     private final float centerX, centerY, centerZ;
     private final int originX, originY, originZ;
     
-    // Normalized flow direction
+    //Normalized flow direction
     private final float dirX, dirY, dirZ;
     
     private final float strength;
@@ -25,9 +25,9 @@ public class HoleEffector implements HapEffector {
         this.centerY = (float)(holeY - anchorY) + 0.5f;
         this.centerZ = (float)(holeZ - anchorZ) + 0.5f;
         this.strength = strength;
-        this.radius = 3.0f; // Max influence radius
+        this.radius = 3.0f; //Max influence radius
         
-        // Normalize direction
+        //Normalize direction
         if (direction.lengthSquared() > 0.0001f) {
             direction.normalize();
         }

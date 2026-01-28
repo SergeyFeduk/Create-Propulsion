@@ -18,9 +18,9 @@ public class ShipEffectorHandler {
     private final Long2ObjectOpenHashMap<EffectorBucket> effectors = new Long2ObjectOpenHashMap<>();
     private final ShipParticleHandler parent;
     
-    // Config constants
+    //Config constants
     private static final float HOLE_EJECT_STRENGTH = 2.8f;
-    private static final int HOLE_EFFECTOR_RADIUS = 2; // 5x5x5
+    private static final int HOLE_EFFECTOR_RADIUS = 2; //5x5x5
 
     public ShipEffectorHandler(ShipParticleHandler parent) {
         this.parent = parent;
@@ -65,7 +65,7 @@ public class ShipEffectorHandler {
     private void addHoleEffectorInternal(Level level, ClientBalloon balloon, BlockPos hole) {
         Vector3f dirAccumulator = calculateHoleDirection(level, balloon, hole);
 
-        // Only register if we have a valid flow direction
+        //Only register if we have a valid flow direction
         if (dirAccumulator.lengthSquared() > 0.001f) {
             HapEffector holeEffector = new HoleEffector(
                 balloon.id,
@@ -75,7 +75,7 @@ public class ShipEffectorHandler {
                 HOLE_EJECT_STRENGTH
             );
 
-            // Register in cubic area
+            //Register in cubic area
             BlockPos.MutableBlockPos mut = new BlockPos.MutableBlockPos();
             for (int x = -HOLE_EFFECTOR_RADIUS; x <= HOLE_EFFECTOR_RADIUS; x++) {
                 for (int y = -HOLE_EFFECTOR_RADIUS; y <= HOLE_EFFECTOR_RADIUS; y++) {

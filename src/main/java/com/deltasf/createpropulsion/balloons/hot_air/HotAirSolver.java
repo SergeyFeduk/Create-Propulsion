@@ -120,7 +120,7 @@ public class HotAirSolver {
         if (ctx.isStructurallyFailed) {
             ctx.balloon.isInvalid = true;
         } else {
-            // Re-check validity against the group
+            //Re-check validity against the group
             boolean isValid = BalloonRegistryUtility.isBalloonValid(ctx.balloon, ctx.group);
 
             if (isValid && ctx.balloon.isSupportHaisEmpty() && ctx.group.hais.isEmpty()) {

@@ -52,7 +52,7 @@ public class CreativeThrusterRenderer extends SmartBlockEntityRenderer<CreativeT
         ms.popPose();
     }
 
-    // :)
+    //:)
     private float getBracketAngle(Direction facing, Direction placementFacing) {
         Vector3f local = new Vector3f(placementFacing.step());
         local.rotate(facing.getRotation().conjugate());

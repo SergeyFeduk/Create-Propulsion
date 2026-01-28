@@ -82,7 +82,7 @@ public class PropellerBlock extends DirectionalKineticBlock implements IBE<Prope
 
         if (propellerBE.getBladeCount() != 1) {
             if (Math.abs(propellerBE.getInternalRPM()) > INTERACTION_RPM_THRESHOLD) {
-                // TODO: Notify player that propeller must be stopped
+                //TODO: Notify player that propeller must be stopped
                 return InteractionResult.FAIL;
             }
         }
@@ -128,7 +128,7 @@ public class PropellerBlock extends DirectionalKineticBlock implements IBE<Prope
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
         if (state.hasBlockEntity() && (!state.is(newState.getBlock()) || !newState.hasBlockEntity())) {
             if (!level.isClientSide) {
-                // Use the new PropellerForceAttachment
+                //Use the new PropellerForceAttachment
                 PropellerAttachment ship = PropellerAttachment.get(level, pos);
                 if (ship != null) {
                     ship.removeApplier((ServerLevel) level, pos);

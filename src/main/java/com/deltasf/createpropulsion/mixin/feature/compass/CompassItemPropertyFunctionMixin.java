@@ -17,8 +17,8 @@ import net.minecraft.world.phys.Vec3;
 @Mixin(CompassItemPropertyFunction.class)
 public abstract class CompassItemPropertyFunctionMixin {
 
-    /// This mixin fixes the model selection of the compass item in inventories
-    /// If target position is on client ship - ship transform is applied to the original ship-space position to convert it to world-space with respect to the ship
+    ///This mixin fixes the model selection of the compass item in inventories
+    ///If target position is on client ship - ship transform is applied to the original ship-space position to convert it to world-space with respect to the ship
     
     @ModifyExpressionValue(
         method = "getAngleFromEntityToPos",

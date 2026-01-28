@@ -1,7 +1,7 @@
 #version 330 core
 
 //Per-vertex
-layout(location = 0) in vec2 aQuadPos; // -0.5..0.5
+layout(location = 0) in vec2 aQuadPos; //-0.5..0.5
 layout(location = 1) in vec2 aUV;
 
 //Per-instance

@@ -153,7 +153,7 @@ public class CreativeThrusterBlockEntity extends AbstractThrusterBlockEntity {
         return CreateLang.translate("gui.goggles.thruster.status.not_powered").style(ChatFormatting.GOLD);
     }
 
-    // CC slop
+    //CC slop
 
     public void setThrustConfig(int value) {
         int clamped = Math.max(0, Math.min(value, 99));

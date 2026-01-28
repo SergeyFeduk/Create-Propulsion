@@ -11,7 +11,7 @@ import net.minecraftforge.network.NetworkEvent;
 
 public class BalloonDeltaPacket extends BalloonPacket {
     private final byte[] addedB, removedB, addedH, removedH;
-    private final int sAB, sRB, sAH, sRH; // Sizes
+    private final int sAB, sRB, sAH, sRH; //Sizes
     private final UUID[] addedHais, removedHais;
     //TODO: Just send an aabb
 

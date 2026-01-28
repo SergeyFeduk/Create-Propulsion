@@ -190,7 +190,7 @@ public class PropellerBlockEntity extends KineticBlockEntity {
 
         if (speed > 0) {
             PropellerBladeItem blade = bladeOptional.get();
-            // Calculate thrust based on speed, up to the max effective speed.
+            //Calculate thrust based on speed, up to the max effective speed.
             float speedPercentage = Math.min(speed / (float)MAX_EFFECTIVE_SPEED, 1.0f);
             float bladeCountModifier = (float)getBladeCount() / (float)blade.getMaxBlades();
             float fluidSample = getSpatialHandler().getSmoothFluidSample();
@@ -251,7 +251,7 @@ public class PropellerBlockEntity extends KineticBlockEntity {
         }
     }
 
-    // Blades
+    //Blades
 
     public int getBladeCount() {
         int count = 0;
@@ -285,7 +285,7 @@ public class PropellerBlockEntity extends KineticBlockEntity {
 
         int currentBlades = getBladeCount();
         if (currentBlades >= bladeItem.getMaxBlades())
-            return false; // Reached max for this type
+            return false; //Reached max for this type
 
         ItemStack firstBlade = ItemStack.EMPTY;
         for (int i = 0; i < bladeInventory.getSlots(); i++) {
@@ -336,7 +336,7 @@ public class PropellerBlockEntity extends KineticBlockEntity {
     }
 
     private ItemStackHandler createBladeInventory() {
-        // Max blades for any type is 6
+        //Max blades for any type is 6
         return new ItemStackHandler(6) {
             @Override
             protected void onContentsChanged(int slot) {

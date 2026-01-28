@@ -185,7 +185,7 @@ public class Balloon implements Iterable<BlockPos> {
     public void mergeFrom(Balloon other) {
         if (other == null) return;
         
-        // Merge the volume and mark related chunks
+        //Merge the volume and mark related chunks
         final LongIterator it = other.volume.iterator();
         while (it.hasNext()) {
             long packed = it.nextLong();
@@ -206,15 +206,15 @@ public class Balloon implements Iterable<BlockPos> {
             addHole(hole);
         }
 
-        // Migrate support hais
+        //Migrate support hais
         supportHais.addAll(other.supportHais);
-        // Migrate hot air
+        //Migrate hot air
         hotAir += other.hotAir;
     }
 
 
     public void resolveHolesAfterMerge() {
-        // Check if any holes ended up in the new volume. If they did - remove them
+        //Check if any holes ended up in the new volume. If they did - remove them
         List<BlockPos> holesToKill = new ArrayList<>();
         
         for(BlockPos hole : holes) {
@@ -223,7 +223,7 @@ public class Balloon implements Iterable<BlockPos> {
             }
         }
         
-        // Kill
+        //Kill
         for(BlockPos hole : holesToKill) {
             removeHole(hole);
         }
@@ -321,15 +321,15 @@ public class Balloon implements Iterable<BlockPos> {
     //Incremental bounds
 
     private void onAddCoords(int x, int y, int z) {
-        // increment X counter
+        //increment X counter
         int prevX = countAtX.getOrDefault(x, 0);
         countAtX.put(x, prevX + 1);
 
-        // increment Y counter
+        //increment Y counter
         int prevY = countAtY.getOrDefault(y, 0);
         countAtY.put(y, prevY + 1);
 
-        // increment Z counter
+        //increment Z counter
         int prevZ = countAtZ.getOrDefault(z, 0);
         countAtZ.put(z, prevZ + 1);
 
@@ -351,17 +351,17 @@ public class Balloon implements Iterable<BlockPos> {
     }
 
     private void onRemoveCoords(int x, int y, int z) {
-        // decrement X counter
+        //decrement X counter
         int prevX = countAtX.getOrDefault(x, 0);
         int nextX = prevX - 1;
         if (nextX <= 0) countAtX.remove(x); else countAtX.put(x, nextX);
 
-        // decrement Y counter
+        //decrement Y counter
         int prevY = countAtY.getOrDefault(y, 0);
         int nextY = prevY - 1;
         if (nextY <= 0) countAtY.remove(y); else countAtY.put(y, nextY);
 
-        // decrement Z counter
+        //decrement Z counter
         int prevZ = countAtZ.getOrDefault(z, 0);
         int nextZ = prevZ - 1;
         if (nextZ <= 0) countAtZ.remove(z); else countAtZ.put(z, nextZ);
@@ -408,7 +408,7 @@ public class Balloon implements Iterable<BlockPos> {
                                (double) maxX + 1, (double) maxY + 1, (double) maxZ + 1);
     }
 
-    // Force chunks
+    //Force chunks
 
     public void resolveDirtyChunks() {
         if (dirtyChunks.isEmpty()) return;
@@ -493,7 +493,7 @@ public class Balloon implements Iterable<BlockPos> {
         return packPos(pos.getX(), pos.getY(), pos.getZ());
     }
 
-    // Chunk position handling
+    //Chunk position handling
 
     private static int worldToChunkCoord(int worldCoord) {
         return Math.floorDiv(worldCoord, CHUNK_SIZE);

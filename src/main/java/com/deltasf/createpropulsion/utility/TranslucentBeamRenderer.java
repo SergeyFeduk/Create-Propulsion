@@ -28,16 +28,16 @@ public class TranslucentBeamRenderer {
         RENDER_QUEUE.offer(data);
     }
 
-    // The idea behind this is to perform two render passes:
-    // First one happens BEFORE translucent world geometry and therefore renders beam behind it. It is located inside OpticalSensorRender
-    // Second one happens AFTER ALL translucent world geometry (including stuff like particles) and therefore renders beam above it
-    // Both passes respect depth buffer and do not write to it in order to preserve all other translucent geometry
-    // I assume this is a bad practice but this is what it takes to make stuff render adequately without proper translucentcy sorting
+    //The idea behind this is to perform two render passes:
+    //First one happens BEFORE translucent world geometry and therefore renders beam behind it. It is located inside OpticalSensorRender
+    //Second one happens AFTER ALL translucent world geometry (including stuff like particles) and therefore renders beam above it
+    //Both passes respect depth buffer and do not write to it in order to preserve all other translucent geometry
+    //I assume this is a bad practice but this is what it takes to make stuff render adequately without proper translucentcy sorting
     
-    // Drawbacks of this method: 
-    // 1 | Doubling of alpha in regions where both passes overlap, while in regions of no overlap alpha remains undoubled
-    //     The only way to fix that seems to be using stencil buffer which is set in the first pass and read in the second, and used in the second to double alpha
-    // 2 | Beams are rendered after ALL world geometry, indlucing weather, so weather is always behind as AFAIK it does not write into depth
+    //Drawbacks of this method: 
+    //1 | Doubling of alpha in regions where both passes overlap, while in regions of no overlap alpha remains undoubled
+    //    The only way to fix that seems to be using stencil buffer which is set in the first pass and read in the second, and used in the second to double alpha
+    //2 | Beams are rendered after ALL world geometry, indlucing weather, so weather is always behind as AFAIK it does not write into depth
 
     @SubscribeEvent
     public static void onRenderLevelStageEnd(RenderLevelStageEvent event) {
@@ -72,8 +72,8 @@ public class TranslucentBeamRenderer {
 
     public static void drawBeam(VertexConsumer buffer, BeamRenderData data){
         Matrix4f pose = data.poseSnapshot.pose();
-        // We use this instead of NO_CULL cause the more faces we render the worse alpha duplication issue becomes.
-        // Also this method halves amount of faces rendered
+        //We use this instead of NO_CULL cause the more faces we render the worse alpha duplication issue becomes.
+        //Also this method halves amount of faces rendered
         if (isCameraInside(data)) {
             drawQuadReversed(buffer, pose, data.sBottomLeft, data.sBottomRight, data.eBottomRight, data.eBottomLeft, data.startColor, data.endColor, data.normalBottom);
             drawQuadReversed(buffer, pose, data.sBottomRight, data.sTopRight, data.eTopRight, data.eBottomRight, data.startColor, data.endColor, data.normalRight);
@@ -91,25 +91,25 @@ public class TranslucentBeamRenderer {
                           Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4,
                           Vector4f startColor, Vector4f endColor, Vector3f normal) {
 
-        // Vertex 1 (Start)
+        //Vertex 1 (Start)
         buffer.vertex(pose, v1.x(), v1.y(), v1.z())
               .color(startColor.x(), startColor.y(), startColor.z(), startColor.w())
               .normal(normal.x(), normal.y(), normal.z())
               .endVertex();
 
-        // Vertex 2 (Start)
+        //Vertex 2 (Start)
         buffer.vertex(pose, v2.x(), v2.y(), v2.z())
               .color(startColor.x(), startColor.y(), startColor.z(), startColor.w())
               .normal(normal.x(), normal.y(), normal.z())
               .endVertex();
 
-        // Vertex 3 (End)
+        //Vertex 3 (End)
         buffer.vertex(pose, v3.x(), v3.y(), v3.z())
               .color(endColor.x(), endColor.y(), endColor.z(), endColor.w())
               .normal(normal.x(), normal.y(), normal.z())
               .endVertex();
 
-        // Vertex 4 (End)
+        //Vertex 4 (End)
         buffer.vertex(pose, v4.x(), v4.y(), v4.z())
               .color(endColor.x(), endColor.y(), endColor.z(), endColor.w())
               .normal(normal.x(), normal.y(), normal.z())
@@ -120,28 +120,28 @@ public class TranslucentBeamRenderer {
                                         Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4,
                                         Vector4f startColor, Vector4f endColor, Vector3f normal) {
 
-        // Reversing the order and flipping the normal for the new "front" side
+        //Reversing the order and flipping the normal for the new "front" side
         Vector3f flippedNormal = new Vector3f(-normal.x(), -normal.y(), -normal.z());
 
-        // Vertex 4 (End)
+        //Vertex 4 (End)
         buffer.vertex(pose, v4.x(), v4.y(), v4.z())
             .color(endColor.x(), endColor.y(), endColor.z(), endColor.w())
             .normal(flippedNormal.x(), flippedNormal.y(), flippedNormal.z())
             .endVertex();
 
-        // Vertex 3 (End)
+        //Vertex 3 (End)
         buffer.vertex(pose, v3.x(), v3.y(), v3.z())
             .color(endColor.x(), endColor.y(), endColor.z(), endColor.w())
             .normal(flippedNormal.x(), flippedNormal.y(), flippedNormal.z())
             .endVertex();
 
-        // Vertex 2 (Start)
+        //Vertex 2 (Start)
         buffer.vertex(pose, v2.x(), v2.y(), v2.z())
             .color(startColor.x(), startColor.y(), startColor.z(), startColor.w())
             .normal(flippedNormal.x(), flippedNormal.y(), flippedNormal.z())
             .endVertex();
 
-        // Vertex 1 (Start)
+        //Vertex 1 (Start)
         buffer.vertex(pose, v1.x(), v1.y(), v1.z())
             .color(startColor.x(), startColor.y(), startColor.z(), startColor.w())
             .normal(flippedNormal.x(), flippedNormal.y(), flippedNormal.z())

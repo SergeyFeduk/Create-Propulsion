@@ -24,19 +24,19 @@ public class PropulsionInstanceTypes {
             .vector("rotation", FloatRepr.FLOAT, 4)
             .build())
         .writer((ptr, instance) -> {
-            // Color
+            //Color
             MemoryUtil.memPutByte(ptr, instance.red);
             MemoryUtil.memPutByte(ptr + 1, instance.green);
             MemoryUtil.memPutByte(ptr + 2, instance.blue);
             MemoryUtil.memPutByte(ptr + 3, instance.alpha);
-            // Light & overlay
+            //Light & overlay
             ExtraMemoryOps.put2x16(ptr + 4, instance.light);
             ExtraMemoryOps.put2x16(ptr + 8, instance.overlay);
-            // Position
+            //Position
             MemoryUtil.memPutFloat(ptr + 12, instance.x);
             MemoryUtil.memPutFloat(ptr + 16, instance.y);
             MemoryUtil.memPutFloat(ptr + 20, instance.z);
-            // Rotation
+            //Rotation
             ExtraMemoryOps.putQuaternionf(ptr + 24, instance.rotation);
         })
         .build();
@@ -52,19 +52,19 @@ public class PropulsionInstanceTypes {
             .vector("rotation", FloatRepr.FLOAT, 4)
             .build())
         .writer((ptr, instance) -> {
-            // Color
+            //Color
             MemoryUtil.memPutByte(ptr, instance.red);
             MemoryUtil.memPutByte(ptr + 1, instance.green);
             MemoryUtil.memPutByte(ptr + 2, instance.blue);
             MemoryUtil.memPutByte(ptr + 3, instance.alpha);
-            // Light & overlay
+            //Light & overlay
             ExtraMemoryOps.put2x16(ptr + 4, instance.light);
             ExtraMemoryOps.put2x16(ptr + 8, instance.overlay);
-            // Position
+            //Position
             MemoryUtil.memPutFloat(ptr + 12, instance.x);
             MemoryUtil.memPutFloat(ptr + 16, instance.y);
             MemoryUtil.memPutFloat(ptr + 20, instance.z);
-            // Rotation
+            //Rotation
             ExtraMemoryOps.putQuaternionf(ptr + 24, instance.rotation);
         })
         .build();

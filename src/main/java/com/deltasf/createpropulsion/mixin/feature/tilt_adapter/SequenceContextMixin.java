@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.Unique;
 @Mixin(SequencedGearshiftBlockEntity.SequenceContext.class)
 public class SequenceContextMixin implements ISnappingSequenceContext {
 
-    /// This mixin allows to snap specific sequence contexts back to zero. ISnappingSequenceContext should only be emitted by tilt adapter and derivative blocks
+    ///This mixin allows to snap specific sequence contexts back to zero. ISnappingSequenceContext should only be emitted by tilt adapter and derivative blocks
 
     @Unique private boolean shouldSnap = false;
 

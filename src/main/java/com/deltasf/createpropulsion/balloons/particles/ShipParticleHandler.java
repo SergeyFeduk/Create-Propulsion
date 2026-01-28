@@ -85,7 +85,7 @@ public class ShipParticleHandler {
     public void tick(ClientLevel level, ClientShip ship, Int2ObjectMap<ClientBalloon> allBalloons, Map<ClientBalloon, AABB> intersections) {
         tickCounter++;
 
-        // Anchor is initialized based on the first available intersection
+        //Anchor is initialized based on the first available intersection
         if (!initialized && !intersections.isEmpty()) {
             AABB first = intersections.values().iterator().next();
             ensureInitialized(first.getCenter().x, first.getCenter().y, first.getCenter().z);
@@ -121,7 +121,7 @@ public class ShipParticleHandler {
 
             boolean isSamplingTick = (i + tickCounter) % SAMPLE_INTERVAL == 0;
             
-            // Wall check
+            //Wall check
             if ((i + tickCounter) % 2 == 0) {
                 if (data.state[i] == HapData.STATE_VOLUME) {
                     int bId = data.balloonId[i];
@@ -180,7 +180,7 @@ public class ShipParticleHandler {
                 fz += (random.nextFloat() - 0.5f) * 0.01f;
             }
 
-            // Integration
+            //Integration
             data.vx[i] += fx * dt;
             data.vy[i] += fy * dt;
             data.vz[i] += fz * dt;
@@ -193,7 +193,7 @@ public class ShipParticleHandler {
             data.y[i] += data.vy[i] * dt;
             data.z[i] += data.vz[i] * dt;
 
-            // Drag
+            //Drag
             float drag;
             if (data.state[i] == HapData.STATE_LEAK) drag = DRAG_LEAK;
             else if (data.state[i] == HapData.STATE_STREAM) drag = DRAG_STREAM;
@@ -203,7 +203,7 @@ public class ShipParticleHandler {
             data.vy[i] *= drag;
             data.vz[i] *= drag;
 
-            // Life
+            //Life
             data.life[i] -= 0.005f;
             if (data.life[i] <= 0) {
                 data.remove(i);
@@ -218,7 +218,7 @@ public class ShipParticleHandler {
         int bz = Mth.floor(absZ);
         long currentKey = packPos(bx, by, bz);
 
-        // Check Cache
+        //Check Cache
         if (data.lastBlockPosKey[i] != currentKey) {
             data.cachedBucket[i] = effectors.getOrCreateBucket(currentKey);
             data.lastBlockPosKey[i] = currentKey;
@@ -281,7 +281,7 @@ public class ShipParticleHandler {
                     EffectorBucket bucket = effectors.getBucket(packed);
                     
                     if (bucket != null && bucket.hasHole) {
-                        shouldSpawn = true; // Force spawn due to hole
+                        shouldSpawn = true; //Force spawn due to hole
                     }
                 }
 
@@ -301,6 +301,7 @@ public class ShipParticleHandler {
         }
     }
 
+    //TODO: Reference directly
     private static long packPos(double x, double y, double z) {
         return packPos(Mth.floor(x), Mth.floor(y), Mth.floor(z));
     }
@@ -312,7 +313,7 @@ public class ShipParticleHandler {
         return i | ((long)z & PACKED_Z_MASK) << Z_OFFSET;
     }
 
-    // BlockPos slop
+    //BlockPos slop
     private static final int PACKED_X_LENGTH = 26;
     private static final int PACKED_Z_LENGTH = PACKED_X_LENGTH;
     private static final int PACKED_Y_LENGTH = 64 - PACKED_X_LENGTH - PACKED_Z_LENGTH;

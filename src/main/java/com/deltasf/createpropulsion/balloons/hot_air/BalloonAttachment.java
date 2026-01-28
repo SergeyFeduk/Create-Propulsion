@@ -68,7 +68,7 @@ public final class BalloonAttachment implements ShipPhysicsListener {
 
         Vector3d worldUp = new Vector3d(0, 1, 0);
         Vector3d alignAxis = new Vector3d();
-        shipUpWorld.cross(worldUp, alignAxis); // axis direction and magnitude ~ sin(angle)
+        shipUpWorld.cross(worldUp, alignAxis); //axis direction and magnitude ~ sin(angle)
         double alignMag = alignAxis.length();
 
         //P torque dampening
@@ -93,8 +93,8 @@ public final class BalloonAttachment implements ShipPhysicsListener {
             shipToWorld.transformDirection(dampingTorqueShipSpace, dampingTorqueWorldSpace);
             accumulatedTorque.add(dampingTorqueWorldSpace);
         }
-        // Potato Note: Should no longer be necessary with new VS Drag model, but leaving just in case
-        // Delta Note: ^ VS drag is too weak, will keep this for the time being
+        //Potato Note: Should no longer be necessary with new VS Drag model, but leaving just in case
+        //Delta Note: ^ VS drag is too weak, will keep this for the time being
         //Vertical linear drag based on surface area of all balloons
         Vector3dc linearVel = simpl.getVelocity();
 

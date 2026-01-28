@@ -157,7 +157,7 @@ public class EnvelopeScenes {
 
         scene.idle(5);
 
-        // Undo removal of removedSections
+        //Undo removal of removedSections
         for (int i = removedSections.length - 1; i >= 0; i--) {
             scene.world().showSection(removedSections[i], Direction.SOUTH);
             scene.idle(10);

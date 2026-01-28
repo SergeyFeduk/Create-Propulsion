@@ -18,7 +18,7 @@ public class ManagedHaiSet implements Set<UUID>{
         this.owner = owner;
         this.map = map;
 
-        // Perform the initial linking
+        //Perform the initial linking
         for (UUID haiId : this.delegate) {
             map.put(haiId, owner);
         }
@@ -37,7 +37,7 @@ public class ManagedHaiSet implements Set<UUID>{
     public boolean remove(Object o) {
         boolean changed = delegate.remove(o);
         if (changed && o instanceof UUID) {
-            // Only remove from the map if it was mapped to THIS balloon
+            //Only remove from the map if it was mapped to THIS balloon
             map.remove((UUID) o, owner);
         }
         return changed;

@@ -139,7 +139,7 @@ public abstract class AbstractOpticalSensorBlock extends DirectionalBlock implem
         return state.rotate(mirrorIn.getRotation(state.getValue(FACING)));
     }
 
-    // Abstract methods
+    //Abstract methods
     @Override
     public abstract BlockEntity newBlockEntity(@Nonnull BlockPos pos, @Nonnull BlockState state);
 

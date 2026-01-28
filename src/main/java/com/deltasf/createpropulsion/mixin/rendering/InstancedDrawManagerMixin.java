@@ -12,7 +12,7 @@ import java.util.List;
 @Mixin(InstancedDrawManager.class)
 public class InstancedDrawManagerMixin {
 
-    /// This mixin forces draws to be filtered through render control class so they are actually skipped. 
+    ///This mixin forces draws to be filtered through render control class so they are actually skipped. 
 
     @Shadow(remap = false) private List<?> draws;
     @Shadow(remap = false) private List<?> oitDraws;

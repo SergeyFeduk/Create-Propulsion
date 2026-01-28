@@ -21,8 +21,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 
-/// testHit was stolen from VS <3
-/// https://github.com/ValkyrienSkies/Valkyrien-Skies-2/blob/1.20.1/main/common/src/main/java/org/valkyrienskies/mod/mixin/mod_compat/create/behaviour/MixinScrollValueBehaviour.java
+///testHit was stolen from VS <3
+///https://github.com/ValkyrienSkies/Valkyrien-Skies-2/blob/1.20.1/main/common/src/main/java/org/valkyrienskies/mod/mixin/mod_compat/create/behaviour/MixinScrollValueBehaviour.java
 
 public class StirlingScrollValueBehaviour extends DualRowValueBehaviour {
     protected static final int STEP = 64;

@@ -7,19 +7,19 @@ public class HapData {
     public final int capacity;
     public int count = 0;
 
-    // Everything is in ship space
-    // Position
+    //Everything is in ship space
+    //Position
     public final float[] x, y, z;
     public final float[] px, py, pz;
-    // Velocity
+    //Velocity
     public final float[] vx, vy, vz;
-    // Cached force
+    //Cached force
     public final float[] cfx, cfy, cfz;
     
-    // State
-    public final float[] life; // 0.0 to 1.0
+    //State
+    public final float[] life;
     public final float[] maxLife;
-    public final byte[] state; // 0 = Volume, 1 = Stream, 2 = Leak
+    public final byte[] state; //0 = Volume, 1 = Stream, 2 = Leak
     public final float[] scale;
 
     //Acceleration

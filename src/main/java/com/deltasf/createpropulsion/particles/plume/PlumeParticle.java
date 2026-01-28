@@ -154,32 +154,32 @@ public class PlumeParticle extends SimpleAnimatedParticle {
                     float spreadBlendFactor = (float)Math.cos(angleOfIncidence);
                     float slideBlendFactor = (float)Math.sin(angleOfIncidence);
 
-                    // Velocity decomposition
+                    //Velocity decomposition
                     Vec3 V_normal_comp = collisionNormal.scale(incomingVel.dot(collisionNormal));
                     Vec3 V_tangential_comp = incomingVel.subtract(V_normal_comp);
 
-                    // Reflect + dampen
+                    //Reflect + dampen
                     Vec3 desiredNormalVel;
-                    if (incomingVel.dot(collisionNormal) < 0) { // Moving into the surface
+                    if (incomingVel.dot(collisionNormal) < 0) { //Moving into the surface
                         desiredNormalVel = V_normal_comp.scale(-COLLISION_PERPENDICULAR_DAMPEN); 
                     } else {
                         desiredNormalVel = V_normal_comp; 
                     }
                     
-                    // Calculate spread velocity
+                    //Calculate spread velocity
                     Vec3 spreadPlaneDirection;
                     double randomAngle = this.random.nextDouble() * Math.PI * 2.0D;
                     
-                    // Determine two axes perpendicular to normal
+                    //Determine two axes perpendicular to normal
                     Vec3 axis1, axis2;
-                    if (Math.abs(collisionNormal.y) > 0.9) { // Ground/Ceiling
+                    if (Math.abs(collisionNormal.y) > 0.9) { //Ground/Ceiling
                         axis1 = new Vec3(1, 0, 0).normalize();
                         axis2 = collisionNormal.cross(axis1).normalize();
-                    } else { // Wall 
+                    } else { //Wall 
                         axis1 = new Vec3(0, 1, 0).normalize();
                         axis2 = collisionNormal.cross(axis1).normalize();
                     }
-                    if (axis2.lengthSqr() < 0.1) { // Fallback
+                    if (axis2.lengthSqr() < 0.1) { //Fallback
                         if(Math.abs(collisionNormal.x) > 0.9) axis1 = new Vec3(0,0,1).normalize();
                         else axis1 = new Vec3(1,0,0).normalize();
                         axis2 = collisionNormal.cross(axis1).normalize();
@@ -188,7 +188,7 @@ public class PlumeParticle extends SimpleAnimatedParticle {
                     spreadPlaneDirection = axis1.scale(Math.cos(randomAngle)).add(axis2.scale(Math.sin(randomAngle))).normalize();
                     
                     Vec3 spreadComponent = spreadPlaneDirection.scale(incomingVel.length() * spreadBlendFactor);
-                    Vec3 slideComponent = V_tangential_comp.scale(slideBlendFactor); // For sliding use original tangential component
+                    Vec3 slideComponent = V_tangential_comp.scale(slideBlendFactor); //For sliding use original tangential component
                     
                     Vec3 desiredTangentialVel = slideComponent.add(spreadComponent);
 
@@ -205,7 +205,7 @@ public class PlumeParticle extends SimpleAnimatedParticle {
                         this.dz = spreadPlaneDirection.z * incomingVel.length() * COLLISION_SPEED_RETENTION * 0.5;
                     }
 
-                } else { // Incoming speed too low, slow down
+                } else { //Incoming speed too low, slow down
                     this.dx *= 0.1; this.dy *= 0.1; this.dz *= 0.1;
                 }
             }

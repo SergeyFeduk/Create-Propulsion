@@ -253,10 +253,10 @@ public class BalloonUpdater {
             }
             //Detect holes
             if (resultVolume.isLeaky()) {
-                // Find all original seeds that are part of this specific leaky volume.
+                //Find all original seeds that are part of this specific leaky volume.
                 for (BlockPos holeSeed : seeds) {
                     if (resultVolume.volume().contains(holeSeed)) {
-                        // For each seed, get the balloons that were originally next to it.
+                        //For each seed, get the balloons that were originally next to it.
                         Set<Balloon> balloonsToGetHole = subGroup.affectedBalloonsMap().get(holeSeed);
                         for (Balloon balloon : balloonsToGetHole) {
                             //Check if the hole is NOT EXCLUSIEVELY BELOW the balloon. If so - don't create a hole as blocks below balloons volume cannot be holes
@@ -273,7 +273,7 @@ public class BalloonUpdater {
                         }
                     }
                 }
-                continue; // Done with this volume.
+                continue; //Done with this volume.
             }
             
             //Handle merge/extend
@@ -367,7 +367,7 @@ public class BalloonUpdater {
         int shellCount = result.sliceShell().size();
         int denominator = holeCount + shellCount;
 
-        if (denominator == 0) { // lim x->+0 a / x = a bit over 4
+        if (denominator == 0) {
             return;
         }
 
@@ -460,7 +460,7 @@ public class BalloonUpdater {
                 if (group.isPlacement() && balloon.contains(pos)) {
                     isRelevant = true;
                 }
-                // If not already found to be relevant, check all neighbors.
+                //If not already found to be relevant, check all neighbors.
                 if (!isRelevant) {
                     for (Direction dir : Direction.values()) {
                         BlockPos neighborPos = pos.relative(dir);

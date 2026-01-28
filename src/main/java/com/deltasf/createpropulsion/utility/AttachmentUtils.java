@@ -36,7 +36,7 @@ public class AttachmentUtils {
     @Nullable
     public static <T> T get(Level level, BlockPos pos, Class<T> attachmentClass, Supplier<T> factory) {
         if (!(level instanceof ServerLevel serverLevel)) {
-            return null; // Can only get ships on the server
+            return null; //Can only get ships on the server
         }
         ServerShip ship = getShipAt(serverLevel, pos);
         return ship instanceof LoadedServerShip lship ? getOrCreate(lship, attachmentClass, factory) : null;

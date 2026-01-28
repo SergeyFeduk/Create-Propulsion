@@ -53,19 +53,19 @@ public class BalloonDebug {
             long shipId = entry.getLongKey();
             Map<Integer, ClientBalloon> shipBalloons = entry.getValue();
             for (ClientBalloon balloon : shipBalloons.values()) {
-                // Use ID for stable coloring
+                //Use ID for stable coloring
                 float hue = (balloon.id * GOLDEN_RATIO_CONJUGATE) % 1.0f;
                 Color balloonColor = Color.getHSBColor(hue, 0.8f, 0.95f);
 
-                // Render Client AABB
+                //Render Client AABB
                 if (PropulsionDebug.isDebug(BalloonDebugRoute.AABB)) {
                     renderClientAABB(shipId, balloon, balloonColor); 
                 }
-                // Render Client Volume
+                //Render Client Volume
                 if (PropulsionDebug.isDebug(BalloonDebugRoute.VOLUME)) {
                     renderClientVolume(balloon, balloonColor);
                 }
-                // Render Client Holes
+                //Render Client Holes
                 if (PropulsionDebug.isDebug(BalloonDebugRoute.HOLES)) {
                     renderClientHoles(balloon);
                 }
@@ -164,7 +164,7 @@ public class BalloonDebug {
 
             AABB chunkAABB = new AABB(originX, originY, originZ, originX + CHUNK_SIZE, originY + CHUNK_SIZE, originZ + CHUNK_SIZE);
             
-            String chunkAABBId = "chunk_aabb_" + UUID.randomUUID(); // This UUID generation might be spammy, consider hashing pos
+            String chunkAABBId = "chunk_aabb_" + UUID.randomUUID(); //This UUID generation might be spammy, consider hashing pos
             Color transparentColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), 60);
             DebugRenderer.drawBox(chunkAABBId, chunkAABB, transparentColor, 3);
 

@@ -20,9 +20,9 @@ import net.minecraft.world.level.Level;
 @Mixin(CompassItem.class)
 public abstract class CompassItemMixin {
 
-    /// This mixin fixes binding compass to lodestone located on ship
-    /// If lodestone block is in shipyard - ship managing this pos in shipyard must actuall exist
-    /// If it does not - do not bind to the lodestone, as it is located on dead ship
+    ///This mixin fixes binding compass to lodestone located on ship
+    ///If lodestone block is in shipyard - ship managing this pos in shipyard must actuall exist
+    ///If it does not - do not bind to the lodestone, as it is located on dead ship
     
     @WrapOperation(
         method = "inventoryTick",

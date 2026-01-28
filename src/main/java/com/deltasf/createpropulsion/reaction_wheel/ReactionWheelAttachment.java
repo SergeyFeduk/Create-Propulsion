@@ -33,7 +33,7 @@ public final class ReactionWheelAttachment implements ShipPhysicsListener {
         appliersMapping.remove(pos.asLong());
     }
 
-    // Getters
+    //Getters
     public static ReactionWheelAttachment getOrCreateAsAttachment(LoadedServerShip ship) {
         return AttachmentUtils.getOrCreate(ship, ReactionWheelAttachment.class, ReactionWheelAttachment::new);
     }

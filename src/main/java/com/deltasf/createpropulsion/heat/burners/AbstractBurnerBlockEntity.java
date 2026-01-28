@@ -78,7 +78,7 @@ public abstract class AbstractBurnerBlockEntity extends SmartBlockEntity impleme
 
     @SuppressWarnings("null")
     protected boolean shouldThermostatBurn() {
-        if (isPowered) return true; // Redstone override
+        if (isPowered) return true; //Redstone override
         if (level == null) return false;
         
         BlockEntity beAbove = level.getBlockEntity(worldPosition.above());
@@ -95,7 +95,7 @@ public abstract class AbstractBurnerBlockEntity extends SmartBlockEntity impleme
 
                 float currentHeat = heatSource.getCapability().map(IHeatSource::getHeatStored).orElse(0f);
                 float expectedHeatProduction = heatSource.getCapability().map(IHeatSource::getExpectedHeatProduction).orElse(1f);
-                // Prediction logic
+                //Prediction logic
                 float consumptionNextTick = consumer.consumeHeat(currentHeat, expectedHeatProduction, true); 
                 float heatNextTick = currentHeat - consumptionNextTick - PASSIVE_LOSS_PER_TICK;
 

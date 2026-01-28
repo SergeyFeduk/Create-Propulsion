@@ -158,7 +158,7 @@ dependencies {
     implementation(jarJar("com.github.bawnorton.mixinsquared:mixinsquared-forge:0.3.2-beta.4")) {
         jarJar.ranged(it, "[0.3.2-beta.4,)")
     }*/
-    // Mixin Extras
+    //Mixin Extras
     compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1"))
     //implementation("io.github.llamalad7:mixinextras-forge:0.4.1")
     implementation(jarJar("io.github.llamalad7:mixinextras-forge:0.4.1")) {

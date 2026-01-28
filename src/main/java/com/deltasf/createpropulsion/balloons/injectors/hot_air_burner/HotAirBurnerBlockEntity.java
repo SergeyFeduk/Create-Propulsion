@@ -47,14 +47,14 @@ public class HotAirBurnerBlockEntity extends SmartBlockEntity implements IHaveGo
     public static final double TREND_THRESHOLD = 0.001;
     private static final float PARTICLE_SPAWN_MULTIPLIER = 0.1f;
 
-    // Behaviours
+    //Behaviours
     private HotAirInjectorBehaviour injectorBehaviour;
     private BurnerFuelBehaviour fuelInventory;
     private AirInjectorObstructionBehaviour obstructionBehaviour;
     private BalloonInfoBehaviour balloonInfoBehaviour;
 
     private int burnTime = 0;
-    private int leverPosition = 0; // 0-1-2
+    private int leverPosition = 0; //0-1-2
     private float particleAccumulator = 0;
 
     public HotAirBurnerBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
@@ -75,7 +75,7 @@ public class HotAirBurnerBlockEntity extends SmartBlockEntity implements IHaveGo
         behaviours.add(balloonInfoBehaviour);
     }
 
-    // Hot air injector impl
+    //Hot air injector impl
 
     @Override
     public UUID getId() {
@@ -109,7 +109,7 @@ public class HotAirBurnerBlockEntity extends SmartBlockEntity implements IHaveGo
     @Override
     public void onBalloonLoaded() { balloonInfoBehaviour.performUpdate(); }
 
-    // Lever and burner logic
+    //Lever and burner logic
 
     public void cycleLever(boolean isShiftPressed) {
         if (isShiftPressed) {
@@ -196,19 +196,19 @@ public class HotAirBurnerBlockEntity extends SmartBlockEntity implements IHaveGo
                         float r = level.random.nextFloat() * totalArea;
 
                         if (r < wTopBot) {
-                            // Top rect
+                            //Top rect
                             offsetX = (level.random.nextFloat() * 2 * R_OUT) - R_OUT;
                             offsetZ = -R_OUT + (level.random.nextFloat() * width);
                         } else if (r < 2 * wTopBot) {
-                            // Bottom rect
+                            //Bottom rect
                             offsetX = (level.random.nextFloat() * 2 * R_OUT) - R_OUT;
                             offsetZ = R_IN + (level.random.nextFloat() * width);
                         } else if (r < 2 * wTopBot + wLeftRight) {
-                            // Left rect
+                            //Left rect
                             offsetX = -R_OUT + (level.random.nextFloat() * width);
                             offsetZ = (level.random.nextFloat() * 2 * R_IN) - R_IN;
                         } else {
-                            // Right rect
+                            //Right rect
                             offsetX = R_IN + (level.random.nextFloat() * width);
                             offsetZ = (level.random.nextFloat() * 2 * R_IN) - R_IN;
                         }
@@ -305,7 +305,7 @@ public class HotAirBurnerBlockEntity extends SmartBlockEntity implements IHaveGo
         return true;
     }
 
-    // Caps and nbt
+    //Caps and nbt
 
     @Override
     public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {

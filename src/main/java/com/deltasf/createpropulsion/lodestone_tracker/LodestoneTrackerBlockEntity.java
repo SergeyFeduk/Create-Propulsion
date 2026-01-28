@@ -109,7 +109,7 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
         //Acquire target and tracker world space positions
         Vector3d targetPosition = getWorldSpacePosition(targetBlock);
         Vector3d trackerPosition = getWorldSpacePosition(worldPosition);
-        if (targetPosition == null || trackerPosition == null) return 0; // In case anything is on unloaded ship - set angle to 0 
+        if (targetPosition == null || trackerPosition == null) return 0; //In case anything is on unloaded ship - set angle to 0 
 
         //Calculate angle between two positions
         float angle = getHorizontalAndVerticalAngles(targetPosition, trackerPosition).x;
@@ -201,7 +201,7 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
 
             for (int k = 0; k < remainderToDistribute; k++) {
                 float maxFrac = -1.0f;
-                int bestDir = -1; // 0:N, 1:E, 2:S, 3:W
+                int bestDir = -1; //0:N, 1:E, 2:S, 3:W
 
                 if (fracN > maxFrac) { maxFrac = fracN; bestDir = 0; }
                 if (fracE > maxFrac) { maxFrac = fracE; bestDir = 1; }
@@ -210,7 +210,7 @@ public class LodestoneTrackerBlockEntity extends SmartBlockEntity {
             
                 if (bestDir == 0) {
                     intPowerN++;
-                    fracN = -2.0f; // Mark as used
+                    fracN = -2.0f; //Mark as used
                 } else if (bestDir == 1) {
                     intPowerE++;
                     fracE = -2.0f;

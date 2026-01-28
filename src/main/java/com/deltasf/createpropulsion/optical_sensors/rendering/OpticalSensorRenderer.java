@@ -37,7 +37,7 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<AbstractOptic
     
     public OpticalSensorRenderer(BlockEntityRendererProvider.Context context) { super();}
 
-    private static final float RAY_THICKNESS = 0.25f; // 4 pixels wide
+    private static final float RAY_THICKNESS = 0.25f; //4 pixels wide
     private static final float START_ALPHA = 0.3f;
     private static final float END_ALPHA = 0.0f;
     private static final Vector4f RAY_COLOR = new Vector4f(0.8f, 0.1f, 0.1f, 1.0f);
@@ -45,7 +45,7 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<AbstractOptic
 
     //#region Reusable variables for to make it almost-zero alloc code yay
 
-    // Colors
+    //Colors
     private static final Vector4f START_COLOR = new Vector4f(
         RAY_COLOR.x(), RAY_COLOR.y(), RAY_COLOR.z(), RAY_COLOR.w() * START_ALPHA
     );
@@ -63,7 +63,7 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<AbstractOptic
     private static final Vector4f MODIFIED_START_COLOR = new Vector4f();
     private static final Vector4f MODIFIED_END_COLOR = new Vector4f();
 
-    // Positions
+    //Positions
     private final Vector3f localStartPos = new Vector3f();
     private final Vector3f directionVec = new Vector3f();
     private final Vector3f localEndPos = new Vector3f();
@@ -71,13 +71,13 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<AbstractOptic
     private final Vector3f sideVector = new Vector3f();
     private final Vector3f upVector = new Vector3f();
 
-    // Corner offsets
-    private final Vector3f offset_BL = new Vector3f(); // Bottom-Left offset
-    private final Vector3f offset_BR = new Vector3f(); // Bottom-Right offset
-    private final Vector3f offset_TR = new Vector3f(); // Top-Right offset
-    private final Vector3f offset_TL = new Vector3f(); // Top-Left offset
+    //Corner offsets
+    private final Vector3f offset_BL = new Vector3f(); //Bottom-Left offset
+    private final Vector3f offset_BR = new Vector3f(); //Bottom-Right offset
+    private final Vector3f offset_TR = new Vector3f(); //Top-Right offset
+    private final Vector3f offset_TL = new Vector3f(); //Top-Left offset
 
-    // AABB Calculation Vectors
+    //AABB Calculation Vectors
     private static final float HALF_THICKNESS = RAY_THICKNESS * 0.5f;
     private final Vector3d worldStart = new Vector3d();
     private final Vector3d worldEnd = new Vector3d();
@@ -97,7 +97,7 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<AbstractOptic
             
         //Laser beam
         float distance = blockEntity.getRaycastDistance();
-        if (distance <= 1e-6f) return; // Same position case
+        if (distance <= 1e-6f) return; //Same position case
         BlockState state = blockEntity.getBlockState();
         Direction facing = state.getValue(BlockStateProperties.FACING);
         boolean powered = state.getValue(AbstractOpticalSensorBlock.POWERED);
@@ -117,18 +117,18 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<AbstractOptic
             this.worldUp.set(1, 0, 0);
         }
 
-        // Calculate perpendicular vectors
-        this.directionVec.cross(this.worldUp, this.sideVector).normalize();; // side = ray x up
-        this.directionVec.cross(this.sideVector, this.upVector).normalize();; // up = ray x side
+        //Calculate perpendicular vectors
+        this.directionVec.cross(this.worldUp, this.sideVector).normalize();; //side = ray x up
+        this.directionVec.cross(this.sideVector, this.upVector).normalize();; //up = ray x side
 
         this.sideVector.mul(HALF_THICKNESS);
         this.upVector.mul(HALF_THICKNESS);
 
         //Vertices 
-        this.offset_BL.set(this.sideVector).negate().sub(this.upVector); // -side - up
-        this.offset_BR.set(this.sideVector).sub(this.upVector);          // +side - up
-        this.offset_TR.set(this.sideVector).add(this.upVector);          // +side + up
-        this.offset_TL.set(this.sideVector).negate().add(this.upVector); // -side + up
+        this.offset_BL.set(this.sideVector).negate().sub(this.upVector); //-side - up
+        this.offset_BR.set(this.sideVector).sub(this.upVector);          //+side - up
+        this.offset_TR.set(this.sideVector).add(this.upVector);          //+side + up
+        this.offset_TL.set(this.sideVector).negate().add(this.upVector); //-side + up
 
         this.localStartPos.add(this.offset_BL, beamData.sBottomLeft);
         this.localStartPos.add(this.offset_BR, beamData.sBottomRight);
@@ -152,7 +152,7 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<AbstractOptic
                 MODIFIED_START_COLOR.set(MODIFIED_TEMP_COLOR, START_ALPHA);
                 MODIFIED_END_COLOR.set(MODIFIED_TEMP_COLOR, END_ALPHA);
                 setBeamColors(beamData, MODIFIED_START_COLOR, MODIFIED_END_COLOR);
-            } else { // No colored lens, default behaviour
+            } else { //No colored lens, default behaviour
                 setBeamColors(beamData, powered);
             }
         } else {
@@ -260,12 +260,12 @@ public class OpticalSensorRenderer extends SafeBlockEntityRenderer<AbstractOptic
                     if (dyeableItem.hasCustomColor(stack)) {
                         int color = dyeableItem.getColor(stack);
     
-                        // Extract RGB values from hex
+                        //Extract RGB values from hex
                         int r = (color >> 16) & 0xFF;
                         int g = (color >> 8) & 0xFF;
                         int b = color & 0xFF;
     
-                        // Accumulate RGB values
+                        //Accumulate RGB values
                         totalRed += r;
                         totalGreen += g;
                         totalBlue += b;

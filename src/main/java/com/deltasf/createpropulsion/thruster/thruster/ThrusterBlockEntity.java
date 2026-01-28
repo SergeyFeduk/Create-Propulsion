@@ -58,7 +58,7 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
         float thrust = 0;
         float currentPower = getPower();
 
-        // This thruster only works if it has valid fuel and power
+        //This thruster only works if it has valid fuel and power
         if (isWorking() && currentPower > 0) {
             var properties = getFuelProperties(fluidStack().getRawFluid());
             float obstructionEffect = calculateObstructionEffect();

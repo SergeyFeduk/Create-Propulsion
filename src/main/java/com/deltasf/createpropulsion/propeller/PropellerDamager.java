@@ -56,7 +56,7 @@ public class PropellerDamager extends AbstractAreaDamagerBehaviour {
         
         PropellerBladeItem blade = bladeOpt.get();
         
-        // Get the damage zone from the blade
+        //Get the damage zone from the blade
         AABB bladeDamageZone = blade.getDamageZone();
         Vec3 bladeOffset = blade.getDamageZoneOffset();
         
@@ -66,7 +66,7 @@ public class PropellerDamager extends AbstractAreaDamagerBehaviour {
             bladeDamageZone.getZsize()
         );
         
-        // Get the facing direction of the propeller
+        //Get the facing direction of the propeller
         Direction facing = propeller.getBlockState().getValue(PropellerBlock.FACING);
 
         if (facing == Direction.WEST) {
@@ -81,7 +81,7 @@ public class PropellerDamager extends AbstractAreaDamagerBehaviour {
             bladeOffset = new Vec3(-bladeOffset.y, -bladeOffset.x, -bladeOffset.z);
         }
         
-        // Create the damage zone with the blade as context
+        //Create the damage zone with the blade as context
         return Optional.of(new DamageZone(dimensions, bladeOffset, facing, Direction.SOUTH, blade));
     }
 

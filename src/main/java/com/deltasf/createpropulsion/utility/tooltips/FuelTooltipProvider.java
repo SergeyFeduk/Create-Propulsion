@@ -25,7 +25,7 @@ public class FuelTooltipProvider implements ITooltipProvider {
             if (properties == null) return;
 
             TooltipHandler.wrapShiftHoldText(tooltipList, "createpropulsion.tooltip.holdForRocketFuelSummary", () -> {
-                // Thrust
+                //Thrust
                 int thrustPercent = Math.round(properties.thrustMultiplier * 100.0f);
                 Component thrustLine = Component.translatable("createpropulsion.tooltip.thrust")
                     .append(": ")
@@ -34,7 +34,7 @@ public class FuelTooltipProvider implements ITooltipProvider {
                     .append(Component.literal("%").withStyle(Palette.STANDARD_CREATE.primary()));
                 tooltipList.add(thrustLine);
 
-                // Burn rate
+                //Burn rate
                 int consumptionPercent = Math.round(properties.consumptionMultiplier * 100.0f);
                 Component consumptionLine = Component.translatable("createpropulsion.tooltip.consumption")
                     .append(": ")

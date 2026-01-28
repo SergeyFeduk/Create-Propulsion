@@ -34,7 +34,7 @@ public class BalloonParticleSystem {
     public static final double SPAWN_RADIUS = 32.0;
     public static final double SPAWN_RADIUS_SQ = SPAWN_RADIUS * SPAWN_RADIUS;
     
-    // Temp
+    //Temp
     private static final Map<ClientBalloon, AABB> perBalloonIntersections = new HashMap<>();
     private static final Vector3d tmpMin = new Vector3d();
     private static final Vector3d tmpMax = new Vector3d();
@@ -51,7 +51,7 @@ public class BalloonParticleSystem {
         ShipParticleHandler newHandler = new ShipParticleHandler();
         handlers.put(shipId, newHandler);
         
-        // Initialize effectors for existing balloons
+        //Initialize effectors for existing balloons
         Minecraft mc = Minecraft.getInstance();
         if (mc.level != null) {
             Map<Integer, ClientBalloon> balloons = ClientBalloonRegistry.getBalloonsForShip(shipId);

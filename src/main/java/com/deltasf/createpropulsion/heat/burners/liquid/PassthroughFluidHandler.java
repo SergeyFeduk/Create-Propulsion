@@ -33,14 +33,14 @@ public class PassthroughFluidHandler implements IFluidHandler {
         int totalFilled = 0;
         FluidStack remaining = resource.copy();
 
-        // Try to fill internal tank if it matches a valid fuel
+        //Try to fill internal tank if it matches a valid fuel
         if (isFuel(resource)) {
             int filledIntoTank = blockEntity.tank.getPrimaryHandler().fill(remaining, action);
             totalFilled += filledIntoTank;
             remaining.shrink(filledIntoTank);
         }
 
-        // Pass to the opposite side
+        //Pass to the opposite side
         if (!remaining.isEmpty()) {
             Level level = blockEntity.getLevel();
             if (level != null) {

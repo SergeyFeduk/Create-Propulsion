@@ -43,7 +43,7 @@ public abstract class AbstractAreaDamagerBehaviour extends BlockEntityBehaviour 
             debugZone(zone);
         }
 
-        // Find entities in the zone
+        //Find entities in the zone
         List<LivingEntity> entities = OBBEntityFinder.getEntitiesInOrientedBox(
             level,
             getPos(),
@@ -55,7 +55,7 @@ public abstract class AbstractAreaDamagerBehaviour extends BlockEntityBehaviour 
 
         if (entities.isEmpty()) { return; }
 
-        // Apply damage to entities
+        //Apply damage to entities
         DamageSource damageSource = getDamageSource();
         for (LivingEntity entity : entities) {
             if (entity.isRemoved() || entity.fireImmune()) continue;

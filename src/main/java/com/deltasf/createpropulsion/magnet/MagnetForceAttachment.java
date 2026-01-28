@@ -122,14 +122,14 @@ public final class MagnetForceAttachment implements ShipPhysicsListener {
             pair.localPos.getY() + POINT_FIVE,
             pair.localPos.getZ() + POINT_FIVE
         );
-        // World-space position of magnet A
+        //World-space position of magnet A
         transformA.getShipToWorld().transformPosition(localPosA_absolute_shipspace, worldPosA);
-        // World-space normalized direction of magnet A moment
+        //World-space normalized direction of magnet A moment
         toWorldDirection(transformA, pair.localDir, m_A_hat);
 
         LoadedShip shipB_loaded = null;
 
-        if (pair.otherShipId == -1) { // Magnet B is on the world grid
+        if (pair.otherShipId == -1) { //Magnet B is on the world grid
             worldPosB.set(
                 pair.otherPos.getX() + POINT_FIVE,
                 pair.otherPos.getY() + POINT_FIVE,
@@ -141,9 +141,9 @@ public final class MagnetForceAttachment implements ShipPhysicsListener {
                                 ". This will result in NaN forces/torques.");
             }
             m_B_hat.normalize();
-        } else { // Magnet B is on another ship
+        } else { //Magnet B is on another ship
             shipB_loaded = getShipById(this.level, pair.otherShipId);
-            if (shipB_loaded == null) return; // Other ship not found or not loaded
+            if (shipB_loaded == null) return; //Other ship not found or not loaded
 
             ShipTransform transformB = shipB_loaded.getTransform();
             localPosB_shipspace.set(
@@ -228,11 +228,11 @@ public final class MagnetForceAttachment implements ShipPhysicsListener {
         return VSGameUtilsKt.getShipWorldNullable(level).getLoadedShips().getById(shipId);
     }
 
-    // As you can see the calculations are done only for magnet A. This sucks as magnet B would have to do 90% of the same calculations when calculating pair (B; A) 
-    // It is possible to reduce the amount of calculations by a factor of 2 by introducing centralized cache for the whole physics thread
-    // By caching result(A, B) after its calculation we can skip almost all math for (B, A) and just reuse inverted result(A, B), as F(A, B) = -F(B, A)
-    // This would require having a centralized cache and a way to subsribe to the start of physics tick, which I did not figure out yet
-    // Or, instead of physics tick start - check if all pairs were cached - and clean up after (tho this is less desirable)
+    //As you can see the calculations are done only for magnet A. This sucks as magnet B would have to do 90% of the same calculations when calculating pair (B; A) 
+    //It is possible to reduce the amount of calculations by a factor of 2 by introducing centralized cache for the whole physics thread
+    //By caching result(A, B) after its calculation we can skip almost all math for (B, A) and just reuse inverted result(A, B), as F(A, B) = -F(B, A)
+    //This would require having a centralized cache and a way to subsribe to the start of physics tick, which I did not figure out yet
+    //Or, instead of physics tick start - check if all pairs were cached - and clean up after (tho this is less desirable)
 
     public static MagnetForceAttachment getOrCreateAsAttachment(Level level, LoadedServerShip ship){
         return AttachmentUtils.getOrCreate(ship, MagnetForceAttachment.class, () -> {

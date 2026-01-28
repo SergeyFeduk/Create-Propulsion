@@ -51,7 +51,7 @@ public class PlumeParticleData implements ParticleOptions, ICustomParticleDataWi
 	public String writeToString() {
         ResourceLocation key = ForgeRegistries.PARTICLE_TYPES.getKey(this.getType());
         if (key == null) {
-            return "createpropulsion:plume_default"; // Fallback
+            return "createpropulsion:plume_default"; //Fallback
        }
        return key.toString();
 	}

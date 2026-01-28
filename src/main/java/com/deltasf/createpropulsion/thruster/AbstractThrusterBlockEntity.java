@@ -37,7 +37,7 @@ import java.util.List;
 
 @SuppressWarnings({"deprecation", "unchecked"})
 public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity implements IHaveGoggleInformation {
-    // Constants
+    //Constants
     protected static final int OBSTRUCTION_LENGTH = 10;
     protected static final int TICKS_PER_ENTITY_CHECK = 5;
     private static final float PARTICLE_VELOCITY = 4;
@@ -45,17 +45,17 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
     
     protected static final float LOWEST_POWER_THRESHOLD = 5.0f / 15.0f;
 
-    // Common State
+    //Common State
     protected ThrusterData thrusterData;
     protected int emptyBlocks;
     protected boolean isThrustDirty = false;
 
-    // Ticking
+    //Ticking
     private int currentTick = 0;
     private int clientTick = 0;
     private float particleSpawnAccumulator = 0.0f;
 
-    // CC Peripheral
+    //CC Peripheral
     public AbstractComputerBehaviour computerBehaviour;
     public enum ControlMode {
         NORMAL,
@@ -95,7 +95,7 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
         }
     }
 
-    // Control logic
+    //Control logic
 
     public void setRedstoneInput(int power) {
         if (redstoneInput != power) {
@@ -168,7 +168,7 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
         currentTick++;
         int tick_rate = PropulsionConfig.THRUSTER_TICKS_PER_UPDATE.get();
 
-        // Periodically recalculate obstruction
+        //Periodically recalculate obstruction
         if (currentTick % (tick_rate * 2) == 0) {
             int previousEmptyBlocks = emptyBlocks;
             calculateObstruction(level, worldPosition, currentBlockState.getValue(AbstractThrusterBlock.FACING));
@@ -179,7 +179,7 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
             }
         }
 
-        // Update thrust periodically or when marked dirty
+        //Update thrust periodically or when marked dirty
         if (isThrustDirty || currentTick % tick_rate == 0) {
             updateThrust(currentBlockState);
         }
@@ -285,7 +285,7 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
     
         ParticleOptions particleData = createParticleOptions();
 
-        // Spawn the calculated number of particles.
+        //Spawn the calculated number of particles.
         for (int i = 0; i < particlesToSpawn; i++) {
             level.addParticle(particleData, true,
                 particleX, particleY, particleZ,
@@ -302,7 +302,7 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
             BlockState state = level.getBlockState(checkPos);
             if (!(state.isAir() || !state.isSolid())) break;
         }
-        if (oldEmptyBlocks != this.emptyBlocks) { // Only set dirty if it actually changed
+        if (oldEmptyBlocks != this.emptyBlocks) { //Only set dirty if it actually changed
             isThrustDirty = true;
         }
     }

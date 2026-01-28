@@ -335,13 +335,13 @@ public class PhysicsAssemblerBlockEntity extends SmartBlockEntity {
         BlockPos posA = AssemblyGaugeItem.getPosA(gauge);
         BlockPos posB = AssemblyGaugeItem.getPosB(gauge);
 
-        // Check gauge positions
+        //Check gauge positions
         if (posA == null || posB == null) {
             Component reason = Component.literal("Gauge is not fully configured").withStyle(s -> s.withColor(AssemblyUtility.CANCEL_COLOR));
             return new GaugeValidationResult(false, Optional.of(reason));
         }
 
-        // Check if the assembler is inside the region
+        //Check if the assembler is inside the region
         BlockPos selfPos = this.worldPosition;
         int minX = Math.min(posA.getX(), posB.getX());
         int maxX = Math.max(posA.getX(), posB.getX());
@@ -357,7 +357,7 @@ public class PhysicsAssemblerBlockEntity extends SmartBlockEntity {
             return new GaugeValidationResult(false, Optional.of(reason));
         }
 
-        // Check distance between assembler and region
+        //Check distance between assembler and region
         int manhattanDistance = getManhattanDistanceToRegion(this.worldPosition, posA, posB);
         if (manhattanDistance > PropulsionConfig.PHYSICS_ASSEMBLER_MAX_MINK_DISTANCE.get()) {
              Component reason = Component.translatable("createpropulsion.assembler.selection.too_far").withStyle(s -> s.withColor(AssemblyUtility.CANCEL_COLOR));

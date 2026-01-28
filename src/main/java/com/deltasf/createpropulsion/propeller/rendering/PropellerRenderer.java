@@ -98,7 +98,7 @@ public class PropellerRenderer extends KineticBlockEntityRenderer<PropellerBlock
         float time = AnimationTickHolder.getRenderTime(level);
         float timeSeconds = time / 20.0f;
 
-        if (be.lastRenderTimeSeconds == 0) { // First frame
+        if (be.lastRenderTimeSeconds == 0) { //First frame
             be.lastRenderTimeSeconds = timeSeconds;
         }
         float deltaTimeSeconds = timeSeconds - be.lastRenderTimeSeconds;

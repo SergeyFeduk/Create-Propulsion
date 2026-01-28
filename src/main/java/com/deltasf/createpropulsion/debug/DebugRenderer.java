@@ -112,7 +112,7 @@ public class DebugRenderer {
             return;
         }
         Vec3 center = blockPos.getCenter();
-        Vec3 size = new Vec3(0.999, 0.999, 0.999); // 0.999 to avoid z-figting
+        Vec3 size = new Vec3(0.999, 0.999, 0.999); //0.999 to avoid z-figting
         drawBox(identifier, center, size, new Quaternionf(), color, false, ticksToRender);
     }
 
@@ -253,7 +253,7 @@ public class DebugRenderer {
         consumer.vertex(matrix, pos2.x(), pos2.y(), pos2.z()).color(r, g, b, a).endVertex();
     }
 
-    // Utility
+    //Utility
 
     private static Quaternionf getRotationFromZ(Vector3f direction) {
         Vector3f zAxis = new Vector3f(0, 0, 1);
@@ -264,7 +264,7 @@ public class DebugRenderer {
         float angle = (float) Math.acos(dot);
 
         if (axis.lengthSquared() < 1e-6) {
-            // If direction is same or opposite of Z, avoid instability
+            //If direction is same or opposite of Z, avoid instability
             if (dot > 0.9999f) {
                 return new Quaternionf();
             } else {

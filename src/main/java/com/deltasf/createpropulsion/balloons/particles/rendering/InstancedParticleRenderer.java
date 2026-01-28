@@ -34,7 +34,7 @@ public class InstancedParticleRenderer {
     private static int instanceVBOId;
     private static int textureId;
     
-    // Uniform Locations
+    //Uniform Locations
     private static int uProjectionMat;
     private static int uModelViewMat;
     private static int uCamRight;
@@ -43,7 +43,7 @@ public class InstancedParticleRenderer {
     private static int uRelativeAnchor;
 
     private static final int MAX_PARTICLES = 10000; 
-    private static final int INSTANCE_STRIDE = 20; // 12(pos) + 4(col) + 4(scale) = 20
+    private static final int INSTANCE_STRIDE = 20; //12(pos) + 4(col) + 4(scale) = 20
     private static ByteBuffer instanceBuffer;
     
     private static final FloatBuffer MATRIX_BUFFER = MemoryUtil.memAllocFloat(16);
@@ -164,7 +164,7 @@ public class InstancedParticleRenderer {
             HapData data = handler.data;
             int count = Math.min(data.count, MAX_PARTICLES);
 
-            // CPU -> ByteBuffer Loop
+            //CPU -> ByteBuffer
             for (int i = 0; i < count; i++) {
                 float px = data.px[i] + (data.x[i] - data.px[i]) * partialTick;
                 float py = data.py[i] + (data.y[i] - data.py[i]) * partialTick;
