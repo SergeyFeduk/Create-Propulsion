@@ -107,6 +107,9 @@ public class HotAirBurnerBlockEntity extends SmartBlockEntity implements IHaveGo
     }
 
     @Override
+    public float getVisualInjectionIntencity() { return (float)getInjectionAmount(); }
+
+    @Override
     public void onBalloonLoaded() { balloonInfoBehaviour.performUpdate(); }
 
     //Lever and burner logic

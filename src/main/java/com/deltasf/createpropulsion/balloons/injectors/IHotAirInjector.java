@@ -6,5 +6,6 @@ public interface IHotAirInjector {
     public UUID getId();
     public double getInjectionAmount();
     void attemptScan();
+    public float getVisualInjectionIntencity();
     default void onBalloonLoaded() {}
 }

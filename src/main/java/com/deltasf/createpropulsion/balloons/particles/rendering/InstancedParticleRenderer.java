@@ -42,7 +42,7 @@ public class InstancedParticleRenderer {
     private static int uShipRotation;
     private static int uRelativeAnchor;
 
-    private static final int MAX_PARTICLES = 10000; 
+    private static final int MAX_PARTICLES = 16384;
     private static final int INSTANCE_STRIDE = 20; //12(pos) + 4(col) + 4(scale) = 20
     private static ByteBuffer instanceBuffer;
     

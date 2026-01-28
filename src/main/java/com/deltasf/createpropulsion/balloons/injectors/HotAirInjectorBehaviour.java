@@ -6,8 +6,6 @@ import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import com.deltasf.createpropulsion.balloons.hot_air.BalloonAttachment;
-import com.deltasf.createpropulsion.balloons.injectors.hot_air_burner.HotAirBurnerBlockEntity;
-import com.deltasf.createpropulsion.balloons.injectors.hot_air_pump.HotAirPumpBlockEntity;
 import com.deltasf.createpropulsion.balloons.particles.BalloonParticleSystem;
 import com.deltasf.createpropulsion.balloons.particles.ShipParticleHandler;
 import com.deltasf.createpropulsion.balloons.particles.effectors.StreamEffector;
@@ -86,18 +84,12 @@ public class HotAirInjectorBehaviour extends BlockEntityBehaviour {
                 updateEffectorIntensity();
             }
         }
-
     }
 
     private void updateEffectorIntensity() {
         float intensity = 0.0f;
-        
-        if (blockEntity instanceof HotAirBurnerBlockEntity burner) {
-            float ratio = (float) (burner.getInjectionAmount() / 1); 
-            intensity = Mth.clamp(ratio, 0f, 1f);
-        } else if (blockEntity instanceof IHotAirInjector injector) {
-            float ratio = (float) (injector.getInjectionAmount() / HotAirPumpBlockEntity.BASE_INJECTION_AMOUNT);
-            intensity = Mth.clamp(ratio, 0f, 1f);
+        if (blockEntity instanceof IHotAirInjector injector) {
+            intensity = Mth.clamp(injector.getVisualInjectionIntencity(), 0f, 1f);
         }
         
         streamEffector.intensity = intensity;

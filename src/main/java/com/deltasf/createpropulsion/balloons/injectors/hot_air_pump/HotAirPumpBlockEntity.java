@@ -41,6 +41,8 @@ public class HotAirPumpBlockEntity extends KineticBlockEntity implements IHotAir
     public static final float OPERATING_THRESHOLD = 0.3f; 
     public static final float BASE_INJECTION_AMOUNT = 6.0f; //TODO: Config
 
+    public static final float MIN_VISUAL_INJECTION = 0.4f;
+
     //Behaviours
     private HotAirInjectorBehaviour injectorBehaviour;
     private AirInjectorObstructionBehaviour obstructionBehaviour;
@@ -159,6 +161,13 @@ public class HotAirPumpBlockEntity extends KineticBlockEntity implements IHotAir
         double injection = BASE_INJECTION_AMOUNT * rpmPercentage * effectiveHeat;
         double efficiency = obstructionBehaviour.getEfficiency();
         return injection * efficiency;
+    }
+
+    @Override
+    public float getVisualInjectionIntencity() { 
+        float ratio = (float) (getInjectionAmount() / HotAirPumpBlockEntity.BASE_INJECTION_AMOUNT);
+        if (ratio <= MathUtility.epsilon) return 0;
+        return Math.max(ratio, MIN_VISUAL_INJECTION); 
     }
 
     @Override
