@@ -1,0 +1,13 @@
+{
+    "height" : 100.0,
+    "gravity": 9.81,
+    "sea_level_pressure": 0.51,
+    "variance_noise": {
+        "drift_speed_x": 0.05,
+        "drift_speed_z": 0.05,
+        "evolution_speed": 0.1,
+        "octaves": [
+            { "scale": 150.0, "magnitude": 0.02 }
+        ]
+    }
+}

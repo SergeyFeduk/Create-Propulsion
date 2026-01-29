@@ -1,5 +1,7 @@
 package com.deltasf.createpropulsion.balloons.hot_air;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.joml.Quaterniond;
@@ -44,6 +46,7 @@ public class HotAirSolver {
         }
         
         SolverContext ctx = new SolverContext(level, balloon, group, registry, ship);
+        //System.out.println(predictSteadyHotAir(ctx, 0.01));
 
         calculateInjections(ctx);
         calculateGlobalLeak(ctx);
@@ -187,5 +190,101 @@ public class HotAirSolver {
         if (t <= 0.0) return 0.0;
         if (t >= 1.0) return 1.0;
         return t;
+    }
+
+    //TODO: May use this somewhere
+
+    //Predicts hot air amount that satisfies (injection - leak = 0)
+    //Uses bisection (cus ramp & exponents -> no closed-form solution)
+    public static double predictSteadyHotAir(SolverContext ctx, double HotAirTolerance) {
+        if (ctx == null) return 0.0;
+        final double volume = ctx.volume;
+        if (volume <= 0.0) return 0.0;
+
+        //Accumulate injection
+        double totalInjection = 0.0;
+        for (UUID id : ctx.balloon.getSupportHais()) {
+            IHotAirInjector injector = ctx.registry.getInjector(ctx.level, id);
+            if (injector == null) continue;
+            totalInjection += injector.getInjectionAmount();
+        }
+
+        final double surfaceLeakCoefficient = PropulsionConfig.BALLOON_SURFACE_LEAK_FACTOR.get() * ctx.catastrophicFailureModifier * ctx.surfaceArea;
+        final double holeLeakFactor = PropulsionConfig.BALLOON_HOLE_LEAK_FACTOR.get();
+        final double height = ctx.height;
+
+        final List<BlockPos> holeList = new ArrayList<>(ctx.balloon.getHoles());
+        final int holeCount = holeList.size();
+        final double[] deltaYs = new double[holeCount];
+        final double[] weights = new double[holeCount];
+
+        final double boundsMaxY = ctx.balloon.getAABB().maxY;
+        final double boundsMinY = ctx.balloon.getAABB().minY;
+
+        for (int i = 0; i < holeCount; i++) {
+            BlockPos hp = holeList.get(i);
+            deltaYs[i] = (hp.getY() + 1.0) - boundsMaxY;
+            double relativePos = 0.0;
+            if (height > 0.0) relativePos = (hp.getY() - boundsMinY) / height;
+            weights[i] = 1.0 + org.joml.Math.clamp(0.0, 1.0, relativePos);
+        }
+
+        final double downness = new Vector3d(0.0, 1.0, 0.0)
+            .rotate(ctx.ship.getTransform().getShipToWorldRotation().normalize(new Quaterniond()), new Vector3d())
+            .dot(0.0, -1.0, 0.0);
+        final double upsideDownLeakPercent = downRamp(downness, upsideDownThreshold);
+
+        //Check endpoints
+        double phiAtZero = evaluatePhi(totalInjection, surfaceLeakCoefficient, holeLeakFactor, height, deltaYs, weights, holeCount, upsideDownLeakPercent, 0.0, volume);
+        if (phiAtZero <= 0.0) return 0.0;
+        double phiAtOne = evaluatePhi(totalInjection, surfaceLeakCoefficient, holeLeakFactor, height, deltaYs, weights, holeCount, upsideDownLeakPercent, 1.0, volume);
+        if (phiAtOne >= 0.0) return volume;
+
+        //Determine bisection iterations from tolerance
+        double fullnessTolerance = (HotAirTolerance <= 0.0) ? 1e-12 : (HotAirTolerance / volume);
+        if (fullnessTolerance <= 0.0) fullnessTolerance = 1e-12;
+        int iterations = (int) Math.ceil(Math.log(1.0 / fullnessTolerance) / Math.log(2.0));
+        iterations = Math.max(4, Math.min(iterations, 60));
+
+        double low = 0.0;
+        double high = 1.0;
+        for (int iter = 0; iter < iterations; iter++) {
+            double mid = 0.5 * (low + high);
+            double phiMid = evaluatePhi(totalInjection, surfaceLeakCoefficient, holeLeakFactor, height, deltaYs, weights, holeCount, upsideDownLeakPercent, mid, volume);
+            if (phiMid > 0.0) low = mid; else high = mid;
+        }
+        double fullness = 0.5 * (low + high);
+        double predictedHotAir = fullness * volume;
+        if (predictedHotAir < 0.0) predictedHotAir = 0.0;
+        if (predictedHotAir > volume) predictedHotAir = volume;
+        return predictedHotAir;
+    }
+
+    private static double evaluatePhi(double totalInjection, double surfaceLeakCoefficient, double holeLeakFactor,
+                                      double height, double[] deltaYs, double[] weights, int holeCount,
+                                      double upsideDownLeakPercent, double fullness, double volume) {
+        double leakAdjustedFullness = Math.max(fullness, 0.1);
+        double globalLeak = surfaceLeakCoefficient * leakAdjustedFullness;
+
+        double activeHoleCount = 0.0;
+        for (int i = 0; i < holeCount; i++) {
+            double raw = deltaYs[i] + height * fullness;
+            double activity = org.joml.Math.clamp(0.0, 1.0, raw);
+            activeHoleCount += weights[i] * activity;
+        }
+        double holeLeak = holeLeakFactor * fullness * Math.pow(activeHoleCount, holeFactorExponent);
+
+        double upsideDownLeakFraction = 0.0;
+        if (upsideDownLeakPercent > 0.0) {
+            double allowedRemainingFraction = (1.0 - upsideDownLeakPercent);
+            if (fullness > allowedRemainingFraction) {
+                double baseRemovalFraction = upsideDownLeakPercent * fullness;
+                double candidate = baseRemovalFraction * upsideDownLeakFactor;
+                double maxRemovableFraction = fullness - allowedRemainingFraction;
+                upsideDownLeakFraction = Math.min(candidate, maxRemovableFraction);
+            }
+        }
+
+        return totalInjection - (globalLeak + holeLeak + upsideDownLeakFraction * volume);
     }
 }
