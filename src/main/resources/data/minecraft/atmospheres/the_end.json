@@ -2,6 +2,7 @@
     "height" : 400.0,
     "gravity": 9.81,
     "sea_level_pressure": 0.9,
+    "sea_level": 0,
     "variance_noise": {
         "drift_speed_x": 0.2,
         "drift_speed_z": 0.2,

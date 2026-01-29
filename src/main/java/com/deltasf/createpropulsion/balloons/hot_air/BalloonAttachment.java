@@ -40,11 +40,23 @@ import net.minecraft.world.level.Level;
 public final class BalloonAttachment implements ShipPhysicsListener {
     public BalloonAttachment() {}
     private AtmosphereData atmosphereData;
+    private transient boolean isAtmosphereLoaded = false;
     final static double epsilon = MathUtility.epsilon;
 
     @Override
     public void physTick(@NotNull PhysShip physicShip, @NotNull PhysLevel physLevel) {
-        if (this.atmosphereData == null) { return; }
+        if (!isAtmosphereLoaded) {
+            String dimension = physLevel.getDimension();
+            if (dimension != null) {
+                AtmosphereData data = DimensionAtmosphereManager.getData(dimension);
+                atmosphereData = data;
+                if (!data.isFallback()) {
+                    isAtmosphereLoaded = true;
+                }
+            }
+            
+        }
+        if (atmosphereData == null) { return; }
 
         List<Balloon> balloons = BalloonShipRegistry.forShip(physicShip.getId()).getBalloons(); 
         Matrix4dc shipToWorld = physicShip.getTransform().getShipToWorld();
@@ -188,7 +200,7 @@ public final class BalloonAttachment implements ShipPhysicsListener {
         return AttachmentUtils.get(level, pos, BalloonAttachment.class, () -> {
             BalloonAttachment attachment = new BalloonAttachment();
             
-            updateAtmosphereData(attachment, level);
+            updateAtmosphereData(attachment, level.dimension().location().toString());
 
             return attachment;
         });
@@ -198,7 +210,11 @@ public final class BalloonAttachment implements ShipPhysicsListener {
         get(level, pos);
     }
 
-    public static void updateAtmosphereData(BalloonAttachment attachment, Level level) {
-        attachment.atmosphereData = DimensionAtmosphereManager.getData(level);
+    public static void updateAtmosphereData(BalloonAttachment attachment, String dimensionId) {
+        AtmosphereData data = DimensionAtmosphereManager.getData(dimensionId);
+        attachment.atmosphereData = data;
+        if (!data.isFallback()) {
+            attachment.isAtmosphereLoaded = true;
+        }
     }
 }

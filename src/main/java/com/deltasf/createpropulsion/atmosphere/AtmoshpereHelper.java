@@ -4,24 +4,8 @@ import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.atmosphere.data.VarianceNoiseProperties;
 import com.deltasf.createpropulsion.utility.math.PerlinNoise;
 
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.chunk.ChunkGenerator;
-import net.minecraft.world.level.levelgen.FlatLevelSource;
-
 public class AtmoshpereHelper {
     private static final double NOISE_SEED = 196418;
-
-    public static int determineSeaLevel(Level level) {
-        if (level instanceof ServerLevel serverLevel) {
-            ChunkGenerator generator = serverLevel.getChunkSource().getGenerator();
-            if (generator instanceof FlatLevelSource) {
-                return -60;
-            }
-        }
-
-        return level.getSeaLevel();
-    }
 
     public static double calculateExternalAirDensity(AtmosphereData atmosphere, double worldY, boolean clampAtSea) {
         if (atmosphere.isAirless() || atmosphere.pressureAtSea() <= 0) return 0.0;

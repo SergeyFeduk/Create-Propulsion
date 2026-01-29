@@ -28,7 +28,7 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.ModList;
 
 public class DimensionAtmosphereManager extends SimpleJsonResourceReloadListener {
-    public record AtmosphereProperties(double pressureAtSeaLevel, double scaleHeight, double gravity, boolean isAirless, VarianceNoiseProperties varianceNoise) {}
+    public record AtmosphereProperties(double pressureAtSeaLevel, double scaleHeight, double gravity, int seaLevel, boolean isAirless, VarianceNoiseProperties varianceNoise) {}
     private static final double epsilon = 1e-5;
 
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -38,10 +38,15 @@ public class DimensionAtmosphereManager extends SimpleJsonResourceReloadListener
     private static Map<ResourceKey<Level>, AtmosphereProperties> atmosphereMap = new HashMap<>();
 
     public static final VarianceNoiseProperties DEFAULT_NOISE = new VarianceNoiseProperties(0.1, -0.05, 0.2, List.of(new NoiseOctave(250, 0.03), new NoiseOctave(80, 0.015)));
-    public static final AtmosphereProperties DEFAULT = new AtmosphereProperties(1.225, 200.0, 9.81, false, DEFAULT_NOISE);
+    public static final int DEFAULT_SEA_LEVEL = 63;
+    public static final AtmosphereProperties DEFAULT = new AtmosphereProperties(1.225, 200.0, 9.81, DEFAULT_SEA_LEVEL, false, DEFAULT_NOISE);
 
     public DimensionAtmosphereManager() {
         super(GSON, DIRECTORY);
+    }
+
+    public static AtmosphereProperties getProperties(ResourceKey<Level> dimKey) {
+        return atmosphereMap.getOrDefault(dimKey, DEFAULT);
     }
 
     public static AtmosphereProperties getProperties(Level level) {
@@ -49,21 +54,40 @@ public class DimensionAtmosphereManager extends SimpleJsonResourceReloadListener
     }
 
     public static AtmosphereData getData(Level level) {
-        AtmosphereProperties properties = getProperties(level);
+        return getData(level.dimension().location().toString());
+    }
 
-        if (properties.isAirless()) {
-            return new AtmosphereData(0.0, 0.0, properties.gravity(), AtmoshpereHelper.determineSeaLevel(level), true, properties.varianceNoise());
+    public static AtmosphereData getData(String dimensionId) {
+        final String PREFIX = "minecraft:dimension:";
+        if (dimensionId.startsWith(PREFIX)) {
+            dimensionId = dimensionId.substring(PREFIX.length());
         }
 
-        double scaleHeight = properties.scaleHeight() > epsilon ? properties.scaleHeight() : DimensionAtmosphereManager.DEFAULT.scaleHeight();
+        ResourceLocation location = ResourceLocation.parse(dimensionId);
+        ResourceKey<Level> key = ResourceKey.create(Registries.DIMENSION, location);
+        
+        AtmosphereProperties properties = atmosphereMap.get(key);
+        boolean isFallback = false;
+
+        if (properties == null) {
+            properties = DEFAULT;
+            isFallback = true;
+        }
+
+        if (properties.isAirless()) {
+            return new AtmosphereData(0.0, 0.0, properties.gravity(), properties.seaLevel(), true, properties.varianceNoise(), isFallback);
+        }
+
+        double scaleHeight = properties.scaleHeight() > epsilon ? properties.scaleHeight() : DEFAULT.scaleHeight();
 
         return new AtmosphereData(
             properties.pressureAtSeaLevel(), 
             scaleHeight, 
             properties.gravity(),
-            AtmoshpereHelper.determineSeaLevel(level),
+            properties.seaLevel(),
             false,
-            properties.varianceNoise()
+            properties.varianceNoise(),
+            isFallback
         );
     }
 
@@ -90,8 +114,9 @@ public class DimensionAtmosphereManager extends SimpleJsonResourceReloadListener
                 if (airless) {
                     newMap.put(dimensionKey, new AtmosphereProperties(
                         0.0, 
-                        DEFAULT.scaleHeight(), //Not used, but good to have a value
+                        DEFAULT.scaleHeight(),
                         definition.gravity().orElse(DEFAULT.gravity()),
+                        definition.seaLevel().orElse(DEFAULT_SEA_LEVEL),
                         true,
                         noise
                     ));
@@ -100,6 +125,7 @@ public class DimensionAtmosphereManager extends SimpleJsonResourceReloadListener
                         definition.pressureAtSeaLevel().orElse(DEFAULT.pressureAtSeaLevel()),
                         definition.scaleHeight().get(),
                         definition.gravity().orElse(DEFAULT.gravity()),
+                        definition.seaLevel().orElse(DEFAULT_SEA_LEVEL),
                         false,
                         noise
                     );

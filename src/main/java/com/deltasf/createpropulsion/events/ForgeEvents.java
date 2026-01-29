@@ -10,6 +10,7 @@ import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
+import com.deltasf.createpropulsion.atmosphere.DimensionAtmosphereManager;
 import com.deltasf.createpropulsion.balloons.hot_air.BalloonAttachment;
 import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
 import com.deltasf.createpropulsion.balloons.serialization.BalloonSerializer;
@@ -49,6 +50,7 @@ public class ForgeEvents {
     @SubscribeEvent
     public static void onAddReloadListeners(AddReloadListenerEvent event) {
         event.addListener(new ThrusterFuelManager());
+        event.addListener(new DimensionAtmosphereManager());
         event.addListener(new AssemblyBlacklistManager());
     }
 
@@ -101,7 +103,7 @@ public class ForgeEvents {
                     //Restore BalloonAttachment atmosphere data
                     var balloonAttachment = serverShip.getAttachment(BalloonAttachment.class);
                     if (balloonAttachment != null) {
-                        BalloonAttachment.updateAtmosphereData(balloonAttachment, level);
+                        BalloonAttachment.updateAtmosphereData(balloonAttachment, level.dimension().location().toString());
                     }
                 }
             }
