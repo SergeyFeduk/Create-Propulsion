@@ -39,9 +39,6 @@ public class BalloonParticleSystem {
     private static final Vector3d tmpMin = new Vector3d();
     private static final Vector3d tmpMax = new Vector3d();
 
-    private static final Vector3d TMP_MIN_AABB = new Vector3d();
-    private static final Vector3d TMP_MAX_AABB = new Vector3d();
-
     public static ShipParticleHandler getHandler(long shipId) {
         return handlers.get(shipId);
     }
@@ -56,28 +53,7 @@ public class BalloonParticleSystem {
         Player player = mc.player;
         if (player == null) return false;
 
-        AABB playerSimAABB = player.getBoundingBox().inflate(getSpawnRadiusSqared());
-        AABB blockAABB = new AABB(pos);
-
-        ClientShip ship = (ClientShip) VSGameUtilsKt.getShipManagingPos(level, pos);
-
-        if (ship == null) {
-            return playerSimAABB.intersects(blockAABB);
-        } else {
-            Matrix4dc shipToWorld = ship.getRenderTransform().getShipToWorld();
-            shipToWorld.transformAab(
-                blockAABB.minX, blockAABB.minY, blockAABB.minZ,
-                blockAABB.maxX, blockAABB.maxY, blockAABB.maxZ,
-                TMP_MIN_AABB, TMP_MAX_AABB
-            );
-
-            AABB worldBlockAABB = new AABB(
-                TMP_MIN_AABB.x, TMP_MIN_AABB.y, TMP_MIN_AABB.z,
-                TMP_MAX_AABB.x, TMP_MAX_AABB.y, TMP_MAX_AABB.z
-            );
-
-            return playerSimAABB.intersects(worldBlockAABB);
-        }
+        return player.distanceToSqr(pos.getCenter()) < getSpawnRadiusSqared();
     }
     
     public static ShipParticleHandler getOrCreateHandler(long shipId) {

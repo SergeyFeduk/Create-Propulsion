@@ -160,7 +160,7 @@ public class HotAirBurnerBlockEntity extends SmartBlockEntity implements IHaveGo
         double amount = getInjectionAmount();
         if (amount <= 0) return;
 
-        if (BalloonParticleSystem.isBlockInSpawnRange(level, getBlockPos())) {
+        if (!BalloonParticleSystem.isBlockInSpawnRange(level, getBlockPos())) {
             return;
         }
         

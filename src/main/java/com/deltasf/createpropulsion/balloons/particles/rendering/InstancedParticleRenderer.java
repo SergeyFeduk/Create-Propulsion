@@ -29,6 +29,9 @@ public class InstancedParticleRenderer {
     private static final int G = 225;
     private static final int B = 225;
 
+    private static final double MAX_RENDER_DISTANCE = 256;
+    private static final double MAX_RENDER_DISTANCE_SQ = MAX_RENDER_DISTANCE * MAX_RENDER_DISTANCE;
+
     private static boolean initialized = false;
     private static int programId;
     private static int VAOId;
@@ -176,6 +179,16 @@ public class InstancedParticleRenderer {
             ClientShip ship = (ClientShip) VSGameUtilsKt.getShipObjectWorld(mc.level).getLoadedShips().getById(shipId);
             if (ship == null) continue;
 
+
+            Matrix4dc shipToWorld = ship.getRenderTransform().getShipToWorld();
+            //Calculate anchor position in world space
+            TEMP_VEC4.set(handler.getAnchorX(), handler.getAnchorY(), handler.getAnchorZ(), 1.0);
+            shipToWorld.transform(TEMP_VEC4);
+
+            double distSq = camPos.distanceSquared(TEMP_VEC4.x, TEMP_VEC4.y, TEMP_VEC4.z);
+            if (distSq > MAX_RENDER_DISTANCE_SQ) continue; 
+
+            //pT based on simulation (if not ticking/paused -> pT = 1)
             float t = (isPaused || handler.lastSimulatedTick == gameTime) ? partialTick : 1.0f;
             GL33.glUniform1f(uPartialTick, t);
 
@@ -195,17 +208,11 @@ public class InstancedParticleRenderer {
             GL33.glBufferSubData(GL33.GL_ARRAY_BUFFER, ARRAY_SIZE_BYTES * 7, data.scale);
 
             //Ship uniforms
-            Matrix4dc shipToWorld = ship.getRenderTransform().getShipToWorld();
-            
             TEMP_MATRIX.set(shipToWorld);
             //Translation components set to zero cus we only need rotation and scale from this matrix
             TEMP_MATRIX.m30(0); TEMP_MATRIX.m31(0); TEMP_MATRIX.m32(0);
             TEMP_MATRIX.get(MATRIX_BUFFER);
             GL33.glUniformMatrix4fv(uShipRotation, false, MATRIX_BUFFER);
-
-            //Calculate anchor position in world space
-            TEMP_VEC4.set(handler.getAnchorX(), handler.getAnchorY(), handler.getAnchorZ(), 1.0);
-            shipToWorld.transform(TEMP_VEC4);
 
             //Anchor relative to camera
             float rx = (float)(TEMP_VEC4.x - camPos.x);
