@@ -245,7 +245,7 @@ public class PropulsionConfig {
             HOT_AIR_BURNER_PARTICLE_SPAWN_MULTIPLIER = CLIENT_BUILDER.comment("Multiplier for the rate at which the Hot Air Burner spawns heat stream particles.")
                 .define("Burner particle spawn multiplier", 0.1);
             HOT_AIR_PUMP_PARTICLE_SPAWN_MULTIPLIER = CLIENT_BUILDER.comment("Multiplier for the rate at which the Hot Air Pump spawns heat stream particles.")
-                .define("Pump particle spawn multiplier", 0.15);
+                .define("Pump particle spawn multiplier", 0.12);
 
         CLIENT_BUILDER.pop();
 

@@ -18,8 +18,6 @@ import net.minecraft.resources.ResourceLocation;
 public class DeltaPonderPlugin implements PonderPlugin {
     //TODO: Stirling engine ponder
 
-    //TODO: Transmission ponder
-
     public static void register(PonderSceneRegistrationHelper<ResourceLocation> helper) {
         final PonderSceneRegistrationHelper<ItemProviderEntry<?>> HELPER = helper.withKeyFunction(RegistryEntry::getId);
         //Tilt adapter
@@ -38,6 +36,8 @@ public class DeltaPonderPlugin implements PonderPlugin {
             envelopePonderables.add(PropulsionBlocks.getEnvelope(color));
         }
         HELPER.forComponents(envelopePonderables).addStoryBoard("balloon", EnvelopeScenes::makingBalloon);
+        //Injectors
+        HELPER.forComponents(PropulsionBlocks.HOT_AIR_PUMP_BLOCK).addStoryBoard("hot_air_pump", InjectorScenes::hotAirPump);
     }
 
     @Override

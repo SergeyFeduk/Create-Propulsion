@@ -203,6 +203,7 @@ public class EnvelopeScenes {
         scene.markAsFinished();
     }
 
+    //TODO: Move in ponder utility
     private static List<List<BlockPos>> generateInternalSlices() {
         List<List<BlockPos>> slices = new ArrayList<>();
         int centerX = 4;

@@ -40,7 +40,7 @@ public class HotAirPumpBlockEntity extends KineticBlockEntity implements IHotAir
     public static final float MAX_HEAT_CONSUMPTION = 2.0f;
 
     public static final float OPERATING_THRESHOLD = 0.3f;
-    public static final float MIN_VISUAL_INJECTION = 0.5f;
+    public static final float MIN_VISUAL_INJECTION = 0.75f;
 
     //Behaviours
     private HotAirInjectorBehaviour injectorBehaviour;

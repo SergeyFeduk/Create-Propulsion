@@ -261,5 +261,12 @@
     "createpropulsion.ponder.making_balloon.text_3": "Hot Air Burners must not be further than 5 blocks from the open bottom of the balloon.",
     "createpropulsion.ponder.making_balloon.text_4": "Hot air output can be controlled by clicking on the lever.",
     "createpropulsion.ponder.making_balloon.text_5": "Hot Air Burner has 3 power levels.",
-    "createpropulsion.ponder.making_balloon.text_6": "The higher is power level - the higher is hot air output."
+    "createpropulsion.ponder.making_balloon.text_6": "The higher is power level - the higher is hot air output.",
+
+    "createpropulsion.ponder.hot_air_pump.header": "Using Hot Air Pump",
+    "createpropulsion.ponder.hot_air_pump.text_1": "Hot air pumps can be used to create balloons and fill them with hot air.",
+    "createpropulsion.ponder.hot_air_pump.text_2": "Hot air pump must be placed on active heat source...",
+    "createpropulsion.ponder.hot_air_pump.text_3": "... and rotation must be provided for it to function.",
+    "createpropulsion.ponder.hot_air_pump.text_4": "Amount of hot air produced depends on RPM.",
+    "createpropulsion.ponder.hot_air_pump.text_5": "At 256 RPM Hot Air Pump outputs the most amount of hot air."
 }
