@@ -9,6 +9,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.level.Level;
+
 import org.joml.Matrix4dc;
 import org.joml.Matrix4f;
 import org.joml.Vector3d;
@@ -42,11 +44,17 @@ public class InstancedParticleRenderer {
     private static int uShipRotation;
     private static int uRelativeAnchor;
 
+    private static int uPartialTick;
+    private static int uColor;
+
+    private static final int FLOAT_SIZE = 4;
     private static final int MAX_PARTICLES = 16384;
-    private static final int INSTANCE_STRIDE = 20; //12(pos) + 4(col) + 4(scale) = 20
-    private static ByteBuffer instanceBuffer;
+    private static final int ARRAY_SIZE_BYTES = MAX_PARTICLES * FLOAT_SIZE; 
+    private static final int TOTAL_BUFFER_SIZE = ARRAY_SIZE_BYTES * 8; 
     
     private static final FloatBuffer MATRIX_BUFFER = MemoryUtil.memAllocFloat(16);
+    private static final Matrix4f TEMP_MATRIX = new Matrix4f();
+    private static final Vector4d TEMP_VEC4 = new Vector4d();
 
     public static void init() {
         if (initialized) return;
@@ -59,10 +67,13 @@ public class InstancedParticleRenderer {
         uCamUp = GL33.glGetUniformLocation(programId, "uCamUp");
         uShipRotation = GL33.glGetUniformLocation(programId, "uShipRotation");
         uRelativeAnchor = GL33.glGetUniformLocation(programId, "uRelativeAnchor");
+        uPartialTick = GL33.glGetUniformLocation(programId, "uPartialTick");
+        uColor = GL33.glGetUniformLocation(programId, "uColor");
 
         //Buffers
         VAOId = GL33.glGenVertexArrays();
         GL33.glBindVertexArray(VAOId);
+        
         float[] quadData = {
             -0.5f, -0.5f, 0.0f, 0.0f,
              0.5f, -0.5f, 1.0f, 0.0f,
@@ -74,41 +85,39 @@ public class InstancedParticleRenderer {
         GL33.glBindBuffer(GL33.GL_ARRAY_BUFFER, quadVBOId);
         GL33.glBufferData(GL33.GL_ARRAY_BUFFER, quadData, GL33.GL_STATIC_DRAW);
 
-        //Quad position (vec2)
+        //Quad position
         GL33.glEnableVertexAttribArray(0);
-        GL33.glVertexAttribPointer(0, 2, GL33.GL_FLOAT, false, 4 * 4, 0);
+        GL33.glVertexAttribPointer(0, 2, GL33.GL_FLOAT, false, 16, 0);
         
-        //UV (vec2)
+        //Quad UV
         GL33.glEnableVertexAttribArray(1);
-        GL33.glVertexAttribPointer(1, 2, GL33.GL_FLOAT, false, 4 * 4, 2 * 4);
+        GL33.glVertexAttribPointer(1, 2, GL33.GL_FLOAT, false, 16, 8);
 
-        //Instace VBO
         instanceVBOId = GL33.glGenBuffers();
         GL33.glBindBuffer(GL33.GL_ARRAY_BUFFER, instanceVBOId);
-        GL33.glBufferData(GL33.GL_ARRAY_BUFFER, MAX_PARTICLES * INSTANCE_STRIDE, GL33.GL_STREAM_DRAW);
+        GL33.glBufferData(GL33.GL_ARRAY_BUFFER, TOTAL_BUFFER_SIZE, GL33.GL_STREAM_DRAW);
 
-        //Position (vec3)
-        GL33.glEnableVertexAttribArray(2);
-        GL33.glVertexAttribPointer(2, 3, GL33.GL_FLOAT, false, INSTANCE_STRIDE, 0);
-        GL33.glVertexAttribDivisor(2, 1);
-
-        //Color (vec4 as bytes)
-        GL33.glEnableVertexAttribArray(3);
-        GL33.glVertexAttribPointer(3, 4, GL33.GL_UNSIGNED_BYTE, true, INSTANCE_STRIDE, 12);
-        GL33.glVertexAttribDivisor(3, 1);
-
-        //Scale (float)
-        GL33.glEnableVertexAttribArray(4);
-        GL33.glVertexAttribPointer(4, 1, GL33.GL_FLOAT, false, INSTANCE_STRIDE, 16);
-        GL33.glVertexAttribDivisor(4, 1);
-
+        setupAttrib(2, 0);
+        setupAttrib(3, ARRAY_SIZE_BYTES);
+        setupAttrib(4, ARRAY_SIZE_BYTES * 2);
+        setupAttrib(5, ARRAY_SIZE_BYTES * 3);
+        setupAttrib(6, ARRAY_SIZE_BYTES * 4);
+        setupAttrib(7, ARRAY_SIZE_BYTES * 5);
+        setupAttrib(8, ARRAY_SIZE_BYTES * 6);
+        setupAttrib(9, ARRAY_SIZE_BYTES * 7);
+        
         generateWhitePixelTexture();
 
         GL33.glBindVertexArray(0);
         GL33.glBindBuffer(GL33.GL_ARRAY_BUFFER, 0);
         
-        instanceBuffer = MemoryUtil.memAlloc(MAX_PARTICLES * INSTANCE_STRIDE);
         initialized = true;
+    }
+
+    private static void setupAttrib(int index, long offset) {
+        GL33.glEnableVertexAttribArray(index);
+        GL33.glVertexAttribPointer(index, 1, GL33.GL_FLOAT, false, 0, offset);
+        GL33.glVertexAttribDivisor(index, 1);
     }
 
     public static void render(PoseStack ms, Matrix4f projectionMatrix, Camera camera, float partialTick) {
@@ -116,6 +125,10 @@ public class InstancedParticleRenderer {
         if (BalloonParticleSystem.getAllHandlers().isEmpty()) return;
 
         Minecraft mc = Minecraft.getInstance();
+        Level level = mc.level;
+        if (level == null) return;
+        long gameTime = level.getGameTime();
+        boolean isPaused = mc.isPaused();
         
         //Prepare state
         RenderSystem.depthMask(false);
@@ -150,7 +163,8 @@ public class InstancedParticleRenderer {
 
         Vector3d camPos = new Vector3d(camera.getPosition().x, camera.getPosition().y, camera.getPosition().z);
 
-        byte alpha = PropulsionConfig.BALLOON_PARTICLES_ALPHA.get().byteValue();
+        float alpha = PropulsionConfig.BALLOON_PARTICLES_ALPHA.get().floatValue() / 255.0f;
+        GL33.glUniform4f(uColor, R/255.0f, G/255.0f, B/255.0f, alpha);
 
         //Rendering
         Long2ObjectMap<ShipParticleHandler> handlers = BalloonParticleSystem.getAllHandlers();
@@ -162,58 +176,41 @@ public class InstancedParticleRenderer {
             ClientShip ship = (ClientShip) VSGameUtilsKt.getShipObjectWorld(mc.level).getLoadedShips().getById(shipId);
             if (ship == null) continue;
 
-            instanceBuffer.clear();
+            float t = (isPaused || handler.lastSimulatedTick == gameTime) ? partialTick : 1.0f;
+            GL33.glUniform1f(uPartialTick, t);
+
             HapData data = handler.data;
             int count = Math.min(data.count, MAX_PARTICLES);
 
-            //CPU -> ByteBuffer
-            for (int i = 0; i < count; i++) {
-                float px = data.px[i] + (data.x[i] - data.px[i]) * partialTick;
-                float py = data.py[i] + (data.y[i] - data.py[i]) * partialTick;
-                float pz = data.pz[i] + (data.z[i] - data.pz[i]) * partialTick;
-                
-                //Local position
-                instanceBuffer.putFloat(px);
-                instanceBuffer.putFloat(py);
-                instanceBuffer.putFloat(pz);
-
-                //Color
-                instanceBuffer.put((byte) R);
-                instanceBuffer.put((byte) G);
-                instanceBuffer.put((byte) B);
-                instanceBuffer.put(   alpha);
-
-                //Scale
-                float scale = data.scale[i];
-                if (data.life[i] < 0.2f) {
-                    scale *= (data.life[i] / 0.2f);
-                }
-                instanceBuffer.putFloat(scale);
-            }
-            
-            instanceBuffer.flip();
-
-            //Upload
+            //Upload stuff
             GL33.glBindBuffer(GL33.GL_ARRAY_BUFFER, instanceVBOId);
-            GL33.glBufferSubData(GL33.GL_ARRAY_BUFFER, 0, instanceBuffer);
+            
+            GL33.glBufferSubData(GL33.GL_ARRAY_BUFFER, 0, data.px);
+            GL33.glBufferSubData(GL33.GL_ARRAY_BUFFER, ARRAY_SIZE_BYTES, data.py);
+            GL33.glBufferSubData(GL33.GL_ARRAY_BUFFER, ARRAY_SIZE_BYTES * 2, data.pz);
+            GL33.glBufferSubData(GL33.GL_ARRAY_BUFFER, ARRAY_SIZE_BYTES * 3, data.x);
+            GL33.glBufferSubData(GL33.GL_ARRAY_BUFFER, ARRAY_SIZE_BYTES * 4, data.y);
+            GL33.glBufferSubData(GL33.GL_ARRAY_BUFFER, ARRAY_SIZE_BYTES * 5, data.z);
+            GL33.glBufferSubData(GL33.GL_ARRAY_BUFFER, ARRAY_SIZE_BYTES * 6, data.life);
+            GL33.glBufferSubData(GL33.GL_ARRAY_BUFFER, ARRAY_SIZE_BYTES * 7, data.scale);
 
             //Ship uniforms
             Matrix4dc shipToWorld = ship.getRenderTransform().getShipToWorld();
-            Matrix4f shipToWorldF = new Matrix4f(shipToWorld);
             
+            TEMP_MATRIX.set(shipToWorld);
             //Translation components set to zero cus we only need rotation and scale from this matrix
-            shipToWorldF.m30(0); shipToWorldF.m31(0); shipToWorldF.m32(0);
-            shipToWorldF.get(MATRIX_BUFFER);
+            TEMP_MATRIX.m30(0); TEMP_MATRIX.m31(0); TEMP_MATRIX.m32(0);
+            TEMP_MATRIX.get(MATRIX_BUFFER);
             GL33.glUniformMatrix4fv(uShipRotation, false, MATRIX_BUFFER);
 
             //Calculate anchor position in world space
-            Vector4d anchorWorld = new Vector4d(handler.getAnchorX(), handler.getAnchorY(), handler.getAnchorZ(), 1.0);
-            shipToWorld.transform(anchorWorld);
+            TEMP_VEC4.set(handler.getAnchorX(), handler.getAnchorY(), handler.getAnchorZ(), 1.0);
+            shipToWorld.transform(TEMP_VEC4);
 
             //Anchor relative to camera
-            float rx = (float)(anchorWorld.x - camPos.x);
-            float ry = (float)(anchorWorld.y - camPos.y);
-            float rz = (float)(anchorWorld.z - camPos.z);
+            float rx = (float)(TEMP_VEC4.x - camPos.x);
+            float ry = (float)(TEMP_VEC4.y - camPos.y);
+            float rz = (float)(TEMP_VEC4.z - camPos.z);
             
             GL33.glUniform3f(uRelativeAnchor, rx, ry, rz);
 
@@ -239,7 +236,6 @@ public class InstancedParticleRenderer {
         GL33.glDeleteBuffers(instanceVBOId);
         GL33.glDeleteTextures(textureId);
         GL33.glDeleteProgram(programId);
-        MemoryUtil.memFree(instanceBuffer);
         MemoryUtil.memFree(MATRIX_BUFFER);
         initialized = false;
     }

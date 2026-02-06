@@ -40,6 +40,7 @@ public class ShipParticleHandler {
     private boolean initialized = false;
     
     private final Vector3f tmpForce = new Vector3f();
+    public long lastSimulatedTick = -1;
     private int tickCounter = 0;
 
     public ShipParticleHandler() {
@@ -82,6 +83,7 @@ public class ShipParticleHandler {
     }
 
     public void tick(ClientLevel level, ClientShip ship, Int2ObjectMap<ClientBalloon> allBalloons, Map<ClientBalloon, AABB> intersections) {
+        lastSimulatedTick = level.getGameTime();
         tickCounter++;
 
         //Anchor is initialized based on the first available intersection

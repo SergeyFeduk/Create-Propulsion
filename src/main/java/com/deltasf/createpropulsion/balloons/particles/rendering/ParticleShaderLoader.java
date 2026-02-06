@@ -39,7 +39,7 @@ public class ParticleShaderLoader {
     }
 
     private static String loadResource(String filename) {
-        ResourceLocation location = new ResourceLocation("createpropulsion", "shaders/" + filename);
+        ResourceLocation location = ResourceLocation.fromNamespaceAndPath("createpropulsion", "shaders/" + filename);
         try {
             Resource resource = Minecraft.getInstance().getResourceManager().getResourceOrThrow(location);
             try (InputStream in = resource.open()) {
