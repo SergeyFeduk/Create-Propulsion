@@ -18,14 +18,12 @@ import net.createmod.catnip.animation.AnimationTickHolder;
 import net.createmod.catnip.render.CachedBuffers;
 import net.createmod.catnip.render.SpriteShiftEntry;
 import net.createmod.catnip.render.SuperByteBuffer;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -112,8 +110,7 @@ public class HotAirPumpRenderer extends KineticBlockEntityRenderer<HotAirPumpBlo
         float translateY = (2.0f / 16.0f) * (1.0f - t);
         float meshTranslateY = -(9.0f / 16.0f) * (1.0f - tRaw);
 
-        Player player = Minecraft.getInstance().player;
-        if (player != null && player.distanceToSqr(be.getBlockPos().getX(), be.getBlockPos().getY(), be.getBlockPos().getZ()) < BalloonParticleSystem.getSpawnRadiusSqared()) {
+        if (BalloonParticleSystem.isBlockInSpawnRange(level, be.getBlockPos())) {
             float deltaT = t - be.clientLastVisualT;
             be.clientLastVisualT = t;
             

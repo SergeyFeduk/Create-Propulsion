@@ -29,12 +29,10 @@ import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -162,8 +160,7 @@ public class HotAirBurnerBlockEntity extends SmartBlockEntity implements IHaveGo
         double amount = getInjectionAmount();
         if (amount <= 0) return;
 
-        Player player = Minecraft.getInstance().player;
-        if (player == null || player.distanceToSqr(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ()) > BalloonParticleSystem.getSpawnRadiusSqared()) {
+        if (BalloonParticleSystem.isBlockInSpawnRange(level, getBlockPos())) {
             return;
         }
         
