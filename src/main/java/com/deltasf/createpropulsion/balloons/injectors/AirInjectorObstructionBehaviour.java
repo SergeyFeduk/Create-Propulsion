@@ -25,6 +25,7 @@ import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.Level;
 
+//TODO: Normal obstruction logic is now broken and needs to be fixed
 public class AirInjectorObstructionBehaviour extends BlockEntityBehaviour {
     public static final BehaviourType<AirInjectorObstructionBehaviour> TYPE = new BehaviourType<>();
 

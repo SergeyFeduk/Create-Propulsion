@@ -31,7 +31,7 @@ public class HotAirPumpBlock extends KineticBlock implements IBE<HotAirPumpBlock
 
     @Override
     public boolean hasShaftTowards(LevelReader world, BlockPos pos, BlockState state, Direction face) {
-        return face.getAxis() == Axis.Y;
+        return false;
     }
 
     @Override
