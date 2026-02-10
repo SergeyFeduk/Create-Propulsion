@@ -1,6 +1,7 @@
 package com.deltasf.createpropulsion.events;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
+import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.heat.HeatMapper;
 import com.deltasf.createpropulsion.heat.IHeatConsumer;
 import com.deltasf.createpropulsion.registries.PropulsionCapabilities;
@@ -83,6 +84,7 @@ public class CapabilityEventHandler {
         @Override
         public boolean isActive() {
             if (basin.getLevel() == null) return false; 
+            if (!PropulsionConfig.BURNERS_POWER_HEATED_MIXERS.get().booleanValue()) return false;
             BlockEntity beAbove = basin.getLevel().getBlockEntity(basin.getBlockPos().above(2));
             //We keep burner always heated as keeping heat level for heated mixers is much more important than saving fuel
             //Also the correct solution is too hard to implement and it will eat a ton of performance

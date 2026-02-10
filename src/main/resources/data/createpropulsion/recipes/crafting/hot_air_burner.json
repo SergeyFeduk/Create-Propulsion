@@ -10,7 +10,7 @@
             "item": "minecraft:blast_furnace"
         },
         "C": {
-            "item": "create:copper_nugget"
+            "tag": "forge:nuggets/copper"
         },
         "I": {
             "item": "minecraft:iron_bars"

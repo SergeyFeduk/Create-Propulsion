@@ -16,21 +16,27 @@ public class PropulsionConfig {
     public static final ForgeConfigSpec.ConfigValue<Boolean> THRUSTER_DAMAGE_ENTITIES;
     public static final ForgeConfigSpec.ConfigValue<Double>  THRUSTER_PARTICLE_OFFSET_INCOMING_VEL_MODIFIER;
     public static final ForgeConfigSpec.ConfigValue<Double>  THRUSTER_PARTICLE_COUNT_MULTIPLIER;
+    
     //Creative Thruster
     public static final ForgeConfigSpec.ConfigValue<Double> CREATIVE_THRUSTER_THRUST_MULTIPLIER;
+    
     //Optical sensors
     public static final ForgeConfigSpec.ConfigValue<Integer> OPTICAL_SENSOR_TICKS_PER_UPDATE;
     public static final ForgeConfigSpec.ConfigValue<Integer> INLINE_OPTICAL_SENSOR_MAX_DISTANCE;
     public static final ForgeConfigSpec.ConfigValue<Integer> OPTICAL_SENSOR_MAX_DISTANCE;
+    
     //Magnet
     public static final ForgeConfigSpec.ConfigValue<Double> REDSTONE_MAGNET_POWER_MULTIPLIER;
     public static final ForgeConfigSpec.ConfigValue<Double> REDSTONE_MAGNET_FORCE_INDUCED_TORQUE_MULTIPLIER;
+    
     //Physics assembler
     public static final ForgeConfigSpec.ConfigValue<Integer> PHYSICS_ASSEMBLER_MAX_MINK_DISTANCE;
     public static final ForgeConfigSpec.ConfigValue<Integer> ASSEMBLY_GAUGE_MAX_SIZE;
+    
     //Wings
     public static final ForgeConfigSpec.ConfigValue<Double> BASE_WING_LIFT;
     public static final ForgeConfigSpec.ConfigValue<Double> BASE_WING_DRAG;
+    
     //Balloons
     public static final ForgeConfigSpec.ConfigValue<Double> BALLOON_FORCE_COEFFICIENT;
     public static final ForgeConfigSpec.ConfigValue<Double> BALLOON_ANGULAR_DAMPING;
@@ -47,7 +53,6 @@ public class PropulsionConfig {
     public static final ForgeConfigSpec.ConfigValue<Double>  BALLOON_PARTICLES_HOLE_STRENGTH;
     public static final ForgeConfigSpec.ConfigValue<Double>  BALLOON_PARTICLES_INERTIA_SCALE;
     public static final ForgeConfigSpec.ConfigValue<Integer> BALLOON_PARTICLES_ALPHA;
-    
 
     //Hot air burner
     public static final ForgeConfigSpec.ConfigValue<Double> HOT_AIR_BURNER_PRODUCTION_MULTIPLIER;
@@ -69,12 +74,14 @@ public class PropulsionConfig {
     public static final ForgeConfigSpec.ConfigValue<Double>  PROPELLER_LOD_DISTANCE;
     public static final ForgeConfigSpec.ConfigValue<Double>  PROPELLER_EXPOSURE_TIME;
     public static final ForgeConfigSpec.ConfigValue<Double>  PROPELLER_BLADE_ANGLE;
+    
     //Stirling engine
     public static final ForgeConfigSpec.ConfigValue<Double> STIRLING_GENERATED_SU;
 
     public static final ForgeConfigSpec.ConfigValue<Double> STIRLING_REVOLUTION_PERIOD;
     public static final ForgeConfigSpec.ConfigValue<Double> STIRLING_CRANK_RADIUS;
     public static final ForgeConfigSpec.ConfigValue<Double> STIRLING_CONROD_LENGTH;
+    
     //Tilt adapter
     public static final ForgeConfigSpec.ConfigValue<Double> TILT_ADAPTER_ANGLE_RANGE;
 
@@ -82,6 +89,9 @@ public class PropulsionConfig {
     public static final ForgeConfigSpec.ConfigValue<Double> ATMOSPHERE_HEIGHT_FACTOR;
     public static final ForgeConfigSpec.ConfigValue<Double> ATMOSPHERE_NOISE_MAGNITUDE;
     public static final ForgeConfigSpec.ConfigValue<Double> ATMOSPHERE_NOISE_TIME_FACTOR;
+
+    //Burners
+    public static final ForgeConfigSpec.ConfigValue<Boolean> BURNERS_POWER_HEATED_MIXERS;
 
     static {
         //#region Server
@@ -193,6 +203,11 @@ public class PropulsionConfig {
                 .define("Noise magnitude", 1.0);
             ATMOSPHERE_NOISE_TIME_FACTOR = SERVER_BUILDER.comment("Speed of atmospheric perlin noise change. Higher values make atmosphere (and therefore balloons and propellers) more unstable.")
                 .define("Noise time factor", 1.0);
+        SERVER_BUILDER.pop();
+
+        SERVER_BUILDER.push("Burners");
+            BURNERS_POWER_HEATED_MIXERS = SERVER_BUILDER.comment("If true - both solid and liquid burners can provide heat to heated mixers allowing for pre-nether brass.")
+                .define("Burners power heated mixers", true);
         SERVER_BUILDER.pop();
 
         SERVER_SPEC = SERVER_BUILDER.build();
