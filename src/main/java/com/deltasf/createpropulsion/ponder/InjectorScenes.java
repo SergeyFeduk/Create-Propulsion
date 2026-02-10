@@ -40,7 +40,7 @@ public class InjectorScenes {
 
         Selection airshipPlate = util.select().fromTo(1, 1, 2, 9, 1, 6);
 
-        // Fences
+        //Fences
         Selection fencesBack = util.select().fromTo(2, 2, 6, 2, 3, 6).add(util.select().fromTo(8, 2, 6, 8, 3, 6));
         Selection fencesFront = util.select().fromTo(2, 2, 2, 2, 3, 2).add(util.select().fromTo(8, 2, 2, 8, 3, 2));
         Selection allFences = fencesBack.add(fencesFront);
