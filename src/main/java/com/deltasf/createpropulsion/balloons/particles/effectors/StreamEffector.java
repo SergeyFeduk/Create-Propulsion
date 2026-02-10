@@ -24,7 +24,7 @@ public class StreamEffector implements HapEffector {
     private static final float FORCE_SOFTENING = 0.2f;
     private static final float CENTERING_STRENGTH = 0.45f;
 
-    private static final float NEUTRAL_THRESHOLD = 0.75f; 
+    private static final float NEUTRAL_THRESHOLD = 0.9f; 
     private static final float CENTERING_WEAKNESS = 0.2f;
     private static final float SLOPE_PULL = 1.0f / (1.0f - NEUTRAL_THRESHOLD);
     private static final float SLOPE_PUSH = (1.0f / NEUTRAL_THRESHOLD) * CENTERING_WEAKNESS;

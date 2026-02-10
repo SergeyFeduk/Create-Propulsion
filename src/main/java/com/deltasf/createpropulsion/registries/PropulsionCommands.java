@@ -9,6 +9,7 @@ import com.deltasf.createpropulsion.balloons.HaiGroup;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry;
 import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
 import com.deltasf.createpropulsion.debug.PropulsionDebug;
+import com.deltasf.createpropulsion.events.ModClientEvents;
 import com.deltasf.createpropulsion.magnet.MagnetRegistry;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.FloatArgumentType;
@@ -18,6 +19,8 @@ import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 
 public class PropulsionCommands {
 
@@ -28,18 +31,8 @@ public class PropulsionCommands {
         LiteralArgumentBuilder<CommandSourceStack> debugNode = PropulsionDebug.registerCommands();
         propulsionCommand.then(debugNode);
 
-        Set<String> floatKeys = PropulsionDebug.getFloatKeys();
-        if (floatKeys.size() > 0) {
-            LiteralArgumentBuilder<CommandSourceStack> varNode = Commands.literal("var");
-            for (String key : floatKeys) {
-                varNode.then(Commands.literal(key)
-                    .then(Commands.argument("val", FloatArgumentType.floatArg())
-                    .executes(ctx -> setVar(key, FloatArgumentType.getFloat(ctx, "val")))));
-            }
-            propulsionCommand.then(varNode);
-        }
+        registerFloatKeys(propulsionCommand);
 
-        //Magnet registry cleanup command
         propulsionCommand
             .then(Commands.literal("clearMagnetRegistry")
             .executes(PropulsionCommands::clearMagnetRegistry));
@@ -52,7 +45,24 @@ public class PropulsionCommands {
             .then(Commands.literal("kill-orphans")
             .executes(PropulsionCommands::killOrphans));
 
+        propulsionCommand
+            .then(Commands.literal("config")
+            .executes(PropulsionCommands::openConfig));
+
         dispatcher.register(propulsionCommand);
+    }
+
+    private static void registerFloatKeys(LiteralArgumentBuilder<CommandSourceStack> propulsionCommand) {
+        Set<String> floatKeys = PropulsionDebug.getFloatKeys();
+        if (floatKeys.size() > 0) {
+            LiteralArgumentBuilder<CommandSourceStack> varNode = Commands.literal("var");
+            for (String key : floatKeys) {
+                varNode.then(Commands.literal(key)
+                    .then(Commands.argument("val", FloatArgumentType.floatArg())
+                    .executes(ctx -> setVar(key, FloatArgumentType.getFloat(ctx, "val")))));
+            }
+            propulsionCommand.then(varNode);
+        }
     }
 
     private static int setVar(String key, float val) {
@@ -100,6 +110,13 @@ public class PropulsionCommands {
         } else {
             context.getSource().sendFailure(Component.literal("No orphans to kill :("));
         }
+        return 1;
+    }
+
+    private static int openConfig(CommandContext<CommandSourceStack> context) {
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+            ModClientEvents.openConfig();
+        });
         return 1;
     }
 }
