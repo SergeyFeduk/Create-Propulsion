@@ -20,8 +20,6 @@ import com.deltasf.createpropulsion.propeller.PropellerBlock;
 import com.deltasf.createpropulsion.redstone_transmission.RedstoneTransmissionBlock;
 import com.deltasf.createpropulsion.thruster.creative_thruster.CreativeThrusterBlock;
 import com.deltasf.createpropulsion.thruster.thruster.ThrusterBlock;
-import com.simibubi.create.foundation.data.AssetLookup;
-import com.simibubi.create.foundation.data.BlockStateGen;
 import com.deltasf.createpropulsion.tilt_adapter.TiltAdapterBlock;
 import com.deltasf.createpropulsion.wing.CopycatWingBlock;
 import com.deltasf.createpropulsion.wing.CopycatWingItem;
@@ -172,7 +170,7 @@ public class PropulsionBlocks {
         .transform(PropulsionDefaultStress.setNoImpact())
         .transform(axeOrPickaxe())
         .transform(displaySource(PropulsionDisplaySources.REDSTONE_TRANSMISSION))
-        .blockstate((c, p) -> BlockStateGen.axisBlock(c, p, AssetLookup.forPowered(c, p)))
+        .blockstate(FUCK_OFF())
         .item().model(FUCK_OFF_ITEM()).build()
         .setData(ProviderType.LANG, FUCK_OFF_LANG())
         .register();

@@ -1,6 +1,7 @@
 {
   "values": [
     "createpropulsion:lodestone_tracker",
+    "createpropulsion:redstone_transmission",
     "createpropulsion:propeller",
     "createpropulsion:tilt_adapter",
     "createpropulsion:copycat_wing",
