@@ -2,6 +2,7 @@
 	"format_version": "1.9.0",
 	"credit": "Made with Blockbench",
 	"parent": "create:block/large_wheels",
+	"render_type": "cutout",
 	"texture_size": [64, 64],
 	"textures": {
 		"0": "createpropulsion:block/hot_air_pump",

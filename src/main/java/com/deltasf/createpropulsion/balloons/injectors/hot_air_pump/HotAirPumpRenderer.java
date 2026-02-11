@@ -48,48 +48,34 @@ public class HotAirPumpRenderer extends KineticBlockEntityRenderer<HotAirPumpBlo
     }
 
     @Override
-    protected void renderSafe(HotAirPumpBlockEntity be, float partialTicks, PoseStack ms, MultiBufferSource buffer, int light, int overlay) {
-        Level level = be.getLevel();
+    protected void renderSafe(HotAirPumpBlockEntity blockEntity, float partialTicks, PoseStack ms, MultiBufferSource buffer, int light, int overlay) {
+        Level level = blockEntity.getLevel();
         if (level == null) return;
         
-        BlockState state = be.getBlockState();
+        BlockState state = blockEntity.getBlockState();
 
         SuperByteBuffer cogModel = CachedBuffers.partialFacing(PropulsionPartialModels.HOT_AIR_PUMP_COG, state, Direction.NORTH);
         SuperByteBuffer fanModel = CachedBuffers.partialFacing(PropulsionPartialModels.LIQUID_BURNER_FAN, state, Direction.NORTH);
         SuperByteBuffer membraneModel = CachedBuffers.partialFacing(PropulsionPartialModels.HOT_AIR_PUMP_MEMBRANE, state, Direction.NORTH);
         SuperByteBuffer meshModel = CachedBuffers.partialFacing(PropulsionPartialModels.HOT_AIR_PUMP_MESH, state, Direction.NORTH);
 
-        VertexConsumer cutoutBuffer = buffer.getBuffer(RenderType.cutout());
-        VertexConsumer solidBuffer = buffer.getBuffer(RenderType.solid());
+        VertexConsumer vertexBuffer = buffer.getBuffer(RenderType.cutout()); 
         
         //Time
         float time = AnimationTickHolder.getRenderTime(level);
-        if (be.lastRenderTime == -1) be.lastRenderTime = time;
-        float dt = time - be.lastRenderTime;
-        be.lastRenderTime = time;
-
-        //Cog
-        standardKineticRotationTransform(cogModel, be, light).renderInto(ms, solidBuffer);
+        if (blockEntity.lastRenderTime == -1) blockEntity.lastRenderTime = time;
+        float dt = time - blockEntity.lastRenderTime;
+        blockEntity.lastRenderTime = time;
 
         //Fan
-        float heat = be.getLastHeatConsumed();
+        float heat = blockEntity.getLastHeatConsumed();
         if (heat > 0) {
-            be.fanAngle += (heat * FAN_SPEED_MULTIPLIER) * dt;
-            be.fanAngle %= (float) (Math.PI * 2);
+            blockEntity.fanAngle += (heat * FAN_SPEED_MULTIPLIER) * dt;
+            blockEntity.fanAngle %= (float) (Math.PI * 2);
         }
 
-        fanModel
-            .translate(2/16.0f,12/16.0f,0)
-            .rotate(Axis.Z, -(float)Math.PI / 2.0f)
-            .translate(0.5f,6/16.0f,0.5f)
-            .rotate(Axis.X, be.fanAngle)
-            .translate(-0.5f,-6/16.0f,-0.5f)
-            .light(light)
-            .overlay(overlay)
-            .renderInto(ms, solidBuffer);
-
         //Membrane
-        float currentRpm = Math.abs(be.getSpeed());
+        float currentRpm = Math.abs(blockEntity.getSpeed());
         float targetMembraneSpeed;
 
         if (currentRpm <= 0) {
@@ -100,40 +86,16 @@ public class HotAirPumpRenderer extends KineticBlockEntityRenderer<HotAirPumpBlo
             targetMembraneSpeed = MIN_VISUAL_SPEED + (MAX_VISUAL_SPEED - MIN_VISUAL_SPEED) * speedCurve;
         }
 
-        be.membraneSpeed = MathUtility.expDecay(be.membraneSpeed, targetMembraneSpeed, MEMBRANE_DECAY, dt);
-        be.membraneTime += be.membraneSpeed * dt;
+        blockEntity.membraneSpeed = MathUtility.expDecay(blockEntity.membraneSpeed, targetMembraneSpeed, MEMBRANE_DECAY, dt);
+        blockEntity.membraneTime += blockEntity.membraneSpeed * dt;
 
-        float t = MathUtility.sineInRange(be.membraneTime, MIN_INTERPOLATION_VALUE, MAX_INTERPOLATION_VALUE);
-        float tRaw = MathUtility.sineInRange(be.membraneTime, 0, MAX_INTERPOLATION_VALUE);
+        float t = MathUtility.sineInRange(blockEntity.membraneTime, MIN_INTERPOLATION_VALUE, MAX_INTERPOLATION_VALUE);
+        float tRaw = MathUtility.sineInRange(blockEntity.membraneTime, 0, MAX_INTERPOLATION_VALUE);
 
         float scaleY = 0.5f + (0.5f * t);
         float translateY = (2.0f / 16.0f) * (1.0f - t);
         float meshTranslateY = -(9.0f / 16.0f) * (1.0f - tRaw);
 
-        if (BalloonParticleSystem.isBlockInSpawnRange(level, be.getBlockPos())) {
-            float deltaT = t - be.clientLastVisualT;
-            be.clientLastVisualT = t;
-            
-            if (deltaT < 0) {
-                //Inhale
-                double amount = be.getInjectionAmount();
-                if (amount > 0) {
-                    float multiplier = PropulsionConfig.HOT_AIR_PUMP_PARTICLE_SPAWN_MULTIPLIER.get().floatValue();
-                    be.clientParticleBuffer += amount * multiplier * dt;
-                }
-            } else {
-                //Exhale
-                if (t > 0.95f && be.clientParticleBuffer >= 1.0f) {
-                    int count = (int) be.clientParticleBuffer;
-                    if (count > 0) {
-                        be.clientParticleBuffer -= count;
-                        spawnPumpParticles(be, count, level, meshTranslateY);
-                    }
-                }
-            }
-        }
-
-        //Membrane
         SpriteShiftEntry worldSpaceShift = new SpriteShiftEntry() {
             @Override
             public float getTargetU(float globalU) { return PropulsionSpriteShifts.HOT_AIR_PUMP.getTargetU(globalU); }
@@ -151,22 +113,64 @@ public class HotAirPumpRenderer extends KineticBlockEntityRenderer<HotAirPumpBlo
             }
         };
 
+        //Membrane
+        ms.pushPose();
         membraneModel
             .translate(0, translateY, 0)
             .scale(1, scaleY, 1)
             .shiftUV(worldSpaceShift)
-            .light(light)
-            .overlay(overlay)
-            .renderInto(ms, cutoutBuffer);
+            .light(light).renderInto(ms, vertexBuffer);
+        ms.popPose();
 
         //Mesh
-        
+        ms.pushPose();
         meshModel
             .translate(0, meshTranslateY - 0.02f, 0)
             .light(light)
-            .overlay(overlay)
-            .renderInto(ms, cutoutBuffer);
+            .renderInto(ms, vertexBuffer);
+        ms.popPose();
 
+        VertexConsumer solidBuffer = buffer.getBuffer(RenderType.solid());
+
+        //Cog
+        standardKineticRotationTransform(cogModel, blockEntity, light).renderInto(ms, solidBuffer);
+
+        //Fan
+        ms.pushPose();
+        fanModel
+            .translate(2/16.0f,12/16.0f,0)
+            .rotate(Axis.Z, -(float)Math.PI / 2.0f)
+            .translate(0.5f,6/16.0f,0.5f)
+            .rotate(Axis.X, blockEntity.fanAngle)
+            .translate(-0.5f,-6/16.0f,-0.5f)
+            .light(light)
+            .overlay(overlay)
+            .renderInto(ms, solidBuffer);
+        ms.popPose();
+
+        //Particles
+        if (BalloonParticleSystem.isBlockInSpawnRange(level, blockEntity.getBlockPos())) {
+            float deltaT = t - blockEntity.clientLastVisualT;
+            blockEntity.clientLastVisualT = t;
+            
+            if (deltaT < 0) {
+                //Inhale
+                double amount = blockEntity.getInjectionAmount();
+                if (amount > 0) {
+                    float multiplier = PropulsionConfig.HOT_AIR_PUMP_PARTICLE_SPAWN_MULTIPLIER.get().floatValue();
+                    blockEntity.clientParticleBuffer += amount * multiplier * dt;
+                }
+            } else {
+                //Exhale
+                if (t > 0.95f && blockEntity.clientParticleBuffer >= 1.0f) {
+                    int count = (int) blockEntity.clientParticleBuffer;
+                    if (count > 0) {
+                        blockEntity.clientParticleBuffer -= count;
+                        spawnPumpParticles(blockEntity, count, level, meshTranslateY);
+                    }
+                }
+            }
+        }
     }
 
     private void spawnPumpParticles(HotAirPumpBlockEntity be, int count, Level level, float meshTranslateY) {
