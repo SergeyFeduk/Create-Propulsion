@@ -9,7 +9,9 @@ import com.deltasf.createpropulsion.particles.ParticleTypes;
 import com.simibubi.create.compat.Mods;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -24,7 +26,6 @@ public class CreatePropulsion {
     public CreatePropulsion() {
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
         //Content
-        modBus.addListener(ModClientEvents::clientInit);
         ParticleTypes.register(modBus);
         PropulsionBlocks.register();
         PropulsionBlockEntities.register();
@@ -39,6 +40,8 @@ public class CreatePropulsion {
 
         //Compat
         Mods.COMPUTERCRAFT.executeIfInstalled(() -> CCProxy::register);
+
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> modBus.addListener(PropulsionClient::clientInit));
         //Config
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, PropulsionConfig.SERVER_SPEC, ID + "-server.toml");
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, PropulsionConfig.CLIENT_SPEC, ID + "-client.toml");

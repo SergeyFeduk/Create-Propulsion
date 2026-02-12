@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import com.deltasf.createpropulsion.PropulsionClient;
 import com.deltasf.createpropulsion.balloons.Balloon;
 import com.deltasf.createpropulsion.balloons.HaiGroup;
 import com.deltasf.createpropulsion.balloons.registries.BalloonRegistry;
@@ -104,9 +105,7 @@ public class PropulsionCommands {
     }
 
     private static int openConfig(CommandContext<CommandSourceStack> context) {
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-            ModClientEvents.openConfig();
-        });
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> PropulsionClient::openConfig);
         return 1;
     }
 }
