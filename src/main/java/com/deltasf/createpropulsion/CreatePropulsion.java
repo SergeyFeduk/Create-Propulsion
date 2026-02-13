@@ -3,7 +3,6 @@ package com.deltasf.createpropulsion;
 import com.deltasf.createpropulsion.registries.*;
 
 import com.deltasf.createpropulsion.compat.computercraft.CCProxy;
-import com.deltasf.createpropulsion.events.ModClientEvents;
 import com.deltasf.createpropulsion.network.PropulsionPackets;
 import com.deltasf.createpropulsion.particles.ParticleTypes;
 import com.simibubi.create.compat.Mods;
