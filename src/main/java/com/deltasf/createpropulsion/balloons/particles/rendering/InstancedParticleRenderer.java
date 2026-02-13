@@ -11,11 +11,13 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.Level;
 
+import org.joml.FrustumIntersection;
 import org.joml.Matrix4dc;
 import org.joml.Matrix4f;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
 import org.joml.Vector4d;
+import org.joml.primitives.AABBic;
 import org.lwjgl.opengl.ARBInstancedArrays;
 import org.lwjgl.opengl.GL31;
 import org.lwjgl.system.MemoryUtil;
@@ -63,6 +65,12 @@ public class InstancedParticleRenderer {
     private static final Matrix4f TEMP_MATRIX = new Matrix4f();
     private static final Vector4d TEMP_VEC4 = new Vector4d();
     private static final Vector3d TEMP_CAM_POS = new Vector3d();
+
+    //Frustum culling
+    private static final FrustumIntersection FRUSTUM_INTERSECTION = new FrustumIntersection();
+    private static final Matrix4f VIEW_PROJ_MAT = new Matrix4f();
+    private static final Vector3d CULL_MIN = new Vector3d();
+    private static final Vector3d CULL_MAX = new Vector3d();
 
     public static void init() {
         if (initialized) return;
@@ -137,6 +145,10 @@ public class InstancedParticleRenderer {
         if (level == null) return;
         long gameTime = level.getGameTime();
         boolean isPaused = mc.isPaused();
+
+        //Prepare frustum
+        VIEW_PROJ_MAT.set(projectionMatrix).mul(ms.last().pose());
+        FRUSTUM_INTERSECTION.set(VIEW_PROJ_MAT);
         
         //Prepare state
         RenderSystem.depthMask(false);
@@ -190,6 +202,23 @@ public class InstancedParticleRenderer {
             //Calculate anchor position in world space
             TEMP_VEC4.set(handler.getAnchorX(), handler.getAnchorY(), handler.getAnchorZ(), 1.0);
             shipToWorld.transform(TEMP_VEC4);
+
+            //Frustum culling
+            AABBic shipBounds = ship.getShipAABB();
+            shipToWorld.transformAab(
+                shipBounds.minX(), shipBounds.minY(), shipBounds.minZ(), 
+                shipBounds.maxX(), shipBounds.maxY(), shipBounds.maxZ(), 
+                CULL_MIN, CULL_MAX
+            );
+
+            CULL_MIN.sub(camPos);
+            CULL_MAX.sub(camPos);
+
+            if (!FRUSTUM_INTERSECTION.testAab(
+                    (float)CULL_MIN.x, (float)CULL_MIN.y, (float)CULL_MIN.z, 
+                    (float)CULL_MAX.x, (float)CULL_MAX.y, (float)CULL_MAX.z)) {
+                continue; 
+            }
 
             double distSq = camPos.distanceSquared(TEMP_VEC4.x, TEMP_VEC4.y, TEMP_VEC4.z);
             if (distSq > MAX_RENDER_DISTANCE_SQ) continue;
