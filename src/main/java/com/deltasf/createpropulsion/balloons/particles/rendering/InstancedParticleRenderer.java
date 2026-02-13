@@ -16,7 +16,8 @@ import org.joml.Matrix4f;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
 import org.joml.Vector4d;
-import org.lwjgl.opengl.GL33;
+import org.lwjgl.opengl.ARBInstancedArrays;
+import org.lwjgl.opengl.GL31;
 import org.lwjgl.system.MemoryUtil;
 import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
@@ -64,18 +65,18 @@ public class InstancedParticleRenderer {
         programId = ParticleShaderLoader.createProgram("hap.vert", "hap.frag");
         
         //Uniforms!!!
-        uProjectionMat = GL33.glGetUniformLocation(programId, "uProjMat");
-        uModelViewMat = GL33.glGetUniformLocation(programId, "uModelViewMat");
-        uCamRight = GL33.glGetUniformLocation(programId, "uCamRight");
-        uCamUp = GL33.glGetUniformLocation(programId, "uCamUp");
-        uShipRotation = GL33.glGetUniformLocation(programId, "uShipRotation");
-        uRelativeAnchor = GL33.glGetUniformLocation(programId, "uRelativeAnchor");
-        uPartialTick = GL33.glGetUniformLocation(programId, "uPartialTick");
-        uColor = GL33.glGetUniformLocation(programId, "uColor");
+        uProjectionMat = GL31.glGetUniformLocation(programId, "uProjMat");
+        uModelViewMat = GL31.glGetUniformLocation(programId, "uModelViewMat");
+        uCamRight = GL31.glGetUniformLocation(programId, "uCamRight");
+        uCamUp = GL31.glGetUniformLocation(programId, "uCamUp");
+        uShipRotation = GL31.glGetUniformLocation(programId, "uShipRotation");
+        uRelativeAnchor = GL31.glGetUniformLocation(programId, "uRelativeAnchor");
+        uPartialTick = GL31.glGetUniformLocation(programId, "uPartialTick");
+        uColor = GL31.glGetUniformLocation(programId, "uColor");
 
         //Buffers
-        VAOId = GL33.glGenVertexArrays();
-        GL33.glBindVertexArray(VAOId);
+        VAOId = GL31.glGenVertexArrays();
+        GL31.glBindVertexArray(VAOId);
         
         float[] quadData = {
             -0.5f, -0.5f, 0.0f, 0.0f,
@@ -84,21 +85,21 @@ public class InstancedParticleRenderer {
             -0.5f,  0.5f, 0.0f, 1.0f
         };
         
-        quadVBOId = GL33.glGenBuffers();
-        GL33.glBindBuffer(GL33.GL_ARRAY_BUFFER, quadVBOId);
-        GL33.glBufferData(GL33.GL_ARRAY_BUFFER, quadData, GL33.GL_STATIC_DRAW);
+        quadVBOId = GL31.glGenBuffers();
+        GL31.glBindBuffer(GL31.GL_ARRAY_BUFFER, quadVBOId);
+        GL31.glBufferData(GL31.GL_ARRAY_BUFFER, quadData, GL31.GL_STATIC_DRAW);
 
         //Quad position
-        GL33.glEnableVertexAttribArray(0);
-        GL33.glVertexAttribPointer(0, 2, GL33.GL_FLOAT, false, 16, 0);
+        GL31.glEnableVertexAttribArray(0);
+        GL31.glVertexAttribPointer(0, 2, GL31.GL_FLOAT, false, 16, 0);
         
         //Quad UV
-        GL33.glEnableVertexAttribArray(1);
-        GL33.glVertexAttribPointer(1, 2, GL33.GL_FLOAT, false, 16, 8);
+        GL31.glEnableVertexAttribArray(1);
+        GL31.glVertexAttribPointer(1, 2, GL31.GL_FLOAT, false, 16, 8);
 
-        instanceVBOId = GL33.glGenBuffers();
-        GL33.glBindBuffer(GL33.GL_ARRAY_BUFFER, instanceVBOId);
-        GL33.glBufferData(GL33.GL_ARRAY_BUFFER, TOTAL_BUFFER_SIZE, GL33.GL_STREAM_DRAW);
+        instanceVBOId = GL31.glGenBuffers();
+        GL31.glBindBuffer(GL31.GL_ARRAY_BUFFER, instanceVBOId);
+        GL31.glBufferData(GL31.GL_ARRAY_BUFFER, TOTAL_BUFFER_SIZE, GL31.GL_STREAM_DRAW);
 
         setupAttrib(2, 0);
         setupAttrib(3, ARRAY_SIZE_BYTES);
@@ -111,16 +112,17 @@ public class InstancedParticleRenderer {
         
         generateWhitePixelTexture();
 
-        GL33.glBindVertexArray(0);
-        GL33.glBindBuffer(GL33.GL_ARRAY_BUFFER, 0);
+        GL31.glBindVertexArray(0);
+        GL31.glBindBuffer(GL31.GL_ARRAY_BUFFER, 0);
         
         initialized = true;
     }
 
     private static void setupAttrib(int index, long offset) {
-        GL33.glEnableVertexAttribArray(index);
-        GL33.glVertexAttribPointer(index, 1, GL33.GL_FLOAT, false, 0, offset);
-        GL33.glVertexAttribDivisor(index, 1);
+        GL31.glEnableVertexAttribArray(index);
+        GL31.glVertexAttribPointer(index, 1, GL31.GL_FLOAT, false, 0, offset);
+        ARBInstancedArrays.glVertexAttribDivisorARB(index, 1);
+
     }
 
     public static void render(PoseStack ms, Matrix4f projectionMatrix, Camera camera, float partialTick) {
@@ -139,35 +141,35 @@ public class InstancedParticleRenderer {
         RenderSystem.defaultBlendFunc();
         RenderSystem.enableDepthTest();
         
-        GL33.glUseProgram(programId);
-        GL33.glBindVertexArray(VAOId);
+        GL31.glUseProgram(programId);
+        GL31.glBindVertexArray(VAOId);
 
         //Bind pixel texture
-        GL33.glActiveTexture(GL33.GL_TEXTURE0);
-        GL33.glBindTexture(GL33.GL_TEXTURE_2D, textureId);
-        int uTexLoc = GL33.glGetUniformLocation(programId, "uTex");
-        GL33.glUniform1i(uTexLoc, 0);
+        GL31.glActiveTexture(GL31.GL_TEXTURE0);
+        GL31.glBindTexture(GL31.GL_TEXTURE_2D, textureId);
+        int uTexLoc = GL31.glGetUniformLocation(programId, "uTex");
+        GL31.glUniform1i(uTexLoc, 0);
 
         //Projection Matrix
         projectionMatrix.get(MATRIX_BUFFER);
-        GL33.glUniformMatrix4fv(uProjectionMat, false, MATRIX_BUFFER);
+        GL31.glUniformMatrix4fv(uProjectionMat, false, MATRIX_BUFFER);
 
         //ModelView Matrix
         Matrix4f modelViewMatrix = ms.last().pose();
         modelViewMatrix.get(MATRIX_BUFFER);
-        GL33.glUniformMatrix4fv(uModelViewMat, false, MATRIX_BUFFER);
+        GL31.glUniformMatrix4fv(uModelViewMat, false, MATRIX_BUFFER);
 
         //Camera Vectors
         Vector3f camRight = camera.getLeftVector().mul(-1.0f);
-        GL33.glUniform3f(uCamRight, camRight.x(), camRight.y(), camRight.z());
+        GL31.glUniform3f(uCamRight, camRight.x(), camRight.y(), camRight.z());
 
         Vector3f camUp = camera.getUpVector();
-        GL33.glUniform3f(uCamUp, camUp.x(), camUp.y(), camUp.z());
+        GL31.glUniform3f(uCamUp, camUp.x(), camUp.y(), camUp.z());
 
         Vector3d camPos = new Vector3d(camera.getPosition().x, camera.getPosition().y, camera.getPosition().z);
 
         float alpha = PropulsionConfig.BALLOON_PARTICLES_ALPHA.get().floatValue() / 255.0f;
-        GL33.glUniform4f(uColor, R/255.0f, G/255.0f, B/255.0f, alpha);
+        GL31.glUniform4f(uColor, R/255.0f, G/255.0f, B/255.0f, alpha);
 
         //Rendering
         Long2ObjectMap<ShipParticleHandler> handlers = BalloonParticleSystem.getAllHandlers();
@@ -190,47 +192,47 @@ public class InstancedParticleRenderer {
 
             //pT based on simulation (if not ticking/paused -> pT = 1)
             float t = (isPaused || handler.lastSimulatedTick == gameTime) ? partialTick : 1.0f;
-            GL33.glUniform1f(uPartialTick, t);
+            GL31.glUniform1f(uPartialTick, t);
 
             HapData data = handler.data;
             int count = Math.min(data.count, MAX_PARTICLES);
 
             //Upload stuff
-            GL33.glBindBuffer(GL33.GL_ARRAY_BUFFER, instanceVBOId);
+            GL31.glBindBuffer(GL31.GL_ARRAY_BUFFER, instanceVBOId);
             
-            GL33.glBufferSubData(GL33.GL_ARRAY_BUFFER, 0, data.px);
-            GL33.glBufferSubData(GL33.GL_ARRAY_BUFFER, ARRAY_SIZE_BYTES, data.py);
-            GL33.glBufferSubData(GL33.GL_ARRAY_BUFFER, ARRAY_SIZE_BYTES * 2, data.pz);
-            GL33.glBufferSubData(GL33.GL_ARRAY_BUFFER, ARRAY_SIZE_BYTES * 3, data.x);
-            GL33.glBufferSubData(GL33.GL_ARRAY_BUFFER, ARRAY_SIZE_BYTES * 4, data.y);
-            GL33.glBufferSubData(GL33.GL_ARRAY_BUFFER, ARRAY_SIZE_BYTES * 5, data.z);
-            GL33.glBufferSubData(GL33.GL_ARRAY_BUFFER, ARRAY_SIZE_BYTES * 6, data.life);
-            GL33.glBufferSubData(GL33.GL_ARRAY_BUFFER, ARRAY_SIZE_BYTES * 7, data.scale);
+            GL31.glBufferSubData(GL31.GL_ARRAY_BUFFER, 0, data.px);
+            GL31.glBufferSubData(GL31.GL_ARRAY_BUFFER, ARRAY_SIZE_BYTES, data.py);
+            GL31.glBufferSubData(GL31.GL_ARRAY_BUFFER, ARRAY_SIZE_BYTES * 2, data.pz);
+            GL31.glBufferSubData(GL31.GL_ARRAY_BUFFER, ARRAY_SIZE_BYTES * 3, data.x);
+            GL31.glBufferSubData(GL31.GL_ARRAY_BUFFER, ARRAY_SIZE_BYTES * 4, data.y);
+            GL31.glBufferSubData(GL31.GL_ARRAY_BUFFER, ARRAY_SIZE_BYTES * 5, data.z);
+            GL31.glBufferSubData(GL31.GL_ARRAY_BUFFER, ARRAY_SIZE_BYTES * 6, data.life);
+            GL31.glBufferSubData(GL31.GL_ARRAY_BUFFER, ARRAY_SIZE_BYTES * 7, data.scale);
 
             //Ship uniforms
             TEMP_MATRIX.set(shipToWorld);
             //Translation components set to zero cus we only need rotation and scale from this matrix
             TEMP_MATRIX.m30(0); TEMP_MATRIX.m31(0); TEMP_MATRIX.m32(0);
             TEMP_MATRIX.get(MATRIX_BUFFER);
-            GL33.glUniformMatrix4fv(uShipRotation, false, MATRIX_BUFFER);
+            GL31.glUniformMatrix4fv(uShipRotation, false, MATRIX_BUFFER);
 
             //Anchor relative to camera
             float rx = (float)(TEMP_VEC4.x - camPos.x);
             float ry = (float)(TEMP_VEC4.y - camPos.y);
             float rz = (float)(TEMP_VEC4.z - camPos.z);
             
-            GL33.glUniform3f(uRelativeAnchor, rx, ry, rz);
+            GL31.glUniform3f(uRelativeAnchor, rx, ry, rz);
 
             //Perform a draw
-            GL33.glDrawArraysInstanced(GL33.GL_TRIANGLE_FAN, 0, 4, count);
+            GL31.glDrawArraysInstanced(GL31.GL_TRIANGLE_FAN, 0, 4, count);
         }
 
         //Tidy up after outselves
-        GL33.glBindVertexArray(0);
-        GL33.glUseProgram(0);
+        GL31.glBindVertexArray(0);
+        GL31.glUseProgram(0);
 
-        GL33.glBindBuffer(GL33.GL_ARRAY_BUFFER, 0); 
-        GL33.glBindTexture(GL33.GL_TEXTURE_2D, 0);
+        GL31.glBindBuffer(GL31.GL_ARRAY_BUFFER, 0); 
+        GL31.glBindTexture(GL31.GL_TEXTURE_2D, 0);
 
         RenderSystem.depthMask(true); 
         RenderSystem.disableBlend();
@@ -238,25 +240,25 @@ public class InstancedParticleRenderer {
     
     public static void destroy() {
         if (!initialized) return;
-        GL33.glDeleteVertexArrays(VAOId);
-        GL33.glDeleteBuffers(quadVBOId);
-        GL33.glDeleteBuffers(instanceVBOId);
-        GL33.glDeleteTextures(textureId);
-        GL33.glDeleteProgram(programId);
+        GL31.glDeleteVertexArrays(VAOId);
+        GL31.glDeleteBuffers(quadVBOId);
+        GL31.glDeleteBuffers(instanceVBOId);
+        GL31.glDeleteTextures(textureId);
+        GL31.glDeleteProgram(programId);
         MemoryUtil.memFree(MATRIX_BUFFER);
         initialized = false;
     }
 
     //TODO: Move in some utility class
     private static void generateWhitePixelTexture() {
-        textureId = GL33.glGenTextures();
-        GL33.glBindTexture(GL33.GL_TEXTURE_2D, textureId);
+        textureId = GL31.glGenTextures();
+        GL31.glBindTexture(GL31.GL_TEXTURE_2D, textureId);
         ByteBuffer whitePixel = MemoryUtil.memAlloc(4);
         whitePixel.put((byte)255).put((byte)255).put((byte)255).put((byte)255);
         whitePixel.flip();
-        GL33.glTexImage2D(GL33.GL_TEXTURE_2D, 0, GL33.GL_RGBA, 1, 1, 0, GL33.GL_RGBA, GL33.GL_UNSIGNED_BYTE, whitePixel);
-        GL33.glTexParameteri(GL33.GL_TEXTURE_2D, GL33.GL_TEXTURE_MIN_FILTER, GL33.GL_NEAREST);
-        GL33.glTexParameteri(GL33.GL_TEXTURE_2D, GL33.GL_TEXTURE_MAG_FILTER, GL33.GL_NEAREST);
+        GL31.glTexImage2D(GL31.GL_TEXTURE_2D, 0, GL31.GL_RGBA, 1, 1, 0, GL31.GL_RGBA, GL31.GL_UNSIGNED_BYTE, whitePixel);
+        GL31.glTexParameteri(GL31.GL_TEXTURE_2D, GL31.GL_TEXTURE_MIN_FILTER, GL31.GL_NEAREST);
+        GL31.glTexParameteri(GL31.GL_TEXTURE_2D, GL31.GL_TEXTURE_MAG_FILTER, GL31.GL_NEAREST);
         MemoryUtil.memFree(whitePixel);
     }
 }
