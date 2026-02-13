@@ -20,6 +20,7 @@ import org.lwjgl.opengl.ARBInstancedArrays;
 import org.lwjgl.opengl.GL31;
 import org.lwjgl.system.MemoryUtil;
 import org.valkyrienskies.core.api.ships.ClientShip;
+import org.valkyrienskies.core.internal.ships.VsiQueryableShipData;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import java.nio.ByteBuffer;
@@ -57,8 +58,11 @@ public class InstancedParticleRenderer {
     private static final int TOTAL_BUFFER_SIZE = ARRAY_SIZE_BYTES * 8; 
     
     private static final FloatBuffer MATRIX_BUFFER = MemoryUtil.memAllocFloat(16);
+    private static final FloatBuffer UPLOAD_BUFFER = MemoryUtil.memAllocFloat(MAX_PARTICLES);
+    
     private static final Matrix4f TEMP_MATRIX = new Matrix4f();
     private static final Vector4d TEMP_VEC4 = new Vector4d();
+    private static final Vector3d TEMP_CAM_POS = new Vector3d();
 
     public static void init() {
         if (initialized) return;
@@ -122,7 +126,6 @@ public class InstancedParticleRenderer {
         GL31.glEnableVertexAttribArray(index);
         GL31.glVertexAttribPointer(index, 1, GL31.GL_FLOAT, false, 0, offset);
         ARBInstancedArrays.glVertexAttribDivisorARB(index, 1);
-
     }
 
     public static void render(PoseStack ms, Matrix4f projectionMatrix, Camera camera, float partialTick) {
@@ -166,11 +169,13 @@ public class InstancedParticleRenderer {
         Vector3f camUp = camera.getUpVector();
         GL31.glUniform3f(uCamUp, camUp.x(), camUp.y(), camUp.z());
 
-        Vector3d camPos = new Vector3d(camera.getPosition().x, camera.getPosition().y, camera.getPosition().z);
+        Vector3d camPos = TEMP_CAM_POS.set(camera.getPosition().x, camera.getPosition().y, camera.getPosition().z);
 
         float alpha = PropulsionConfig.BALLOON_PARTICLES_ALPHA.get().floatValue() / 255.0f;
         GL31.glUniform4f(uColor, R/255.0f, G/255.0f, B/255.0f, alpha);
 
+        VsiQueryableShipData<ClientShip> loadedShips = VSGameUtilsKt.getShipObjectWorld(mc.level).getLoadedShips();
+        
         //Rendering
         Long2ObjectMap<ShipParticleHandler> handlers = BalloonParticleSystem.getAllHandlers();
         for (Long2ObjectMap.Entry<ShipParticleHandler> entry : handlers.long2ObjectEntrySet()) {
@@ -178,9 +183,8 @@ public class InstancedParticleRenderer {
             ShipParticleHandler handler = entry.getValue();
             if (handler.isEmpty()) continue;
 
-            ClientShip ship = (ClientShip) VSGameUtilsKt.getShipObjectWorld(mc.level).getLoadedShips().getById(shipId);
+            ClientShip ship = loadedShips.getById(shipId);
             if (ship == null) continue;
-
 
             Matrix4dc shipToWorld = ship.getRenderTransform().getShipToWorld();
             //Calculate anchor position in world space
@@ -188,7 +192,7 @@ public class InstancedParticleRenderer {
             shipToWorld.transform(TEMP_VEC4);
 
             double distSq = camPos.distanceSquared(TEMP_VEC4.x, TEMP_VEC4.y, TEMP_VEC4.z);
-            if (distSq > MAX_RENDER_DISTANCE_SQ) continue; 
+            if (distSq > MAX_RENDER_DISTANCE_SQ) continue;
 
             //pT based on simulation (if not ticking/paused -> pT = 1)
             float t = (isPaused || handler.lastSimulatedTick == gameTime) ? partialTick : 1.0f;
@@ -196,18 +200,19 @@ public class InstancedParticleRenderer {
 
             HapData data = handler.data;
             int count = Math.min(data.count, MAX_PARTICLES);
+            if (count <= 0) continue;
 
             //Upload stuff
             GL31.glBindBuffer(GL31.GL_ARRAY_BUFFER, instanceVBOId);
             
-            GL31.glBufferSubData(GL31.GL_ARRAY_BUFFER, 0, data.px);
-            GL31.glBufferSubData(GL31.GL_ARRAY_BUFFER, ARRAY_SIZE_BYTES, data.py);
-            GL31.glBufferSubData(GL31.GL_ARRAY_BUFFER, ARRAY_SIZE_BYTES * 2, data.pz);
-            GL31.glBufferSubData(GL31.GL_ARRAY_BUFFER, ARRAY_SIZE_BYTES * 3, data.x);
-            GL31.glBufferSubData(GL31.GL_ARRAY_BUFFER, ARRAY_SIZE_BYTES * 4, data.y);
-            GL31.glBufferSubData(GL31.GL_ARRAY_BUFFER, ARRAY_SIZE_BYTES * 5, data.z);
-            GL31.glBufferSubData(GL31.GL_ARRAY_BUFFER, ARRAY_SIZE_BYTES * 6, data.life);
-            GL31.glBufferSubData(GL31.GL_ARRAY_BUFFER, ARRAY_SIZE_BYTES * 7, data.scale);
+            uploadData(0, data.px, count);
+            uploadData(ARRAY_SIZE_BYTES, data.py, count);
+            uploadData(ARRAY_SIZE_BYTES * 2, data.pz, count);
+            uploadData(ARRAY_SIZE_BYTES * 3, data.x, count);
+            uploadData(ARRAY_SIZE_BYTES * 4, data.y, count);
+            uploadData(ARRAY_SIZE_BYTES * 5, data.z, count);
+            uploadData(ARRAY_SIZE_BYTES * 6, data.life, count);
+            uploadData(ARRAY_SIZE_BYTES * 7, data.scale, count);
 
             //Ship uniforms
             TEMP_MATRIX.set(shipToWorld);
@@ -238,6 +243,13 @@ public class InstancedParticleRenderer {
         RenderSystem.disableBlend();
     }
     
+    private static void uploadData(long offset, float[] data, int count) {
+        UPLOAD_BUFFER.clear();
+        UPLOAD_BUFFER.put(data, 0, count);
+        UPLOAD_BUFFER.flip();
+        GL31.glBufferSubData(GL31.GL_ARRAY_BUFFER, offset, UPLOAD_BUFFER);
+    }
+    
     public static void destroy() {
         if (!initialized) return;
         GL31.glDeleteVertexArrays(VAOId);
@@ -245,7 +257,10 @@ public class InstancedParticleRenderer {
         GL31.glDeleteBuffers(instanceVBOId);
         GL31.glDeleteTextures(textureId);
         GL31.glDeleteProgram(programId);
+        
         MemoryUtil.memFree(MATRIX_BUFFER);
+        MemoryUtil.memFree(UPLOAD_BUFFER);
+        
         initialized = false;
     }
 
