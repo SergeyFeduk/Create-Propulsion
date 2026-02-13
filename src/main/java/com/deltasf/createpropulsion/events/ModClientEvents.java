@@ -2,15 +2,8 @@ package com.deltasf.createpropulsion.events;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.physics_assembler.AssemblyGaugeOverlayRenderer;
-import com.deltasf.createpropulsion.ponder.DeltaPonderPlugin;
-import com.deltasf.createpropulsion.registries.PropulsionInstanceTypes;
 import com.deltasf.createpropulsion.registries.PropulsionItems;
 
-import net.createmod.catnip.config.ui.BaseConfigScreen;
-import net.createmod.catnip.gui.ScreenOpener;
-import net.createmod.ponder.foundation.PonderIndex;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.world.item.DyeableLeatherItem;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterColorHandlersEvent;
@@ -18,7 +11,6 @@ import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 @Mod.EventBusSubscriber(modid = CreatePropulsion.ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ModClientEvents {
@@ -57,15 +49,5 @@ public class ModClientEvents {
     @SubscribeEvent
     public static void registerGuiOverlays(RegisterGuiOverlaysEvent event) {
         event.registerAbove(VanillaGuiOverlay.HOTBAR.id(), "assembly_gauge", AssemblyGaugeOverlayRenderer.OVERLAY);
-    }
-
-    public static void openConfig() {
-        Screen parent = Minecraft.getInstance().screen;
-        ScreenOpener.open(new BaseConfigScreen(parent, CreatePropulsion.ID));
-    }
-
-    public static void clientInit(final FMLClientSetupEvent event) {
-        PonderIndex.addPlugin(new DeltaPonderPlugin());
-        PropulsionInstanceTypes.register();
     }
 }
