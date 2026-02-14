@@ -3,18 +3,24 @@ package com.deltasf.createpropulsion.propeller;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.deltasf.createpropulsion.physics_assembler.AssemblyUtility;
 import com.deltasf.createpropulsion.propeller.blades.PropellerBladeItem;
 import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
 import com.deltasf.createpropulsion.registries.PropulsionShapes;
 import com.simibubi.create.AllSoundEvents;
+import com.simibubi.create.content.equipment.goggles.GogglesItem;
 import com.simibubi.create.content.kinetics.base.DirectionalKineticBlock;
 import com.simibubi.create.content.kinetics.base.IRotate;
 import com.simibubi.create.foundation.block.IBE;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntityTicker;
 
+import net.createmod.catnip.data.Pair;
+import net.createmod.catnip.outliner.Outliner;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -32,6 +38,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -39,6 +46,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class PropellerBlock extends DirectionalKineticBlock implements IBE<PropellerBlockEntity> {
     public static final float INTERACTION_RPM_THRESHOLD = 20.0f;
+    private static final int ERROR_MESSAGE_COLOR = 0xFF_ff5d6c;
 
     public PropellerBlock(Properties properties) {
         super(properties);
@@ -72,30 +80,41 @@ public class PropellerBlock extends DirectionalKineticBlock implements IBE<Prope
 
     @Override
     public InteractionResult use(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull Player player, @Nonnull InteractionHand hand, @Nonnull BlockHitResult hit) {
-        if (level.isClientSide)
-            return InteractionResult.SUCCESS;
-
         BlockEntity be = level.getBlockEntity(pos);
         if (!(be instanceof PropellerBlockEntity propellerBE))
             return InteractionResult.PASS;
 
-
+        //RPM check
         if (propellerBE.getBladeCount() != 1) {
-            if (Math.abs(propellerBE.getInternalRPM()) > INTERACTION_RPM_THRESHOLD) {
-                //TODO: Notify player that propeller must be stopped
+            float rpm = Math.abs(level.isClientSide ? propellerBE.visualRPM : propellerBE.getInternalRPM());
+
+            if (rpm > INTERACTION_RPM_THRESHOLD) {
+                if (level.isClientSide && player instanceof LocalPlayer localPlayer)  {
+                    localPlayer.displayClientMessage(
+                        Component.translatable("createpropulsion.propeller.must_be_stopped")
+                        .withStyle(s -> s.withColor(ERROR_MESSAGE_COLOR)), true); 
+                    return InteractionResult.SUCCESS; //While this is for fail case - only SUCCESS causes arm swing animation
+                }
                 return InteractionResult.FAIL;
             }
         }
 
+        //Blade insertion
         ItemStack heldItem = player.getItemInHand(hand);
         if (heldItem.getItem() instanceof PropellerBladeItem) {
 
+            propellerBE.getSpatialHandler().triggerImmediateScan();
+
             if (!propellerBE.getSpatialHandler().getObstructedBlocks().isEmpty()) {
+                if (level.isClientSide) {
+                    showBounds(pos, state, player);
+                    return InteractionResult.SUCCESS; //While this is for fail case - only SUCCESS causes arm swing animation
+                }
                 return InteractionResult.FAIL;
             }
+            if (level.isClientSide) return InteractionResult.SUCCESS;
 
             Vec3 localHit = hit.getLocation().subtract(Vec3.atCenterOf(pos));
-
             if (propellerBE.addBlade(heldItem, localHit)) {
                 if (!player.getAbilities().instabuild) {
                     heldItem.shrink(1);
@@ -103,7 +122,9 @@ public class PropellerBlock extends DirectionalKineticBlock implements IBE<Prope
                 level.playSound(null, pos, SoundEvents.ARMOR_EQUIP_IRON, SoundSource.BLOCKS, 1.0f, 1.2f);
                 return InteractionResult.SUCCESS;
             }
+
         } else if (heldItem.isEmpty() && hand == InteractionHand.MAIN_HAND) {
+            if (level.isClientSide) return InteractionResult.SUCCESS;
 
             if (player.isShiftKeyDown()) {
                 if (propellerBE.getBladeCount() > 0) {
@@ -205,5 +226,21 @@ public class PropellerBlock extends DirectionalKineticBlock implements IBE<Prope
     @Override
     public BlockEntityType<? extends PropellerBlockEntity> getBlockEntityType() {
         return PropulsionBlockEntities.PROPELLER_BLOCK_ENTITY.get();
+    }
+
+    private void showBounds(BlockPos pos, BlockState state, Player player) {
+        if (!(player instanceof LocalPlayer localPlayer)) return;
+
+        if (!GogglesItem.isWearingGoggles(localPlayer)) {
+            Vec3 contract = Vec3.atLowerCornerOf(state.getValue(DirectionalKineticBlock.FACING).getNormal());
+            Outliner.getInstance().showAABB(Pair.of("propeller", pos), 
+                new AABB(pos).inflate(1)
+                .deflate(contract.x, contract.y, contract.z))
+                .colored(AssemblyUtility.CANCEL_COLOR);
+        }
+
+        localPlayer.displayClientMessage(
+            Component.translatable("createpropulsion.propeller.not_enough_space")
+            .withStyle(s -> s.withColor(ERROR_MESSAGE_COLOR)), true); 
     }
 }

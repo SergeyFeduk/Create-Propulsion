@@ -160,6 +160,8 @@
     "createpropulsion.propeller.tooltip.summary": "Provides thrust when _two or more blades_ are installed. _Thrust_ is _proportional_ to input _RPM_.",
     "createpropulsion.propeller.tooltip.condition1": "When Shift R-clicked",
     "createpropulsion.propeller.tooltip.behaviour1": "_Flips direction_ of installed blades, effectievely _reversing_ the _thrust_ direction.",
+    "createpropulsion.propeller.not_enough_space": "Clear blocks to insert the Blade",
+    "createpropulsion.propeller.must_be_stopped": "Stop the Propeller before interacting with it",
 
     "createpropulsion.stirling_engine.tooltip.summary": "Uses _heat_ from sources with high heat conductivity to _generate rotational power_.",
     "createpropulsion.stirling_engine.tooltip.condition1": "When heat is provided",
