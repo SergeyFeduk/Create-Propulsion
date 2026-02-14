@@ -58,6 +58,7 @@
     "block.createpropulsion.enveloped_shaft_black": "Чёрная обшивка",
 
     "block.createpropulsion.hot_air_burner": "Горелка",
+    "block.createpropulsion.hot_air_pump": "Тепловой насос",
     "block.createpropulsion.solid_burner": "Твердотопливный нагреватель",
     "block.createpropulsion.liquid_burner": "Жидкостный нагреватель",
     "block.createpropulsion.propeller": "Пропеллер",
@@ -77,7 +78,13 @@
     "create.gui.goggles.thruster.status.working": "Работает",
     "create.gui.goggles.thruster.obstructed": "Заблокировано",
     "create.gui.goggles.thruster.efficiency": "Эффективность",
+    "create.gui.goggles.thruster.peripheral_controlled": "Управляется программно",
     "create.gui.goggles.optical_sensor.lenses": "Линзы",
+
+    "create.gui.goggles.creative_thruster.particle": "Частицы",
+    "create.gui.goggles.creative_thruster.particle.plasma": "Плазма",
+    "create.gui.goggles.creative_thruster.particle.plume": "Пламя",
+    "create.gui.goggles.creative_thruster.particle.none": "Нет",
 
     "createpropulsion.inline_optical_sensor.tooltip.summary": "Сканирует _лучом до {} блоков_.",
     "createpropulsion.inline_optical_sensor.tooltip.condition1": "Когда блок обнаружен",
@@ -90,6 +97,12 @@
     "createpropulsion.thruster.tooltip.summary": "Создаёт тягу до _{} кН_ при установке на корабль.",
     "createpropulsion.thruster.tooltip.condition1": "Когда заправлен и подан редстоун-сигнал",
     "createpropulsion.thruster.tooltip.behaviour1": "Толкает корабль. Тяга зависит от мощности _редстоун-сигнала_ и используемого топлива.",
+
+    "createpropulsion.creative_thruster.tooltip.summary": "Создаёт тягу до _{} кН_ при установке на корабль.",
+    "createpropulsion.creative_thruster.tooltip.condition1": "Когда подан редстоун-сигнал",
+    "createpropulsion.creative_thruster.tooltip.behaviour1": "Толкает корабль. Тяга зависит от мощности _редстоун-сигнала_.",
+    "createpropulsion.creative_thruster.tooltip.condition2": "При использовании гаечного ключа",
+    "createpropulsion.creative_thruster.tooltip.behaviour2": "_Меняет_ частицу пламени.",
 
     "createpropulsion.lodestone_tracker.tooltip.summary": "Преобразует направление стрелки _компаса_ в _редстоун-сигнал_.",
     "createpropulsion.lodestone_tracker.tooltip.condition1": "Когда установлен компас",
@@ -134,6 +147,9 @@
     "createpropulsion.assembler.selection.too_far": "Выделенная область слишком далеко",
 
     "createpropulsion.stirling.generated_speed": "Генерируемая скорость в оборотах в минуту",
+    "createpropulsion.redstone_transmission.control_mode": "Режим трансмиссии",
+    "createpropulsion.redstone_transmission.control_mode.direct": "Прямой",
+    "createpropulsion.redstone_transmission.control_mode.incremental": "Инкрементальный",
 
     "createpropulsion.optical_lens.tooltip.summary": "Оптическая линза, которую можно _покрасить_, чтобы изменить цвет луча _оптического сенсора_.",
     "createpropulsion.fluid_lens.tooltip.summary": "Позволяет _оптическому сенсору_ обнаруживать _жидкости_.",
@@ -144,6 +160,8 @@
     "createpropulsion.propeller.tooltip.summary": "Создаёт тягу если _две или более лопасти_ установлены. _Тяга пропорциональна оборотам вала_.",
     "createpropulsion.propeller.tooltip.condition1": "Shift+ПКМ",
     "createpropulsion.propeller.tooltip.behaviour1": "_Изменяет направление_ установленных лопастей, тем самым _меняя направление тяги_.",
+    "createpropulsion.propeller.not_enough_space": "Уберите блоки чтобы вставить лопасть",
+    "createpropulsion.propeller.must_be_stopped": "Остановите пропеллер перед взаимодействием",
 
     "createpropulsion.stirling_engine.tooltip.summary": "Использует _тепло_ от источников с высокой теплопроводностью для _вращения вала_.",
     "createpropulsion.stirling_engine.tooltip.condition1": "При подаче тепла",
@@ -158,6 +176,9 @@
     "createpropulsion.tooltip.waterEfficiency": "Эффективность в воде",
     "createpropulsion.tooltip.noTorque": "Не производит крутящего момента",
 
+    "createpropulsion.tooltip.heat.generation": "Выработка тепла",
+    "createpropulsion.tooltip.heat.consumption": "Потребление тепла",
+
     "create.gui.goggles.burner.status": "Статус нагревателя",
     "create.gui.goggles.burner.heat.cold": "Холодный",
     "create.gui.goggles.burner.heat.warm": "Тёплый",
@@ -166,6 +187,11 @@
     "create.gui.goggles.burner.thermostat": "Термостат",
     "create.gui.goggles.burner.thermostat.on": "Включён",
     "create.gui.goggles.burner.thermostat.off": "Выключен",
+
+    "create.gui.goggles.hot_air_pump.status": "Статус теплового насоса",
+    "create.gui.goggles.hot_air_pump.status.no_rpm": "Нет вращения",
+    "create.gui.goggles.hot_air_pump.status.no_heat": "Нет тепла",
+    "create.gui.goggles.hot_air_pump.injection": "Скорость надува",
 
     "create.gui.goggles.hot_air_burner.status": "Статус горелки",
     "create.gui.goggles.hot_air_burner.status.airless": "Нет атмосферы",
@@ -181,8 +207,68 @@
     "create.gui.goggles.thruster.unit_kn": "кН",
     "create.gui.creative_thruster.power_behaviour": "Создаваемая тяга",
 
+    "createpropulsion.display_source.redstone_transmission_shift": "Текущий уровень передачи",
+
+    "createpropulsion.gui.goggles.redstone_transmission.title": "Режим трансмиссии",
+    "createpropulsion.gui.goggles.redstone_transmission.internal_shift_title": "Уровень передачи",
+    "createpropulsion.gui.goggles.redstone_transmission.internal_shift_number": " {0} / {1}",
+    "createpropulsion.gui.goggles.redstone_transmission.output": "Переданная скорость вращения",
+
+    "createpropulsion.ponder.shared.rpm": "%.2f Оборотов в минуту",
+
+    "createpropulsion.ponder.redstone_transmission_direct.header": "Режим трансмиссии: Прямой",
+    "createpropulsion.ponder.redstone_transmission_direct.text_1": "У трансмиссии есть два режима, по умолчанию установлен прямой режим.",
+    "createpropulsion.ponder.redstone_transmission_direct.text_2": "В прямом режиме, выходные обороты трансмиссии прямо пропорциональны редстоун-сигналу.",
+    "createpropulsion.ponder.redstone_transmission_direct.text_3": "Выходная скорость не может превышать входной скорости.",
+
+    "createpropulsion.ponder.redstone_transmission_incremental.header": "Режим трансмиссии: Инкрементальный",
+    "createpropulsion.ponder.redstone_transmission_incremental.text_1": "Трансмиссия в Инкрементальном режиме выдаёт обороты пропорциональные внутреннему уровню передачи.",
+    "createpropulsion.ponder.redstone_transmission_incremental.text_2": "Режим трансмиссии можно сменить с помощью поля на задней стороне блока.",
+    "createpropulsion.ponder.redstone_transmission_incremental.text_3": "Редстоун-сигнал на стороне со знаком + (плюс) увеличивает уровень передачи.",
+    "createpropulsion.ponder.redstone_transmission_incremental.text_4": "Редстоун-сигнал на стороне со знаком - (минус) уменьшает уровень передачи.",
+    "createpropulsion.ponder.redstone_transmission_incremental.text_5": "Если редстоун-сигнал подан на обе стороны...",
+    "createpropulsion.ponder.redstone_transmission_incremental.text_6": "...трансмиссия учтёт оба сигнала.",
+
     "createpropulsion.ponder.tilt_adapter.header": "Наклоняем крылья с помощью адаптера наклона",
-    "createpropulsion.ponder.tilt_adapter.text_1": "Адаптер наклона позволяет изменять угол выходного вала в зависимости от сигнала редстоуна",
-    "createpropulsion.ponder.tilt_adapter.text_2": "Подключённые вращатели гарантированно возвращаются в исходное положение",
-    "createpropulsion.ponder.tilt_adapter.text_3": "Конечный угол наклона пропорционален силе сигнала редстоуна"
+    "createpropulsion.ponder.tilt_adapter.text_1": "Адаптер наклона позволяет изменять угол выходного вала в зависимости от сигнала редстоуна.",
+    "createpropulsion.ponder.tilt_adapter.text_2": "Подключённые вращатели гарантированно возвращаются в исходное положение.",
+    "createpropulsion.ponder.tilt_adapter.text_3": "Конечный угол наклона пропорционален силе сигнала редстоуна.",
+
+    "createpropulsion.ponder.solid_burner.header": "Использование твердотопливного нагревателя",
+    "createpropulsion.ponder.solid_burner.text_1": "Твердотопливные нагреватели обеспечивают теплом потребителей расположенных над ними.",
+    "createpropulsion.ponder.solid_burner.text_2": "Потребители тепла активируются, когда нагреватель заправлен.",
+    "createpropulsion.ponder.solid_burner.text_3": "Производство тепла автоматически регулируется для оптимального расхода топлива.",
+    "createpropulsion.ponder.solid_burner.text_4": "Твердотопливные нагреватели имеют встроенный термостат.",
+    "createpropulsion.ponder.solid_burner.text_5": "Подача редстоун-сигнала отключает термостат.",
+    "createpropulsion.ponder.solid_burner.text_6": "Когда термостат выключен, топливо сжигается постоянно, даже без потребителя тепла сверху.",
+    "createpropulsion.ponder.solid_burner.text_7": "§fСтатус нагревателя: §6Горячий.",
+    "createpropulsion.ponder.solid_burner.text_8": "§fСтатус нагревателя: §cОбжигающий.",
+
+    "createpropulsion.ponder.liquid_burner.header": "Использование жидкостного нагревателя",
+    "createpropulsion.ponder.liquid_burner.text_1": "Жидкостные нагреватели сжигают жидкое топливо для обеспечения теплом потребителя над ними.",
+    "createpropulsion.ponder.liquid_burner.text_2": "Потребители тепла активируются, когда нагреватель заправлен.",
+    "createpropulsion.ponder.liquid_burner.text_3": "Производство тепла автоматически регулируется для оптимального расхода топлива.",
+    "createpropulsion.ponder.liquid_burner.text_4": "Жидкостные нагреватели производят вдвое больше тепла по сравнению с твердотопливными нагревателями.",
+    "createpropulsion.ponder.liquid_burner.text_5": "Жидкостные нагреватели имеют встроенный термостат.",
+    "createpropulsion.ponder.liquid_burner.text_6": "Подача редстоун-сигнала отключает термостат.",
+    "createpropulsion.ponder.liquid_burner.text_7": "Когда термостат выключен, топливо сжигается постоянно, даже без потребителя тепла сверху.",
+    "createpropulsion.ponder.liquid_burner.text_8": "§fСтатус нагревателя: §6Горячий.",
+    "createpropulsion.ponder.liquid_burner.text_9": "§fСтатус нагревателя: §cОбжигающий.",
+    "createpropulsion.ponder.liquid_burner.text_10": "Жидкостные нагреватели могут быть установлены друг за другом.",
+    "createpropulsion.ponder.liquid_burner.text_11": "Они будут действовать как труба и передавать топливо другим жидкостным нагревателям.",
+
+    "createpropulsion.ponder.making_balloon.header": "Создание воздушного шара",
+    "createpropulsion.ponder.making_balloon.text_1": "Обшивка образует оболочку, которую можно заполнить горячим воздухом.",
+    "createpropulsion.ponder.making_balloon.text_2": "Горелка будет наполнять горячим воздухом воздушный шар над ней, если она заправлена.",
+    "createpropulsion.ponder.making_balloon.text_3": "Расстояние от горелки до нижнего слоя воздушного шара не должно превышать пяти блоков.",
+    "createpropulsion.ponder.making_balloon.text_4": "Скорость нагрева воздуха можно контролировать рычагом горелки.",
+    "createpropulsion.ponder.making_balloon.text_5": "У горелки есть 3 режима мощности.",
+    "createpropulsion.ponder.making_balloon.text_6": "Чем выше мощность горелки - тем выше скорость нагрева воздуха.",
+
+    "createpropulsion.ponder.hot_air_pump.header": "Использование теплового насоса",
+    "createpropulsion.ponder.hot_air_pump.text_1": "Тепловой насос может быть использован для создания воздушных шаров и наполнения их горячим воздухом.",
+    "createpropulsion.ponder.hot_air_pump.text_2": "Тепловой насос должен быть установлен на активный источник тепла...",
+    "createpropulsion.ponder.hot_air_pump.text_3": "... и его шестерня должна быть подключена к источнику вращения.",
+    "createpropulsion.ponder.hot_air_pump.text_4": "Скорость нагрева воздуха зависит от входных оборотов.",
+    "createpropulsion.ponder.hot_air_pump.text_5": "При входной скорости 256 об/мин тепловой насос нагревает воздух с максимальной скоростью."
 }
