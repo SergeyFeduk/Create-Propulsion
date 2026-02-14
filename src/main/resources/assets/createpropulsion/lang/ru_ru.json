@@ -144,7 +144,7 @@
     "createpropulsion.gauge.selection.cancel": "Кликните ещё раз для отмены",
     "createpropulsion.gauge.selection.confirm": "Кликните ещё раз для подтверждения",
     "createpropulsion.assembler.selection.cannot_be_inside": "Сборщик не может находиться внутри выделенной области",
-    "createpropulsion.assembler.selection.too_far": "Выделенная область слишком далеко",
+    "createpropulsion.assembler.selection.too_far": "Выделенная область находится слишком далеко",
 
     "createpropulsion.stirling.generated_speed": "Генерируемая скорость в оборотах в минуту",
     "createpropulsion.redstone_transmission.control_mode": "Режим трансмиссии",
@@ -214,7 +214,7 @@
     "createpropulsion.gui.goggles.redstone_transmission.internal_shift_number": " {0} / {1}",
     "createpropulsion.gui.goggles.redstone_transmission.output": "Переданная скорость вращения",
 
-    "createpropulsion.ponder.shared.rpm": "%.2f Оборотов в минуту",
+    "createpropulsion.ponder.shared.rpm": "%.2f оборотов в минуту",
 
     "createpropulsion.ponder.redstone_transmission_direct.header": "Режим трансмиссии: Прямой",
     "createpropulsion.ponder.redstone_transmission_direct.text_1": "У трансмиссии есть два режима, по умолчанию установлен прямой режим.",
@@ -222,7 +222,7 @@
     "createpropulsion.ponder.redstone_transmission_direct.text_3": "Выходная скорость не может превышать входной скорости.",
 
     "createpropulsion.ponder.redstone_transmission_incremental.header": "Режим трансмиссии: Инкрементальный",
-    "createpropulsion.ponder.redstone_transmission_incremental.text_1": "Трансмиссия в Инкрементальном режиме выдаёт обороты пропорциональные внутреннему уровню передачи.",
+    "createpropulsion.ponder.redstone_transmission_incremental.text_1": "Трансмиссия в инкрементальном режиме выдаёт обороты пропорциональные внутреннему уровню передачи.",
     "createpropulsion.ponder.redstone_transmission_incremental.text_2": "Режим трансмиссии можно сменить с помощью поля на задней стороне блока.",
     "createpropulsion.ponder.redstone_transmission_incremental.text_3": "Редстоун-сигнал на стороне со знаком + (плюс) увеличивает уровень передачи.",
     "createpropulsion.ponder.redstone_transmission_incremental.text_4": "Редстоун-сигнал на стороне со знаком - (минус) уменьшает уровень передачи.",
@@ -245,7 +245,7 @@
     "createpropulsion.ponder.solid_burner.text_8": "§fСтатус нагревателя: §cОбжигающий.",
 
     "createpropulsion.ponder.liquid_burner.header": "Использование жидкостного нагревателя",
-    "createpropulsion.ponder.liquid_burner.text_1": "Жидкостные нагреватели сжигают жидкое топливо для обеспечения теплом потребителя над ними.",
+    "createpropulsion.ponder.liquid_burner.text_1": "Жидкостные нагреватели сжигают жидкое топливо для обеспечения теплом потребителей над ними.",
     "createpropulsion.ponder.liquid_burner.text_2": "Потребители тепла активируются, когда нагреватель заправлен.",
     "createpropulsion.ponder.liquid_burner.text_3": "Производство тепла автоматически регулируется для оптимального расхода топлива.",
     "createpropulsion.ponder.liquid_burner.text_4": "Жидкостные нагреватели производят вдвое больше тепла по сравнению с твердотопливными нагревателями.",
@@ -263,7 +263,7 @@
     "createpropulsion.ponder.making_balloon.text_3": "Расстояние от горелки до нижнего слоя воздушного шара не должно превышать пяти блоков.",
     "createpropulsion.ponder.making_balloon.text_4": "Скорость нагрева воздуха можно контролировать рычагом горелки.",
     "createpropulsion.ponder.making_balloon.text_5": "У горелки есть 3 режима мощности.",
-    "createpropulsion.ponder.making_balloon.text_6": "Чем выше мощность горелки - тем выше скорость нагрева воздуха.",
+    "createpropulsion.ponder.making_balloon.text_6": "Чем выше мощность горелки, тем выше скорость нагрева воздуха.",
 
     "createpropulsion.ponder.hot_air_pump.header": "Использование теплового насоса",
     "createpropulsion.ponder.hot_air_pump.text_1": "Тепловой насос может быть использован для создания воздушных шаров и наполнения их горячим воздухом.",
