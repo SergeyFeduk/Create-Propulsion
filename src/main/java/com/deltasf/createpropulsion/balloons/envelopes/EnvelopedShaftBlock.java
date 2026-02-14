@@ -40,6 +40,7 @@ public class EnvelopedShaftBlock extends AbstractEncasedShaftBlock implements En
 
     @Override
     public void handleEncasing(BlockState state, Level level, BlockPos pos, ItemStack heldItem, Player player, InteractionHand hand, BlockHitResult ray) {
+        if (!player.isCreative()) heldItem.shrink(1);
         KineticBlockEntity.switchToBlockState(level, pos, defaultBlockState().setValue(RotatedPillarKineticBlock.AXIS, state.getValue(RotatedPillarKineticBlock.AXIS)));
     }
 
