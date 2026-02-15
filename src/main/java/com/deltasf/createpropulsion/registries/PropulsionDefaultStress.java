@@ -3,41 +3,92 @@ package com.deltasf.createpropulsion.registries;
 import com.simibubi.create.api.stress.BlockStressValues;
 import com.tterrag.registrate.builders.BlockBuilder;
 import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
+import net.createmod.catnip.config.ConfigBase;
 import net.createmod.catnip.platform.CatnipServices;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
+import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.DoubleSupplier;
 
-public class PropulsionDefaultStress {
-    public static final Map<ResourceLocation, Double> DEFAULT_IMPACTS = new HashMap<>();
+import javax.annotation.Nonnull;
 
-    public static void register() {
-        //TODO: make stress values configurable
-        BlockStressValues.IMPACTS.registerProvider(PropulsionDefaultStress::getImpact);
+@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
+public class PropulsionDefaultStress extends ConfigBase {
+    private static final int VERSION = 1;
+    public static final PropulsionDefaultStress INSTANCE = new PropulsionDefaultStress();
+
+    private static final Map<ResourceLocation, Double> DEFAULT_IMPACTS = new HashMap<>();
+    private static final Map<ResourceLocation, Double> INTERNAL_IMPACTS = new HashMap<>();
+
+    protected final Map<ResourceLocation, ForgeConfigSpec.ConfigValue<Double>> impacts = new HashMap<>();
+
+    public static void init(ForgeConfigSpec spec) {
+        INSTANCE.specification = spec;
+        BlockStressValues.IMPACTS.registerProvider(INSTANCE::getImpact);
     }
 
-    public static DoubleSupplier getImpact(Block block) {
+    @Override
+    public String getName() {
+        return "stress-values.v" + VERSION;
+    }
+
+    @Override
+    public void registerAll(@Nonnull ForgeConfigSpec.Builder builder) {
+        builder.push("Stress impacts");
+
+        //Internal impacts are not added into spec as they must not be modified!
+        DEFAULT_IMPACTS.forEach((id, value) ->
+            impacts.put(id, builder.define(id.getPath(), value))
+        );
+
+        builder.pop();
+    }
+
+    @Nullable
+    public DoubleSupplier getImpact(Block block) {
         ResourceLocation id = CatnipServices.REGISTRIES.getKeyOrThrow(block);
-        Double value = DEFAULT_IMPACTS.getOrDefault(id, 0.0);
-        if (value == null) return null;
-        return () -> value;
+
+        //Check config
+        ForgeConfigSpec.ConfigValue<Double> configValue = this.impacts.get(id);
+        if (configValue != null) return configValue::get;
+
+        //Check internal
+        Double internalValue = INTERNAL_IMPACTS.get(id);
+        if (internalValue != null) return () -> internalValue;
+
+        return null;
     }
 
-    public static void setDefaultImpact(ResourceLocation blockId, double impact) {
-        DEFAULT_IMPACTS.put(blockId, impact);
+    @SubscribeEvent
+    public static void onLoad(ModConfigEvent.Loading event) {
+        if (INSTANCE.specification == event.getConfig().getSpec())
+            INSTANCE.onLoad();
     }
 
-    public static <B extends Block, P> NonNullUnaryOperator<BlockBuilder<B, P>> setImpact(double impact) {
-        return b -> {
-            setDefaultImpact(ResourceLocation.fromNamespaceAndPath(b.getOwner().getModid(), b.getName()), impact);
-            return b;
+    @SubscribeEvent
+    public static void onReload(ModConfigEvent.Reloading event) {
+        if (INSTANCE.specification == event.getConfig().getSpec())
+            INSTANCE.onReload();
+    }
+
+    public static <B extends Block, P> NonNullUnaryOperator<BlockBuilder<B, P>> setImpact(double impact, boolean addToConfig) {
+        return builder -> {
+            ResourceLocation id = ResourceLocation.tryParse(builder.getOwner().getModid() + ":" + builder.getName());
+            if (id != null) {
+                if (addToConfig) {
+                    DEFAULT_IMPACTS.put(id, impact);
+                } else {
+                    INTERNAL_IMPACTS.put(id, impact);
+                }
+            }
+            return builder;
         };
-    }
-
-    public static <B extends Block, P> NonNullUnaryOperator<BlockBuilder<B, P>> setNoImpact() {
-        return setImpact(0.0);
     }
 }

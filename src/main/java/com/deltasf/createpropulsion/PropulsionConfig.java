@@ -1,5 +1,7 @@
 package com.deltasf.createpropulsion;
 
+import com.deltasf.createpropulsion.registries.PropulsionDefaultStress;
+
 import net.minecraftforge.common.ForgeConfigSpec;
 
 public class PropulsionConfig {
@@ -209,6 +211,8 @@ public class PropulsionConfig {
             BURNERS_POWER_HEATED_MIXERS = SERVER_BUILDER.comment("If true - both solid and liquid burners can provide heat to heated mixers allowing for pre-nether brass.")
                 .define("Burners power heated mixers", true);
         SERVER_BUILDER.pop();
+
+        PropulsionDefaultStress.INSTANCE.registerAll(SERVER_BUILDER);
 
         SERVER_SPEC = SERVER_BUILDER.build();
         //#endregion
