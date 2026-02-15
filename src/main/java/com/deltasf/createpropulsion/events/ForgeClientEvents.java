@@ -49,12 +49,12 @@ public class ForgeClientEvents {
     @SubscribeEvent
     public static void onClientCommandsRegister(RegisterClientCommandsEvent event) {
         LiteralArgumentBuilder<CommandSourceStack> propulsionCommand = Commands.literal("propulsion");
-        propulsionCommand
+        event.getDispatcher().register(propulsionCommand
                 .then(Commands.literal("config")
                         .executes((ctx) -> {
                             openConfig();
                             return 1;
-                        }));
+                        })));
     }
 
     private static void openConfig() {
