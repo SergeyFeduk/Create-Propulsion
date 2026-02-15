@@ -12,8 +12,6 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import org.joml.Matrix4f;
 
 public class PropulsionIcons extends AllIcons {
@@ -33,19 +31,16 @@ public class PropulsionIcons extends AllIcons {
         iconY = y * 16;
     }
 
-    @OnlyIn(Dist.CLIENT)
     @Override
     public void bind() {
         RenderSystem.setShaderTexture(0, ICON_ATLAS);
     }
 
-    @OnlyIn(Dist.CLIENT)
     @Override
     public void render(GuiGraphics graphics, int x, int y) {
         graphics.blit(ICON_ATLAS, x, y, 0, iconX, iconY, 16, 16, 32, 32);
     }
 
-    @OnlyIn(Dist.CLIENT)
     @Override
     public void render(PoseStack ms, MultiBufferSource buffer, int color) {
         VertexConsumer builder = buffer.getBuffer(RenderType.text(ICON_ATLAS));
@@ -69,7 +64,6 @@ public class PropulsionIcons extends AllIcons {
         vertex(builder, matrix, vec4, rgb, u2, v1, light);
     }
 
-    @OnlyIn(Dist.CLIENT)
     private void vertex(VertexConsumer builder, Matrix4f matrix, Vec3 vec, Color rgb, float u, float v, int light) {
         builder.vertex(matrix, (float) vec.x, (float) vec.y, (float) vec.z)
                 .color(rgb.getRed(), rgb.getGreen(), rgb.getBlue(), 255)

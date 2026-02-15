@@ -11,7 +11,6 @@ import com.simibubi.create.foundation.utility.CreateLang;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -51,7 +50,6 @@ public enum ParticleTypes {
         ParticleEntry.REGISTER.register(modEventBus);
     }
 
-    @OnlyIn(Dist.CLIENT)
     public static void registerFactories(RegisterParticleProvidersEvent event) {
         for (ParticleTypes particle : values()) 
             particle.entry.registerFactory(event);
@@ -76,7 +74,6 @@ public enum ParticleTypes {
             object = REGISTER.register(name, () -> this.typeFactory.get().createType());
         }
 
-        @OnlyIn(Dist.CLIENT)
         public void registerFactory(RegisterParticleProvidersEvent event){
             typeFactory.get().register(object.get(), event);
         }

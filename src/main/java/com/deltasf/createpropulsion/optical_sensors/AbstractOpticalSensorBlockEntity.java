@@ -20,7 +20,6 @@ import com.mojang.datafixers.util.Pair;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
@@ -39,17 +38,14 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraft.world.phys.HitResult;
 
 public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity implements IHaveGoggleInformation {
     private int currentTick = -1; //-1 to run raycast immediately after placement/load
     protected float raycastDistance = 0;
 
-    @OnlyIn(Dist.CLIENT)
     private BeamRenderData beamRenderData;
 
-    @OnlyIn(Dist.CLIENT)
     public BeamRenderData getClientBeamRenderData() {
         //Initialize lazily on first access on the client
         if (this.beamRenderData == null) {
