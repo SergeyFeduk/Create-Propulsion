@@ -31,7 +31,6 @@ public class CreatePropulsion {
         PropulsionCreativeTab.register(modBus);
         PropulsionPackets.register();
         PropulsionDisplaySources.register();
-        PropulsionDefaultStress.register();
         PropulsionValkyrien.init();
 
         //Compat
@@ -40,6 +39,7 @@ public class CreatePropulsion {
         //Config
         ctx.registerConfig(ModConfig.Type.SERVER, PropulsionConfig.SERVER_SPEC, ID + "-server.toml");
         ctx.registerConfig(ModConfig.Type.CLIENT, PropulsionConfig.CLIENT_SPEC, ID + "-client.toml");
+        PropulsionDefaultStress.init(PropulsionConfig.SERVER_SPEC);
         
         REGISTRATE.registerEventListeners(modBus);
     }
