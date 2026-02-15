@@ -16,7 +16,6 @@ import com.simibubi.create.foundation.blockEntity.SmartBlockEntityTicker;
 
 import net.createmod.catnip.data.Pair;
 import net.createmod.catnip.outliner.Outliner;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -89,8 +88,8 @@ public class PropellerBlock extends DirectionalKineticBlock implements IBE<Prope
             float rpm = Math.abs(level.isClientSide ? propellerBE.visualRPM : propellerBE.getInternalRPM());
 
             if (rpm > INTERACTION_RPM_THRESHOLD) {
-                if (level.isClientSide && player instanceof LocalPlayer localPlayer)  {
-                    localPlayer.displayClientMessage(
+                if (level.isClientSide)  {
+                    player.displayClientMessage(
                         Component.translatable("createpropulsion.propeller.must_be_stopped")
                         .withStyle(s -> s.withColor(ERROR_MESSAGE_COLOR)), true); 
                     return InteractionResult.SUCCESS; //While this is for fail case - only SUCCESS causes arm swing animation
@@ -229,9 +228,9 @@ public class PropellerBlock extends DirectionalKineticBlock implements IBE<Prope
     }
 
     private void showBounds(BlockPos pos, BlockState state, Player player) {
-        if (!(player instanceof LocalPlayer localPlayer)) return;
+        if (!player.level().isClientSide) return;
 
-        if (!GogglesItem.isWearingGoggles(localPlayer)) {
+        if (!GogglesItem.isWearingGoggles(player)) {
             Vec3 contract = Vec3.atLowerCornerOf(state.getValue(DirectionalKineticBlock.FACING).getNormal());
             Outliner.getInstance().showAABB(Pair.of("propeller", pos), 
                 new AABB(pos).inflate(1)
@@ -239,7 +238,7 @@ public class PropellerBlock extends DirectionalKineticBlock implements IBE<Prope
                 .colored(AssemblyUtility.CANCEL_COLOR);
         }
 
-        localPlayer.displayClientMessage(
+        player.displayClientMessage(
             Component.translatable("createpropulsion.propeller.not_enough_space")
             .withStyle(s -> s.withColor(ERROR_MESSAGE_COLOR)), true); 
     }

@@ -67,7 +67,6 @@ public class PlasmaParticleData implements ParticleOptions, ICustomParticleDataW
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
     public SpriteParticleRegistration<PlasmaParticleData> getMetaFactory() {
         return PlasmaParticle.Factory::new;
     }
