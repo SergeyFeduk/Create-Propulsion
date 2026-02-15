@@ -3,8 +3,7 @@ package com.deltasf.createpropulsion.physics_assembler.packets;
 import com.deltasf.createpropulsion.physics_assembler.AssemblyGaugeOverlayRenderer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
@@ -31,9 +30,7 @@ public class GaugeUsedPacket {
     }
 
     public void handle(Supplier<NetworkEvent.Context> context) {
-        context.get().enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-            AssemblyGaugeOverlayRenderer.triggerFlash(this.selection);
-        }));
+        if (FMLEnvironment.dist.isClient()) AssemblyGaugeOverlayRenderer.triggerFlash(this.selection);
         context.get().setPacketHandled(true);
     }
 }

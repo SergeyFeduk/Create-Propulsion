@@ -6,6 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.network.NetworkEvent;
 
 public class GaugeInsertionErrorPacket {
@@ -24,10 +25,11 @@ public class GaugeInsertionErrorPacket {
         buf.writeComponent(message);
     }
 
+    public Component getMessage() {
+        return message;
+    }
+
     public void handle(Supplier<NetworkEvent.Context> context) {
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.gui instanceof ForgeGui gui) {
-            gui.setOverlayMessage(message, false);
-        }
+        if (FMLEnvironment.dist.isClient()) ClientPacketHandler.handleGaugeInsertionErrorClient(this);
     }
 }

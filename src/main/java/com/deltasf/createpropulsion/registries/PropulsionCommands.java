@@ -18,8 +18,6 @@ import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
 
 public class PropulsionCommands {
 
@@ -39,10 +37,6 @@ public class PropulsionCommands {
         propulsionCommand
             .then(Commands.literal("kill-orphans")
             .executes(PropulsionCommands::killOrphans));
-
-        propulsionCommand
-            .then(Commands.literal("config")
-            .executes(PropulsionCommands::openConfig));
 
         dispatcher.register(propulsionCommand);
     }
@@ -100,11 +94,6 @@ public class PropulsionCommands {
         } else {
             context.getSource().sendFailure(Component.literal("No orphans to kill :("));
         }
-        return 1;
-    }
-
-    private static int openConfig(CommandContext<CommandSourceStack> context) {
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> PropulsionClient::openConfig);
         return 1;
     }
 }
