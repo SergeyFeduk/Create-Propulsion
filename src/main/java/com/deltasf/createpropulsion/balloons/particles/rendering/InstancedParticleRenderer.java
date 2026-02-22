@@ -143,6 +143,7 @@ public class InstancedParticleRenderer {
 
     public static void render(PoseStack ms, Matrix4f projectionMatrix, Camera camera, float partialTick) {
         if (!initialized) init();
+        if (MATRIX_BUFFER == null || UPLOAD_BUFFER == null) return; //Kys atp
         if (BalloonParticleSystem.getAllHandlers().isEmpty()) return;
 
         Minecraft mc = Minecraft.getInstance();
@@ -161,12 +162,13 @@ public class InstancedParticleRenderer {
         RenderSystem.defaultBlendFunc();
         RenderSystem.enableDepthTest();
         
+        int previousProgram = GL31.glGetInteger(GL31.GL_CURRENT_PROGRAM);
         GL31.glUseProgram(programId);
         GL31.glBindVertexArray(VAOId);
 
         //Bind pixel texture
-        GL31.glActiveTexture(GL31.GL_TEXTURE0);
-        GL31.glBindTexture(GL31.GL_TEXTURE_2D, textureId);
+        RenderSystem.activeTexture(GL31.GL_TEXTURE0);
+        RenderSystem.bindTexture(textureId);
         int uTexLoc = GL31.glGetUniformLocation(programId, "uTex");
         GL31.glUniform1i(uTexLoc, 0);
 
@@ -239,16 +241,14 @@ public class InstancedParticleRenderer {
             //Upload stuff
             GL31.glBindBuffer(GL31.GL_ARRAY_BUFFER, instanceVBOId);
             
-            if (UPLOAD_BUFFER != null) {
-                uploadData(0, data.px, count);
-                uploadData(ARRAY_SIZE_BYTES, data.py, count);
-                uploadData(ARRAY_SIZE_BYTES * 2, data.pz, count);
-                uploadData(ARRAY_SIZE_BYTES * 3, data.x, count);
-                uploadData(ARRAY_SIZE_BYTES * 4, data.y, count);
-                uploadData(ARRAY_SIZE_BYTES * 5, data.z, count);
-                uploadData(ARRAY_SIZE_BYTES * 6, data.life, count);
-                uploadData(ARRAY_SIZE_BYTES * 7, data.scale, count);
-            }
+            uploadData(0, data.px, count);
+            uploadData(ARRAY_SIZE_BYTES, data.py, count);
+            uploadData(ARRAY_SIZE_BYTES * 2, data.pz, count);
+            uploadData(ARRAY_SIZE_BYTES * 3, data.x, count);
+            uploadData(ARRAY_SIZE_BYTES * 4, data.y, count);
+            uploadData(ARRAY_SIZE_BYTES * 5, data.z, count);
+            uploadData(ARRAY_SIZE_BYTES * 6, data.life, count);
+            uploadData(ARRAY_SIZE_BYTES * 7, data.scale, count);
 
             //Ship uniforms
             TEMP_MATRIX.set(shipToWorld);
@@ -270,10 +270,10 @@ public class InstancedParticleRenderer {
 
         //Tidy up after outselves
         GL31.glBindVertexArray(0);
-        GL31.glUseProgram(0);
+        GL31.glUseProgram(previousProgram);
 
         GL31.glBindBuffer(GL31.GL_ARRAY_BUFFER, 0); 
-        GL31.glBindTexture(GL31.GL_TEXTURE_2D, 0);
+        RenderSystem.bindTexture(0);
 
         RenderSystem.depthMask(true); 
         RenderSystem.disableBlend();

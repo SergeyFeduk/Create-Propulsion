@@ -6,6 +6,7 @@ import java.util.Map;
 import org.joml.Matrix4dc;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.ClientShip;
+import org.valkyrienskies.core.internal.ships.VsiQueryableShipData;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
@@ -94,8 +95,13 @@ public class BalloonParticleSystem {
         double radius = PropulsionConfig.BALLOON_PARTICLES_SPAWN_RADIUS.get();
         AABB playerBounds = player.getBoundingBox().inflate(radius);
 
+        VsiQueryableShipData<ClientShip> loadedShips = VSGameUtilsKt.getShipObjectWorld(mc.level).getLoadedShips();
+
+        //Remove all handlers that are no longer loaded
+        handlers.long2ObjectEntrySet().removeIf(entry -> loadedShips.getById(entry.getLongKey()) == null);
+
         //Iterate over loaded ships
-        for (ClientShip ship : VSGameUtilsKt.getShipObjectWorld(mc.level).getLoadedShips()) {
+        for (ClientShip ship : loadedShips) {
             AABB shipWorldAABB = VectorConversionsMCKt.toMinecraft(ship.getRenderAABB());
             if (!shipWorldAABB.intersects(playerBounds)) continue;
 
