@@ -59,8 +59,8 @@ public class InstancedParticleRenderer {
     private static final int ARRAY_SIZE_BYTES = MAX_PARTICLES * FLOAT_SIZE; 
     private static final int TOTAL_BUFFER_SIZE = ARRAY_SIZE_BYTES * 8; 
     
-    private static final FloatBuffer MATRIX_BUFFER = MemoryUtil.memAllocFloat(16);
-    private static final FloatBuffer UPLOAD_BUFFER = MemoryUtil.memAllocFloat(MAX_PARTICLES);
+    private static FloatBuffer MATRIX_BUFFER;
+    private static FloatBuffer UPLOAD_BUFFER;
     
     private static final Matrix4f TEMP_MATRIX = new Matrix4f();
     private static final Vector4d TEMP_VEC4 = new Vector4d();
@@ -74,6 +74,11 @@ public class InstancedParticleRenderer {
 
     public static void init() {
         if (initialized) return;
+
+        //Init buffers
+        if (MATRIX_BUFFER == null) MATRIX_BUFFER = MemoryUtil.memAllocFloat(16);
+        if (UPLOAD_BUFFER == null) UPLOAD_BUFFER = MemoryUtil.memAllocFloat(MAX_PARTICLES);
+
         programId = ParticleShaderLoader.createProgram("hap.vert", "hap.frag");
         
         //Uniforms!!!
@@ -234,14 +239,16 @@ public class InstancedParticleRenderer {
             //Upload stuff
             GL31.glBindBuffer(GL31.GL_ARRAY_BUFFER, instanceVBOId);
             
-            uploadData(0, data.px, count);
-            uploadData(ARRAY_SIZE_BYTES, data.py, count);
-            uploadData(ARRAY_SIZE_BYTES * 2, data.pz, count);
-            uploadData(ARRAY_SIZE_BYTES * 3, data.x, count);
-            uploadData(ARRAY_SIZE_BYTES * 4, data.y, count);
-            uploadData(ARRAY_SIZE_BYTES * 5, data.z, count);
-            uploadData(ARRAY_SIZE_BYTES * 6, data.life, count);
-            uploadData(ARRAY_SIZE_BYTES * 7, data.scale, count);
+            if (UPLOAD_BUFFER != null) {
+                uploadData(0, data.px, count);
+                uploadData(ARRAY_SIZE_BYTES, data.py, count);
+                uploadData(ARRAY_SIZE_BYTES * 2, data.pz, count);
+                uploadData(ARRAY_SIZE_BYTES * 3, data.x, count);
+                uploadData(ARRAY_SIZE_BYTES * 4, data.y, count);
+                uploadData(ARRAY_SIZE_BYTES * 5, data.z, count);
+                uploadData(ARRAY_SIZE_BYTES * 6, data.life, count);
+                uploadData(ARRAY_SIZE_BYTES * 7, data.scale, count);
+            }
 
             //Ship uniforms
             TEMP_MATRIX.set(shipToWorld);
@@ -272,7 +279,7 @@ public class InstancedParticleRenderer {
         RenderSystem.disableBlend();
     }
     
-    private static void uploadData(long offset, float[] data, int count) {
+    private static void uploadData(long offset, float[] data, int count) { 
         UPLOAD_BUFFER.clear();
         UPLOAD_BUFFER.put(data, 0, count);
         UPLOAD_BUFFER.flip();
@@ -287,8 +294,14 @@ public class InstancedParticleRenderer {
         GL31.glDeleteTextures(textureId);
         GL31.glDeleteProgram(programId);
         
-        MemoryUtil.memFree(MATRIX_BUFFER);
-        MemoryUtil.memFree(UPLOAD_BUFFER);
+        if (MATRIX_BUFFER != null) {
+            MemoryUtil.memFree(MATRIX_BUFFER);
+            MATRIX_BUFFER = null;
+        }
+        if (UPLOAD_BUFFER != null) {
+            MemoryUtil.memFree(UPLOAD_BUFFER);
+            UPLOAD_BUFFER = null;
+        }
         
         initialized = false;
     }
