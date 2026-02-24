@@ -149,7 +149,7 @@ public class BalloonParticleSystem {
 
     @SubscribeEvent
     public static void onRenderLevelStage(RenderLevelStageEvent event) {
-        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS) return;
+        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES) return;
         if (!PropulsionConfig.BALLOON_PARTICLES_ENABLED.get()) return;
 
         InstancedParticleRenderer.render(
