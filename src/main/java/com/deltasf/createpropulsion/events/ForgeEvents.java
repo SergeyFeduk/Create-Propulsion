@@ -98,7 +98,7 @@ public class ForgeEvents {
                     //Restore MagnetForceAttachment levels
                     var magnetAttachment  = serverShip.getAttachment(MagnetForceAttachment.class);
                     if (magnetAttachment != null) {
-                        magnetAttachment.level = level;
+                        magnetAttachment.dimension = level.dimension();
                     }
                     //Restore BalloonAttachment atmosphere data
                     var balloonAttachment = serverShip.getAttachment(BalloonAttachment.class);

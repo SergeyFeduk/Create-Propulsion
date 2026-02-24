@@ -11,43 +11,46 @@ import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.joml.Vector3ic;
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
-import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.core.api.ships.PhysShip;
+import org.valkyrienskies.core.api.ships.QueryableShipData;
+import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.ShipPhysicsListener;
 import org.valkyrienskies.core.api.ships.properties.ShipTransform;
 import org.valkyrienskies.core.api.world.PhysLevel;
 import org.valkyrienskies.core.impl.game.ships.PhysShipImpl;
-import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 
 import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.utility.AttachmentUtils;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 
 public final class MagnetForceAttachment implements ShipPhysicsListener {
     @JsonIgnore
-    public volatile Level level;
+    public volatile ResourceKey<Level> dimension;
     public MagnetForceAttachment() {}
     
     @Override
     public void physTick(@NotNull PhysShip physicShip, @NotNull PhysLevel physLevel) {
         PhysShipImpl ship = (PhysShipImpl) physicShip;
-        if (this.level == null) {
-            return;
-        }
-        List<MagnetPair> pairs = MagnetRegistry.forLevel(level).getPairsForShip(ship.getId());
-        if (pairs.isEmpty()) {
-            return;
-        }
+        if (dimension == null) return;
+
+        MagnetLevelRegistry registry = MagnetRegistry.getRegistry(dimension);
+        if (registry == null) return; 
+
+        List<MagnetPair> pairs = registry.getPairsForShip(ship.getId());
+        if (pairs == null || pairs.isEmpty()) return;
 
         var transform = ship.getTransform();
         var shipCOM = transform.getPositionInShip();
+        QueryableShipData<ServerShip> allShips = ValkyrienSkies.api().getServerShipWorld().getAllShips();
 
         accumulatedForce.zero();
         accumulatedTorque.zero();
         for(MagnetPair pair : pairs) {
-            calculateInteraction(pair, ship, shipCOM, transform, accumulatedForce, accumulatedTorque);
+            calculateInteraction(pair, ship, shipCOM, transform, allShips, accumulatedForce, accumulatedTorque);
         }
         //Cuz doing this individually for some reason breaks things
         if (accumulatedForce.lengthSquared() > 1e-9) { 
@@ -107,7 +110,7 @@ public final class MagnetForceAttachment implements ShipPhysicsListener {
     private final Vector3d tempTorqueFromForce = new Vector3d();
 
 
-    private void calculateInteraction(MagnetPair pair, PhysShipImpl shipA, Vector3dc ACOM, ShipTransform transformA, 
+    private void calculateInteraction(MagnetPair pair, PhysShipImpl shipA, Vector3dc ACOM, ShipTransform transformA, QueryableShipData<ServerShip> allShips,
         Vector3d totalForceAcc,
         Vector3d totalTorqueAcc) {
         //Calculate interaction power
@@ -127,7 +130,7 @@ public final class MagnetForceAttachment implements ShipPhysicsListener {
         //World-space normalized direction of magnet A moment
         toWorldDirection(transformA, pair.localDir, m_A_hat);
 
-        LoadedShip shipB_loaded = null;
+        ServerShip shipB_loaded = null;
 
         if (pair.otherShipId == -1) { //Magnet B is on the world grid
             worldPosB.set(
@@ -142,7 +145,7 @@ public final class MagnetForceAttachment implements ShipPhysicsListener {
             }
             m_B_hat.normalize();
         } else { //Magnet B is on another ship
-            shipB_loaded = getShipById(this.level, pair.otherShipId);
+            shipB_loaded = getShipById(allShips, pair.otherShipId);
             if (shipB_loaded == null) return; //Other ship not found or not loaded
 
             ShipTransform transformB = shipB_loaded.getTransform();
@@ -224,20 +227,17 @@ public final class MagnetForceAttachment implements ShipPhysicsListener {
         destWorldDir.normalize();
     }    
     
-    public static LoadedShip getShipById(Level level, long shipId) {
-        return VSGameUtilsKt.getShipWorldNullable(level).getLoadedShips().getById(shipId);
+    public static ServerShip getShipById(QueryableShipData<ServerShip> allShips, long shipId) {
+        return allShips.getById(shipId);
     }
 
-    //As you can see the calculations are done only for magnet A. This sucks as magnet B would have to do 90% of the same calculations when calculating pair (B; A) 
-    //It is possible to reduce the amount of calculations by a factor of 2 by introducing centralized cache for the whole physics thread
-    //By caching result(A, B) after its calculation we can skip almost all math for (B, A) and just reuse inverted result(A, B), as F(A, B) = -F(B, A)
-    //This would require having a centralized cache and a way to subsribe to the start of physics tick, which I did not figure out yet
-    //Or, instead of physics tick start - check if all pairs were cached - and clean up after (tho this is less desirable)
+    //There was a comment about caching magnet calculations, but after reflecting on it for a whopping 2 minutes I came 
+    //to conclusion that it would likely be slower than simply doing calculations twice. 
 
     public static MagnetForceAttachment getOrCreateAsAttachment(Level level, LoadedServerShip ship){
         return AttachmentUtils.getOrCreate(ship, MagnetForceAttachment.class, () -> {
             MagnetForceAttachment attachment = new MagnetForceAttachment();
-            attachment.level = level;
+            attachment.dimension = level.dimension();
             return attachment;
         });
     }
@@ -245,7 +245,7 @@ public final class MagnetForceAttachment implements ShipPhysicsListener {
     public static MagnetForceAttachment get(Level level, BlockPos pos) {
         return AttachmentUtils.get(level, pos, MagnetForceAttachment.class, () -> {
             MagnetForceAttachment attachment = new MagnetForceAttachment();
-            attachment.level = level;
+            attachment.dimension = level.dimension();
             return attachment;
         });
     }

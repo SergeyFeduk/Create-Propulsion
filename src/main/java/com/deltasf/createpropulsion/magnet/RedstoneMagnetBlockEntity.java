@@ -3,6 +3,8 @@ package com.deltasf.createpropulsion.magnet;
 import java.util.List;
 import java.util.UUID;
 
+import javax.annotation.Nonnull;
+
 import org.joml.Vector3i;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
@@ -18,6 +20,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
@@ -59,6 +62,7 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
         }
 
         BlockState currentState = level.getBlockState(worldPosition);
+        MagnetLevelRegistry registry = MagnetRegistry.getOrCreateRegistry(level);
         int effectivePower = getEffectivePower();
 
         if (effectivePower > 0) {
@@ -70,13 +74,12 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
             }
 
             Vector3i currentDipoleDir = VectorConversionsMCKt.toJOML(currentState.getValue(RedstoneMagnetBlock.FACING).getNormal());
-            MagnetData magnetData = MagnetRegistry.forLevel(level).getOrCreateMagnet(this.magnetId, worldPosition, currentShipId, currentDipoleDir, effectivePower);
+            MagnetData magnetData = registry.getOrCreateMagnet(this.magnetId, worldPosition, currentShipId, currentDipoleDir, effectivePower);
             magnetData.cancelRemoval();
             magnetData.update(worldPosition, currentShipId, currentDipoleDir, effectivePower);
-            MagnetRegistry.forLevel(level).updateMagnetPosition(magnetData);
-
+            registry.updateMagnetPosition(magnetData);
         } else {
-            MagnetRegistry.forLevel(level).scheduleRemoval(this.magnetId);
+            registry.scheduleRemoval(this.magnetId);
         }
     }
 
@@ -84,9 +87,9 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
         this.needsUpdate = true;
     }
 
-    public void onBlockBroken() {
+    public void onBlockBroken(@Nonnull Level level) {
         if (this.magnetId != null) {
-            MagnetRegistry.forLevel(level).scheduleRemoval(this.magnetId);
+            MagnetRegistry.getOrCreateRegistry(level).scheduleRemoval(this.magnetId);
         }
     }
 
@@ -106,20 +109,21 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
             var serverShip = VSGameUtilsKt.getLoadedShipManagingPos((ServerLevel)level, worldPosition);
             if (serverShip != null) {
                 var magnetAttachment  = serverShip.getAttachment(MagnetForceAttachment.class);
-                if (magnetAttachment != null && magnetAttachment.level == null) {
-                    magnetAttachment.level = level;
+                if (magnetAttachment != null && magnetAttachment.dimension == null) {
+                    magnetAttachment.dimension = level.dimension();
                 }
                 updatedAttachment = true;
             }
         }
 
-        MagnetData data = MagnetRegistry.forLevel(level).getMagnet(this.magnetId);
+        MagnetLevelRegistry registry = MagnetRegistry.getOrCreateRegistry(level);
+        MagnetData data = registry.getMagnet(this.magnetId);
         if (data != null && data.shipId != -1) {
             var serverShip = VSGameUtilsKt.getLoadedShipManagingPos((ServerLevel)level, worldPosition);
             if (serverShip == null) {
-                MagnetRegistry.forLevel(level).removeAllMagnetsForShip(data.shipId); //Technically we could just remove only this magnet but who cares
+                registry.removeAllMagnetsForShip(data.shipId); //Technically we could just remove only this magnet but who cares
             } else {
-                MagnetRegistry.forLevel(level).updateMagnetPosition(data);
+                registry.updateMagnetPosition(data);
             }
         }
     }

@@ -13,7 +13,7 @@ public class MagnetRegistryTickHandler {
         var levels = event.getServer().getAllLevels();
         
         for(ServerLevel level : levels) {
-            MagnetRegistry.forLevel(level).computePairs();
+            MagnetRegistry.getOrCreateRegistry(level).computePairs();
         }
     }
 }
