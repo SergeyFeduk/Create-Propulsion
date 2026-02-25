@@ -1,6 +1,6 @@
 package com.deltasf.createpropulsion.magnet;
 
-import java.util.List;
+import java.util.Collection;
 
 import javax.annotation.Nonnull;
 
@@ -40,7 +40,7 @@ public final class MagnetForceAttachment implements ShipPhysicsListener {
         MagnetLevelRegistry registry = MagnetRegistry.getRegistry(dimension);
         if (registry == null) return; 
 
-        List<MagnetPair> pairs = registry.getPairsForShip(ship.getId());
+        Collection<MagnetPair> pairs = registry.getPairsForShip(ship.getId());
         if (pairs == null || pairs.isEmpty()) return;
 
         var transform = ship.getTransform();

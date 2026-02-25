@@ -6,6 +6,8 @@ import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
+import com.deltasf.createpropulsion.PropulsionConfig;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import java.util.UUID;
@@ -27,6 +29,9 @@ public class MagnetData {
     private final Vector3i blockDipoleDir; 
     private int power;
 
+    private final Vector3d lastPairedPosition = new Vector3d(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+    public boolean needsRepairing = true;
+
     public BlockPos getBlockPos() { return pos; }
     public Vector3d getPosition() { return worldPosition; }
     public Vector3i getBlockDipoleDir() { return blockDipoleDir; }
@@ -46,6 +51,13 @@ public class MagnetData {
             Ship ship = VSGameUtilsKt.getShipManagingPos(level, pos);
             if (ship == null) return;
             worldPosition = VectorConversionsMCKt.toJOML(VSGameUtilsKt.toWorldCoordinates(ship, pos.getCenter()));
+        }
+        
+        // Flag for re-pairing if moved more than threshold
+        double movementThreshold = PropulsionConfig.REDSTONE_MAGNET_MOVEMENT_DISTANCE_THRESHOLD.get();
+        if (worldPosition != null && lastPairedPosition.distanceSquared(worldPosition) >= movementThreshold * movementThreshold) {
+            lastPairedPosition.set(worldPosition);
+            needsRepairing = true;
         }
     }
 

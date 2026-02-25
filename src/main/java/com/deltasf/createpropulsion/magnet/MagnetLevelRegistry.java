@@ -1,12 +1,13 @@
 package com.deltasf.createpropulsion.magnet;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -27,19 +28,26 @@ import net.minecraft.world.phys.Vec3;
 @SuppressWarnings("deprecation")
 public class MagnetLevelRegistry {
 
-    ///Hello there. You are probably interested in how I impl'd magnets. So let me assist you with an explanation:
-    ///Magnets register themselves into the registry (this file) when they are activated. Registry handles pairing
-    ///in O(n * k), where k is the average amount of neighbours per magnet. Neighbours are all other active magnets
-    ///in 5x5 chunk region. All magnets on different grids are paired together and result is stored in shipToPairs map
-    ///This map is later used inside MagnetForceAttachment to calculate and aggregate forces and torques affecting each magnet on a given ship.
-    ///
-    ///Btw, this implementation is not final, read TODOs. 
+    public static final class PairKey {
+        public final UUID local;
+        public final UUID other;
+        public PairKey(UUID local, UUID other) { this.local = local; this.other = other; }
+        @Override public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (obj == null || getClass() != obj.getClass()) return false;
+            PairKey key = (PairKey) obj;
+            return local.equals(key.local) && other.equals(key.other);
+        }
+        @Override public int hashCode() { return 31 * local.hashCode() + other.hashCode(); }
+    }
 
     private final ConcurrentHashMap<UUID, MagnetData> magnets = new ConcurrentHashMap<>();
     private final Long2ObjectOpenHashMap<List<UUID>> spatial = new Long2ObjectOpenHashMap<>();
     private final Map<UUID, Long> lastChunkKey = new ConcurrentHashMap<>();
-    private volatile Map<Long, List<MagnetPair>> shipToPairs = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Long, List<UUID>> shipMagnets = new ConcurrentHashMap<>();
+    
+    private final Map<Long, ConcurrentHashMap<PairKey, MagnetPair>> shipToPairs = new ConcurrentHashMap<>();
+    private final Map<UUID, Set<UUID>> activeEdges = new ConcurrentHashMap<>();
     
     private Level level;
 
@@ -62,9 +70,7 @@ public class MagnetLevelRegistry {
 
     public void scheduleRemoval(UUID id) {
         MagnetData data = magnets.get(id);
-        if (data != null) {
-            data.scheduleForRemoval();
-        }
+        if (data != null) data.scheduleForRemoval();
     }
 
     public void updateMagnetPosition(MagnetData data) {
@@ -83,20 +89,23 @@ public class MagnetLevelRegistry {
         lastChunkKey.put(data.id, newChunkKey);
     }
 
-    //TODO: Instead of doing neighbour scan every tick - do it only when one of the magnets moved far enough (> 0.2 blocks) from previous registered position
-    //However it should keep worldPosition updated, and update registered position only when moved too far away
-    //When this happens - do retrieveNeighbours for this magnet only
-    //This will make sure that registry is updated only when needed and will increase performance
-
     public void computePairs() {
-        //Collect garbage
         List<UUID> toRemove = new ArrayList<>();
+        List<MagnetData> dirty = new ArrayList<>();
+
+        //Collect garbage and dirty magnets
         for (MagnetData data : magnets.values()) {
             if (data.isPendingRemoval()) {
                 toRemove.add(data.id);
+            } else if (data.needsRepairing) {
+                dirty.add(data);
             }
         }
 
+        //Sleep
+        if (toRemove.isEmpty() && dirty.isEmpty()) return;
+
+        //Handle removals
         for (UUID id : toRemove) {
             MagnetData removedData = magnets.remove(id);
             if (removedData != null) {
@@ -105,103 +114,114 @@ public class MagnetLevelRegistry {
                     List<UUID> list = spatial.get(chunkKey);
                     if (list != null) list.remove(id);
                 }
-                //Remove from shipMagnets map
                 if (removedData.shipId != -1) {
                     List<UUID> shipList = shipMagnets.get(removedData.shipId);
                     if (shipList != null) {
                         shipList.remove(id);
                         if (shipList.isEmpty()) {
                             shipMagnets.remove(removedData.shipId);
+                            shipToPairs.remove(removedData.shipId);
                         }
+                    }
+                }
+                severAllConnections(id, removedData.shipId);
+            }
+        }
+
+        //Handle incremental updates
+        for (MagnetData A : dirty) {
+            A.needsRepairing = false;
+
+            //Before scanning for new connections - kill all previous ones
+            severAllConnections(A.id, A.shipId);
+
+            Vector3d posA = A.getPosition();
+            if (posA == null) continue;
+
+            for (UUID BUUID : retrieveNeighbours(level, A)) {
+                if (A.id.equals(BUUID)) continue;
+                MagnetData B = magnets.get(BUUID);
+                if (B == null || B.isPendingRemoval()) continue;
+                if (shouldSkip(A, B)) continue;
+
+                Vector3d posB = B.getPosition();
+                if (posB != null && posA.distanceSquared(posB) <= MagnetRegistry.magnetRangeSquared) {
+                    createConnection(A, B);
+                }
+            }
+        }
+
+        //Debug Rendering
+        if (PropulsionDebug.isDebug(MainDebugRoute.MAGNET)) {
+            int i = 0;
+            for (MagnetData data : magnets.values()) {
+                i++;
+                DebugRenderer.drawBox(i + "_active", data.getBlockPos().getCenter(), new Vec3(1.5, 1.5, 1.5), Color.red, 2);
+            }
+            int j = 0;
+            for (Map.Entry<UUID, Set<UUID>> entry : activeEdges.entrySet()) {
+                UUID idA = entry.getKey();
+                MagnetData A = magnets.get(idA);
+                if (A == null) continue;
+                for (UUID idB : entry.getValue()) {
+                    if (idA.compareTo(idB) < 0) { //Only draw each A-B link once
+                        MagnetData B = magnets.get(idB);
+                        if (B == null) continue;
+                        j++;
+                        DebugRenderer.drawElongatedBox(j + "_edge", 
+                            VectorConversionsMCKt.toMinecraft(A.getPosition()), 
+                            VectorConversionsMCKt.toMinecraft(B.getPosition()), 
+                            0.25f, Color.blue, false, 2);
                     }
                 }
             }
         }
+    }
 
-        //Gather active magnets
-        List<MagnetData> active = new ArrayList<>(magnets.values());
-        int n = active.size();
-        if (PropulsionDebug.isDebug(MainDebugRoute.MAGNET)) {
-            //Draw active magnets
-            for (int i = 0; i < n; i++) {
-                var data = active.get(i);
-                String identifier = i + "_active";
-                DebugRenderer.drawBox(identifier, data.getBlockPos().getCenter(), new Vec3(1.5, 1.5, 1.5), Color.red, 2);
-            }
-        }
-        
-        if (n <= 1) {
-            //Nothing to pair if there's 0 or 1 magnet
-            if (!shipToPairs.isEmpty()) {
-                this.shipToPairs = new ConcurrentHashMap<>();
-            }
-            return;
-    
-        }
-        List<int[]> edges = new ArrayList<>();
+    private void severAllConnections(UUID magnetId, long shipId) {
+        Set<UUID> pairedWith = activeEdges.remove(magnetId);
+        if (pairedWith == null) return;
 
-        //Build a map from MagnetData to its index for fast lookup
-        Map<MagnetData, Integer> indexMap = new HashMap<>();
-        for (int i = 0; i < n; i++) {
-            indexMap.put(active.get(i), i);
-        }
-        
-        //Neighbour scan
-        for(int i = 0; i < n; i++) {
-            MagnetData A = active.get(i);
-            Vector3d posA = A.getPosition();
-            for(UUID BUUID : retrieveNeighbours(level, A)) {
-                MagnetData B = magnets.get(BUUID);
-                Integer jObj = indexMap.get(B);
-                if (jObj == null) continue; //B not in active list
-                int j = jObj;
-                if (j <= i) continue;
-                if (shouldSkip(A, B)) continue;
-                Vector3d posB = B.getPosition();
-                if (posA.distanceSquared(posB) <= MagnetRegistry.magnetRangeSquared) {
-                    edges.add(new int[]{i, j});
-                }
-            }
-        }
-        //Add pairs
-        ConcurrentHashMap<Long, List<MagnetPair>> newShipToPairs = new ConcurrentHashMap<>();
+        for (UUID otherId : pairedWith) {
+            Set<UUID> otherEdges = activeEdges.get(otherId);
+            if (otherEdges != null) otherEdges.remove(magnetId);
 
-        for(int[] edge : edges) {
-            MagnetData A = active.get(edge[0]);
-            MagnetData B = active.get(edge[1]);
-            if (A.shipId != -1) {
-                MagnetPair pair = new MagnetPair(A.getBlockPos(), A.getBlockDipoleDir(), A.getPower(),
-                                                 B.shipId, B.getBlockPos(), B.getBlockDipoleDir(), B.getPower());
-                newShipToPairs.computeIfAbsent(A.shipId, k -> new CopyOnWriteArrayList<>()).add(pair);
+            MagnetData B = magnets.get(otherId);
+            long otherShipId = B != null ? B.shipId : -1;
+
+            if (shipId != -1) {
+                ConcurrentHashMap<PairKey, MagnetPair> mapA = shipToPairs.get(shipId);
+                if (mapA != null) mapA.remove(new PairKey(magnetId, otherId));
             }
-            if (B.shipId != -1) {
-                MagnetPair pair = new MagnetPair(B.getBlockPos(), B.getBlockDipoleDir(), B.getPower(), 
-                                                 A.shipId, A.getBlockPos(), A.getBlockDipoleDir(), A.getPower());
-                newShipToPairs.computeIfAbsent(B.shipId, k -> new CopyOnWriteArrayList<>()).add(pair);
+            if (otherShipId != -1) {
+                ConcurrentHashMap<PairKey, MagnetPair> mapB = shipToPairs.get(otherShipId);
+                if (mapB != null) mapB.remove(new PairKey(otherId, magnetId));
             }
         }
-        //Update shipToPairs
-        this.shipToPairs = newShipToPairs;
+    }
 
-        if (PropulsionDebug.isDebug(MainDebugRoute.MAGNET)) {
-            //Draw edges
-            int i = 0;
-            for(int[] edge : edges) {
-                i++;
-                String identifier = i + "_edge";
-                MagnetData A = active.get(edge[0]);
-                MagnetData B = active.get(edge[1]);
-                
-                DebugRenderer.drawElongatedBox(identifier, 
-                    VectorConversionsMCKt.toMinecraft(A.getPosition()), 
-                    VectorConversionsMCKt.toMinecraft(B.getPosition()), 
-                    0.25f, Color.blue, false, 2);
-            }
+    private void createConnection(MagnetData A, MagnetData B) {
+        Set<UUID> edgesA = activeEdges.computeIfAbsent(A.id, k -> ConcurrentHashMap.newKeySet());
+        if (!edgesA.add(B.id)) return; //Prevent duplicate pairs if A and B both moved on the same tick
+
+        Set<UUID> edgesB = activeEdges.computeIfAbsent(B.id, k -> ConcurrentHashMap.newKeySet());
+        edgesB.add(A.id);
+
+        if (A.shipId != -1) {
+            MagnetPair pairA = new MagnetPair(A.id, A.getBlockPos(), A.getBlockDipoleDir(), A.getPower(),
+                                              B.id, B.shipId, B.getBlockPos(), B.getBlockDipoleDir(), B.getPower());
+            shipToPairs.computeIfAbsent(A.shipId, k -> new ConcurrentHashMap<>()).put(new PairKey(A.id, B.id), pairA);
+        }
+        if (B.shipId != -1) {
+            MagnetPair pairB = new MagnetPair(B.id, B.getBlockPos(), B.getBlockDipoleDir(), B.getPower(), 
+                                              A.id, A.shipId, A.getBlockPos(), A.getBlockDipoleDir(), A.getPower());
+            shipToPairs.computeIfAbsent(B.shipId, k -> new ConcurrentHashMap<>()).put(new PairKey(B.id, A.id), pairB);
         }
     }
 
     public List<UUID> retrieveNeighbours(Level level, MagnetData data) {
         Vector3d position = data.getPosition();
+        if (position == null) return Collections.emptyList();
         int cx = Mth.floor(position.x) >> 4;
         int cz = Mth.floor(position.z) >> 4;
 
@@ -216,14 +236,12 @@ public class MagnetLevelRegistry {
         return neighbours;
     }
 
-    //Utility
-
-    public List<MagnetPair> getPairsForShip(long shipId) {
-        List<MagnetPair> internal = shipToPairs.get(shipId);
+    public Collection<MagnetPair> getPairsForShip(long shipId) {
+        ConcurrentHashMap<PairKey, MagnetPair> internal = shipToPairs.get(shipId);
         if (internal == null || internal.isEmpty()) {
             return Collections.emptyList();
         }
-        return internal;
+        return internal.values();
     }
 
     public void removeAllMagnetsForShip(long shipId) {

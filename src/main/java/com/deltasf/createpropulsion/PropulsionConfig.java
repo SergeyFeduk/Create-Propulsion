@@ -30,6 +30,7 @@ public class PropulsionConfig {
     //Magnet
     public static final ForgeConfigSpec.ConfigValue<Double> REDSTONE_MAGNET_POWER_MULTIPLIER;
     public static final ForgeConfigSpec.ConfigValue<Double> REDSTONE_MAGNET_FORCE_INDUCED_TORQUE_MULTIPLIER;
+    public static final ForgeConfigSpec.ConfigValue<Double> REDSTONE_MAGNET_MOVEMENT_DISTANCE_THRESHOLD;
     
     //Physics assembler
     public static final ForgeConfigSpec.ConfigValue<Integer> PHYSICS_ASSEMBLER_MAX_MINK_DISTANCE;
@@ -129,6 +130,8 @@ public class PropulsionConfig {
                 .define("Power multiplier", 1.0);
             REDSTONE_MAGNET_FORCE_INDUCED_TORQUE_MULTIPLIER = SERVER_BUILDER.comment("Torque induced by offset of the force-applying magnet from COM. Value of 1.0 is realistic but does not allow for statically stable contraptions. Modify this value only if you know what you are doing!")
                 .define("Force-induced torque multiplier", 1.0);
+            REDSTONE_MAGNET_MOVEMENT_DISTANCE_THRESHOLD = SERVER_BUILDER.comment("Distance the magnet has to move to initiate a re-pairing against its neighbours. If you experience magnets having weird forces when far apart - tune down this value.")
+                .define("Movement threshold", 0.2);
         SERVER_BUILDER.pop();
 
         SERVER_BUILDER.push("Physics assembler");
