@@ -98,6 +98,7 @@ public class RedstoneTransmissionRenderer extends KineticBlockEntityRenderer<Red
     public static float getDirectionalSpeed(RedstoneTransmissionBlockEntity be, Direction direction) {
         Level level = be.getLevel();
         if (level == null) return 0;
-        return be.getSpeed() * be.getRotationSpeedModifier(direction);
+        if (!be.hasSource() || be.getSourceFacing() == direction) return be.getSpeed();
+        return be.getSpeed() * ((float) be.get_current_shift() / RedstoneTransmissionBlockEntity.MAX_VALUE);
     }
 }

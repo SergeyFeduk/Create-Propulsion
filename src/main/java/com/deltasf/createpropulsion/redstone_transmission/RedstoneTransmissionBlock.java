@@ -95,11 +95,6 @@ public class RedstoneTransmissionBlock extends AbstractEncasedShaftBlock impleme
     }
 
     @Override
-    protected boolean areStatesKineticallyEquivalent(BlockState oldState, BlockState newState) {
-        return false;
-    }
-
-    @Override
     public boolean hasAnalogOutputSignal(@Nonnull BlockState state) {
         return true;
     }

@@ -148,26 +148,22 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
         return Math.round((float) shift_level / MAX_VALUE * 15);
     }
 
-    @SuppressWarnings("null")
     @Override
     public float getRotationSpeedModifier(Direction face) {
-        if (!hasSource() || getSourceFacing().equals(face)){
-            return 1;
-        } else if (level.getBlockEntity(getBlockPos().relative(face)) instanceof KineticBlockEntity kbe) {
-            BlockPos prevSource = this.source;
-            this.source = null;
-            float possible_speed = kbe.getTheoreticalSpeed();
-            if(kbe instanceof SplitShaftBlockEntity ssbe) {
-                possible_speed *= ssbe.getRotationSpeedModifier(face.getOpposite());
-            }
-            if(Math.abs(possible_speed) <= Math.abs(getTheoreticalSpeed())) {
-                this.source = prevSource;
-            } else {
-                this.source = getBlockPos().relative(face);
-                return 1;
+        if (!hasSource() || face == getSourceFacing()) return 1f;
+        if (shift_level == 0) return 0f;
+        return 1f;
+    }
+
+    @Override
+    public float propagateRotationTo(KineticBlockEntity target, BlockState stateFrom, BlockState stateTo, BlockPos diff, boolean connectedViaAxes, boolean connectedViaCogs) {
+        if (connectedViaAxes && shift_level > 0) {
+            Direction targetFace = Direction.getNearest(diff.getX(), diff.getY(), diff.getZ());
+            if (hasSource() && targetFace != getSourceFacing()) {
+                return (float) shift_level / MAX_VALUE;
             }
         }
-        return (float) shift_level / MAX_VALUE;
+        return 0f;
     }
 
     public float getGaugeTarget(float partialTick) {
