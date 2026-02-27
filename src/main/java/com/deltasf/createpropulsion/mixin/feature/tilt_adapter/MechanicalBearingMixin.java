@@ -29,11 +29,29 @@ public abstract class MechanicalBearingMixin extends KineticBlockEntity {
     @Shadow(remap = false) protected float angle;
     @Shadow(remap = false) protected boolean running;
     @Shadow(remap = false) protected boolean assembleNextTick;
+    @Shadow(remap = false) protected double sequencedAngleLimit;
 
     @Unique private boolean shouldSnapOnStop = false;
+    @Unique private double capturedOldLimit = -1.0;
 
     public MechanicalBearingMixin(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
+    }
+
+    @Inject(method = "onSpeedChanged", at = @At("HEAD"), remap = false)
+    private void captureOldLimit(float prevSpeed, CallbackInfo ci) {
+        if (sequenceContext != null && ((Object)sequenceContext) instanceof ISnappingSequenceContext snap && snap.shouldSnapToZero()) {
+            capturedOldLimit = this.sequencedAngleLimit;
+        } else {
+            capturedOldLimit = -1.0;
+        }
+    }
+
+    @Inject(method = "onSpeedChanged", at = @At("TAIL"), remap = false)
+    private void fixLimitReset(float prevSpeed, CallbackInfo ci) {
+        if (capturedOldLimit >= 0 && sequenceContext != null && ((Object)sequenceContext) instanceof ISnappingSequenceContext snap && snap.shouldSnapToZero()) {
+            this.sequencedAngleLimit = capturedOldLimit;
+        }
     }
 
     @Inject(method = "tick", at = @At("HEAD"), remap = false)
