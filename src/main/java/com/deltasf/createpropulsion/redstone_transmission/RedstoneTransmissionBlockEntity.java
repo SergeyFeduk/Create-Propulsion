@@ -1,5 +1,7 @@
 package com.deltasf.createpropulsion.redstone_transmission;
 
+import com.deltasf.createpropulsion.compat.PropulsionCompatibility;
+import com.deltasf.createpropulsion.compat.computercraft.ComputerBehaviour;
 import com.deltasf.createpropulsion.registries.PropulsionIcons;
 import com.deltasf.createpropulsion.utility.FlickerAwareTicker;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -26,6 +28,8 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.LazyOptional;
 
 import java.util.List;
 
@@ -43,6 +47,8 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
     private static final int FLICKER_THRESHOLD = 100;
     private FlickerAwareTicker ticker;
     private int tickCounter = 0;
+
+    public ComputerBehaviour computerBehaviour;
 
     public RedstoneTransmissionBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -76,6 +82,10 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
         });
             
         behaviours.add(controlMode);
+
+        if (PropulsionCompatibility.CC_ACTIVE) {
+            behaviours.add(computerBehaviour = new ComputerBehaviour(this));
+        }
     }
 
     private boolean attemptShiftUpdate(int newLevel) {
@@ -120,6 +130,9 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
 
         Level level = getLevel();
         if (level == null || level.isClientSide) return;
+
+        boolean peripheralControlled = PropulsionCompatibility.CC_ACTIVE && computerBehaviour != null && computerBehaviour.hasAttachedComputer();
+        if (peripheralControlled) return;
 
         int shiftUp = get_shift_up();
         int shiftDown = get_shift_down();
@@ -242,8 +255,42 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
 
         IRotate.SpeedLevel.getFormattedSpeedText(speed * shift_level / MAX_VALUE, isOverStressed()).forGoggles(tooltip);
 
+        if (PropulsionCompatibility.CC_ACTIVE && computerBehaviour != null && computerBehaviour.hasAttachedComputer()) {
+            CreateLang.translate("gui.goggles.cc.peripheral_controlled", new Object[0]).style(ChatFormatting.GRAY).forGoggles(tooltip);
+        }
+
         super.addToGoggleTooltip(tooltip, isPlayerSneaking);
         return true;
+    }
+
+    public TransmissionMode getTransmissionMode() {
+        return controlMode.get();
+    }
+
+    public void setTransmissionMode(TransmissionMode mode) {
+        controlMode.setValue(mode.ordinal());
+    }
+
+    public void setShiftFromPeripheral(int level) {
+        TransmissionMode mode = controlMode.get();
+        int target;
+        
+        if (mode == TransmissionMode.DIRECT) {
+            float clampedLevel = Math.max(0, Math.min(15, level));
+            target = Math.round((clampedLevel / 15.0f) * MAX_VALUE);
+        } else {
+            target = Math.max(0, Math.min(MAX_VALUE, level));
+        }
+        
+        ticker.scheduleUpdate(() -> attemptShiftUpdate(target));
+    }
+
+    @Override
+    public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
+        if (PropulsionCompatibility.CC_ACTIVE && computerBehaviour != null && computerBehaviour.isPeripheralCap(cap)) {
+            return computerBehaviour.getPeripheralCapability();
+        }
+        return super.getCapability(cap, side);
     }
 
     public enum TransmissionMode implements INamedIconOptions {

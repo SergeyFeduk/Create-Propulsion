@@ -78,7 +78,8 @@
     "create.gui.goggles.thruster.status.working": "Работает",
     "create.gui.goggles.thruster.obstructed": "Заблокировано",
     "create.gui.goggles.thruster.efficiency": "Эффективность",
-    "create.gui.goggles.thruster.peripheral_controlled": "Управляется программно",
+    
+    "create.gui.goggles.cc.peripheral_controlled": "Управляется программно",
     "create.gui.goggles.optical_sensor.lenses": "Линзы",
 
     "create.gui.goggles.creative_thruster.particle": "Частицы",

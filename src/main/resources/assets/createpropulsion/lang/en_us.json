@@ -78,9 +78,10 @@
     "create.gui.goggles.thruster.status.working": "On",
     "create.gui.goggles.thruster.obstructed": "Obstructed",
     "create.gui.goggles.thruster.efficiency": "Efficiency",
-    "create.gui.goggles.thruster.peripheral_controlled": "Controlled via Peripheral",
+    
+    "create.gui.goggles.cc.peripheral_controlled": "Controlled via Peripheral",
     "create.gui.goggles.optical_sensor.lenses": "Lenses",
-
+    
     "create.gui.goggles.creative_thruster.particle": "Particle",
     "create.gui.goggles.creative_thruster.particle.plasma": "Plasma",
     "create.gui.goggles.creative_thruster.particle.plume": "Plume",

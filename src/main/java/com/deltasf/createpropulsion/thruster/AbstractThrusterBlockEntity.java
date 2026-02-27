@@ -318,7 +318,7 @@ public abstract class AbstractThrusterBlockEntity extends SmartBlockEntity imple
         addThrusterDetails(tooltip, isPlayerSneaking);
 
         if (controlMode == ControlMode.PERIPHERAL) {
-            CreateLang.translate("gui.goggles.thruster.peripheral_controlled", new Object[0]).style(ChatFormatting.GRAY).forGoggles(tooltip);
+            CreateLang.translate("gui.goggles.cc.peripheral_controlled", new Object[0]).style(ChatFormatting.GRAY).forGoggles(tooltip);
         }
 
         return true;

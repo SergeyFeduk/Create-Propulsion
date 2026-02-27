@@ -25,7 +25,7 @@ import net.minecraft.world.phys.Vec3;
 ///https://github.com/ValkyrienSkies/Valkyrien-Skies-2/blob/1.20.1/main/common/src/main/java/org/valkyrienskies/mod/mixin/mod_compat/create/behaviour/MixinScrollValueBehaviour.java
 
 public class StirlingScrollValueBehaviour extends DualRowValueBehaviour {
-    protected static final int STEP = 64;
+    public static final int STEP = 64;
     protected static final int OPTIONS_PER_ROW = 3;
 
     public StirlingScrollValueBehaviour(Component label, SmartBlockEntity be, ValueBoxTransform slot) {

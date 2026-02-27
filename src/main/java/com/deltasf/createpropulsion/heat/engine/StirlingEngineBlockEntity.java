@@ -3,8 +3,11 @@ package com.deltasf.createpropulsion.heat.engine;
 import java.util.List;
 
 import com.deltasf.createpropulsion.PropulsionConfig;
+import com.deltasf.createpropulsion.compat.PropulsionCompatibility;
+import com.deltasf.createpropulsion.compat.computercraft.ComputerBehaviour;
 import com.deltasf.createpropulsion.heat.IHeatConsumer;
 import com.deltasf.createpropulsion.registries.PropulsionCapabilities;
+import com.simibubi.create.compat.computercraft.AbstractComputerBehaviour;
 import com.simibubi.create.content.kinetics.base.GeneratingKineticBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 
@@ -26,6 +29,8 @@ public class StirlingEngineBlockEntity extends GeneratingKineticBlockEntity impl
     private int activeTicks = 0;
     private boolean firstTick = true;
 
+    public AbstractComputerBehaviour computerBehaviour;
+
     public StirlingEngineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
         this.heatConsumerCapability = LazyOptional.of(() -> this);
@@ -39,6 +44,8 @@ public class StirlingEngineBlockEntity extends GeneratingKineticBlockEntity impl
         }
     }
 
+    public StirlingScrollValueBehaviour getTargetSpeedBehaviour() { return targetSpeedBehaviour; }
+
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviors) {
         super.addBehaviours(behaviors);
@@ -46,6 +53,10 @@ public class StirlingEngineBlockEntity extends GeneratingKineticBlockEntity impl
         targetSpeedBehaviour.value = 4;
         targetSpeedBehaviour.withCallback(i -> this.updateGeneratedRotation());
         behaviors.add(targetSpeedBehaviour);
+
+        if (PropulsionCompatibility.CC_ACTIVE) {
+            behaviors.add(computerBehaviour = new ComputerBehaviour(this));
+        }
     }
 
     @SuppressWarnings("null")
@@ -124,6 +135,9 @@ public class StirlingEngineBlockEntity extends GeneratingKineticBlockEntity impl
     public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
         if (cap == PropulsionCapabilities.HEAT_CONSUMER && side == Direction.DOWN) {
             return heatConsumerCapability.cast();
+        }
+        if (PropulsionCompatibility.CC_ACTIVE && computerBehaviour.isPeripheralCap(cap)) {
+            return computerBehaviour.getPeripheralCapability();
         }
         return super.getCapability(cap, side);
     }

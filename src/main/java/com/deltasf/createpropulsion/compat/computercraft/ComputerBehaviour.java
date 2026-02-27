@@ -1,9 +1,15 @@
 package com.deltasf.createpropulsion.compat.computercraft;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
+
+import com.deltasf.createpropulsion.heat.engine.StirlingEngineBlockEntity;
 import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerBlockEntity;
 import com.deltasf.createpropulsion.magnet.RedstoneMagnetBlockEntity;
 import com.deltasf.createpropulsion.optical_sensors.OpticalSensorBlockEntity;
 import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerBlockEntity;
+import com.deltasf.createpropulsion.redstone_transmission.RedstoneTransmissionBlockEntity;
 import com.deltasf.createpropulsion.thruster.creative_thruster.CreativeThrusterBlockEntity;
 import com.deltasf.createpropulsion.thruster.thruster.ThrusterBlockEntity;
 import com.simibubi.create.compat.computercraft.AbstractComputerBehaviour;
@@ -21,8 +27,26 @@ public class ComputerBehaviour extends AbstractComputerBehaviour {
     protected static final Capability<IPeripheral> PERIPHERAL_CAPABILITY =
         CapabilityManager.get(new CapabilityToken<>() {});
 
-    LazyOptional<IPeripheral> peripheral;
-    NonNullSupplier<IPeripheral> peripheralSupplier;
+    protected LazyOptional<IPeripheral> peripheral;
+    protected NonNullSupplier<IPeripheral> peripheralSupplier;
+
+    private static final Map<Class<? extends SmartBlockEntity>, Function<SmartBlockEntity, IPeripheral>> PERIPHERAL_FACTORIES = new HashMap<>();
+
+    @SuppressWarnings("unchecked")
+    private static <T extends SmartBlockEntity> void register(Class<T> clazz, Function<T, IPeripheral> factory) {
+        PERIPHERAL_FACTORIES.put(clazz, be -> factory.apply((T) be));
+    }
+
+    static {
+        register(ThrusterBlockEntity.class, ThrusterPeripheral::new);
+        register(CreativeThrusterBlockEntity.class, CreativeThrusterPeripheral::new);
+        register(OpticalSensorBlockEntity.class, OpticalSensorPeripheral::new);
+        register(LodestoneTrackerBlockEntity.class, LodestoneTrackerPeripheral::new);
+        register(RedstoneMagnetBlockEntity.class, MagnetPeripheral::new);
+        register(PhysicsAssemblerBlockEntity.class, PhysicsAssemblerPeripheral::new);
+        register(StirlingEngineBlockEntity.class, StirlingEnginePeripheral::new);
+        register(RedstoneTransmissionBlockEntity.class, RedstoneTransmissionPeripheral::new);
+    }
 
     public ComputerBehaviour(SmartBlockEntity blockEntity) {
         super(blockEntity);
@@ -30,18 +54,11 @@ public class ComputerBehaviour extends AbstractComputerBehaviour {
     }
 
     public static NonNullSupplier<IPeripheral> getPeripheralFor(SmartBlockEntity blockEntity) {
-        if (blockEntity instanceof ThrusterBlockEntity thruster)
-            return () -> new ThrusterPeripheral(thruster);
-        if (blockEntity instanceof CreativeThrusterBlockEntity creativeThruster)
-            return () -> new CreativeThrusterPeripheral(creativeThruster);
-        if (blockEntity instanceof OpticalSensorBlockEntity opticalSensor)
-            return () -> new OpticalSensorPeripheral(opticalSensor);
-        if (blockEntity instanceof LodestoneTrackerBlockEntity tracker)
-            return () -> new LodestoneTrackerPeripheral(tracker);
-        if (blockEntity instanceof RedstoneMagnetBlockEntity redstoneMagner)
-            return () -> new MagnetPeripheral(redstoneMagner);
-        if (blockEntity instanceof PhysicsAssemblerBlockEntity physicsAssembler)
-            return () -> new PhysicsAssemblerPeripheral(physicsAssembler);
+        Function<SmartBlockEntity, IPeripheral> factory = PERIPHERAL_FACTORIES.get(blockEntity.getClass());
+        if (factory != null) {
+            return () -> factory.apply(blockEntity);
+        }
+
         throw new IllegalArgumentException("No peripheral available for " + ForgeRegistries.BLOCK_ENTITY_TYPES.getKey(blockEntity.getType()));
     }
 

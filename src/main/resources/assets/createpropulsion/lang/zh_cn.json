@@ -78,7 +78,8 @@
     "create.gui.goggles.thruster.status.working": "启用",
     "create.gui.goggles.thruster.obstructed": "被遮挡",
     "create.gui.goggles.thruster.efficiency": "效率",
-    "create.gui.goggles.thruster.peripheral_controlled": "通过外设控制",
+    
+    "create.gui.goggles.cc.peripheral_controlled": "通过外设控制",
     "create.gui.goggles.optical_sensor.lenses": "透镜",
 
     "create.gui.goggles.creative_thruster.particle": "粒子效果",
