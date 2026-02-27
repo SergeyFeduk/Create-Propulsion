@@ -26,6 +26,7 @@ public class TiltAdapterBlockEntity extends SplitShaftBlockEntity {
     protected int redstoneRight = 0;
     
     protected float targetAngle = 0f;
+    protected float networkTargetAngle = 0f;
     protected float currentAngle = 0f;
     protected int activeMoveDirection = 0;
     protected float activeSequenceLimit = 0f;
@@ -59,6 +60,7 @@ public class TiltAdapterBlockEntity extends SplitShaftBlockEntity {
 
             if (activeSequenceLimit <= 0) {
                 activeSequenceLimit = 0;
+                currentAngle = networkTargetAngle;
                 flickerTicker.scheduleUpdate(this::syncNetworkState);
             }
         }
@@ -117,14 +119,18 @@ public class TiltAdapterBlockEntity extends SplitShaftBlockEntity {
         if (Math.abs(delta) > 0.001f && speed > 0) {
             activeMoveDirection = (int) Math.signum(delta);
             activeSequenceLimit = Math.abs(delta);
+            networkTargetAngle = targetAngle;
             
             float kineticSpeed = speed * activeMoveDirection;
             sequenceContext = new SequenceContext(SequencerInstructions.TURN_ANGLE, activeSequenceLimit / Math.abs(kineticSpeed));
-            ((ISnappingSequenceContext) (Object) sequenceContext).setSnapToZero(true);
+            
+            boolean returningToZero = Math.abs(targetAngle) < 0.001f;
+            ((ISnappingSequenceContext) (Object) sequenceContext).setSnapToZero(returningToZero);
         } else {
             activeMoveDirection = 0;
             activeSequenceLimit = 0;
             sequenceContext = null;
+            currentAngle = targetAngle;
         }
 
         detachKinetics();
@@ -155,12 +161,14 @@ public class TiltAdapterBlockEntity extends SplitShaftBlockEntity {
     @Override
     public void initialize() {
         super.initialize();
-        if (!level.isClientSide) flickerTicker.scheduleUpdate(this::syncNetworkState);
+        Level level = getLevel();
+        if (level != null && !level.isClientSide) flickerTicker.scheduleUpdate(this::syncNetworkState);
     }
 
     @Override
     protected void write(CompoundTag compound, boolean clientPacket) {
         compound.putFloat("targetAngle", targetAngle);
+        compound.putFloat("networkTargetAngle", networkTargetAngle);
         compound.putFloat("currentAngle", currentAngle);
         compound.putInt("activeMoveDirection", activeMoveDirection);
         compound.putFloat("activeSequenceLimit", activeSequenceLimit);
@@ -172,6 +180,7 @@ public class TiltAdapterBlockEntity extends SplitShaftBlockEntity {
     @Override
     protected void read(CompoundTag compound, boolean clientPacket) {
         targetAngle = compound.getFloat("targetAngle");
+        networkTargetAngle = compound.getFloat("networkTargetAngle");
         currentAngle = compound.getFloat("currentAngle");
         activeMoveDirection = compound.getInt("activeMoveDirection");
         activeSequenceLimit = compound.getFloat("activeSequenceLimit");

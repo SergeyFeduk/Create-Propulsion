@@ -1,6 +1,5 @@
 package com.deltasf.createpropulsion.mixin.feature.tilt_adapter;
 
-import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.tilt_adapter.ISnappingSequenceContext;
 import com.simibubi.create.content.contraptions.bearing.MechanicalBearingBlockEntity;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
@@ -40,7 +39,7 @@ public abstract class MechanicalBearingMixin extends KineticBlockEntity {
 
     @Inject(method = "onSpeedChanged", at = @At("HEAD"), remap = false)
     private void captureOldLimit(float prevSpeed, CallbackInfo ci) {
-        if (sequenceContext != null && ((Object)sequenceContext) instanceof ISnappingSequenceContext snap && snap.shouldSnapToZero()) {
+        if (sequenceContext != null && ((Object)sequenceContext) instanceof ISnappingSequenceContext) {
             capturedOldLimit = this.sequencedAngleLimit;
         } else {
             capturedOldLimit = -1.0;
@@ -49,7 +48,7 @@ public abstract class MechanicalBearingMixin extends KineticBlockEntity {
 
     @Inject(method = "onSpeedChanged", at = @At("TAIL"), remap = false)
     private void fixLimitReset(float prevSpeed, CallbackInfo ci) {
-        if (capturedOldLimit >= 0 && sequenceContext != null && ((Object)sequenceContext) instanceof ISnappingSequenceContext snap && snap.shouldSnapToZero()) {
+        if (capturedOldLimit >= 0 && sequenceContext != null && ((Object)sequenceContext) instanceof ISnappingSequenceContext) {
             this.sequencedAngleLimit = capturedOldLimit;
         }
     }
@@ -60,8 +59,8 @@ public abstract class MechanicalBearingMixin extends KineticBlockEntity {
         if (level == null || level.isClientSide) return;
         if (sequenceContext == null) return;
         //Warcrime
-        if (((Object)sequenceContext) instanceof ISnappingSequenceContext snapCtx) {
-            shouldSnapOnStop = snapCtx.shouldSnapToZero();
+        if (((Object)sequenceContext) instanceof ISnappingSequenceContext snapContext) {
+            shouldSnapOnStop = snapContext.shouldSnapToZero();
         } else {
             shouldSnapOnStop = false;
         }
@@ -85,13 +84,8 @@ public abstract class MechanicalBearingMixin extends KineticBlockEntity {
         if (getSpeed() != 0) { return; }
 
         if (shouldSnapOnStop) {
-            shouldSnapOnStop = false;
-            float absAngle = Math.abs(angle);
-
-            float tiltAdapterRange = PropulsionConfig.TILT_ADAPTER_ANGLE_RANGE.get().floatValue();
-            float threshold = Math.max(0.333f, (1 / 15.0f * tiltAdapterRange) - 0.25f);
-            
-            if (absAngle < threshold || absAngle > (360 - threshold)) {
+            if (this.sequencedAngleLimit <= 0.001f) {
+                shouldSnapOnStop = false;
                 angle = 0;
                 setChanged();
                 sendData(); 
