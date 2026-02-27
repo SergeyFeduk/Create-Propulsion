@@ -58,6 +58,7 @@
     "block.createpropulsion.enveloped_shaft_black": "黑色纸气球传动杆",
 
     "block.createpropulsion.hot_air_burner": "热空气燃烧室",
+    "block.createpropulsion.hot_air_pump": "热空气泵",
     "block.createpropulsion.solid_burner": "固体燃料燃烧器",
     "block.createpropulsion.liquid_burner": "液体燃料燃烧器",
     "block.createpropulsion.propeller": "螺旋桨轴承",
@@ -77,7 +78,13 @@
     "create.gui.goggles.thruster.status.working": "启用",
     "create.gui.goggles.thruster.obstructed": "被遮挡",
     "create.gui.goggles.thruster.efficiency": "效率",
+    "create.gui.goggles.thruster.peripheral_controlled": "通过外设控制",
     "create.gui.goggles.optical_sensor.lenses": "透镜",
+
+    "create.gui.goggles.creative_thruster.particle": "粒子效果",
+    "create.gui.goggles.creative_thruster.particle.plasma": "等离子体",
+    "create.gui.goggles.creative_thruster.particle.plume": "羽流",
+    "create.gui.goggles.creative_thruster.particle.none": "无",
 
     "createpropulsion.inline_optical_sensor.tooltip.summary": "投射出最长_{}格_的_光束_以检测方块。",
     "createpropulsion.inline_optical_sensor.tooltip.condition1": "当检测到方块时",
@@ -87,9 +94,15 @@
     "createpropulsion.optical_sensor.tooltip.condition1": "当检测到方块时",
     "createpropulsion.optical_sensor.tooltip.behaviour1": "当检测到符合条件的方块时，发出_红石信号_。方块距离越近，信号越强。",
 
-    "createpropulsion.thruster.tooltip.summary": "提供最大_{}kN_的推力以推动物理结构",
+    "createpropulsion.thruster.tooltip.summary": "提供最大_{}kN_的推力以推动物理结构。",
     "createpropulsion.thruster.tooltip.condition1": "当燃料充足且被红石充能时",
     "createpropulsion.thruster.tooltip.behaviour1": "对物理结构施加推力。推力大小取决于_红石信号_的强度。",
+
+    "createpropulsion.creative_thruster.tooltip.summary": "提供最大_{}kN_的推力以推动物理结构。",
+    "createpropulsion.creative_thruster.tooltip.condition1": "当被红石充能时",
+    "createpropulsion.creative_thruster.tooltip.behaviour1": "对物理结构施加推力。推力大小取决于_红石信号_的强度。",
+    "createpropulsion.creative_thruster.tooltip.condition2": "当被扳手右击时",
+    "createpropulsion.creative_thruster.tooltip.behaviour2": "_循环切换_羽流粒子的类型。",
 
     "createpropulsion.lodestone_tracker.tooltip.summary": "将_指南针_指向的方向映射为_红石信号_。",
     "createpropulsion.lodestone_tracker.tooltip.condition1": "当安装了指南针时",
@@ -117,7 +130,7 @@
     "item.createpropulsion.turpentine_bucket": "松节油桶",
 
     "item.createpropulsion.design_goggles": "设计师护目镜",
-    "createpropulsion.design_goggles.tooltip.summary": "这是一个调试物品。目前如此。",
+    "createpropulsion.design_goggles.tooltip.summary": "这是一个调试物品。（目前是这样的）",
 
     "item.createpropulsion.optical_lens": "光学透镜",
     "item.createpropulsion.fluid_lens": "流体透镜",
@@ -134,16 +147,21 @@
     "createpropulsion.assembler.selection.too_far": "选区距离过远",
 
     "createpropulsion.stirling.generated_speed": "RPM 输出",
+    "createpropulsion.redstone_transmission.control_mode": "变速器控制模式",
+    "createpropulsion.redstone_transmission.control_mode.direct": "直接模式",
+    "createpropulsion.redstone_transmission.control_mode.incremental": "增量模式",
 
-    "createpropulsion.optical_lens.tooltip.summary": "可被_染色_的光学镜片，用于为_光学传感器_的光束着色。",
+    "createpropulsion.optical_lens.tooltip.summary": "可被_染色_的光学镜片，可使_光学传感器_的光束着色。",
     "createpropulsion.fluid_lens.tooltip.summary": "使_光学传感器_能够检测_流体_。",
     "createpropulsion.focus_lens.tooltip.summary": "使_光学传感器_的最大_探测距离_加倍。",
     "createpropulsion.invisibility_lens.tooltip.summary": "使_光学传感器_的光束_不再可见_。",
     "createpropulsion.unfinished_lens.tooltip.summary": "使_光学传感器_的最大_探测距离_减半。",
 
-    "createpropulsion.propeller.tooltip.summary": "安装_两个或更多叶片_时提供推力。_推力_与输入_RPM_成_正比_。",
+    "createpropulsion.propeller.tooltip.summary": "安装_两个或更多叶片_时提供推力。_推力_与输入的_RPM_成_正比_。",
     "createpropulsion.propeller.tooltip.condition1": "潜行并右击时",
     "createpropulsion.propeller.tooltip.behaviour1": "_翻转_已安装叶片的方向，从而_反转_推力方向。",
+    "createpropulsion.propeller.not_enough_space": "清理周围的方块以便安装叶片",
+    "createpropulsion.propeller.must_be_stopped": "与轴承交互前，需要先让螺旋桨停止转动",
 
     "createpropulsion.stirling_engine.tooltip.summary": "利用热导率高的热源提供的_热量_来_产生旋转力_。",
     "createpropulsion.stirling_engine.tooltip.condition1": "提供热量时",
@@ -158,6 +176,9 @@
     "createpropulsion.tooltip.waterEfficiency": "水下推进效率",
     "createpropulsion.tooltip.noTorque": "无扭矩效应。",
 
+    "createpropulsion.tooltip.heat.generation": "热量产生",
+    "createpropulsion.tooltip.heat.consumption": "热量消耗",
+
     "create.gui.goggles.burner.status": "燃烧器状态",
     "create.gui.goggles.burner.heat.cold": "冰冷",
     "create.gui.goggles.burner.heat.warm": "温热",
@@ -166,6 +187,11 @@
     "create.gui.goggles.burner.thermostat": "恒温器",
     "create.gui.goggles.burner.thermostat.on": "开启",
     "create.gui.goggles.burner.thermostat.off": "关闭",
+
+    "create.gui.goggles.hot_air_pump.status": "热空气泵状态",
+    "create.gui.goggles.hot_air_pump.status.no_rpm": "无旋转",
+    "create.gui.goggles.hot_air_pump.status.no_heat": "无热量",
+    "create.gui.goggles.hot_air_pump.injection": "注入速率",
 
     "create.gui.goggles.hot_air_burner.status": "热空气燃烧室状态",
     "create.gui.goggles.hot_air_burner.status.airless": "无大气",
@@ -179,10 +205,32 @@
 
     "create.gui.goggles.thruster.thrust_output": "推力输出",
     "create.gui.goggles.thruster.unit_kn": "kN",
-    "create.gui.creative_thruster.power_behaviour": "产生推力",
+    "create.gui.creative_thruster.power_behaviour": "产生的推力",
+
+    "createpropulsion.display_source.redstone_transmission_shift": "当前档位",
+
+    "createpropulsion.gui.goggles.redstone_transmission.title": "变速器模式",
+    "createpropulsion.gui.goggles.redstone_transmission.internal_shift_title": "档位",
+    "createpropulsion.gui.goggles.redstone_transmission.internal_shift_number": " {0} / {1}",
+    "createpropulsion.gui.goggles.redstone_transmission.output": "输出转速",
+
+    "createpropulsion.ponder.shared.rpm" : "%.2f RPM",
+
+    "createpropulsion.ponder.redstone_transmission_direct.header" : "变速器控制模式：直接模式",
+    "createpropulsion.ponder.redstone_transmission_direct.text_1" : "变速器有两种控制模式，直接模式为默认模式",
+    "createpropulsion.ponder.redstone_transmission_direct.text_2" : "在直接控制模式下，变速器输出的转速与任意一侧的红石信号输入成正比",
+    "createpropulsion.ponder.redstone_transmission_direct.text_3" : "注意，输出速度会从0到输入速度进行缩放",
+
+    "createpropulsion.ponder.redstone_transmission_incremental.header" : "变速器控制模式：增量模式",
+    "createpropulsion.ponder.redstone_transmission_incremental.text_1" : "在增量控制模式下，变速器的输出速度与内部档位水平成正比",
+    "createpropulsion.ponder.redstone_transmission_incremental.text_2" : "你可以通过变速器背面的选框来更改控制模式",
+    "createpropulsion.ponder.redstone_transmission_incremental.text_3" : "向带有 +（加号）的面输入红石信号会增加档位",
+    "createpropulsion.ponder.redstone_transmission_incremental.text_4" : "向带有 -（减号）的面输入红石信号会减少档位",
+    "createpropulsion.ponder.redstone_transmission_incremental.text_5" : "如果同时给两个面输入信号……",
+    "createpropulsion.ponder.redstone_transmission_incremental.text_6" : "……变速器将同时执行增加和减少档位的操作",
 
     "createpropulsion.ponder.tilt_adapter.header": "使用倾斜适配器调整角度",
-    "createpropulsion.ponder.tilt_adapter.text_1": "倾斜适配器允许根据红石信号倾斜输出端的传动杆",
+    "createpropulsion.ponder.tilt_adapter.text_1": "倾斜适配器可根据红石信号倾斜输出端的传动杆",
     "createpropulsion.ponder.tilt_adapter.text_2": "相连的轴承在信号断开后会回到初始位置",
     "createpropulsion.ponder.tilt_adapter.text_3": "最终的旋转角度与红石信号强度成正比例关系",
 
@@ -206,14 +254,21 @@
     "createpropulsion.ponder.liquid_burner.text_7": "禁用时，即使上方没有用热器，燃料也会以恒定速率消耗",
     "createpropulsion.ponder.liquid_burner.text_8": "§f燃烧器状态：§6灼热",
     "createpropulsion.ponder.liquid_burner.text_9": "§f燃烧器状态：§c炽热",
-    "createpropulsion.ponder.liquid_burner.text_10": "液体燃料燃烧器可以串联使用。",
-    "createpropulsion.ponder.liquid_burner.text_11": "它们将充当管道，将燃料传递给其他液体燃料燃烧器。",
+    "createpropulsion.ponder.liquid_burner.text_10": "液体燃料燃烧器可以串联使用",
+    "createpropulsion.ponder.liquid_burner.text_11": "它们将充当管道，将燃料传递给其他液体燃料燃烧器",
 
     "createpropulsion.ponder.making_balloon.header": "制作一个热气球",
-    "createpropulsion.ponder.making_balloon.text_1": "你可以使用热空气来填充纸气球包成的气室。",
-    "createpropulsion.ponder.making_balloon.text_2": "热空气燃烧室会在燃料充足时产生热空气，并填充上方的气室。",
-    "createpropulsion.ponder.making_balloon.text_3": "热空气燃烧室与气球气室底部开口的距离不得超过5个方块。",
-    "createpropulsion.ponder.making_balloon.text_4": "可以通过点击控制杆来控制热空气的输出。",
-    "createpropulsion.ponder.making_balloon.text_5": "热空气燃烧室有3个功率等级。",
-    "createpropulsion.ponder.making_balloon.text_6": "功率等级越高，输出的热空气就越多。"
+    "createpropulsion.ponder.making_balloon.text_1": "你可以使用热空气来填充纸气球包成的气室",
+    "createpropulsion.ponder.making_balloon.text_2": "热空气燃烧室会在燃料充足时产生热空气，并填充上方的气室",
+    "createpropulsion.ponder.making_balloon.text_3": "热空气燃烧室与气球气室底部开口的距离不得超过5个方块",
+    "createpropulsion.ponder.making_balloon.text_4": "你可以通过点击控制杆来控制热空气的输出",
+    "createpropulsion.ponder.making_balloon.text_5": "热空气燃烧室有3个功率等级",
+    "createpropulsion.ponder.making_balloon.text_6": "功率等级越高，输出的热空气就越多",
+
+    "createpropulsion.ponder.hot_air_pump.header": "使用热空气泵",
+    "createpropulsion.ponder.hot_air_pump.text_1": "热空气泵可用于创建气室并向其中填充热空气",
+    "createpropulsion.ponder.hot_air_pump.text_2": "热空气泵必须放置在工作中的热源上……",
+    "createpropulsion.ponder.hot_air_pump.text_3": "……并且需要提供旋转力才能运行",
+    "createpropulsion.ponder.hot_air_pump.text_4": "产生的热空气量取决于输入的转速",
+    "createpropulsion.ponder.hot_air_pump.text_5": "在256转速下，热空气泵会输出最大量的热空气"
 }
