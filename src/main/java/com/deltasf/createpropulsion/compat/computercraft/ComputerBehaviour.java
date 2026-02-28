@@ -12,6 +12,7 @@ import com.deltasf.createpropulsion.physics_assembler.PhysicsAssemblerBlockEntit
 import com.deltasf.createpropulsion.redstone_transmission.RedstoneTransmissionBlockEntity;
 import com.deltasf.createpropulsion.thruster.creative_thruster.CreativeThrusterBlockEntity;
 import com.deltasf.createpropulsion.thruster.thruster.ThrusterBlockEntity;
+import com.deltasf.createpropulsion.tilt_adapter.TiltAdapterBlockEntity;
 import com.simibubi.create.compat.computercraft.AbstractComputerBehaviour;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 
@@ -46,6 +47,7 @@ public class ComputerBehaviour extends AbstractComputerBehaviour {
         register(PhysicsAssemblerBlockEntity.class, PhysicsAssemblerPeripheral::new);
         register(StirlingEngineBlockEntity.class, StirlingEnginePeripheral::new);
         register(RedstoneTransmissionBlockEntity.class, RedstoneTransmissionPeripheral::new);
+        register(TiltAdapterBlockEntity.class, TiltAdapterPeripheral::new);
     }
 
     public ComputerBehaviour(SmartBlockEntity blockEntity) {

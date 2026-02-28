@@ -3,7 +3,10 @@ package com.deltasf.createpropulsion.tilt_adapter;
 import java.util.List;
 
 import com.deltasf.createpropulsion.PropulsionConfig;
+import com.deltasf.createpropulsion.compat.PropulsionCompatibility;
+import com.deltasf.createpropulsion.compat.computercraft.ComputerBehaviour;
 import com.deltasf.createpropulsion.utility.FlickerAwareTicker;
+import com.simibubi.create.compat.computercraft.AbstractComputerBehaviour;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import com.simibubi.create.content.kinetics.transmission.SplitShaftBlockEntity;
 import com.simibubi.create.content.kinetics.transmission.sequencer.SequencedGearshiftBlockEntity.SequenceContext;
@@ -17,6 +20,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.LazyOptional;
+
 import com.simibubi.create.content.kinetics.base.RotatedPillarKineticBlock;
 
 public class TiltAdapterBlockEntity extends SplitShaftBlockEntity {
@@ -30,8 +36,10 @@ public class TiltAdapterBlockEntity extends SplitShaftBlockEntity {
     protected float currentAngle = 0f;
     protected int activeMoveDirection = 0;
     protected float activeSequenceLimit = 0f;
+    protected float computerTargetAngle = 0f;
 
     public FlickerAwareTicker flickerTicker;
+    public AbstractComputerBehaviour computerBehaviour;
 
     public TiltAdapterBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -42,6 +50,10 @@ public class TiltAdapterBlockEntity extends SplitShaftBlockEntity {
         super.addBehaviours(behaviours);
         flickerTicker = new FlickerAwareTicker(this, 60); 
         behaviours.add(flickerTicker);
+
+        if (PropulsionCompatibility.CC_ACTIVE) {
+            behaviours.add(computerBehaviour = new ComputerBehaviour(this));
+        }
     }
 
     @Override
@@ -70,6 +82,10 @@ public class TiltAdapterBlockEntity extends SplitShaftBlockEntity {
 
     public int getLeft() { return redstoneLeft; }
     public int getRight() { return redstoneRight; }
+
+    public void setComputerTargetAngle(float angle) {
+        computerTargetAngle = angle;
+    }
 
     private void checkRedstoneAndSpeed() {
         Level level = getLevel();
@@ -103,8 +119,14 @@ public class TiltAdapterBlockEntity extends SplitShaftBlockEntity {
             return;
         }
 
-        int diff = redstoneLeft - redstoneRight; 
-        double newTarget = (diff / SIGNAL_RANGE) * PropulsionConfig.TILT_ADAPTER_ANGLE_RANGE.get();
+        double newTarget;
+
+        if (PropulsionCompatibility.CC_ACTIVE && computerBehaviour != null && computerBehaviour.hasAttachedComputer()) {
+            newTarget = computerTargetAngle;
+        } else {
+            int diff = redstoneLeft - redstoneRight; 
+            newTarget = (diff / SIGNAL_RANGE) * PropulsionConfig.TILT_ADAPTER_ANGLE_RANGE.get();
+        }
         
         if (Math.abs(newTarget - targetAngle) > 0.001f) {
             targetAngle = (float)newTarget;
@@ -159,6 +181,14 @@ public class TiltAdapterBlockEntity extends SplitShaftBlockEntity {
     }
 
     @Override
+    public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
+        if (PropulsionCompatibility.CC_ACTIVE && computerBehaviour != null && computerBehaviour.isPeripheralCap(cap)) {
+            return computerBehaviour.getPeripheralCapability();
+        }
+        return super.getCapability(cap, side);
+    }
+
+    @Override
     public void initialize() {
         super.initialize();
         Level level = getLevel();
@@ -174,6 +204,7 @@ public class TiltAdapterBlockEntity extends SplitShaftBlockEntity {
         compound.putFloat("activeSequenceLimit", activeSequenceLimit);
         compound.putInt("redstoneLeft", redstoneLeft);
         compound.putInt("redstoneRight", redstoneRight);
+        compound.putFloat("computerTargetAngle", computerTargetAngle);
         super.write(compound, clientPacket);
     }
 
@@ -186,6 +217,7 @@ public class TiltAdapterBlockEntity extends SplitShaftBlockEntity {
         activeSequenceLimit = compound.getFloat("activeSequenceLimit");
         redstoneLeft = compound.getInt("redstoneLeft");
         redstoneRight = compound.getInt("redstoneRight");
+        computerTargetAngle = compound.getFloat("computerTargetAngle");
         super.read(compound, clientPacket);
     }
 
