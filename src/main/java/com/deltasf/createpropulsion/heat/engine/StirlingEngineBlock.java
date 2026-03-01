@@ -1,5 +1,6 @@
 package com.deltasf.createpropulsion.heat.engine;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
@@ -17,6 +18,7 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -76,6 +78,17 @@ public class StirlingEngineBlock extends HorizontalKineticBlock implements IBE<S
         }
         Direction direction = pState.getValue(HORIZONTAL_FACING);
         return PropulsionShapes.STIRLING_ENGINE.get(direction);
+    }
+    
+    @SuppressWarnings("deprecation")
+    @Override
+    public void neighborChanged(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull Block block, @Nonnull BlockPos fromPos, boolean isMoving) {
+        super.neighborChanged(state, level, pos, block, fromPos, isMoving);
+        if (level.isClientSide) return;
+        BlockEntity be = level.getBlockEntity(pos);
+        if (be instanceof StirlingEngineBlockEntity engine) {
+            engine.setPowered(level.hasNeighborSignal(pos));
+        }
     }
 
     @Override

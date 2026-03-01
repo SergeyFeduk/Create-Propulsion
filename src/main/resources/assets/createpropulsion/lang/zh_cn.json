@@ -147,7 +147,7 @@
     "createpropulsion.assembler.selection.cannot_be_inside": "物理结构组装器不可处于选区内",
     "createpropulsion.assembler.selection.too_far": "选区距离过远",
 
-    "createpropulsion.stirling.generated_speed": "RPM 输出",
+    "createpropulsion.stirling_engine.generated_speed": "RPM 输出",
     "createpropulsion.redstone_transmission.control_mode": "变速器控制模式",
     "createpropulsion.redstone_transmission.control_mode.direct": "直接模式",
     "createpropulsion.redstone_transmission.control_mode.incremental": "增量模式",

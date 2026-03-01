@@ -147,7 +147,7 @@
     "createpropulsion.assembler.selection.cannot_be_inside": "Сборщик не может находиться внутри выделенной области",
     "createpropulsion.assembler.selection.too_far": "Выделенная область находится слишком далеко",
 
-    "createpropulsion.stirling.generated_speed": "Генерируемая скорость в оборотах в минуту",
+    "createpropulsion.stirling_engine.generated_speed": "Генерируемая скорость в оборотах в минуту",
     "createpropulsion.redstone_transmission.control_mode": "Режим трансмиссии",
     "createpropulsion.redstone_transmission.control_mode.direct": "Прямой",
     "createpropulsion.redstone_transmission.control_mode.incremental": "Инкрементальный",

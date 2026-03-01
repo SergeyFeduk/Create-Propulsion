@@ -147,7 +147,10 @@
     "createpropulsion.assembler.selection.cannot_be_inside": "Assembler cannot be inside the selection",
     "createpropulsion.assembler.selection.too_far": "Selection is too far away",
 
-    "createpropulsion.stirling.generated_speed": "Generated Speed in RPM",
+    "createpropulsion.stirling_engine.generated_speed": "Generated Speed in RPM",
+    "createpropulsion.gui.goggles.stirling_engine.status": "Stirling Engine Status",
+    "createpropulsion.gui.goggles.stirling_engine.status.on": "On",
+    "createpropulsion.gui.goggles.stirling_engine.status.off": "Off",
     "createpropulsion.redstone_transmission.control_mode": "Transmission Control Mode",
     "createpropulsion.redstone_transmission.control_mode.direct": "Direct",
     "createpropulsion.redstone_transmission.control_mode.incremental": "Incremental",
@@ -167,6 +170,8 @@
     "createpropulsion.stirling_engine.tooltip.summary": "Uses _heat_ from sources with high heat conductivity to _generate rotational power_.",
     "createpropulsion.stirling_engine.tooltip.condition1": "When heat is provided",
     "createpropulsion.stirling_engine.tooltip.behaviour1": "Generates _RPM_.",
+    "createpropulsion.stirling_engine.tooltip.condition2": "When powered",
+    "createpropulsion.stirling_engine.tooltip.behaviour2": "Stops.",
 
     "createpropulsion.tooltip.holdForRocketFuelSummary": "Hold [%1$s] for Rocket Fuel Summary",
     "createpropulsion.tooltip.thrust": "Thrust",

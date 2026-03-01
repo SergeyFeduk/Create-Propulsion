@@ -32,4 +32,9 @@ public class StirlingEnginePeripheral extends SyncedPeripheral<StirlingEngineBlo
 
         blockEntity.getTargetSpeedBehaviour().setValue(value);
     }
+
+    @LuaFunction(mainThread = true)
+    public final void setActive(boolean active) {
+        blockEntity.setComputerActive(active);
+    }
 }

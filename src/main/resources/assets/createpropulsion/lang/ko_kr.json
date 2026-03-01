@@ -133,7 +133,7 @@
     "createpropulsion.assembler.selection.cannot_be_inside": "조립기는 선택된 영역 안에 있을 수 없습니다.",
     "createpropulsion.assembler.selection.too_far": "선택한 영역이 너무 멀리 있습니다",
 
-    "createpropulsion.stirling.generated_speed": "발전 속도 (RPM)",
+    "createpropulsion.stirling_engine.generated_speed": "발전 속도 (RPM)",
 
     "createpropulsion.optical_lens.tooltip.summary": "렌즈에 색을 입혀 _광학 센서_의 빛을 _색칠_할 수 있습니다.",
     "createpropulsion.fluid_lens.tooltip.summary": "_광학 센서_가 _액체_를 감지 할 수 있도록 합니다.",

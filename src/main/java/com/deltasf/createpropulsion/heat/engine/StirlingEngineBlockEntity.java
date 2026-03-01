@@ -10,7 +10,9 @@ import com.deltasf.createpropulsion.registries.PropulsionCapabilities;
 import com.simibubi.create.compat.computercraft.AbstractComputerBehaviour;
 import com.simibubi.create.content.kinetics.base.GeneratingKineticBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.simibubi.create.foundation.utility.CreateLang;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -29,6 +31,10 @@ public class StirlingEngineBlockEntity extends GeneratingKineticBlockEntity impl
     private int activeTicks = 0;
     private boolean firstTick = true;
 
+    private boolean isPowered = false;
+    private boolean computerActive = true;
+    private boolean wasEngineActive = true;
+
     public AbstractComputerBehaviour computerBehaviour;
 
     public StirlingEngineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -39,6 +45,7 @@ public class StirlingEngineBlockEntity extends GeneratingKineticBlockEntity impl
     @Override
     public void initialize() {
         super.initialize();
+        wasEngineActive = isEngineActive();
         if (activeTicks > 0 || getGeneratedSpeed() > getTheoreticalSpeed()) {
             updateGeneratedRotation();
         }
@@ -49,7 +56,7 @@ public class StirlingEngineBlockEntity extends GeneratingKineticBlockEntity impl
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviors) {
         super.addBehaviours(behaviors);
-        targetSpeedBehaviour = new StirlingScrollValueBehaviour(Component.translatable("createpropulsion.stirling.generated_speed"), this, new StirlingEngineValueBox());
+        targetSpeedBehaviour = new StirlingScrollValueBehaviour(Component.translatable("createpropulsion.stirling_engine.generated_speed"), this, new StirlingEngineValueBox());
         targetSpeedBehaviour.value = 4;
         targetSpeedBehaviour.withCallback(i -> this.updateGeneratedRotation());
         behaviors.add(targetSpeedBehaviour);
@@ -57,6 +64,21 @@ public class StirlingEngineBlockEntity extends GeneratingKineticBlockEntity impl
         if (PropulsionCompatibility.CC_ACTIVE) {
             behaviors.add(computerBehaviour = new ComputerBehaviour(this));
         }
+    }
+
+    public void setPowered(boolean powered) {
+        this.isPowered = powered;
+    }
+
+    public void setComputerActive(boolean active) {
+        this.computerActive = active;
+    }
+
+    public boolean isEngineActive() {
+        if (PropulsionCompatibility.CC_ACTIVE && computerBehaviour != null && computerBehaviour.hasAttachedComputer()) {
+            return computerActive;
+        }
+        return !isPowered;
     }
 
     @SuppressWarnings("null")
@@ -67,9 +89,17 @@ public class StirlingEngineBlockEntity extends GeneratingKineticBlockEntity impl
 
         if (firstTick) {
             firstTick = false;
+            isPowered = level.hasNeighborSignal(getBlockPos());
+            wasEngineActive = isEngineActive();
             if (activeTicks > 0) {
                 reActivateSource = true;
             }
+        }
+
+        boolean currentlyActive = isEngineActive();
+        if (wasEngineActive != currentlyActive) {
+            wasEngineActive = currentlyActive;
+            updateGeneratedRotation();
         }
 
         if (activeTicks > 0) {
@@ -82,7 +112,7 @@ public class StirlingEngineBlockEntity extends GeneratingKineticBlockEntity impl
 
     @Override
     public boolean isActive() {
-        return true; 
+        return isEngineActive(); 
     }
 
     @Override
@@ -92,13 +122,15 @@ public class StirlingEngineBlockEntity extends GeneratingKineticBlockEntity impl
 
     @Override
     public float consumeHeat(float maxAvailable, float expectedHeatOutput, boolean simulate) {
+        if (!isEngineActive()) return 0f;
+
         float rpm = targetSpeedBehaviour.getUnsignedRPM();
         float modeConsumptionFactor = rpm / MAX_GENERATED_RPM;
         float toConsume = Math.min(modeConsumptionFactor * HEAT_CONSUMPTION_RATE, maxAvailable); //Do not care about expected heat output (we always consume less than it)
 
         if (!simulate && toConsume > 0) {
             boolean wasInactive = activeTicks == 0;
-            this.activeTicks = 3;
+            activeTicks = 3;
 
             //We were off, but now we are activate -> update rotation
             if (wasInactive) {
@@ -111,14 +143,14 @@ public class StirlingEngineBlockEntity extends GeneratingKineticBlockEntity impl
 
     @Override
     public float getGeneratedSpeed() {
-        if (activeTicks <= 0) return 0f;
+        if (!isEngineActive() || activeTicks <= 0) return 0f;
         int generatedRPM = targetSpeedBehaviour.getRPM();
         return convertToDirection(generatedRPM, getBlockState().getValue(StirlingEngineBlock.HORIZONTAL_FACING));
     }
 
     @Override
     public float calculateAddedStressCapacity() {
-        if (activeTicks <= 0) return 0f;
+        if (!isEngineActive() || activeTicks <= 0) return 0f;
         float rpm = targetSpeedBehaviour.getUnsignedRPM();
         if (rpm == 0) return 0f; 
 
@@ -127,6 +159,21 @@ public class StirlingEngineBlockEntity extends GeneratingKineticBlockEntity impl
 
         this.lastCapacityProvided = capacity;
         return capacity;
+    }
+
+    @Override
+    public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
+        boolean active = isEngineActive();
+
+        CreateLang.builder()
+            .add(Component.translatable("createpropulsion.gui.goggles.stirling_engine.status"))
+            .text(": ")
+            .add(Component.translatable(active ? "createpropulsion.gui.goggles.stirling_engine.status.on" : "createpropulsion.gui.goggles.stirling_engine.status.off")
+                .withStyle(active ? ChatFormatting.GREEN : ChatFormatting.RED))
+            .forGoggles(tooltip);
+
+        super.addToGoggleTooltip(tooltip, isPlayerSneaking);
+        return true;
     }
 
     //Caps
@@ -152,11 +199,19 @@ public class StirlingEngineBlockEntity extends GeneratingKineticBlockEntity impl
     protected void write(CompoundTag compound, boolean clientPacket) {
         super.write(compound, clientPacket);
         compound.putInt("activeTicks", activeTicks);
+        compound.putBoolean("isPowered", isPowered);
+        compound.putBoolean("computerActive", computerActive);
     }
 
     @Override
     protected void read(CompoundTag compound, boolean clientPacket) {
         super.read(compound, clientPacket);
         activeTicks = compound.getInt("activeTicks");
+        isPowered = compound.getBoolean("isPowered");
+        if (compound.contains("computerActive")) {
+            computerActive = compound.getBoolean("computerActive");
+        } else {
+            computerActive = true;
+        }
     }
 }
