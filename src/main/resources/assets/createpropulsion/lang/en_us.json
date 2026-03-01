@@ -151,6 +151,7 @@
     "createpropulsion.gui.goggles.stirling_engine.status": "Stirling Engine Status",
     "createpropulsion.gui.goggles.stirling_engine.status.on": "On",
     "createpropulsion.gui.goggles.stirling_engine.status.off": "Off",
+    "createpropulsion.gui.goggles.stirling_engine.status.no_heat": "No Heat",
     "createpropulsion.redstone_transmission.control_mode": "Transmission Control Mode",
     "createpropulsion.redstone_transmission.control_mode.direct": "Direct",
     "createpropulsion.redstone_transmission.control_mode.incremental": "Incremental",

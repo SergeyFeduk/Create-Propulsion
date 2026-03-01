@@ -165,11 +165,25 @@ public class StirlingEngineBlockEntity extends GeneratingKineticBlockEntity impl
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         boolean active = isEngineActive();
 
+        String status;
+        ChatFormatting statusColor;
+        if (active) {
+            if (activeTicks == 0) {
+                status = "createpropulsion.gui.goggles.stirling_engine.status.no_heat";
+                statusColor = ChatFormatting.GOLD;
+            } else {
+                status = "createpropulsion.gui.goggles.stirling_engine.status.on";
+                statusColor = ChatFormatting.GREEN;
+            }
+        } else {
+            status = "createpropulsion.gui.goggles.stirling_engine.status.off";
+            statusColor = ChatFormatting.RED;
+        }
+
         CreateLang.builder()
             .add(Component.translatable("createpropulsion.gui.goggles.stirling_engine.status"))
             .text(": ")
-            .add(Component.translatable(active ? "createpropulsion.gui.goggles.stirling_engine.status.on" : "createpropulsion.gui.goggles.stirling_engine.status.off")
-                .withStyle(active ? ChatFormatting.GREEN : ChatFormatting.RED))
+            .add(Component.translatable(status).withStyle(statusColor))
             .forGoggles(tooltip);
 
         super.addToGoggleTooltip(tooltip, isPlayerSneaking);

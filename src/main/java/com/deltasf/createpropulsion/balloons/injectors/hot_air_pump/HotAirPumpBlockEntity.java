@@ -16,9 +16,12 @@ import com.deltasf.createpropulsion.balloons.injectors.BalloonInfoBehaviour;
 import com.deltasf.createpropulsion.balloons.injectors.HotAirInjectorBehaviour;
 import com.deltasf.createpropulsion.balloons.injectors.IHotAirInjector;
 import com.deltasf.createpropulsion.balloons.registries.BalloonShipRegistry;
+import com.deltasf.createpropulsion.compat.PropulsionCompatibility;
+import com.deltasf.createpropulsion.compat.computercraft.ComputerBehaviour;
 import com.deltasf.createpropulsion.heat.IHeatConsumer;
 import com.deltasf.createpropulsion.registries.PropulsionCapabilities;
 import com.deltasf.createpropulsion.utility.math.MathUtility;
+import com.simibubi.create.compat.computercraft.AbstractComputerBehaviour;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.utility.CreateLang;
@@ -46,6 +49,7 @@ public class HotAirPumpBlockEntity extends KineticBlockEntity implements IHotAir
     private HotAirInjectorBehaviour injectorBehaviour;
     private AirInjectorObstructionBehaviour obstructionBehaviour;
     private BalloonInfoBehaviour balloonInfoBehaviour;
+    public AbstractComputerBehaviour computerBehaviour;
 
     private final LazyOptional<IHeatConsumer> heatConsumerCap;
 
@@ -81,6 +85,10 @@ public class HotAirPumpBlockEntity extends KineticBlockEntity implements IHotAir
 
         balloonInfoBehaviour = new BalloonInfoBehaviour(this, this::getId);
         behaviours.add(balloonInfoBehaviour);
+
+        if (PropulsionCompatibility.CC_ACTIVE) {
+            behaviours.add(computerBehaviour = new ComputerBehaviour(this));
+        }
     }
 
     @Override
@@ -288,6 +296,9 @@ public class HotAirPumpBlockEntity extends KineticBlockEntity implements IHotAir
     public <T> @NotNull LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
         if (cap == PropulsionCapabilities.HEAT_CONSUMER && side == Direction.DOWN) {
             return heatConsumerCap.cast();
+        }
+        if (PropulsionCompatibility.CC_ACTIVE && computerBehaviour != null && computerBehaviour.isPeripheralCap(cap)) {
+            return computerBehaviour.getPeripheralCapability();
         }
         return super.getCapability(cap, side);
     }

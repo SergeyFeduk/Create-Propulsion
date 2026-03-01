@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import com.deltasf.createpropulsion.balloons.injectors.hot_air_pump.HotAirPumpBlockEntity;
 import com.deltasf.createpropulsion.heat.engine.StirlingEngineBlockEntity;
 import com.deltasf.createpropulsion.lodestone_tracker.LodestoneTrackerBlockEntity;
 import com.deltasf.createpropulsion.magnet.RedstoneMagnetBlockEntity;
@@ -48,6 +49,7 @@ public class ComputerBehaviour extends AbstractComputerBehaviour {
         register(StirlingEngineBlockEntity.class, StirlingEnginePeripheral::new);
         register(RedstoneTransmissionBlockEntity.class, RedstoneTransmissionPeripheral::new);
         register(TiltAdapterBlockEntity.class, TiltAdapterPeripheral::new);
+        register(HotAirPumpBlockEntity.class, HotAirPumpPeripheral::new);
     }
 
     public ComputerBehaviour(SmartBlockEntity blockEntity) {

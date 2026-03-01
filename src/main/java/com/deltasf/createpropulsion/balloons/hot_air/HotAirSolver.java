@@ -41,12 +41,9 @@ public class HotAirSolver {
             return true;
         }
 
-        if (balloon.isEmpty()) {
-            return true; //Dead in a moment
-        }
+        if (balloon.isEmpty()) { return true; } //Dead in a moment
         
         SolverContext ctx = new SolverContext(level, balloon, group, registry, ship);
-        //System.out.println(predictSteadyHotAir(ctx, 0.01));
 
         calculateInjections(ctx);
         calculateGlobalLeak(ctx);
@@ -192,7 +189,10 @@ public class HotAirSolver {
         return t;
     }
 
-    //TODO: May use this somewhere
+    public static double predictSteadyHotAir(Level level, Balloon balloon, HaiGroup group, BalloonRegistry registry, ServerShip ship, double tolerance) {
+        if (balloon == null || registry == null || ship == null) return 0.0;
+        return predictSteadyHotAir(new SolverContext(level, balloon, group, registry, ship), tolerance);
+    }
 
     //Predicts hot air amount that satisfies (injection - leak = 0)
     //Uses bisection (cus ramp & exponents -> no closed-form solution)
