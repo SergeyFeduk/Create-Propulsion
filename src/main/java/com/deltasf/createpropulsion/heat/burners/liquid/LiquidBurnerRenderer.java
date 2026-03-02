@@ -7,6 +7,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import com.simibubi.create.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 
+import dev.engine_room.flywheel.api.visualization.VisualizationManager;
 import net.createmod.catnip.animation.AnimationTickHolder;
 import net.createmod.catnip.math.AngleHelper;
 import net.createmod.catnip.render.CachedBuffers;
@@ -19,7 +20,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class LiquidBurnerRenderer extends SmartBlockEntityRenderer<LiquidBurnerBlockEntity> {
-    private static final float FAN_SPEED = 0.5f;
+    public static final float FAN_SPEED = 0.5f;
 
     public LiquidBurnerRenderer(BlockEntityRendererProvider.Context context) {
         super(context);
@@ -27,6 +28,8 @@ public class LiquidBurnerRenderer extends SmartBlockEntityRenderer<LiquidBurnerB
 
     @Override
 	protected void renderSafe(LiquidBurnerBlockEntity blockEntity, float partialTicks, PoseStack ms, MultiBufferSource buffer, int light, int overlay) {
+        if (VisualizationManager.supportsVisualization(blockEntity.getLevel())) return;
+        
         BlockState state = blockEntity.getBlockState();
         Level level = blockEntity.getLevel();
         if (level == null) return;
