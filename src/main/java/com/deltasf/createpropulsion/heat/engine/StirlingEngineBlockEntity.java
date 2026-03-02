@@ -186,6 +186,13 @@ public class StirlingEngineBlockEntity extends GeneratingKineticBlockEntity impl
             .add(Component.translatable(status).withStyle(statusColor))
             .forGoggles(tooltip);
 
+        if (PropulsionCompatibility.CC_ACTIVE && computerBehaviour != null && computerBehaviour.hasAttachedComputer()) {
+            CreateLang.builder()
+                .add(Component.translatable("createpropulsion.gui.goggles.cc.peripheral_controlled"))
+                .style(ChatFormatting.GRAY)
+                .forGoggles(tooltip);
+        }
+
         super.addToGoggleTooltip(tooltip, isPlayerSneaking);
         return true;
     }
