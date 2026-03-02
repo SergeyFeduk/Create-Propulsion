@@ -225,41 +225,41 @@ public class HotAirPumpBlockEntity extends KineticBlockEntity implements IHotAir
         ChatFormatting color = null;
 
         if (isAirless) {
-            key = "gui.goggles.hot_air_pump.status.airless";
+            key = "createpropulsion.gui.goggles.hot_air_pump.status.airless"; 
             color = ChatFormatting.RED;
         } else if (!isOnShip) {
-            key = "gui.goggles.hot_air_burner.status.not_shipified";
+            key = "createpropulsion.gui.goggles.hot_air_burner.status.not_shipified";
             color = ChatFormatting.RED;
         } else if (!isBalloonPresent) {
             //No RPM -> No Heat -> No Balloon
             if (!hasRPM) {
-                key = "gui.goggles.hot_air_pump.status.no_rpm";
+                key = "createpropulsion.gui.goggles.hot_air_pump.status.no_rpm";
                 color = ChatFormatting.GRAY;
             } else if (!hasHeat) {
-                key = "gui.goggles.hot_air_pump.status.no_heat";
+                key = "createpropulsion.gui.goggles.hot_air_pump.status.no_heat";
                 color = ChatFormatting.GOLD;
             } else {
-                key = "gui.goggles.hot_air_burner.status.no_balloon";
+                key = "createpropulsion.gui.goggles.hot_air_burner.status.no_balloon";
                 color = ChatFormatting.DARK_GRAY;
             }
         } else {
             //Balloon is present
             if (hasRPM && hasHeat) {
-                key = "gui.goggles.hot_air_burner.status.on";
+                key = "createpropulsion.gui.goggles.hot_air_burner.status.on";
                 color = ChatFormatting.GREEN;
             } else if (!hasRPM) {
-                key = "gui.goggles.hot_air_pump.status.no_rpm";
+                key = "createpropulsion.gui.goggles.hot_air_pump.status.no_rpm";
                 color = ChatFormatting.GRAY;
             } else {
-                key = "gui.goggles.hot_air_pump.status.no_heat";
+                key = "createpropulsion.gui.goggles.hot_air_pump.status.no_heat";
                 color = ChatFormatting.GOLD;
             }
         }
 
         CreateLang.builder()
-            .add(CreateLang.translate("gui.goggles.hot_air_pump.status"))
+            .add(Component.translatable("createpropulsion.gui.goggles.hot_air_pump.status"))
             .text(": ")
-            .add(CreateLang.translate(key).style(color))
+            .add(CreateLang.builder().add(Component.translatable(key)).style(color))
             .forGoggles(tooltip);
 
         //Injection
@@ -269,7 +269,7 @@ public class HotAirPumpBlockEntity extends KineticBlockEntity implements IHotAir
             int percentage = (int) ((currentInjection / baseInjection) * 100);
 
             LangBuilder injectionBuilder = CreateLang.builder()
-                .translate("gui.goggles.hot_air_pump.injection")
+                .add(Component.translatable("createpropulsion.gui.goggles.hot_air_pump.injection"))
                 .text(": ")
                 .add(CreateLang.text(percentage + "%").style(ChatFormatting.AQUA));
 

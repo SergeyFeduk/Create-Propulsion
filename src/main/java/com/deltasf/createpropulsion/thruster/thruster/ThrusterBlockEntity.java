@@ -98,15 +98,15 @@ public class ThrusterBlockEntity extends AbstractThrusterBlockEntity {
     @Override
     protected LangBuilder getGoggleStatus() {
         if (fluidStack().isEmpty()) {
-            return CreateLang.translate("gui.goggles.thruster.status.no_fuel").style(ChatFormatting.RED);
+            return CreateLang.builder().add(Component.translatable("createpropulsion.gui.goggles.thruster.status.no_fuel")).style(ChatFormatting.RED);
         } else if (!validFluid()) {
-            return CreateLang.translate("gui.goggles.thruster.status.wrong_fuel").style(ChatFormatting.RED);
+            return CreateLang.builder().add(Component.translatable("createpropulsion.gui.goggles.thruster.status.wrong_fuel")).style(ChatFormatting.RED);
         } else if (!isPowered()) {
-            return CreateLang.translate("gui.goggles.thruster.status.not_powered").style(ChatFormatting.GOLD);
+            return CreateLang.builder().add(Component.translatable("createpropulsion.gui.goggles.thruster.status.not_powered")).style(ChatFormatting.GOLD);
         } else if (emptyBlocks == 0) {
-            return CreateLang.translate("gui.goggles.thruster.obstructed").style(ChatFormatting.RED);
+            return CreateLang.builder().add(Component.translatable("createpropulsion.gui.goggles.thruster.obstructed")).style(ChatFormatting.RED);
         } else {
-            return CreateLang.translate("gui.goggles.thruster.status.working").style(ChatFormatting.GREEN);
+            return CreateLang.builder().add(Component.translatable("createpropulsion.gui.goggles.thruster.status.working")).style(ChatFormatting.GREEN);
         }
     }
 

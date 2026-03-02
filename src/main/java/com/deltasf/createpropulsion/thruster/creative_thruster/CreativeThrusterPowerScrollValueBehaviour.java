@@ -22,7 +22,7 @@ public class CreativeThrusterPowerScrollValueBehaviour extends ScrollValueBehavi
     }
  
     public CreativeThrusterPowerScrollValueBehaviour(SmartBlockEntity be) {
-        super(CreateLang.builder().translate("gui.creative_thruster.power_behaviour", new Object[0]).component(), be, new CreativeThrusterValueBox());
+        super(Component.translatable("createpropulsion.gui.creative_thruster.power_behaviour"), be, new CreativeThrusterValueBox());
         between(0, TOTAL_STEPS - 1); //Why is this even a thing :\
     }
 

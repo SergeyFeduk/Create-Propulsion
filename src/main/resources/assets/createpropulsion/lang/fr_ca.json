@@ -12,7 +12,7 @@
 
     "block.createpropulsion.optical_sensor": "Capteur Optique",
     "item.createpropulsion.optical_sensor": "Capteur Optique",
-    "create.gui.optical_sensor.distance_behaviour": "Distance De Raycasting",
+    "createpropulsion.gui.optical_sensor.distance_behaviour": "Distance De Raycasting",
 
     "create.gui.goggles.thruster.status": "État De Propulseur",
     "create.gui.goggles.thruster.status.no_fuel": "Pas De Carburant",

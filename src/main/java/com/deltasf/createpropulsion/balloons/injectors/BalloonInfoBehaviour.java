@@ -105,7 +105,7 @@ public class BalloonInfoBehaviour extends BlockEntityBehaviour {
         if (!isBalloonPresent) return;
 
         CreateLang.builder()
-            .translate("gui.goggles.hot_air_burner.balloon.status")
+            .add(Component.translatable("createpropulsion.gui.goggles.hot_air_burner.balloon.status"))
             .text(":")
             .forGoggles(tooltip);
 
@@ -117,7 +117,7 @@ public class BalloonInfoBehaviour extends BlockEntityBehaviour {
         }
 
         var hotAirBuilder = CreateLang.builder()
-            .translate("gui.goggles.hot_air_burner.balloon.hot_air")
+            .add(Component.translatable("createpropulsion.gui.goggles.hot_air_burner.balloon.hot_air"))
             .text(String.format(": %d / %d", balloonHotAir, balloonMaxHotAir));
         
         if (isPlayerSneaking) {

@@ -256,7 +256,7 @@ public class RedstoneTransmissionBlockEntity extends SplitShaftBlockEntity {
         IRotate.SpeedLevel.getFormattedSpeedText(speed * shift_level / MAX_VALUE, isOverStressed()).forGoggles(tooltip);
 
         if (PropulsionCompatibility.CC_ACTIVE && computerBehaviour != null && computerBehaviour.hasAttachedComputer()) {
-            CreateLang.translate("gui.goggles.cc.peripheral_controlled", new Object[0]).style(ChatFormatting.GRAY).forGoggles(tooltip);
+            CreateLang.builder().add(Component.translatable("createpropulsion.gui.goggles.cc.peripheral_controlled")).style(ChatFormatting.GRAY).forGoggles(tooltip);
         }
 
         super.addToGoggleTooltip(tooltip, isPlayerSneaking);

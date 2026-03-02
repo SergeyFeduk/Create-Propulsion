@@ -19,7 +19,7 @@ import net.minecraft.network.chat.MutableComponent;
 
 public class OpticalSensorDistanceScrollBehaviour extends ScrollValueBehaviour {
     public OpticalSensorDistanceScrollBehaviour(SmartBlockEntity be) {
-        super(CreateLang.builder().translate("gui.optical_sensor.distance_behaviour", new Object[0]).component(), be, new OpticalSensorDistanceValueBox());
+        super(Component.translatable("createpropulsion.gui.optical_sensor.distance_behaviour"), be, new OpticalSensorDistanceValueBox());
     }
 
     @Override

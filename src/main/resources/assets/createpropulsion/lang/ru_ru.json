@@ -12,7 +12,7 @@
 
     "block.createpropulsion.optical_sensor": "Оптический датчик",
     "item.createpropulsion.optical_sensor": "Оптический датчик",
-    "create.gui.optical_sensor.distance_behaviour": "Дальность действия датчика",
+    "createpropulsion.gui.optical_sensor.distance_behaviour": "Дальность действия датчика",
 
     "block.createpropulsion.lodestone_tracker": "Трекер магнетита",
     "block.createpropulsion.redstone_magnet": "Редстоун магнит",

@@ -12,7 +12,7 @@
 
     "block.createpropulsion.optical_sensor": "광학 센서",
     "item.createpropulsion.optical_sensor": "광학 센서",
-    "create.gui.optical_sensor.distance_behaviour": "광선 감지 거리",
+    "createpropulsion.gui.optical_sensor.distance_behaviour": "광선 감지 거리",
 
     "block.createpropulsion.lodestone_tracker": "자석석 추적기",
     "block.createpropulsion.redstone_magnet": "레드스톤 자석",

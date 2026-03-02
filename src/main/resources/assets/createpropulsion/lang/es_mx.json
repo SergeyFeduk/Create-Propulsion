@@ -12,7 +12,7 @@
 
     "block.createpropulsion.optical_sensor": "Sensor Óptico",
     "item.createpropulsion.optical_sensor": "Sensor Óptico",
-    "create.gui.optical_sensor.distance_behaviour": "Longitud de rayo",
+    "createpropulsion.gui.optical_sensor.distance_behaviour": "Longitud de rayo",
 
     "create.gui.goggles.thruster.status": "Estado del propulsor",
     "create.gui.goggles.thruster.status.no_fuel": "Sin Combustible",

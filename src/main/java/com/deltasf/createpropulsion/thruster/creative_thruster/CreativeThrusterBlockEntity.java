@@ -126,31 +126,30 @@ public class CreativeThrusterBlockEntity extends AbstractThrusterBlockEntity {
 
         //"Thrust Output: 400/450 kN"
         LangBuilder thrustBuilder = CreateLang.builder();
-        thrustBuilder.add(CreateLang.translate("gui.goggles.thruster.thrust_output").text(": "));
+        thrustBuilder.add(Component.translatable("createpropulsion.gui.goggles.thruster.thrust_output")).text(": ");
         thrustBuilder.add(CreateLang.number(currentThrustKN).text(" / ").add(CreateLang.number(maxThrustKN)).style(ChatFormatting.GRAY));
-        thrustBuilder.space().add(CreateLang.translate("gui.goggles.thruster.unit_kn"));
+        thrustBuilder.space().add(Component.translatable("createpropulsion.gui.goggles.thruster.unit_kn"));
         thrustBuilder.forGoggles(tooltip);
 
         //"Particle: Plasma"
         LangBuilder particleBuilder = CreateLang.builder()
-            .add(CreateLang.translate("gui.goggles.creative_thruster.particle")).text(": ");
+            .add(Component.translatable("createpropulsion.gui.goggles.creative_thruster.particle")).text(": ");
 
         switch (plumeType) {
-            case PLASMA -> particleBuilder.add(CreateLang.translate("gui.goggles.creative_thruster.particle.plasma").style(ChatFormatting.AQUA));
-            case PLUME -> particleBuilder.add(CreateLang.translate("gui.goggles.creative_thruster.particle.plume").style(ChatFormatting.GOLD));
-            case NONE -> particleBuilder.add(CreateLang.translate("gui.goggles.creative_thruster.particle.none").style(ChatFormatting.DARK_GRAY));
+            case PLASMA -> particleBuilder.add(CreateLang.builder().add(Component.translatable("createpropulsion.gui.goggles.creative_thruster.particle.plasma")).style(ChatFormatting.AQUA));
+            case PLUME -> particleBuilder.add(CreateLang.builder().add(Component.translatable("createpropulsion.gui.goggles.creative_thruster.particle.plume")).style(ChatFormatting.GOLD));
+            case NONE -> particleBuilder.add(CreateLang.builder().add(Component.translatable("createpropulsion.gui.goggles.creative_thruster.particle.none")).style(ChatFormatting.DARK_GRAY));
         }
 
         particleBuilder.forGoggles(tooltip);
-
     }
 
     @Override
     protected LangBuilder getGoggleStatus() {
         if (isPowered()) {
-            return CreateLang.translate("gui.goggles.thruster.status.working").style(ChatFormatting.GREEN);
+            return CreateLang.builder().add(Component.translatable("createpropulsion.gui.goggles.thruster.status.working")).style(ChatFormatting.GREEN);
         }
-        return CreateLang.translate("gui.goggles.thruster.status.not_powered").style(ChatFormatting.GOLD);
+        return CreateLang.builder().add(Component.translatable("createpropulsion.gui.goggles.thruster.status.not_powered")).style(ChatFormatting.GOLD);
     }
 
     //CC slop

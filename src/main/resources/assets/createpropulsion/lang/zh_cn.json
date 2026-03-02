@@ -12,7 +12,7 @@
 
     "block.createpropulsion.optical_sensor": "光学传感器",
     "item.createpropulsion.optical_sensor": "光学传感器",
-    "create.gui.optical_sensor.distance_behaviour": "光线投射距离",
+    "createpropulsion.gui.optical_sensor.distance_behaviour": "光线投射距离",
 
     "block.createpropulsion.lodestone_tracker": "磁石追踪器",
     "block.createpropulsion.redstone_magnet": "红石磁铁",

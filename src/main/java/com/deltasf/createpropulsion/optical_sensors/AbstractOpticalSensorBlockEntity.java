@@ -277,7 +277,7 @@ public abstract class AbstractOpticalSensorBlockEntity extends SmartBlockEntity 
         if (getCurrentLensCount() == 0) return false; //No lenses - no need for goggle info
         //Lenses: 1/2
         CreateLang.builder()
-            .add(CreateLang.translate("gui.goggles.optical_sensor.lenses", new Object[0]))
+            .add(Component.translatable("createpropulsion.gui.goggles.optical_sensor.lenses"))
             .add(CreateLang.text(":")).space().add(CreateLang.number(getCurrentLensCount())).text("/").add(CreateLang.number(getLensLimit()))
             .forGoggles(tooltip);
         //List all lenses starting from the deepest

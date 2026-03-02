@@ -160,22 +160,22 @@ public abstract class AbstractBurnerBlockEntity extends SmartBlockEntity impleme
         String key = null;
 
         switch (heatLevelName) {
-            case COLD: color = ChatFormatting.BLUE; key = "gui.goggles.burner.heat.cold"; break;
-            case WARM: color = ChatFormatting.GOLD; key = "gui.goggles.burner.heat.warm"; break;
-            case HOT: color = ChatFormatting.GOLD; key = "gui.goggles.burner.heat.hot"; break;
-            case SEARING: color = ChatFormatting.RED; key = "gui.goggles.burner.heat.searing"; break;
+            case COLD: color = ChatFormatting.BLUE; key = "createpropulsion.gui.goggles.burner.heat.cold"; break;
+            case WARM: color = ChatFormatting.GOLD; key = "createpropulsion.gui.goggles.burner.heat.warm"; break;
+            case HOT: color = ChatFormatting.GOLD; key = "createpropulsion.gui.goggles.burner.heat.hot"; break;
+            case SEARING: color = ChatFormatting.RED; key = "createpropulsion.gui.goggles.burner.heat.searing"; break;
             default: color = ChatFormatting.BLUE; break;
         }
 
         //Heat level
         if (key != null)
-            CreateLang.builder().add(CreateLang.translate("gui.goggles.burner.status")).text(": ").add(CreateLang.translate(key).style(color)).forGoggles(tooltip);
+            CreateLang.builder().add(Component.translatable("createpropulsion.gui.goggles.burner.status")).text(": ").add(CreateLang.builder().add(Component.translatable(key)).style(color)).forGoggles(tooltip);
 
         //Thermostat
         CreateLang.builder()
-            .add(CreateLang.translate("gui.goggles.burner.thermostat"))
+            .add(Component.translatable("createpropulsion.gui.goggles.burner.thermostat"))
             .text(": ")
-            .add(CreateLang.translate(!isPowered ? "gui.goggles.burner.thermostat.on" : "gui.goggles.burner.thermostat.off")
+            .add(CreateLang.builder().add(Component.translatable(!isPowered ? "createpropulsion.gui.goggles.burner.thermostat.on" : "createpropulsion.gui.goggles.burner.thermostat.off"))
                 .style(!isPowered ? ChatFormatting.GREEN : ChatFormatting.RED))
             .forGoggles(tooltip);
     }

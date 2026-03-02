@@ -252,34 +252,34 @@ public class HotAirBurnerBlockEntity extends SmartBlockEntity implements IHaveGo
 
         //Airless -> Not on ship -> No balloon / Fuel -> Valid statuses
         if (isAirless) {
-            key = "gui.goggles.hot_air_burner.status.airless";
+            key = "createpropulsion.gui.goggles.hot_air_burner.status.airless";
             color = ChatFormatting.RED;
         } else if (!VSGameUtilsKt.isBlockInShipyard(getLevel(), getBlockPos())) {
-            key = "gui.goggles.hot_air_burner.status.not_shipified";
+            key = "createpropulsion.gui.goggles.hot_air_burner.status.not_shipified";
             color = ChatFormatting.RED;
         } else if (!isBalloonPresent) {
             if (hasFuel) {
-                key = "gui.goggles.hot_air_burner.status.no_balloon";
+                key = "createpropulsion.gui.goggles.hot_air_burner.status.no_balloon";
                 color = ChatFormatting.DARK_GRAY;
             } else {
-                key = "gui.goggles.hot_air_burner.status.no_fuel";
+                key = "createpropulsion.gui.goggles.hot_air_burner.status.no_fuel";
                 color = ChatFormatting.GOLD;
             }
         } else if (isBurning) {
-            key = "gui.goggles.hot_air_burner.status.on";
+            key = "createpropulsion.gui.goggles.hot_air_burner.status.on";
             color = ChatFormatting.GREEN;
         } else if (hasFuel) {
-            key = "gui.goggles.hot_air_burner.status.ready";
+            key = "createpropulsion.gui.goggles.hot_air_burner.status.ready";
             color = ChatFormatting.GRAY;
         } else {
-            key = "gui.goggles.hot_air_burner.status.no_fuel";
+            key = "createpropulsion.gui.goggles.hot_air_burner.status.no_fuel";
             color = ChatFormatting.GOLD;
         }
 
         CreateLang.builder()
-            .add(CreateLang.translate("gui.goggles.hot_air_burner.status"))
+            .add(Component.translatable("createpropulsion.gui.goggles.hot_air_burner.status"))
             .text(": ")
-            .add(CreateLang.translate(key).style(color))
+            .add(CreateLang.builder().add(Component.translatable(key)).style(color))
             .forGoggles(tooltip);
 
         //Fuel info

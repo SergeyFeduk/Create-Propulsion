@@ -12,7 +12,7 @@
 
     "block.createpropulsion.optical_sensor": "Optischer Sensor",
     "item.createpropulsion.optical_sensor": "Optischer Sensor",
-    "create.gui.optical_sensor.distance_behaviour": "Raycast Distanz",
+    "createpropulsion.gui.optical_sensor.distance_behaviour": "Raycast Distanz",
 
     "block.createpropulsion.lodestone_tracker": "Leitstein Tracker",
     "block.createpropulsion.redstone_magnet": "Redstone Magnet",
