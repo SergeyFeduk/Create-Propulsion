@@ -58,6 +58,7 @@
     "block.createpropulsion.enveloped_shaft_black": "검은색 풍선",
 
     "block.createpropulsion.hot_air_burner": "기체 가열기",
+    "block.createpropulsion.hot_air_pump": "Hot Air Pump", 
     "block.createpropulsion.solid_burner": "고체 연료 버너",
     "block.createpropulsion.liquid_burner": "액체 연료 버너",
     "block.createpropulsion.propeller": "프로펠러",
@@ -77,7 +78,14 @@
     "createpropulsion.gui.goggles.thruster.status.working": "작동 중",
     "createpropulsion.gui.goggles.thruster.obstructed": "막힘",
     "createpropulsion.gui.goggles.thruster.efficiency": "효율",
+    
+    "createpropulsion.gui.goggles.cc.peripheral_controlled": "Controlled via Peripheral", 
     "createpropulsion.gui.goggles.optical_sensor.lenses": "렌즈 종류",
+    
+    "createpropulsion.gui.goggles.creative_thruster.particle": "Particle", 
+    "createpropulsion.gui.goggles.creative_thruster.particle.plasma": "Plasma", 
+    "createpropulsion.gui.goggles.creative_thruster.particle.plume": "Plume", 
+    "createpropulsion.gui.goggles.creative_thruster.particle.none": "None", 
 
     "createpropulsion.inline_optical_sensor.tooltip.summary": "_광선_을 발사하여 최대 {}블록 거리까지 블록을 감지합니다.",
     "createpropulsion.inline_optical_sensor.tooltip.behaviour1": "_레드스톤 신호_를 방출합니다. 가까운 블록일수록 출력이 강해집니다.",
@@ -87,6 +95,11 @@
 
     "createpropulsion.thruster.tooltip.condition1": "연료가 공급되고 레드스톤 신호가 있을 때",
     "createpropulsion.thruster.tooltip.behaviour1": "차량을 밀어냅니다. 추진력은 레드스톤 신호 세기에 따라 달라집니다.",
+
+    "createpropulsion.creative_thruster.tooltip.condition1": "When powered", 
+    "createpropulsion.creative_thruster.tooltip.behaviour1": "Pushes vehicles. Thrust depends on _redstone signal_ strength.", 
+    "createpropulsion.creative_thruster.tooltip.condition2": "When Wrenched", 
+    "createpropulsion.creative_thruster.tooltip.behaviour2": "_Cycles_ its plume particle type.", 
 
     "createpropulsion.lodestone_tracker.tooltip.summary": "적용된 _나침반_ 방향에 따라 _레드스톤 신호_를 생성합니다.",
     "createpropulsion.lodestone_tracker.tooltip.condition1": "나침반을 적용 하면",
@@ -131,6 +144,13 @@
     "createpropulsion.assembler.selection.too_far": "선택한 영역이 너무 멀리 있습니다",
 
     "createpropulsion.stirling_engine.generated_speed": "발전 속도 (RPM)",
+    "createpropulsion.gui.goggles.stirling_engine.status": "Stirling Engine Status", 
+    "createpropulsion.gui.goggles.stirling_engine.status.on": "On", 
+    "createpropulsion.gui.goggles.stirling_engine.status.off": "Off", 
+    "createpropulsion.gui.goggles.stirling_engine.status.no_heat": "No Heat", 
+    "createpropulsion.redstone_transmission.control_mode": "Transmission Control Mode", 
+    "createpropulsion.redstone_transmission.control_mode.direct": "Direct", 
+    "createpropulsion.redstone_transmission.control_mode.incremental": "Incremental", 
 
     "createpropulsion.optical_lens.tooltip.summary": "렌즈에 색을 입혀 _광학 센서_의 빛을 _색칠_할 수 있습니다.",
     "createpropulsion.fluid_lens.tooltip.summary": "_광학 센서_가 _액체_를 감지 할 수 있도록 합니다.",
@@ -141,10 +161,14 @@
 	"createpropulsion.propeller.tooltip.summary": "_두 개 이상의 날개_가 장착되면 추력을 제공합니다. _추력_은 회전 _속도_에 _비례_합니다.",
 	"createpropulsion.propeller.tooltip.condition1": "Shift + 우클릭 시",
 	"createpropulsion.propeller.tooltip.behaviour1": "장착된 날개의 방향을 _반전_시켜 _추력_ 방향을 _반전_합니다.",
+    "createpropulsion.propeller.not_enough_space": "Clear blocks to insert the Blade", 
+    "createpropulsion.propeller.must_be_stopped": "Stop the Propeller before interacting with it", 
 
 	"createpropulsion.stirling_engine.tooltip.summary": "열전도율이 높은 열원에서 발생한 _열_을 사용해 _동력_을 생성합니다.",
 	"createpropulsion.stirling_engine.tooltip.condition1": "열이 공급되면",
 	"createpropulsion.stirling_engine.tooltip.behaviour1": "_동력_을 생성합니다.",
+    "createpropulsion.stirling_engine.tooltip.condition2": "When powered", 
+    "createpropulsion.stirling_engine.tooltip.behaviour2": "Stops.", 
 
     "createpropulsion.tooltip.holdForRocketFuelSummary": "[%1$s]를 눌러 연료 성능 보기",
     "createpropulsion.tooltip.thrust": "추진력",
@@ -155,6 +179,9 @@
     "createpropulsion.tooltip.waterEfficiency": "수중 효율",
     "createpropulsion.tooltip.noTorque": "토크 영향 없음",
 
+    "createpropulsion.tooltip.heat.generation": "Heat Generation", 
+    "createpropulsion.tooltip.heat.consumption": "Heat Consumption", 
+
     "createpropulsion.gui.goggles.burner.status": "버너 상태",
     "createpropulsion.gui.goggles.burner.heat.cold": "차가움",
     "createpropulsion.gui.goggles.burner.heat.warm": "따뜻함",
@@ -164,9 +191,16 @@
     "createpropulsion.gui.goggles.burner.thermostat.on": "켜짐",
     "createpropulsion.gui.goggles.burner.thermostat.off": "꺼짐",
 
+    "createpropulsion.gui.goggles.hot_air_pump.status": "Hot Air Pump Status", 
+    "createpropulsion.gui.goggles.hot_air_pump.status.airless": "No Atmosphere", 
+    "createpropulsion.gui.goggles.hot_air_pump.status.no_rpm": "No RPM", 
+    "createpropulsion.gui.goggles.hot_air_pump.status.no_heat": "No Heat", 
+    "createpropulsion.gui.goggles.hot_air_pump.injection": "Injection Rate", 
+
     "createpropulsion.gui.goggles.hot_air_burner.status": "기체 가열기 상태",
     "createpropulsion.gui.goggles.hot_air_burner.status.airless": "기체가 없습니다.",
     "createpropulsion.gui.goggles.hot_air_burner.status.no_balloon": "풍선이 없습니다.",
+    "createpropulsion.gui.goggles.hot_air_burner.status.not_shipified": "Not On Ship", 
     "createpropulsion.gui.goggles.hot_air_burner.status.no_fuel": "연료가 없습니다.",
     "createpropulsion.gui.goggles.hot_air_burner.status.on": "켜짐",
     "createpropulsion.gui.goggles.hot_air_burner.status.ready": "준비됨",
@@ -176,6 +210,28 @@
     "createpropulsion.gui.goggles.thruster.thrust_output": "추진력",
     "createpropulsion.gui.goggles.thruster.unit_kn": "kN",
     "createpropulsion.gui.creative_thruster.power_behaviour": "추진력 생성",
+
+    "createpropulsion.display_source.redstone_transmission_shift": "Current Shift Level", 
+
+    "createpropulsion.gui.goggles.redstone_transmission.title": "Transmission Mode", 
+    "createpropulsion.gui.goggles.redstone_transmission.internal_shift_title": "Shift Level", 
+    "createpropulsion.gui.goggles.redstone_transmission.internal_shift_number": " {0} / {1}", 
+    "createpropulsion.gui.goggles.redstone_transmission.output": "Transmitted RPM", 
+
+    "createpropulsion.ponder.shared.rpm" : "%.2f RPM", 
+
+    "createpropulsion.ponder.redstone_transmission_direct.header" : "Transmission Control Mode: Direct", 
+    "createpropulsion.ponder.shared.redstone_transmission_direct.intro" : "Transmission has 2 control modes, and direct mode is default", 
+    "createpropulsion.ponder.shared.redstone_transmission_direct.proportional_output" : "In direct control mode, transmission outputs RPM proportional to the redstone input on either side", 
+    "createpropulsion.ponder.shared.redstone_transmission_direct.scaling_note" : "Note that the output speed is scaled from 0 to the input speed", 
+
+    "createpropulsion.ponder.redstone_transmission_incremental.header" : "Transmission Control Mode: Incremental", 
+    "createpropulsion.ponder.shared.redstone_transmission_incremental.proportional_output" : "Transmission in incremental control mode outputs speed proportional to the internal shift level", 
+    "createpropulsion.ponder.shared.redstone_transmission_incremental.changing_mode" : "You can change the control mode with a scroll selection box at the back of the transmission", 
+    "createpropulsion.ponder.shared.redstone_transmission_incremental.increase_shift" : "Redstone signal given to the side with + (plus) sign will increase the shift level", 
+    "createpropulsion.ponder.shared.redstone_transmission_incremental.decrease_shift" : "Redstone signal given to the side with - (minus) sign will decrease the shift level", 
+    "createpropulsion.ponder.shared.redstone_transmission_incremental.both_sides_condition" : "If the signal is given to both sides...", 
+    "createpropulsion.ponder.shared.redstone_transmission_incremental.both_sides_action" : "...the transmission will perform both addition and subtraction", 
 
 	"createpropulsion.ponder.tilt_adapter.header": "기울기 조절기 사용하기",
 	"createpropulsion.ponder.shared.tilt_adapter.intro": "기울기 조절기는 레드스톤 신호에 따라 축의 각도를 조절할 수 있습니다.",
@@ -192,6 +248,21 @@
 	"createpropulsion.ponder.shared.liquid_burner.has_thermostat": "액체 연료 버너에는 내부 온도 조절기가 내장되어 있습니다.",
 	"createpropulsion.ponder.shared.liquid_burner.chaining": "액체 연료 버너는 서로 연결할 수 있습니다.",
 	"createpropulsion.ponder.shared.liquid_burner.acting_as_pipe": "연결된 버너는 파이프처럼 작동해 다른 액체 연료 버너로 연료를 전달합니다.",
+
+    "createpropulsion.ponder.making_balloon.header": "Making a Hot Air Balloon", 
+    "createpropulsion.ponder.shared.making_balloon.intro": "Envelopes encase volume that can be filled with hot air", 
+    "createpropulsion.ponder.shared.making_balloon.fill_condition": "Hot Air Burners will fill balloons above them, when fueled", 
+    "createpropulsion.ponder.shared.making_balloon.distance_requirement": "Hot Air Burners must not be further than 5 blocks from the open bottom of the balloon", 
+    "createpropulsion.ponder.shared.making_balloon.lever_control": "Hot air output can be controlled by clicking on the lever", 
+    "createpropulsion.ponder.shared.making_balloon.power_levels": "Hot Air Burner has 3 power levels", 
+    "createpropulsion.ponder.shared.making_balloon.power_scaling": "The higher is power level - the higher is hot air output", 
+
+    "createpropulsion.ponder.hot_air_pump.header": "Using Hot Air Pump", 
+    "createpropulsion.ponder.shared.hot_air_pump.intro": "Hot air pumps can be used to create balloons and fill them with hot air", 
+    "createpropulsion.ponder.shared.hot_air_pump.placement": "Hot air pump must be placed on active heat source...", 
+    "createpropulsion.ponder.shared.hot_air_pump.rotation_requirement": "... and rotation must be provided for it to function", 
+    "createpropulsion.ponder.shared.hot_air_pump.speed_dependency": "Amount of hot air produced depends on RPM", 
+    "createpropulsion.ponder.shared.hot_air_pump.max_speed": "At 256 RPM Hot Air Pump outputs the most amount of hot air", 
 
     "createpropulsion.tooltip.shared.condition.block_detected": "블록을 감지하면",
     "createpropulsion.tooltip.shared.thruster_summary": "최대 _{}kN_의 추진력을 제공하여 물체를 밀어냅니다.",

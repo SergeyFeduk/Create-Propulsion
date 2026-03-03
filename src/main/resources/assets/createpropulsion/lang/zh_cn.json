@@ -81,7 +81,7 @@
     
     "createpropulsion.gui.goggles.cc.peripheral_controlled": "通过外设控制",
     "createpropulsion.gui.goggles.optical_sensor.lenses": "透镜",
-
+    
     "createpropulsion.gui.goggles.creative_thruster.particle": "粒子效果",
     "createpropulsion.gui.goggles.creative_thruster.particle.plasma": "等离子体",
     "createpropulsion.gui.goggles.creative_thruster.particle.plume": "羽流",
@@ -144,6 +144,10 @@
     "createpropulsion.assembler.selection.too_far": "选区距离过远",
 
     "createpropulsion.stirling_engine.generated_speed": "RPM 输出",
+    "createpropulsion.gui.goggles.stirling_engine.status": "Stirling Engine Status", 
+    "createpropulsion.gui.goggles.stirling_engine.status.on": "On", 
+    "createpropulsion.gui.goggles.stirling_engine.status.off": "Off", 
+    "createpropulsion.gui.goggles.stirling_engine.status.no_heat": "No Heat", 
     "createpropulsion.redstone_transmission.control_mode": "变速器控制模式",
     "createpropulsion.redstone_transmission.control_mode.direct": "直接模式",
     "createpropulsion.redstone_transmission.control_mode.incremental": "增量模式",
@@ -163,6 +167,8 @@
     "createpropulsion.stirling_engine.tooltip.summary": "利用热导率高的热源提供的_热量_来_产生旋转力_。",
     "createpropulsion.stirling_engine.tooltip.condition1": "提供热量时",
     "createpropulsion.stirling_engine.tooltip.behaviour1": "产生_旋转力_。",
+    "createpropulsion.stirling_engine.tooltip.condition2": "When powered", 
+    "createpropulsion.stirling_engine.tooltip.behaviour2": "Stops.", 
 
     "createpropulsion.tooltip.holdForRocketFuelSummary": "按住 [%1$s] 可查看推进剂概要",
     "createpropulsion.tooltip.thrust": "推力",
@@ -186,6 +192,7 @@
     "createpropulsion.gui.goggles.burner.thermostat.off": "关闭",
 
     "createpropulsion.gui.goggles.hot_air_pump.status": "热空气泵状态",
+    "createpropulsion.gui.goggles.hot_air_pump.status.airless": "No Atmosphere", 
     "createpropulsion.gui.goggles.hot_air_pump.status.no_rpm": "无旋转",
     "createpropulsion.gui.goggles.hot_air_pump.status.no_heat": "无热量",
     "createpropulsion.gui.goggles.hot_air_pump.injection": "注入速率",
@@ -259,7 +266,7 @@
 
     "createpropulsion.tooltip.shared.condition.block_detected": "当检测到方块时",
     "createpropulsion.tooltip.shared.thruster_summary": "提供最大_{}kN_的推力以推动物理结构。",
-    
+
     "createpropulsion.ponder.shared.burner.activation": "热量充足后，用热器将会被激活",
     "createpropulsion.ponder.shared.burner.efficiency": "热量输出会自动调节，以提高燃料利用率",
     "createpropulsion.ponder.shared.burner.redstone_thermostat": "通入红石信号会禁用恒温器",
