@@ -48,7 +48,7 @@ public class BurnerScenes {
         scene.idle(20);
 
         scene.overlay().showText(70)
-            .text("createpropulsion.ponder.solid_burner.intro")
+            .sharedText("solid_burner.intro")
             .pointAt(util.vector().blockSurface(burnerPos, Direction.WEST))
             .placeNearTarget();
         scene.idle(80);
@@ -73,14 +73,14 @@ public class BurnerScenes {
         scene.idle(10);
 
         scene.overlay().showText(70)
-            .text("createpropulsion.ponder.shared.burner.activation")
+            .sharedText("burner.activation")
             .pointAt(util.vector().centerOf(enginePos))
             .placeNearTarget();
         scene.idle(80);
 
         scene.overlay().showText(80)
             .colored(PonderPalette.GREEN)
-            .text("createpropulsion.ponder.shared.burner.efficiency")
+            .sharedText("burner.efficiency")
             .pointAt(util.vector().blockSurface(burnerPos, Direction.WEST))
             .placeNearTarget();
         scene.idle(100);
@@ -93,13 +93,13 @@ public class BurnerScenes {
 
         scene.overlay().showText(70)
             .attachKeyFrame()
-            .text("createpropulsion.ponder.solid_burner.has_thermostat")
+            .sharedText("solid_burner.has_thermostat")
             .pointAt(util.vector().blockSurface(burnerPos, Direction.WEST))
             .placeNearTarget();
         scene.idle(80);
 
         scene.overlay().showText(80)
-            .text("createpropulsion.ponder.shared.burner.redstone_thermostat")
+            .sharedText("burner.redstone_thermostat")
             .pointAt(util.vector().blockSurface(burnerPos, Direction.WEST))
             .placeNearTarget();
         scene.idle(90);
@@ -110,21 +110,21 @@ public class BurnerScenes {
 
         scene.overlay().showText(100)
             .colored(PonderPalette.RED)
-            .text("createpropulsion.ponder.shared.burner.constant_consumption")
+            .sharedText("burner.constant_consumption")
             .pointAt(util.vector().blockSurface(burnerPos, Direction.WEST))
             .placeNearTarget();
         scene.idle(110);
 
         scene.world().modifyBlock(burnerPos, s -> s.setValue(AbstractBurnerBlock.HEAT, HeatLevel.KINDLED), false);
         scene.overlay().showText(60)
-            .text("createpropulsion.ponder.shared.burner.status.hot") 
+            .sharedText("burner.status.hot") 
             .pointAt(util.vector().topOf(burnerPos))
             .placeNearTarget();
         scene.idle(65);
 
         scene.world().modifyBlock(burnerPos, s -> s.setValue(AbstractBurnerBlock.HEAT, HeatLevel.SEETHING), false);
         scene.overlay().showText(80)
-            .text("createpropulsion.ponder.shared.burner.status.searing") 
+            .sharedText("burner.status.searing") 
             .pointAt(util.vector().topOf(burnerPos))
             .placeNearTarget();
         scene.idle(90);
@@ -168,7 +168,7 @@ public class BurnerScenes {
         scene.idle(10);
 
         scene.overlay().showText(60)
-            .text("createpropulsion.ponder.liquid_burner.intro")
+            .sharedText("liquid_burner.intro")
             .pointAt(util.vector().blockSurface(burnerAPos, Direction.WEST))
             .placeNearTarget();
         scene.idle(70);
@@ -204,21 +204,21 @@ public class BurnerScenes {
         scene.effects().indicateSuccess(stirlingAPos);
 
         scene.overlay().showText(60)
-            .text("createpropulsion.ponder.shared.burner.activation")
+            .sharedText("shared.burner.activation")
             .pointAt(util.vector().centerOf(stirlingAPos))
             .placeNearTarget();
         scene.idle(70);
 
         scene.overlay().showText(70)
             .colored(PonderPalette.GREEN)
-            .text("createpropulsion.ponder.shared.burner.efficiency")
+            .sharedText("burner.efficiency")
             .pointAt(util.vector().blockSurface(burnerAPos, Direction.WEST))
             .placeNearTarget();
         scene.idle(80);
 
         scene.overlay().showText(70)
             .colored(PonderPalette.GREEN)
-            .text("createpropulsion.ponder.liquid_burner.heat_comparison")
+            .sharedText("liquid_burner.heat_comparison")
             .pointAt(util.vector().blockSurface(burnerAPos, Direction.WEST))
             .placeNearTarget();
         scene.idle(90);
@@ -239,13 +239,13 @@ public class BurnerScenes {
 
         scene.overlay().showText(60)
             .attachKeyFrame()
-            .text("createpropulsion.ponder.liquid_burner.has_thermostat")
+            .sharedText("liquid_burner.has_thermostat")
             .pointAt(util.vector().blockSurface(burnerAPos, Direction.WEST))
             .placeNearTarget();
         scene.idle(70);
 
         scene.overlay().showText(70)
-            .text("createpropulsion.ponder.shared.burner.redstone_thermostat")
+            .sharedText("burner.redstone_thermostat")
             .pointAt(util.vector().blockSurface(burnerAPos, Direction.WEST))
             .placeNearTarget();
         scene.idle(80);
@@ -272,21 +272,21 @@ public class BurnerScenes {
 
         scene.overlay().showText(90)
             .colored(PonderPalette.RED)
-            .text("createpropulsion.ponder.shared.burner.constant_consumption")
+            .sharedText("burner.constant_consumption")
             .pointAt(util.vector().blockSurface(burnerAPos, Direction.WEST))
             .placeNearTarget();
         scene.idle(100);
 
         scene.world().modifyBlock(burnerAPos, s -> s.setValue(AbstractBurnerBlock.HEAT, HeatLevel.KINDLED), false);
         scene.overlay().showText(60)
-            .text("createpropulsion.ponder.shared.burner.status.hot") 
+            .sharedText("burner.status.hot") 
             .pointAt(util.vector().topOf(burnerAPos))
             .placeNearTarget();
         scene.idle(65);
 
         scene.world().modifyBlock(burnerAPos, s -> s.setValue(AbstractBurnerBlock.HEAT, HeatLevel.SEETHING), false);
         scene.overlay().showText(80)
-            .text("createpropulsion.ponder.shared.burner.status.searing") 
+            .sharedText("burner.status.searing") 
             .pointAt(util.vector().topOf(burnerAPos))
             .placeNearTarget();
         scene.idle(90);
@@ -298,7 +298,7 @@ public class BurnerScenes {
             .setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.SOUTH), true);
         
         scene.overlay().showText(60)
-            .text("createpropulsion.ponder.liquid_burner.chaining")
+            .sharedText("liquid_burner.chaining")
             .pointAt(util.vector().blockSurface(burnerBPos, Direction.WEST))
             .placeNearTarget();
         scene.idle(60);
@@ -327,7 +327,7 @@ public class BurnerScenes {
         }, 0.5f, 260);
 
         scene.overlay().showText(70)
-            .text("createpropulsion.ponder.liquid_burner.acting_as_pipe")
+            .sharedText("liquid_burner.acting_as_pipe")
             .pointAt(util.vector().blockSurface(burnerBPos, Direction.SOUTH))
             .placeNearTarget();
 

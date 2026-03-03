@@ -62,7 +62,7 @@ public class TiltAdapterScene {
         scene.idle(20);
 
         scene.overlay().showText(70)
-            .text("createpropulsion.ponder.tilt_adapter.intro")
+            .sharedText("tilt_adapter.intro")
             .placeNearTarget()
             .pointAt(util.vector().topOf(adapterPos));
             
@@ -95,7 +95,7 @@ public class TiltAdapterScene {
         scene.effects().indicateRedstone(leftLeverPos);
         
         scene.overlay().showText(80)
-            .text("createpropulsion.ponder.tilt_adapter.return_guarantee")
+            .sharedText("tilt_adapter.return_guarantee")
             .colored(PonderPalette.GREEN)
             .placeNearTarget()
             .pointAt(util.vector().topOf(bearingPos));
@@ -193,7 +193,7 @@ public class TiltAdapterScene {
             nbt -> nbt.putInt("moveDirection", 0));
 
         scene.overlay().showText(70)
-            .text("createpropulsion.ponder.tilt_adapter.scaling")
+            .sharedText("tilt_adapter.scaling")
             .placeNearTarget()
             .pointAt(util.vector().topOf(bearingPos));
         
