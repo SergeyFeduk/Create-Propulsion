@@ -7,7 +7,7 @@
   "fluidEfficiency": 1.0,
   "airEfficiency": 0.05,
   "damageModifier": 1.0,
-  "damageZone": [-1.2, -1.2, -0.125, 1.2, 1.2, 0.125],
+  "damageZone": [-1.2, -1.2, -0.12, 1.2, 1.2, 0.12],
   "damageZoneOffset": [0.25, 0.0, 0.0],
   "torqueFactor": 1.2,
   "softObstructionRegion": [-1, -1, 0, 1, 1, 4],

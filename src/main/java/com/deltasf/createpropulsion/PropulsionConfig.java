@@ -1,5 +1,6 @@
 package com.deltasf.createpropulsion;
 
+import com.deltasf.createpropulsion.propeller.PropellerSpatialHandler;
 import com.deltasf.createpropulsion.registries.PropulsionDefaultStress;
 
 import net.minecraftforge.common.ForgeConfigSpec;
@@ -68,6 +69,7 @@ public class PropulsionConfig {
     //Propeller
     public static final ForgeConfigSpec.ConfigValue<Double> PROPELLER_MAX_SPEED;
     public static final ForgeConfigSpec.ConfigValue<Double> PROPELLER_POWER_MULTIPLIER;
+    public static final ForgeConfigSpec.ConfigValue<PropellerSpatialHandler.ObstructionCheckLogic> PROPELLER_OBSTRUCTION_LOGIC;
     public static final ForgeConfigSpec.ConfigValue<Double> PROPELLER_WATER_POWER_MULTIPLIER;
     public static final ForgeConfigSpec.ConfigValue<Double> PROPELLER_TORQUE_EFFECT_MULTIPLIER;
 
@@ -185,8 +187,10 @@ public class PropulsionConfig {
                 .defineInRange("Max speed", 40.0, 10.0, 100.0);
             PROPELLER_POWER_MULTIPLIER = SERVER_BUILDER.comment("Propeller force and torque are multiplied by this number")
                 .defineInRange("Power multiplier", 6.0, 0.01, 100.0);
+            PROPELLER_OBSTRUCTION_LOGIC = SERVER_BUILDER.comment("Logic for propeller obstruction checks. PRECISE checks against block shapes, APPROXIMATE checks if block is not air, OFF disables checks.")
+                .defineEnum("Obstruction logic", PropellerSpatialHandler.ObstructionCheckLogic.PRECISE);
             PROPELLER_WATER_POWER_MULTIPLIER = SERVER_BUILDER.comment("Propeller force when it is underwater is multiplied by this number")
-                .defineInRange("Underwater power multiplier", 1.0, 0.01, 100.0);
+                .defineInRange("Underwater power multiplier", 1.5, 0.01, 100.0);
             PROPELLER_TORQUE_EFFECT_MULTIPLIER = SERVER_BUILDER.comment("Propeller torque is multiplied by this number")
                 .defineInRange("Torque effect multiplier", 1.0, 0.0, 100.0);
         SERVER_BUILDER.pop();

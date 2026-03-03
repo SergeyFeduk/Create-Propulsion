@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -15,6 +16,7 @@ import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
+import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.debug.DebugRenderer;
 import com.deltasf.createpropulsion.debug.PropulsionDebug;
 import com.deltasf.createpropulsion.debug.routes.PropellerDebugRoute;
@@ -35,10 +37,16 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 //Handles hard and soft obstruction & fluid checks for propeller
 public class PropellerSpatialHandler extends BlockEntityBehaviour {
+    public enum ObstructionCheckLogic {
+        PRECISE, APPROXIMATE, OFF
+    }
     public static final BehaviourType<PropellerSpatialHandler> TYPE = new BehaviourType<>();
 
     private static final float FLUID_SMOOTHING_DECAY = 5.0f;
@@ -112,16 +120,33 @@ public class PropellerSpatialHandler extends BlockEntityBehaviour {
         }
     }
 
+    public Set<BlockPos> getObstructionsFor(PropellerBladeItem blade) {
+        Set<BlockPos> set = new HashSet<>();
+        if (!(blockEntity instanceof PropellerBlockEntity pbe)) return set;
+        
+        Direction facing = pbe.getBlockState().getValue(PropellerBlock.FACING);
+        for (BlockPos relativePos : SCAN_POSITIONS) {
+            BlockPos worldCheckPos = getPos().offset(rotate(relativePos, facing));
+            if (isPositionObstructed(worldCheckPos, pbe, blade)) {
+                set.add(worldCheckPos);
+            }
+        }
+        return set;
+    }
+
     public void triggerImmediateScan() {
         if (!(blockEntity instanceof PropellerBlockEntity pbe)) return;
 
+        Optional<PropellerBladeItem> bladeOptional = pbe.getBlade();
         obstructedBlocks.clear();
-        Direction facing = pbe.getBlockState().getValue(PropellerBlock.FACING);
-
-        for (BlockPos relativePos : SCAN_POSITIONS) {
-            BlockPos worldCheckPos = getPos().offset(rotate(relativePos, facing));
-            if (isPositionObstructed(worldCheckPos)) {
-                obstructedBlocks.add(worldCheckPos);
+        
+        if (bladeOptional.isPresent()) {
+            Direction facing = pbe.getBlockState().getValue(PropellerBlock.FACING);
+            for (BlockPos relativePos : SCAN_POSITIONS) {
+                BlockPos worldCheckPos = getPos().offset(rotate(relativePos, facing));
+                if (isPositionObstructed(worldCheckPos, pbe, bladeOptional.get())) {
+                    obstructedBlocks.add(worldCheckPos);
+                }
             }
         }
 
@@ -163,7 +188,8 @@ public class PropellerSpatialHandler extends BlockEntityBehaviour {
     }
 
     private void handleObstruction(BlockPos worldCheckPos, PropellerBlockEntity pbe) {
-        boolean isObstructed = isPositionObstructed(worldCheckPos);
+        Optional<PropellerBladeItem> bladeOptional = pbe.getBlade();
+        boolean isObstructed = bladeOptional.isPresent() && isPositionObstructed(worldCheckPos, pbe, bladeOptional.get());
 
         if (isObstructed) {
             obstructedBlocks.add(worldCheckPos);
@@ -174,11 +200,71 @@ public class PropellerSpatialHandler extends BlockEntityBehaviour {
         applyObstructionConsequences(pbe);
     }
 
-    private boolean isPositionObstructed(BlockPos worldCheckPos) {
-        if (worldCheckPos.equals(getPos())) {
-            return false;
+    private boolean isPositionObstructed(BlockPos worldCheckPos, PropellerBlockEntity pbe, PropellerBladeItem blade) {
+        if (worldCheckPos.equals(getPos())) { return false; }
+        ObstructionCheckLogic logic = PropulsionConfig.PROPELLER_OBSTRUCTION_LOGIC.get();
+        if (logic == ObstructionCheckLogic.OFF) { return false; }
+
+        BlockState state = getWorld().getBlockState(worldCheckPos);
+        if (state.isAir()) { return false; }
+        if (state.getBlock() instanceof PropellerBlock) { return true; }
+        if (logic == ObstructionCheckLogic.APPROXIMATE) { return true; }
+
+        //Precise check
+        if (blade == null) { return false; }
+
+        VoxelShape shape = state.getCollisionShape(getWorld(), worldCheckPos);
+        if (shape.isEmpty()) { return false; }
+
+        AABB worldBladeAABB = getPreciseBladeAABB(pbe.getBlockPos(), pbe.getBlockState().getValue(PropellerBlock.FACING), blade);
+        AABB localBladeAABB = worldBladeAABB.move(-worldCheckPos.getX(), -worldCheckPos.getY(), -worldCheckPos.getZ());
+        if (!shape.bounds().intersects(localBladeAABB)) { return false; } //Broad
+
+        //Narrow
+        for (AABB shapeAABB : shape.toAabbs()) {
+            if (shapeAABB.intersects(localBladeAABB)) {
+                return true;
+            }
         }
-        return !getWorld().getBlockState(worldCheckPos).isAir();
+
+        return false;
+    }
+
+    public static AABB getPreciseBladeAABB(BlockPos pos, Direction facing, PropellerBladeItem blade) {
+        AABB bladeDamageZone = blade.getDamageZone();
+        Vec3 bladeOffset = blade.getDamageZoneOffset();
+
+        if (facing == Direction.WEST) {
+            bladeOffset = bladeOffset.multiply(-1, -1, -1);
+        } else if (facing == Direction.SOUTH) {
+            bladeOffset = new Vec3(bladeOffset.z, bladeOffset.y, bladeOffset.x);
+        } else if (facing == Direction.NORTH) {
+            bladeOffset = new Vec3(-bladeOffset.z, -bladeOffset.y, -bladeOffset.x);
+        } else if (facing == Direction.UP) {
+            bladeOffset = new Vec3(bladeOffset.y, bladeOffset.x, bladeOffset.z);
+        } else if (facing == Direction.DOWN) {
+            bladeOffset = new Vec3(-bladeOffset.y, -bladeOffset.x, -bladeOffset.z);
+        }
+
+        double dx = bladeDamageZone.getXsize() / 2.0;
+        double dy = bladeDamageZone.getYsize() / 2.0;
+        double dz = bladeDamageZone.getZsize() / 2.0;
+
+        AABB rotatedBox;
+        switch (facing.getAxis()) {
+            case X:
+                rotatedBox = new AABB(-dz, -dy, -dx, dz, dy, dx);
+                break;
+            case Y:
+                rotatedBox = new AABB(-dx, -dz, -dy, dx, dz, dy);
+                break;
+            case Z:
+            default:
+                rotatedBox = new AABB(-dx, -dy, -dz, dx, dy, dz);
+                break;
+        }
+
+        return rotatedBox.move(Vec3.atCenterOf(pos).add(bladeOffset));
     }
 
     private void applyObstructionConsequences(PropellerBlockEntity pbe) {

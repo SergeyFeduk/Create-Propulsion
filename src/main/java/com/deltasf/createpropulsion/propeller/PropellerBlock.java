@@ -1,14 +1,16 @@
 package com.deltasf.createpropulsion.propeller;
 
+import java.util.Set;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.physics_assembler.AssemblyUtility;
 import com.deltasf.createpropulsion.propeller.blades.PropellerBladeItem;
 import com.deltasf.createpropulsion.registries.PropulsionBlockEntities;
 import com.deltasf.createpropulsion.registries.PropulsionShapes;
 import com.simibubi.create.AllSoundEvents;
-import com.simibubi.create.content.equipment.goggles.GogglesItem;
 import com.simibubi.create.content.kinetics.base.DirectionalKineticBlock;
 import com.simibubi.create.content.kinetics.base.IRotate;
 import com.simibubi.create.foundation.block.IBE;
@@ -100,16 +102,19 @@ public class PropellerBlock extends DirectionalKineticBlock implements IBE<Prope
 
         //Blade insertion
         ItemStack heldItem = player.getItemInHand(hand);
-        if (heldItem.getItem() instanceof PropellerBladeItem) {
+        if (heldItem.getItem() instanceof PropellerBladeItem bladeItem) {
 
-            propellerBE.getSpatialHandler().triggerImmediateScan();
-
-            if (!propellerBE.getSpatialHandler().getObstructedBlocks().isEmpty()) {
-                if (level.isClientSide) {
-                    showBounds(pos, state, player);
-                    return InteractionResult.SUCCESS; //While this is for fail case - only SUCCESS causes arm swing animation
+            PropellerSpatialHandler.ObstructionCheckLogic logic = PropulsionConfig.PROPELLER_OBSTRUCTION_LOGIC.get();
+            if (logic != PropellerSpatialHandler.ObstructionCheckLogic.OFF) {
+                Set<BlockPos> obstructions = propellerBE.getSpatialHandler().getObstructionsFor(bladeItem);
+                
+                if (!obstructions.isEmpty()) {
+                    if (level.isClientSide) {
+                        showBounds(pos, state, player, bladeItem);
+                        return InteractionResult.SUCCESS; //While this is for fail case - only SUCCESS causes arm swing animation
+                    }
+                    return InteractionResult.FAIL;
                 }
-                return InteractionResult.FAIL;
             }
             if (level.isClientSide) return InteractionResult.SUCCESS;
 
@@ -119,6 +124,7 @@ public class PropellerBlock extends DirectionalKineticBlock implements IBE<Prope
                     heldItem.shrink(1);
                 }
                 level.playSound(null, pos, SoundEvents.ARMOR_EQUIP_IRON, SoundSource.BLOCKS, 1.0f, 1.2f);
+                propellerBE.getSpatialHandler().triggerImmediateScan();
                 return InteractionResult.SUCCESS;
             }
 
@@ -136,6 +142,7 @@ public class PropellerBlock extends DirectionalKineticBlock implements IBE<Prope
                 if (!removedBlade.isEmpty()) {
                     player.getInventory().placeItemBackInInventory(removedBlade);
                     level.playSound(null, pos, SoundEvents.ARMOR_EQUIP_IRON, SoundSource.BLOCKS, 1.0f, 1.0f);
+                    propellerBE.getSpatialHandler().triggerImmediateScan();
                     return InteractionResult.SUCCESS;
                 }
             }
@@ -227,16 +234,21 @@ public class PropellerBlock extends DirectionalKineticBlock implements IBE<Prope
         return PropulsionBlockEntities.PROPELLER_BLOCK_ENTITY.get();
     }
 
-    private void showBounds(BlockPos pos, BlockState state, Player player) {
+    private void showBounds(BlockPos pos, BlockState state, Player player, PropellerBladeItem blade) {
         if (!player.level().isClientSide) return;
+        PropellerSpatialHandler.ObstructionCheckLogic logic = PropulsionConfig.PROPELLER_OBSTRUCTION_LOGIC.get();
+        AABB outlineAABB;
 
-        if (!GogglesItem.isWearingGoggles(player)) {
+        if (logic == PropellerSpatialHandler.ObstructionCheckLogic.PRECISE && blade != null) {
+            outlineAABB = PropellerSpatialHandler.getPreciseBladeAABB(pos, state.getValue(DirectionalKineticBlock.FACING), blade);
+        } else {
             Vec3 contract = Vec3.atLowerCornerOf(state.getValue(DirectionalKineticBlock.FACING).getNormal());
-            Outliner.getInstance().showAABB(Pair.of("propeller", pos), 
-                new AABB(pos).inflate(1)
-                .deflate(contract.x, contract.y, contract.z))
-                .colored(AssemblyUtility.CANCEL_COLOR);
+            outlineAABB = new AABB(pos).inflate(1).deflate(contract.x, contract.y, contract.z);
         }
+
+        Outliner.getInstance().showAABB(Pair.of("propeller", pos), outlineAABB)
+            .colored(AssemblyUtility.CANCEL_COLOR)
+            .lineWidth(1/16f);
 
         player.displayClientMessage(
             Component.translatable("createpropulsion.propeller.not_enough_space")
