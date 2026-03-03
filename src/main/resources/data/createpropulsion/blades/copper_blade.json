@@ -1,0 +1,16 @@
+{
+  "maxBlades": 3,
+  "gearRatio": 0.3,
+  "model": "createpropulsion:block/copper_blade",
+  "canBeBlurred": false,
+  "isBladeInverted": false,
+  "fluidEfficiency": 1.0,
+  "airEfficiency": 0.05,
+  "damageModifier": 1.0,
+  "damageZone": [-1.2, -1.2, -0.125, 1.2, 1.2, 0.125],
+  "damageZoneOffset": [0.25, 0.0, 0.0],
+  "torqueFactor": 1.2,
+  "softObstructionRegion": [-1, -1, 0, 1, 1, 4],
+  "stressImpact": 16.0,
+  "breakDrop": "create:copper_nugget"
+}

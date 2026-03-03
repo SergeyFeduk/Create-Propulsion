@@ -1,0 +1,16 @@
+{
+  "maxBlades": 4,
+  "gearRatio": 8.0,
+  "model": "createpropulsion:block/wooden_blade",
+  "canBeBlurred": true,
+  "isBladeInverted": true,
+  "fluidEfficiency": 0.1,
+  "airEfficiency": 1.0,
+  "damageModifier": 0.8,
+  "damageZone": [-1.333, -1.333, -0.125, 1.333, 1.333, 0.125],
+  "damageZoneOffset": [0.25, 0.0, 0.0],
+  "torqueFactor": 1.0,
+  "softObstructionRegion": [-1, -1, 0, 1, 1, 4],
+  "stressImpact": 8.0,
+  "breakDrop": "minecraft:stick"
+}
