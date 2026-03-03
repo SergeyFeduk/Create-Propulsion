@@ -150,38 +150,46 @@ public class PropellerVisual extends KineticBlockEntityVisual<PropellerBlockEnti
         double blurRad = Math.PI * Math.abs(blockEntity.visualRPM) / 30 * PropulsionConfig.PROPELLER_EXPOSURE_TIME.get();
         double blurDeg = blurRad * (180.0 / Math.PI);
 
-        int N = Math.min(PropulsionConfig.PROPELLER_BLUR_MAX_INSTANCES.get(), Math.max(2, (int)Math.ceil(blurDeg / PropulsionConfig.PROPELLER_BLUR_SAMPLE_RATE.get())));
-        float alpha = (float) (1.0 - Math.pow(1.0 - PropellerRenderer.TARGET_OPACITY, 1.0 / N));
-        int alphaInt = (int)(alpha * 255);
-        float headAlpha = (float) (1.0 - Math.pow(1.0 - PropellerRenderer.HEAD_TARGET_OPACITY, 1.0 / N));
-        int headAlphaInt = (int)(headAlpha * 255);
-        
-        float angleStep = (float)blurDeg / (float)N;
+        int desiredSamples = Math.max(2, (int)Math.ceil(blurDeg / PropulsionConfig.PROPELLER_BLUR_SAMPLE_RATE.get()));
+
         float stroboscopicAngle = blockEntity.visualAngle;
         if (!blockEntity.renderedBladeAngles.isEmpty()) {
             float sectorAngle = 360f / blockEntity.renderedBladeAngles.size();
             stroboscopicAngle %= sectorAngle;
         }
 
-        for (int i = 0; i < N; i++) {
-            float rotationalAngle = stroboscopicAngle - (i * angleStep);
-            
-            //Alternate between pre-translucent and post-translucent groups
-            boolean useOIT = (i % 2 == 0);
+        int headN = Math.min(PropulsionConfig.PROPELLER_HEAD_BLUR_MAX_INSTANCES.get(), desiredSamples);
+        float headAlpha = (float) (1.0 - Math.pow(1.0 - PropellerRenderer.HEAD_TARGET_OPACITY, 1.0 / headN));
+        int headAlphaInt = (int)(headAlpha * 255);
+        float headAngleStep = (float)blurDeg / (float)headN;
 
+        for (int i = 0; i < headN; i++) {
+            float rotationalAngle = stroboscopicAngle - (i * headAngleStep);
+            boolean useOIT = (i % 2 == 0);
             PropellerBlurInstance head = useOIT ? blurHeadOIT.get(0) : blurHeadStd.get(0);
             transformHead(head, rotationalAngle, headAlphaInt);
             head.light(light).setChanged();
+        }
 
-            if (bladeModel != null) {
+        if (bladeModel != null) {
+            int bladeN = Math.min(PropulsionConfig.PROPELLER_BLUR_MAX_INSTANCES.get(), desiredSamples);
+            float bladeAlpha = (float) (1.0 - Math.pow(1.0 - PropellerRenderer.TARGET_OPACITY, 1.0 / bladeN));
+            int bladeAlphaInt = (int)(bladeAlpha * 255);
+            float bladeAngleStep = (float)blurDeg / (float)bladeN;
+
+            for (int i = 0; i < bladeN; i++) {
+                float rotationalAngle = stroboscopicAngle - (i * bladeAngleStep);
+                boolean useOIT = (i % 2 == 0);
+                
                 for (float placementAngle : blockEntity.renderedBladeAngles) {
                     PropellerBlurInstance blade = useOIT ? blurBladesOIT.get(bladeModel) : blurBladesStd.get(bladeModel);
-                    transformBlade(blade, rotationalAngle + placementAngle, alphaInt);
+                    transformBlade(blade, rotationalAngle + placementAngle, bladeAlphaInt);
                     blade.light(light).setChanged();
                 }
             }
         }
     }
+
 
     private void transformHead(Instance instance, float rotationAngle, int alpha) {
         Quaternionf q = getBaseRotation(rotationAngle);

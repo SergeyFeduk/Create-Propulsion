@@ -75,6 +75,7 @@ public class PropulsionConfig {
 
     public static final ForgeConfigSpec.ConfigValue<Boolean> PROPELLER_ENABLE_BLUR;
     public static final ForgeConfigSpec.ConfigValue<Integer> PROPELLER_BLUR_MAX_INSTANCES;
+    public static final ForgeConfigSpec.ConfigValue<Integer> PROPELLER_HEAD_BLUR_MAX_INSTANCES;
     public static final ForgeConfigSpec.ConfigValue<Double>  PROPELLER_BLUR_SAMPLE_RATE;
     public static final ForgeConfigSpec.ConfigValue<Double>  PROPELLER_LOD_DISTANCE;
     public static final ForgeConfigSpec.ConfigValue<Double>  PROPELLER_EXPOSURE_TIME;
@@ -234,8 +235,10 @@ public class PropulsionConfig {
         CLIENT_BUILDER.push("Propeller");
             PROPELLER_ENABLE_BLUR = CLIENT_BUILDER.comment("Should fast-rotating propeller blades be blurred. Disable this if you experience visual issues with fast-rotating propellers")
                 .define("Enable blur", true);
-            PROPELLER_BLUR_MAX_INSTANCES = CLIENT_BUILDER.comment("Maximum amount of blurred models rendered. Decrease this value if your fps drops when near a lot of propellers.")
+            PROPELLER_BLUR_MAX_INSTANCES = CLIENT_BUILDER.comment("Maximum amount of blurred blade models rendered. Decrease this value if your fps drops when near a lot of propellers.")
                 .define("Max blur instances", 32);
+            PROPELLER_HEAD_BLUR_MAX_INSTANCES = CLIENT_BUILDER.comment("Maximum amount of blurred head models rendered. Decrease this value if your fps drops when near a lot of propellers.")
+                .define("Max head blur instances", 16);
             PROPELLER_BLUR_SAMPLE_RATE = CLIENT_BUILDER.comment("How slow propeller blades start to become blurry")
                 .define("Sample rate", 2.0);
             PROPELLER_LOD_DISTANCE = CLIENT_BUILDER.comment("Distance at which propllers no longer blur")

@@ -153,14 +153,17 @@ public class PropellerRenderer extends KineticBlockEntityRenderer<PropellerBlock
 
         boolean shouldBlur = distSqr < (PropulsionConfig.PROPELLER_LOD_DISTANCE.get() * PropulsionConfig.PROPELLER_LOD_DISTANCE.get()) && blurDeg > MIN_BLUR_DEG;
         if (canBeBlurred[0] && shouldBlur && PropulsionConfig.PROPELLER_ENABLE_BLUR.get()) {
-            int N = Math.min(PropulsionConfig.PROPELLER_BLUR_MAX_INSTANCES.get(), Math.max(2, (int)Math.ceil(blurDeg / PropulsionConfig.PROPELLER_BLUR_SAMPLE_RATE.get())));
-            //float alpha = 1.0f / (float)N;
-            float alpha = (float) (1.0 - Math.pow(1.0 - TARGET_OPACITY, 1.0 / N));
-            int alphaInt = (int)(alpha * 255);
-            float angleStep = (float)blurDeg / (float)N;
+            int desiredSamples = Math.max(2, (int)Math.ceil(blurDeg / PropulsionConfig.PROPELLER_BLUR_SAMPLE_RATE.get()));
 
-            float headAlpha = (float) (1.0 - Math.pow(1.0 - HEAD_TARGET_OPACITY, 1.0 / N));
+            int bladeN = Math.min(PropulsionConfig.PROPELLER_BLUR_MAX_INSTANCES.get(), desiredSamples);
+            float bladeAlpha = (float) (1.0 - Math.pow(1.0 - TARGET_OPACITY, 1.0 / bladeN));
+            int bladeAlphaInt = (int)(bladeAlpha * 255);
+            float bladeAngleStep = (float)blurDeg / (float)bladeN;
+
+            int headN = Math.min(PropulsionConfig.PROPELLER_HEAD_BLUR_MAX_INSTANCES.get(), desiredSamples);
+            float headAlpha = (float) (1.0 - Math.pow(1.0 - HEAD_TARGET_OPACITY, 1.0 / headN));
             int headAlphaInt = (int)(headAlpha * 255);
+            float headAngleStep = (float)blurDeg / (float)headN;
 
             VertexConsumer translucentVB = buffer.getBuffer(PropulsionRenderTypes.PROPELLER_BLUR);
 
@@ -170,10 +173,14 @@ public class PropellerRenderer extends KineticBlockEntityRenderer<PropellerBlock
                 stroboscopicAngle %= sectorAngle;
             }
 
-            for (int i = 0; i < N; i++) {
-                float rotationalAngle = stroboscopicAngle - (i * angleStep);
+            for (int i = 0; i < headN; i++) {
+                float rotationalAngle = stroboscopicAngle - (i * headAngleStep);
                 renderHead(ms, translucentVB, light, overlay, headModel, direction, rotationalAngle, headAlphaInt);
-                renderBlades(be, ms, translucentVB, light, overlay, bladeModel[0], direction, rotationalAngle, be.renderedBladeAngles, alphaInt);
+            }
+
+            for (int i = 0; i < bladeN; i++) {
+                float rotationalAngle = stroboscopicAngle - (i * bladeAngleStep);
+                renderBlades(be, ms, translucentVB, light, overlay, bladeModel[0], direction, rotationalAngle, be.renderedBladeAngles, bladeAlphaInt);
             }
         } else {
             VertexConsumer cutoutVB = buffer.getBuffer(RenderType.cutoutMipped());
