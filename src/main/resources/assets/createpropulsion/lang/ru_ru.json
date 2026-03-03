@@ -1,6 +1,6 @@
 {
     "itemGroup.createpropulsion.base": "Create: Propulsion",
-    
+
     "block.createpropulsion.thruster": "Реактивный двигатель",
     "item.createpropulsion.thruster": "Реактивный двигатель",
 
@@ -81,7 +81,7 @@
     
     "createpropulsion.gui.goggles.cc.peripheral_controlled": "Управляется программно",
     "createpropulsion.gui.goggles.optical_sensor.lenses": "Линзы",
-
+    
     "createpropulsion.gui.goggles.creative_thruster.particle": "Частицы",
     "createpropulsion.gui.goggles.creative_thruster.particle.plasma": "Плазма",
     "createpropulsion.gui.goggles.creative_thruster.particle.plume": "Пламя",
@@ -144,6 +144,10 @@
     "createpropulsion.assembler.selection.too_far": "Выделенная область находится слишком далеко",
 
     "createpropulsion.stirling_engine.generated_speed": "Генерируемая скорость в оборотах в минуту",
+    "createpropulsion.gui.goggles.stirling_engine.status": "Статус Двигателя Стирлинга",
+    "createpropulsion.gui.goggles.stirling_engine.status.on": "Работает",
+    "createpropulsion.gui.goggles.stirling_engine.status.off": "Выключен",
+    "createpropulsion.gui.goggles.stirling_engine.status.no_heat": "Нет тепла",
     "createpropulsion.redstone_transmission.control_mode": "Режим трансмиссии",
     "createpropulsion.redstone_transmission.control_mode.direct": "Прямой",
     "createpropulsion.redstone_transmission.control_mode.incremental": "Инкрементальный",
@@ -163,6 +167,8 @@
     "createpropulsion.stirling_engine.tooltip.summary": "Использует _тепло_ от источников с высокой теплопроводностью для _вращения вала_.",
     "createpropulsion.stirling_engine.tooltip.condition1": "При подаче тепла",
     "createpropulsion.stirling_engine.tooltip.behaviour1": "Вращает вал.",
+    "createpropulsion.stirling_engine.tooltip.condition2": "Когда подан редстоун-сигнал",
+    "createpropulsion.stirling_engine.tooltip.behaviour2": "Останавливается.",
 
     "createpropulsion.tooltip.holdForRocketFuelSummary": "Удерживайте [%1$s] для сводки о ракетном топливе",
     "createpropulsion.tooltip.thrust": "Тяга",
@@ -186,6 +192,7 @@
     "createpropulsion.gui.goggles.burner.thermostat.off": "Выключен",
 
     "createpropulsion.gui.goggles.hot_air_pump.status": "Статус теплового насоса",
+    "createpropulsion.gui.goggles.hot_air_pump.status.airless": "Нет атмосферы",
     "createpropulsion.gui.goggles.hot_air_pump.status.no_rpm": "Нет вращения",
     "createpropulsion.gui.goggles.hot_air_pump.status.no_heat": "Нет тепла",
     "createpropulsion.gui.goggles.hot_air_pump.injection": "Скорость надува",
