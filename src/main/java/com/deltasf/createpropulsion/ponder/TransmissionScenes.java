@@ -28,15 +28,15 @@ public class TransmissionScenes {
         scene.world().showSection(up, Direction.DOWN);
         scene.idle(20);
         scene.overlay().showText(80)
-                        .text("Transmission has 2 control mode, and direct mode is the default setting when placed.")
-                        .placeNearTarget()
-                        .pointAt(util.vector().blockSurface(util.grid().at(2, 2, 2), Direction.WEST));
+                .text("createpropulsion.ponder.redstone_transmission_direct.intro")
+                .placeNearTarget()
+                .pointAt(util.vector().blockSurface(util.grid().at(2, 2, 2), Direction.WEST));
         scene.idle(100);
 
         scene.idle(20);
         scene.overlay().showText(80)
                 .attachKeyFrame()
-                .text("Transmission in direct control mode will output speed proportional to the redstone input to either side.")
+                .text("createpropulsion.ponder.redstone_transmission_direct.proportional_output")
                 .placeNearTarget()
                 .pointAt(util.vector().blockSurface(util.grid().at(2, 2, 2), Direction.WEST));
         scene.idle(60);
@@ -52,7 +52,7 @@ public class TransmissionScenes {
         scene.effects().rotationSpeedIndicator(util.grid().at(2, 3, 2));
         scene.idle(40);
         scene.overlay().showText(80)
-                .text("Note that the output speed will be scaled between 0 to input speed")
+                .text("createpropulsion.ponder.redstone_transmission_direct.scaling_note")
                 .placeNearTarget()
                 .pointAt(util.vector().blockSurface(util.grid().at(2, 3, 2), Direction.NORTH));
         scene.idle(100);
@@ -91,7 +91,7 @@ public class TransmissionScenes {
                 nbt -> nbt.putInt("ScrollValue", 1));
         scene.idle(20);
         scene.overlay().showText(80)
-                .text("Transmission in incremental control mode will output speed proportional to the internal shift level.")
+                .text("createpropulsion.ponder.redstone_transmission_incremental.proportional_output")
                 .placeNearTarget()
                 .pointAt(util.vector().blockSurface(util.grid().at(2, 2, 2), Direction.WEST));
         scene.idle(100);
@@ -101,7 +101,7 @@ public class TransmissionScenes {
 
         scene.overlay().showScrollInput(util.vector().blockSurface(util.grid().at(2, 2, 2), Direction.SOUTH), Direction.SOUTH, 80);
         scene.overlay().showText(80)
-                .text("You can change the control mode with a scroll selection box at the back of the transmission.")
+                .text("createpropulsion.ponder.redstone_transmission_incremental.changing_mode")
                 .placeNearTarget()
                 .pointAt(util.vector().blockSurface(util.grid().at(2, 2, 2), Direction.SOUTH));
         scene.idle(100);
@@ -110,7 +110,7 @@ public class TransmissionScenes {
         scene.addKeyframe();
 
         scene.overlay().showText(80)
-                .text("Redstone signal given to the side with + (plus) sign will increase the shift level.")
+                .text("createpropulsion.ponder.redstone_transmission_incremental.increase_shift")
                 .placeNearTarget()
                 .pointAt(util.vector().blockSurface(util.grid().at(2, 2, 2), Direction.WEST));
         scene.idle(80);
@@ -138,7 +138,7 @@ public class TransmissionScenes {
         scene.idle(20);
 
         scene.overlay().showText(80)
-                .text("Redstone signal given to the side with - (minus) sign will decrease the shift level.")
+                .text("createpropulsion.ponder.redstone_transmission_incremental.decrease_shift")
                 .placeNearTarget()
                 .pointAt(util.vector().blockSurface(util.grid().at(2, 2, 2), Direction.EAST));
         scene.idle(80);
@@ -167,7 +167,7 @@ public class TransmissionScenes {
         scene.idle(20);
 
         scene.overlay().showText(80)
-                .text("If the signal is given to the both side...")
+                .text("createpropulsion.ponder.redstone_transmission_incremental.both_sides_condition")
                 .placeNearTarget()
                 .pointAt(util.vector().blockSurface(util.grid().at(2, 2, 2), Direction.NORTH));
         scene.idle(80);
@@ -182,7 +182,7 @@ public class TransmissionScenes {
                 nbt -> nbt.putInt("State", 4));
         scene.effects().indicateRedstone(lever_down.iterator().next());
         scene.overlay().showText(80)
-                .text("...the transmission will combine the addition and subtraction.")
+                .text("createpropulsion.ponder.redstone_transmission_incremental.both_sides_action")
                 .placeNearTarget()
                 .pointAt(util.vector().blockSurface(util.grid().at(2, 2, 2), Direction.NORTH));
         for (int i = 1; i <= 8; i++) {
@@ -201,6 +201,5 @@ public class TransmissionScenes {
 
         scene.rotateCameraY(-30);
         scene.idle(40);
-
     }
 }

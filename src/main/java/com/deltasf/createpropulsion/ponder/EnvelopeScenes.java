@@ -73,7 +73,7 @@ public class EnvelopeScenes {
         //Part 2
 
         scene.overlay().showText(70)
-            .text("Envelopes encase volume that can be filled with hot air.")
+            .text("createpropulsion.ponder.making_balloon.intro")
             .pointAt(util.vector().blockSurface(util.grid().at(2, 9, 2), Direction.DOWN))
             .placeNearTarget();
         scene.idle(80);
@@ -96,7 +96,7 @@ public class EnvelopeScenes {
 
         scene.overlay().showText(80)
             .attachKeyFrame()
-            .text("Hot Air Burners fill hot air balloons above them, when fueled.")
+            .text("createpropulsion.ponder.making_balloon.fill_condition")
             .pointAt(util.vector().blockSurface(burnerPos, Direction.WEST))
             .placeNearTarget();
         scene.idle(90);
@@ -147,7 +147,7 @@ public class EnvelopeScenes {
         scene.idle(5);
 
         scene.overlay().showText(70)
-            .text("Hot Air Burners must not be further than 5 blocks from the open bottom of the balloon")
+            .text("createpropulsion.ponder.making_balloon.distance_requirement")
             .pointAt(distLineStart.lerp(distLineEnd, 0.5))
             .placeNearTarget();
 
@@ -174,13 +174,13 @@ public class EnvelopeScenes {
         scene.idle(35);
 
         scene.overlay().showText(60)
-            .text("Hot air output can be controlled by clicking on the lever.")
+            .text("createpropulsion.ponder.making_balloon.lever_control")
             .pointAt(util.vector().blockSurface(burnerPos, Direction.NORTH))
             .placeNearTarget();
         scene.idle(70);
 
         scene.overlay().showText(40)
-            .text("Hot Air Burner has 3 power levels.")
+            .text("createpropulsion.ponder.making_balloon.power_levels")
             .pointAt(util.vector().blockSurface(burnerPos, Direction.NORTH))
             .placeNearTarget();
         scene.idle(50);
@@ -195,7 +195,7 @@ public class EnvelopeScenes {
         scene.idle(10);
 
         scene.overlay().showText(80)
-            .text("The higher is power level - the higher is hot air output")
+            .text("createpropulsion.ponder.making_balloon.power_scaling")
             .pointAt(util.vector().blockSurface(burnerPos, Direction.NORTH))
             .placeNearTarget();
         scene.idle(90);

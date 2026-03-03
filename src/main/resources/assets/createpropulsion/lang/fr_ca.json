@@ -23,14 +23,14 @@
     "createpropulsion.gui.goggles.thruster.efficiency": "Efficacité",
 
     "createpropulsion.inline_optical_sensor.tooltip.summary": "Émet un _rayon_ jusqu'à _{} blocs de distance_, detectant les blocs.",
-    "createpropulsion.inline_optical_sensor.tooltip.condition1": "Lorsqu'un bloc est détecté.",
     "createpropulsion.inline_optical_sensor.tooltip.behaviour1": "Émettre un _signal de redstone_. La puissance est plus forte pour les blocs plus proches.",
 
     "createpropulsion.optical_sensor.tooltip.summary": "_Capteur a raycasting_ configurable. Mettre la _distance_ et _un filtre_ par type de bloc.",
-    "createpropulsion.optical_sensor.tooltip.condition1": "Quand un bloc est détecté.",
     "createpropulsion.optical_sensor.tooltip.behaviour1": "Si un bloc correspondant est détecté, émettre un _signal de redstone_. La Puissance est plus forte pour les blocs plus proches.",
 
-    "createpropulsion.thruster.tooltip.summary": "Fournit une poussée jusqu'à _{} kN_ pour pousser des vehicles.",
     "createpropulsion.thruster.tooltip.condition1": "Quand activé par la redstone et que du carburant et fourni",
-    "createpropulsion.thruster.tooltip.behaviour1": "Pousse des vehicles. La force de la poussée depend de la force du _signal de redstone_."
+    "createpropulsion.thruster.tooltip.behaviour1": "Pousse des vehicles. La force de la poussée depend de la force du _signal de redstone_.",
+
+    "createpropulsion.tooltip.shared.condition.block_detected": "Lorsqu'un bloc est détecté.",
+    "createpropulsion.tooltip.shared.thruster_summary": "Fournit une poussée jusqu'à _{} kN_ pour pousser des vehicles."
 }

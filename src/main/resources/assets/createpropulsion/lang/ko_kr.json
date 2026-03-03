@@ -80,14 +80,11 @@
     "createpropulsion.gui.goggles.optical_sensor.lenses": "렌즈 종류",
 
     "createpropulsion.inline_optical_sensor.tooltip.summary": "_광선_을 발사하여 최대 {}블록 거리까지 블록을 감지합니다.",
-    "createpropulsion.inline_optical_sensor.tooltip.condition1": "블록을 감지하면",
     "createpropulsion.inline_optical_sensor.tooltip.behaviour1": "_레드스톤 신호_를 방출합니다. 가까운 블록일수록 출력이 강해집니다.",
 
     "createpropulsion.optical_sensor.tooltip.summary": "설정 가능한 _광학 센서_입니다. _거리_와 블록 종류별 _필터_를 설정할 수 있습니다.",
-    "createpropulsion.optical_sensor.tooltip.condition1": "블록을 감지하면",
     "createpropulsion.optical_sensor.tooltip.behaviour1": "일치하는 블록을 감지하면 _레드스톤 신호_를 출력합니다. 가까운 블록일수록 출력이 강해집니다.",
 
-    "createpropulsion.thruster.tooltip.summary": "최대 _{}kN_의 추진력을 제공하여 물체를 밀어냅니다.",
     "createpropulsion.thruster.tooltip.condition1": "연료가 공급되고 레드스톤 신호가 있을 때",
     "createpropulsion.thruster.tooltip.behaviour1": "차량을 밀어냅니다. 추진력은 레드스톤 신호 세기에 따라 달라집니다.",
 
@@ -181,31 +178,28 @@
     "createpropulsion.gui.creative_thruster.power_behaviour": "추진력 생성",
 
 	"createpropulsion.ponder.tilt_adapter.header": "기울기 조절기 사용하기",
-	"createpropulsion.ponder.tilt_adapter.text_1": "기울기 조절기는 레드스톤 신호에 따라 축의 각도를 조절할 수 있습니다.",
-	"createpropulsion.ponder.tilt_adapter.text_2": "연결된 베어링은 항상 초기 위치로 되돌아가도록 보장됩니다.",
-	"createpropulsion.ponder.tilt_adapter.text_3": "회전 각도는 레드스톤 신호 강도에 비례해 결정됩니다.",
+	"createpropulsion.ponder.tilt_adapter.intro": "기울기 조절기는 레드스톤 신호에 따라 축의 각도를 조절할 수 있습니다.",
+	"createpropulsion.ponder.tilt_adapter.return_guarantee": "연결된 베어링은 항상 초기 위치로 되돌아가도록 보장됩니다.",
+	"createpropulsion.ponder.tilt_adapter.scaling": "회전 각도는 레드스톤 신호 강도에 비례해 결정됩니다.",
 
 	"createpropulsion.ponder.solid_burner.header": "고체 연료 버너로 열 생성하기",
-	"createpropulsion.ponder.solid_burner.text_1": "고체 연료 버너는 바로 위에 있는 열 소비 장치에 열을 공급합니다.",
-	"createpropulsion.ponder.solid_burner.text_2": "열 소비 장치가 연료를 받으면 버너가 활성화됩니다.",
-	"createpropulsion.ponder.solid_burner.text_3": "열 출력은 연료 효율을 위해 자동으로 조절됩니다.",
-	"createpropulsion.ponder.solid_burner.text_4": "고체 연료 버너에는 내부 온도 조절기가 내장되어 있습니다.",
-	"createpropulsion.ponder.solid_burner.text_5": "레드스톤 신호를 적용하면 온도 조절기가 비활성화됩니다.",
-	"createpropulsion.ponder.solid_burner.text_6": "비활성화된 동안에는 위에 열 소비 장치가 없어도 연료가 일정한 속도로 소모됩니다.",
-	"createpropulsion.ponder.solid_burner.text_7": "§f버너 상태: §6뜨거움",
-	"createpropulsion.ponder.solid_burner.text_8": "§f버너 상태: §c아주 뜨거움",
+	"createpropulsion.ponder.solid_burner.intro": "고체 연료 버너는 바로 위에 있는 열 소비 장치에 열을 공급합니다.",
+	"createpropulsion.ponder.solid_burner.has_thermostat": "고체 연료 버너에는 내부 온도 조절기가 내장되어 있습니다.",
 
 	"createpropulsion.ponder.liquid_burner.header": "액체 연료 버너로 열 생성하기",
-	"createpropulsion.ponder.liquid_burner.text_1": "액체 연료 버너는 액체 연료를 연소해 바로 위에 있는 열 소비 장치에 열을 공급합니다.",
-	"createpropulsion.ponder.liquid_burner.text_2": "열 소비 장치가 연료를 받으면 버너가 활성화됩니다.",
-	"createpropulsion.ponder.liquid_burner.text_3": "열 출력은 연료 효율을 위해 자동으로 조절됩니다.",
-	"createpropulsion.ponder.liquid_burner.text_4": "액체 연료 버너는 고체 연료 버너보다 두 배의 열을 생성합니다.",
-	"createpropulsion.ponder.liquid_burner.text_5": "액체 연료 버너에는 내부 온도 조절기가 내장되어 있습니다.",
-	"createpropulsion.ponder.liquid_burner.text_6": "레드스톤 신호를 적용하면 온도 조절기가 비활성화됩니다.",
-	"createpropulsion.ponder.liquid_burner.text_7": "비활성화된 동안에는 위에 열 소비 장치가 없어도 연료가 일정한 속도로 소모됩니다.",
-	"createpropulsion.ponder.liquid_burner.text_8": "§f버너 상태: §6뜨거움",
-	"createpropulsion.ponder.liquid_burner.text_9": "§f버너 상태: §c아주 뜨거움",
-	"createpropulsion.ponder.liquid_burner.text_10": "액체 연료 버너는 서로 연결할 수 있습니다.",
-	"createpropulsion.ponder.liquid_burner.text_11": "연결된 버너는 파이프처럼 작동해 다른 액체 연료 버너로 연료를 전달합니다."
+	"createpropulsion.ponder.liquid_burner.intro": "액체 연료 버너는 액체 연료를 연소해 바로 위에 있는 열 소비 장치에 열을 공급합니다.",
+	"createpropulsion.ponder.liquid_burner.heat_comparison": "액체 연료 버너는 고체 연료 버너보다 두 배의 열을 생성합니다.",
+	"createpropulsion.ponder.liquid_burner.has_thermostat": "액체 연료 버너에는 내부 온도 조절기가 내장되어 있습니다.",
+	"createpropulsion.ponder.liquid_burner.chaining": "액체 연료 버너는 서로 연결할 수 있습니다.",
+	"createpropulsion.ponder.liquid_burner.acting_as_pipe": "연결된 버너는 파이프처럼 작동해 다른 액체 연료 버너로 연료를 전달합니다.",
 
+    "createpropulsion.tooltip.shared.condition.block_detected": "블록을 감지하면",
+    "createpropulsion.tooltip.shared.thruster_summary": "최대 _{}kN_의 추진력을 제공하여 물체를 밀어냅니다.",
+
+    "createpropulsion.ponder.shared.burner.activation": "열 소비 장치가 연료를 받으면 버너가 활성화됩니다.",
+    "createpropulsion.ponder.shared.burner.efficiency": "열 출력은 연료 효율을 위해 자동으로 조절됩니다.",
+    "createpropulsion.ponder.shared.burner.redstone_thermostat": "레드스톤 신호를 적용하면 온도 조절기가 비활성화됩니다.",
+    "createpropulsion.ponder.shared.burner.constant_consumption": "비활성화된 동안에는 위에 열 소비 장치가 없어도 연료가 일정한 속도로 소모됩니다.",
+    "createpropulsion.ponder.shared.burner.status.hot": "§f버너 상태: §6뜨거움",
+    "createpropulsion.ponder.shared.burner.status.searing": "§f버너 상태: §c아주 뜨거움"
 }

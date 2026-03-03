@@ -103,7 +103,7 @@ public class InjectorScenes {
 
         //Yap
         scene.overlay().showText(70)
-            .text("Hot air pumps can be used to create and fill balloons with hot air.")
+            .text("createpropulsion.ponder.hot_air_pump.intro")
             .pointAt(util.vector().blockSurface(pumpPos, Direction.WEST))
             .placeNearTarget()
             .attachKeyFrame();
@@ -134,7 +134,7 @@ public class InjectorScenes {
 
         //Heat req
         scene.overlay().showText(70)
-            .text("Hot air pump must be placed on active heat source...")
+            .text("createpropulsion.ponder.hot_air_pump.placement")
             .pointAt(util.vector().blockSurface(burnerPos, Direction.WEST))
             .placeNearTarget()
             .attachKeyFrame();
@@ -160,7 +160,7 @@ public class InjectorScenes {
 
         //Rotation req
         scene.overlay().showText(70)
-            .text("... and rotation must be provided for it to function.")
+            .text("createpropulsion.ponder.hot_air_pump.rotation_requirement")
             .pointAt(util.vector().blockSurface(pumpPos, Direction.WEST))
             
             .placeNearTarget();
@@ -176,7 +176,7 @@ public class InjectorScenes {
         scene.idle(60);
 
         scene.overlay().showText(70)
-            .text("Amount of hot air produced depends on RPM.")
+            .text("createpropulsion.ponder.hot_air_pump.speed_dependency")
             .pointAt(util.vector().blockSurface(pumpPos, Direction.WEST))
             .placeNearTarget()
             .attachKeyFrame();
@@ -184,7 +184,7 @@ public class InjectorScenes {
         scene.idle(80);
 
         scene.overlay().showText(80)
-            .text("At 256 RPM Hot Air Pump outputs the most amount of hot air.")
+            .text("createpropulsion.ponder.hot_air_pump.max_speed")
             .colored(PonderPalette.GREEN)
             .pointAt(util.vector().blockSurface(pumpPos, Direction.WEST))
             .placeNearTarget();

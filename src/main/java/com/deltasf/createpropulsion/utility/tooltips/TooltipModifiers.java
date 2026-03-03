@@ -18,25 +18,40 @@ import net.minecraftforge.registries.ForgeRegistries;
 //TODO: Technically modifiers are only applied to GenericSummary, so perhaps I should move this into GenericSummaryProvider class? 
 public class TooltipModifiers {
     private static final HashMap<Item, Function<SummaryPayload, String>> tooltipModificationLookup = new HashMap<Item, Function<SummaryPayload, String>>();
+    private static final HashMap<Item, String> summaryKeyLookup = new HashMap<>();
+    private static final HashMap<Item, String> conditionKeyLookup = new HashMap<>();
 
     static {
+        summaryKeyLookup.put(PropulsionBlocks.THRUSTER_BLOCK.asItem(), "createpropulsion.tooltip.shared.thruster_summary");
+        summaryKeyLookup.put(PropulsionBlocks.CREATIVE_THRUSTER_BLOCK.asItem(), "createpropulsion.tooltip.shared.thruster_summary");
+        conditionKeyLookup.put(PropulsionBlocks.INLINE_OPTICAL_SENSOR_BLOCK.asItem(), "createpropulsion.tooltip.shared.condition.block_detected");
+        conditionKeyLookup.put(PropulsionBlocks.OPTICAL_SENSOR_BLOCK.asItem(), "createpropulsion.tooltip.shared.condition.block_detected");
+
         //Thruster
         tooltipModificationLookup.put(PropulsionBlocks.THRUSTER_BLOCK.asItem(), (payload) -> {
             float thrustMultiplier = PropulsionConfig.THRUSTER_THRUST_MULTIPLIER.get().floatValue();
             int thrusterStrength = Math.round(ThrusterBlockEntity.BASE_MAX_THRUST / 1000.0f * thrustMultiplier);
-            return Component.translatable(payload.path + ".tooltip.summary").getString().replace("{}", String.valueOf(thrusterStrength));
+            return Component.translatable(getSummaryKey(payload.item(), payload.path() + ".tooltip.summary")).getString().replace("{}", String.valueOf(thrusterStrength));
         });
         //Creative thruster
         tooltipModificationLookup.put(PropulsionBlocks.CREATIVE_THRUSTER_BLOCK.asItem(), (payload) -> {
             float thrustMultiplier = PropulsionConfig.CREATIVE_THRUSTER_THRUST_MULTIPLIER.get().floatValue();
             int thrusterStrength = Math.round(1000 * thrustMultiplier);
-            return Component.translatable(payload.path + ".tooltip.summary").getString().replace("{}", String.valueOf(thrusterStrength));
+            return Component.translatable(getSummaryKey(payload.item(), payload.path() + ".tooltip.summary")).getString().replace("{}", String.valueOf(thrusterStrength));
         });
         //Inline optical sensor
         tooltipModificationLookup.put(PropulsionBlocks.INLINE_OPTICAL_SENSOR_BLOCK.asItem(), (payload) -> {
             int raycastDistance = PropulsionConfig.INLINE_OPTICAL_SENSOR_MAX_DISTANCE.get();
             return Component.translatable(payload.path + ".tooltip.summary").getString().replace("{}", String.valueOf(raycastDistance));
         });
+    }
+
+    public static String getSummaryKey(Item item, String defaultKey) {
+        return summaryKeyLookup.getOrDefault(item, defaultKey);
+    }
+
+    public static String getCondition1Key(Item item, String defaultKey) {
+        return conditionKeyLookup.getOrDefault(item, defaultKey);
     }
 
     public static boolean apply(Item item, List<Component> tooltipList) {

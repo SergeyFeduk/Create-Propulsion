@@ -28,14 +28,11 @@
     "createpropulsion.gui.goggles.optical_sensor.lenses": "Linsen",
 
     "createpropulsion.inline_optical_sensor.tooltip.summary": "Strahlt einen _Strahl_ bis zu _{} Blöcke weit_ und erkennt Blöcke.",
-    "createpropulsion.inline_optical_sensor.tooltip.condition1": "Wenn ein Block festgestellt wird.",
     "createpropulsion.inline_optical_sensor.tooltip.behaviour1": "Gibt es ein _Redstonesignal_. Die Stärke ist stärker für nähere Blöcke.",
 
     "createpropulsion.optical_sensor.tooltip.summary": "Konfigurabler _Raycast-Sensor_. Setze _Distanz_ und _filtere_ nach Blocktyp.",
-    "createpropulsion.optical_sensor.tooltip.condition1": "Wenn ein Block erkannt wird.",
     "createpropulsion.optical_sensor.tooltip.behaviour1": "Wenn ein passender Block erkannt wird, emitiert es ein _Redstonesignal_. Die Stärke ist stärker für nähere Blöcke.",
 
-    "createpropulsion.thruster.tooltip.summary": "Erzeugt Schub bis zu _{} kN_ um Fahrzeuge zu bewegen.",
     "createpropulsion.thruster.tooltip.condition1": "Wenn gepowered und mit Treibstoff versorgt,",
     "createpropulsion.thruster.tooltip.behaviour1": "Bewegt es Fahrzeuge. Schub ist der _Redstonesignalstärke_ entsprechend.",
 
@@ -72,5 +69,8 @@
     "createpropulsion.optical_lens.tooltip.summary": "Optische Linse die _gefärbt_ werden kann um den Strahl eines _optischen Sensors_ zu färben.",
     "createpropulsion.fluid_lens.tooltip.summary": "Erlaubt einem _optischem Sensor_ _Flüssigkeiten_ zu erkennen.",
     "createpropulsion.focus_lens.tooltip.summary": "_Verdoppelt_ die maximale _Distanz_ eines _optischen Sensors_.",
-    "createpropulsion.invisibility_lens.tooltip.summary": "Macht den Strahl eines _optischen Senors_ _unsichtbar_."
+    "createpropulsion.invisibility_lens.tooltip.summary": "Macht den Strahl eines _optischen Senors_ _unsichtbar_.",
+
+    "createpropulsion.tooltip.shared.condition.block_detected": "Wenn ein Block erkannt wird.",
+    "createpropulsion.tooltip.shared.thruster_summary": "Erzeugt Schub bis zu _{} kN_ um Fahrzeuge zu bewegen."
 }

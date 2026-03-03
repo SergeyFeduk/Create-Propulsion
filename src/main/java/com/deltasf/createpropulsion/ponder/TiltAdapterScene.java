@@ -62,7 +62,7 @@ public class TiltAdapterScene {
         scene.idle(20);
 
         scene.overlay().showText(70)
-            .text("Tilt Adapter allows tilting the output shaft based on Redstone signals")
+            .text("createpropulsion.ponder.tilt_adapter.intro")
             .placeNearTarget()
             .pointAt(util.vector().topOf(adapterPos));
             
@@ -95,7 +95,7 @@ public class TiltAdapterScene {
         scene.effects().indicateRedstone(leftLeverPos);
         
         scene.overlay().showText(80)
-            .text("Connected bearings are guaranteed to return to their initial position")
+            .text("createpropulsion.ponder.tilt_adapter.return_guarantee")
             .colored(PonderPalette.GREEN)
             .placeNearTarget()
             .pointAt(util.vector().topOf(bearingPos));
@@ -193,7 +193,7 @@ public class TiltAdapterScene {
             nbt -> nbt.putInt("moveDirection", 0));
 
         scene.overlay().showText(70)
-            .text("Final angle scales proportionally with Redstone signal strength")
+            .text("createpropulsion.ponder.tilt_adapter.scaling")
             .placeNearTarget()
             .pointAt(util.vector().topOf(bearingPos));
         

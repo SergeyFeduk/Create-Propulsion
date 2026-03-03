@@ -23,20 +23,23 @@ public class GenericSummaryTooltipProvider implements ITooltipProvider {
         }
 
         String path = CreatePropulsion.ID + "." + ForgeRegistries.ITEMS.getKey(item).getPath();
+        String summaryKey = TooltipModifiers.getSummaryKey(item, path + ".tooltip.summary");
 
-        if (!I18n.exists(path + ".tooltip.summary")) {
+        if (!I18n.exists(summaryKey)) {
             return;
         }
 
         TooltipHandler.wrapShiftHoldText(tooltipList, "create.tooltip.holdForDescription", () -> {
             if (!TooltipModifiers.apply(item, tooltipList)) {
                 tooltipList.addAll(TooltipHelper.cutStringTextComponent(
-                    Component.translatable(path + ".tooltip.summary").getString(), Palette.STANDARD_CREATE));
+                    Component.translatable(summaryKey).getString(), Palette.STANDARD_CREATE));
             }
 
-            if (I18n.exists(path + ".tooltip.condition1")) {
+            String condition1Key = TooltipModifiers.getCondition1Key(item, path + ".tooltip.condition1");
+
+            if (I18n.exists(condition1Key)) {
                 tooltipList.add(Component.empty());
-                tooltipList.add(Component.translatable(path + ".tooltip.condition1").withStyle(ChatFormatting.GRAY));
+                tooltipList.add(Component.translatable(condition1Key).withStyle(ChatFormatting.GRAY));
                 tooltipList.addAll(TooltipHelper.cutStringTextComponent(Component.translatable(path + ".tooltip.behaviour1").getString(), Palette.STANDARD_CREATE.primary(), Palette.STANDARD_CREATE.highlight(), 1));
                 if (I18n.exists(path + ".tooltip.condition2")) {
                     tooltipList.add(Component.translatable(path + ".tooltip.condition2").withStyle(ChatFormatting.GRAY));
