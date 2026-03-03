@@ -3,9 +3,7 @@ package com.deltasf.createpropulsion.registries;
 import com.deltasf.createpropulsion.CreatePropulsion;
 import com.deltasf.createpropulsion.optical_sensors.OpticalLensItem;
 import com.deltasf.createpropulsion.physics_assembler.AssemblyGaugeItem;
-import com.deltasf.createpropulsion.propeller.blades.AndesitePropellerBladeItem;
-import com.deltasf.createpropulsion.propeller.blades.CopperPropellerBladeItem;
-import com.deltasf.createpropulsion.propeller.blades.WoodenPropellerBladeItem;
+import com.deltasf.createpropulsion.propeller.blades.PropellerBladeItem;
 import com.deltasf.createpropulsion.utility.BurnableItem;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.providers.DataGenContext;
@@ -67,17 +65,20 @@ public class PropulsionItems {
         .setData(ProviderType.LANG, FUCK_OFF_LANG())
         .register();
     //Propeller blades
-    public static final ItemEntry<WoodenPropellerBladeItem> WOODEN_BLADE = REGISTRATE.item("wooden_blade", WoodenPropellerBladeItem::new)
+    public static final ItemEntry<PropellerBladeItem> WOODEN_BLADE = REGISTRATE.item("wooden_blade", 
+        p -> new PropellerBladeItem(p, ResourceLocation.fromNamespaceAndPath(CreatePropulsion.ID, "wooden_blade")))
         .model(FUCK_OFF_ITEM())
         .tag(PROPELLER_BLADE_TAG)
         .setData(ProviderType.LANG, FUCK_OFF_LANG())
         .register();
-    public static final ItemEntry<CopperPropellerBladeItem> COPPER_BLADE = REGISTRATE.item("copper_blade", CopperPropellerBladeItem::new)
+    public static final ItemEntry<PropellerBladeItem> COPPER_BLADE = REGISTRATE.item("copper_blade", 
+        p -> new PropellerBladeItem(p, ResourceLocation.fromNamespaceAndPath(CreatePropulsion.ID, "copper_blade")))
         .model(FUCK_OFF_ITEM())
         .tag(PROPELLER_BLADE_TAG)
         .setData(ProviderType.LANG, FUCK_OFF_LANG())
         .register();
-    public static final ItemEntry<AndesitePropellerBladeItem> ANDESITE_BLADE = REGISTRATE.item("andesite_blade", AndesitePropellerBladeItem::new)
+    public static final ItemEntry<PropellerBladeItem> ANDESITE_BLADE = REGISTRATE.item("andesite_blade", 
+        p -> new PropellerBladeItem(p, ResourceLocation.fromNamespaceAndPath(CreatePropulsion.ID, "andesite_blade")))
         .model(FUCK_OFF_ITEM())
         .tag(PROPELLER_BLADE_TAG)
         .setData(ProviderType.LANG, FUCK_OFF_LANG())

@@ -1,20 +1,25 @@
 package com.deltasf.createpropulsion.registries;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.deltasf.createpropulsion.CreatePropulsion;
 
 import dev.engine_room.flywheel.lib.model.baked.PartialModel;
 import net.minecraft.resources.ResourceLocation;
 
 public class PropulsionPartialModels {
+    public static final Map<String, PartialModel> BLADE_MODELS = new HashMap<>();
+
     //Lodestone
     public static final PartialModel LODESTONE_TRACKER_INDICATOR = partial("lodestone_tracker_overlay");
     //Hot air burner
     public static final PartialModel HOT_AIR_BURNER_LEVER = partial("hot_air_burner_lever");
     //Propeller
     public static final PartialModel PROPELLER_HEAD = partial("propeller_head");
-    public static final PartialModel WOODEN_BLADE = partial("wooden_blade");
-    public static final PartialModel COPPER_BLADE = partial("copper_blade");
-    public static final PartialModel ANDESITE_BLADE = partial("andesite_blade");
+    public static final PartialModel WOODEN_BLADE = partialBlade("wooden_blade");
+    public static final PartialModel COPPER_BLADE = partialBlade("copper_blade");
+    public static final PartialModel ANDESITE_BLADE = partialBlade("andesite_blade");
     //Reaction wheel
     public static final PartialModel REACTION_WHEEL_CORE = partial("reaction_wheel_core");
     //Stirling engine
@@ -38,6 +43,12 @@ public class PropulsionPartialModels {
 
     private static PartialModel partial(String path) {
         return PartialModel.of(ResourceLocation.fromNamespaceAndPath(CreatePropulsion.ID, "partial/" + path));
+    }
+
+    private static PartialModel partialBlade(String path) {
+        PartialModel model = partial(path);
+        BLADE_MODELS.put(CreatePropulsion.ID + ":block/" + path, model);
+        return model;
     }
 
     public static void register() {}
