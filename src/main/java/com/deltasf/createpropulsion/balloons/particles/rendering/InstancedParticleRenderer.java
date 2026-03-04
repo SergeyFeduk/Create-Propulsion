@@ -152,6 +152,10 @@ public class InstancedParticleRenderer {
         long gameTime = level.getGameTime();
         boolean isPaused = mc.isPaused();
 
+        int previousProgram = GL31.glGetInteger(GL31.GL_CURRENT_PROGRAM);
+        int previousVAO = GL31.glGetInteger(GL31.GL_VERTEX_ARRAY_BINDING);
+        int previousArrayBuffer = GL31.glGetInteger(GL31.GL_ARRAY_BUFFER_BINDING);
+
         //Prepare frustum
         VIEW_PROJ_MAT.set(projectionMatrix).mul(ms.last().pose());
         FRUSTUM_INTERSECTION.set(VIEW_PROJ_MAT);
@@ -162,7 +166,6 @@ public class InstancedParticleRenderer {
         RenderSystem.defaultBlendFunc();
         RenderSystem.enableDepthTest();
         
-        int previousProgram = GL31.glGetInteger(GL31.GL_CURRENT_PROGRAM);
         GL31.glUseProgram(programId);
         GL31.glBindVertexArray(VAOId);
 
@@ -269,14 +272,15 @@ public class InstancedParticleRenderer {
         }
 
         //Tidy up after outselves
-        GL31.glBindVertexArray(0);
+        GL31.glBindVertexArray(previousVAO);
+        GL31.glBindBuffer(GL31.GL_ARRAY_BUFFER, previousArrayBuffer);
+
         GL31.glUseProgram(previousProgram);
-
-        GL31.glBindBuffer(GL31.GL_ARRAY_BUFFER, 0); 
+        GL31.glActiveTexture(GL31.GL_TEXTURE0);
         RenderSystem.bindTexture(0);
-
-        RenderSystem.depthMask(true); 
+        RenderSystem.depthMask(true);
         RenderSystem.disableBlend();
+
     }
     
     private static void uploadData(long offset, float[] data, int count) { 
