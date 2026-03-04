@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.joml.Vector3d;
@@ -53,22 +52,29 @@ public class PropellerSpatialHandler extends BlockEntityBehaviour {
     private static final AABBi HARD_OBSTRUCTION_REGION = new AABBi(-1, -1, 0, 1, 1, 0);
 
     private static final List<BlockPos> SCAN_POSITIONS;
+    private static final List<BlockPos> OBSTRUCTION_POSITIONS;
     private static final List<Vector3f> FLUID_SAMPLE_POINTS;
     static {
         SCAN_POSITIONS = StreamSupport.stream(
             BlockPos.betweenClosed(HARD_OBSTRUCTION_REGION.minX, HARD_OBSTRUCTION_REGION.minY, HARD_OBSTRUCTION_REGION.minZ, HARD_OBSTRUCTION_REGION.maxX, HARD_OBSTRUCTION_REGION.maxY, HARD_OBSTRUCTION_REGION.maxZ).spliterator(), false)
             .map(BlockPos::immutable)
-            .collect(Collectors.toList());
+            .toList();
+
+        OBSTRUCTION_POSITIONS = StreamSupport.stream(
+            SCAN_POSITIONS.spliterator(), false).
+            filter(pos -> Math.abs(pos.getX()) != 1 || Math.abs(pos.getZ()) != 1) //Corners
+            .toList();
 
         FLUID_SAMPLE_POINTS = SCAN_POSITIONS.stream()
             .map(pos -> { 
                 Vec3 center = pos.getCenter();
                 //Even I don't know why
                 return new Vector3f((float)center.x()-0.5f, (float)center.y()-0.5f,(float)center.z()); 
-            }).collect(Collectors.toList());
+            }).toList();
     }
 
-    private int scanIndex = 0;
+    private int fluidScanIndex = 0;
+    private int obstructionScanIndex = 0;
     private final Set<BlockPos> obstructedBlocks = new HashSet<>();
     private final boolean[] isSampleInFluid;
     private int fluidSampleCount = 0;
@@ -105,16 +111,20 @@ public class PropellerSpatialHandler extends BlockEntityBehaviour {
             return;
         }
 
-        scanIndex = (scanIndex + 1) % SCAN_POSITIONS.size();
-        BlockPos relativePos = SCAN_POSITIONS.get(scanIndex);
+        //Blocks
+        
+        if (!OBSTRUCTION_POSITIONS.isEmpty()) {
+            obstructionScanIndex = (obstructionScanIndex + 1) % OBSTRUCTION_POSITIONS.size();
+            BlockPos relativePos = OBSTRUCTION_POSITIONS.get(obstructionScanIndex);
+            Direction facing = pbe.getBlockState().getValue(PropellerBlock.FACING);
+            BlockPos worldCheckPos = getPos().offset(rotate(relativePos, facing));
+            handleObstruction(worldCheckPos, pbe);
+        }
 
-        Direction facing = pbe.getBlockState().getValue(PropellerBlock.FACING);
-        BlockPos worldCheckPos = getPos().offset(rotate(relativePos, facing));
-
-        handleObstruction(worldCheckPos, pbe);
-
+        //Fluid
         if (!FLUID_SAMPLE_POINTS.isEmpty()) {
-            Vector3f relativeSamplePoint = FLUID_SAMPLE_POINTS.get(scanIndex);
+            fluidScanIndex = (fluidScanIndex + 1) % FLUID_SAMPLE_POINTS.size();
+            Vector3f relativeSamplePoint = FLUID_SAMPLE_POINTS.get(fluidScanIndex);
             Ship ship = VSGameUtilsKt.getShipManagingPos(level, getPos());
             updateFluidState(pbe, ship, relativeSamplePoint);
         }
@@ -170,7 +180,7 @@ public class PropellerSpatialHandler extends BlockEntityBehaviour {
         BlockPos currentWorldPos = new BlockPos((int)Math.floor(worldPosVec.x), (int)Math.floor(worldPosVec.y), (int)Math.floor(worldPosVec.z));
 
         //Update the state
-        boolean wasInFluid = isSampleInFluid[scanIndex];
+        boolean wasInFluid = isSampleInFluid[fluidScanIndex];
         boolean isInFluid = !getWorld().getFluidState(currentWorldPos).isEmpty();
         if (isInFluid && !wasInFluid) {
             fluidSampleCount++;
@@ -178,11 +188,11 @@ public class PropellerSpatialHandler extends BlockEntityBehaviour {
             fluidSampleCount--;
         }
 
-        isSampleInFluid[scanIndex] = isInFluid;
+        isSampleInFluid[fluidScanIndex] = isInFluid;
 
         //Debug
         if (PropulsionDebug.isDebug(PropellerDebugRoute.SAMPLE_POINTS)) {
-            String ident = String.valueOf(pbe.hashCode() + scanIndex);
+            String ident = String.valueOf(pbe.hashCode() + fluidScanIndex);
             DebugRenderer.drawBox(ident, VectorConversionsMCKt.toMinecraft(samplePoint), new Vec3(0.2,0.2,0.2), isInFluid ? Color.GREEN : Color.WHITE, FLUID_SAMPLE_POINTS.size() + 1);
         }
     }
