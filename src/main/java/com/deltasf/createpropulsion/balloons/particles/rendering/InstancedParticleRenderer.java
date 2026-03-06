@@ -280,7 +280,6 @@ public class InstancedParticleRenderer {
         RenderSystem.bindTexture(0);
         RenderSystem.depthMask(true);
         RenderSystem.disableBlend();
-
     }
     
     private static void uploadData(long offset, float[] data, int count) { 
