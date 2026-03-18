@@ -59,7 +59,7 @@ public class MagnetLevelRegistry {
         return magnets.get(id);
     }
 
-    public MagnetData getOrCreateMagnet(UUID id, BlockPos pos, long shipId, Vector3i dir, int power) {
+    public MagnetData getOrCreateMagnet(UUID id, BlockPos pos, long shipId, Vector3i dir, float power) {
         MagnetData data = magnets.computeIfAbsent(id, k -> {
             MagnetData newData = new MagnetData(id, pos, shipId, dir, power);
             shipMagnets.computeIfAbsent(shipId, sId -> new CopyOnWriteArrayList<>()).add(id);

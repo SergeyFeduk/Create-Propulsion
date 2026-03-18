@@ -10,6 +10,7 @@ import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
+import com.deltasf.createpropulsion.PropulsionConfig;
 import com.deltasf.createpropulsion.compat.PropulsionCompatibility;
 import com.deltasf.createpropulsion.compat.computercraft.ComputerBehaviour;
 import com.simibubi.create.compat.computercraft.AbstractComputerBehaviour;
@@ -33,16 +34,16 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
 
     private UUID magnetId;
     private boolean needsUpdate = true;
-    private int power = 0;
+    private float power = 0;
 
     //CC peripheral
     public AbstractComputerBehaviour computerBehaviour;
     public boolean overridePower = false;
-    public int overridenPower;
+    public float overridenPower;
 
     private boolean updatedAttachment = false;
 
-    public void setPower(int power) {
+    public void setPower(float power) {
         if (this.power == power) return;
         this.power = power;
         if (!overridePower) {
@@ -63,7 +64,7 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
 
         BlockState currentState = level.getBlockState(worldPosition);
         MagnetLevelRegistry registry = MagnetRegistry.getOrCreateRegistry(level);
-        int effectivePower = getEffectivePower();
+        float effectivePower = getEffectivePower();
 
         if (effectivePower > 0) {
             long currentShipId = -1;
@@ -103,7 +104,6 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
             needsUpdate = false;
         }
 
-        //TODO: Uhh, this should already be handled by ForgeEvents::onServerStart
         if (!updatedAttachment) {
             //update attachment level reference
             var serverShip = VSGameUtilsKt.getLoadedShipManagingPos((ServerLevel)level, worldPosition);
@@ -133,11 +133,12 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
         scheduleUpdate();
     }
 
-    public int getEffectivePower() {
+    public float getEffectivePower() {
+        float typeMultiplier = getBlockState().getValue(RedstoneMagnetBlock.MAGNETITE) ? PropulsionConfig.REDSTONE_MAGNET_MAGNETITE_POWER.get().floatValue() : 1;
         if (PropulsionCompatibility.CC_ACTIVE && overridePower) {
-            return overridenPower;
+            return overridenPower * typeMultiplier;
         }
-        return this.power;
+        return this.power * typeMultiplier;
     }
 
     @SuppressWarnings("null")
@@ -175,7 +176,7 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
         if (tag.hasUUID("MagnetId")) {
             this.magnetId = tag.getUUID("MagnetId");
         }
-        this.power = tag.getInt("Power");
+        this.power = tag.getFloat("Power");
         if (PropulsionCompatibility.CC_ACTIVE) {
             this.overridePower = tag.getBoolean("overridePower");
             this.overridenPower = tag.getInt("overridenPower");
@@ -189,10 +190,10 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity {
             this.magnetId = UUID.randomUUID();
         }
         tag.putUUID("MagnetId", this.magnetId);
-        tag.putInt("Power", this.power);
+        tag.putFloat("Power", this.power);
         if (PropulsionCompatibility.CC_ACTIVE) {
             tag.putBoolean("overridePower", this.overridePower);
-            tag.putInt("overridenPower", this.overridenPower);
+            tag.putFloat("overridenPower", this.overridenPower);
         }    
     }
 }

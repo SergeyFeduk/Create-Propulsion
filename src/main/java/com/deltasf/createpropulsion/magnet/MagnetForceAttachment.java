@@ -117,7 +117,7 @@ public final class MagnetForceAttachment implements ShipPhysicsListener {
         double powerA = pair.localPower;
         double powerB = pair.otherPower;
         if (powerA <= 0 || powerB <= 0) return; //Interaction power product is zero
-        double normalizedPowerProduct = (powerA / 15.0) * (powerB / 15.0);
+        double normalizedPowerProduct = powerA * powerB;
         double effectiveInteractionConstant = MAGNET_INTERACTION_CONSTANT * normalizedPowerProduct * PropulsionConfig.REDSTONE_MAGNET_POWER_MULTIPLIER.get();
         
         localPosA_absolute_shipspace.set(

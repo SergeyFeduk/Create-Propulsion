@@ -8,16 +8,16 @@ public final class MagnetPair {
     public final UUID localId;
     public final BlockPos localPos;
     public final Vector3i localDir;
-    public final int localPower;
+    public final float localPower;
 
     public final UUID otherId;
     public final long otherShipId;
     public final BlockPos otherPos;
     public final Vector3i otherDir;
-    public final int otherPower;
+    public final float otherPower;
 
-    public MagnetPair(UUID localId, BlockPos APos, Vector3i ADir, int APower, 
-                      UUID otherId, long BShipId, BlockPos BPos, Vector3i BDir, int BPower) {
+    public MagnetPair(UUID localId, BlockPos APos, Vector3i ADir, float APower, 
+                      UUID otherId, long BShipId, BlockPos BPos, Vector3i BDir, float BPower) {
         this.localId = localId;
         this.localPos = APos;
         this.localDir = ADir;

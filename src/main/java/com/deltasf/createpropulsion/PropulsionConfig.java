@@ -32,6 +32,8 @@ public class PropulsionConfig {
     public static final ForgeConfigSpec.ConfigValue<Double> REDSTONE_MAGNET_POWER_MULTIPLIER;
     public static final ForgeConfigSpec.ConfigValue<Double> REDSTONE_MAGNET_FORCE_INDUCED_TORQUE_MULTIPLIER;
     public static final ForgeConfigSpec.ConfigValue<Double> REDSTONE_MAGNET_MOVEMENT_DISTANCE_THRESHOLD;
+    public static final ForgeConfigSpec.ConfigValue<Boolean> REDSTONE_MAGNET_ALLOW_MAGNETITE;
+    public static final ForgeConfigSpec.ConfigValue<Double> REDSTONE_MAGNET_MAGNETITE_POWER;
     
     //Physics assembler
     public static final ForgeConfigSpec.ConfigValue<Integer> PHYSICS_ASSEMBLER_MAX_MINK_DISTANCE;
@@ -135,6 +137,10 @@ public class PropulsionConfig {
                 .define("Force-induced torque multiplier", 1.0);
             REDSTONE_MAGNET_MOVEMENT_DISTANCE_THRESHOLD = SERVER_BUILDER.comment("Distance the magnet has to move to initiate a re-pairing against its neighbours. If you experience magnets having weird forces when far apart - tune down this value.")
                 .define("Movement threshold", 0.2);
+            REDSTONE_MAGNET_ALLOW_MAGNETITE = SERVER_BUILDER.comment("If true, players can apply netherite ingots to magnets to upgrade them.")
+                .define("Allow magnetite upgrade", true);
+            REDSTONE_MAGNET_MAGNETITE_POWER = SERVER_BUILDER.comment("Multiplier for magnet's power when magnet is covered in magnetite.")
+                .define("Magnetite power", 4.0);
         SERVER_BUILDER.pop();
 
         SERVER_BUILDER.push("Physics assembler");

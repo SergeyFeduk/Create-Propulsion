@@ -3,6 +3,7 @@ package com.deltasf.createpropulsion.particles;
 import java.util.function.Supplier;
 
 import com.deltasf.createpropulsion.CreatePropulsion;
+import com.deltasf.createpropulsion.particles.magnetite.MagnetiteSparkParticleData;
 import com.deltasf.createpropulsion.particles.plasma.PlasmaParticleData;
 import com.deltasf.createpropulsion.particles.plume.PlumeParticleData;
 import com.simibubi.create.foundation.particle.ICustomParticleData;
@@ -24,7 +25,8 @@ import net.minecraftforge.registries.RegistryObject;
 @EventBusSubscriber(modid = CreatePropulsion.ID, bus = Bus.MOD, value = Dist.CLIENT)
 public enum ParticleTypes {
     PLUME(PlumeParticleData::new),
-    PLASMA(PlasmaParticleData::new);
+    PLASMA(PlasmaParticleData::new),
+    MAGNETITE_SPARK(MagnetiteSparkParticleData::new);
 
     private final ParticleEntry<?> entry;
 
@@ -38,13 +40,9 @@ public enum ParticleTypes {
         entry = new ParticleEntry<>(name, typeFactory);
     }
 
-    public static ParticleType<?> getPlumeType() {
-        return PLUME.get();
-    }
-
-    public static ParticleType<?> getPlasmaType() {
-        return PLASMA.get();
-    }
+    public static ParticleType<?> getPlumeType() { return PLUME.get(); }
+    public static ParticleType<?> getPlasmaType() { return PLASMA.get(); }
+    public static ParticleType<?> getMagnetiteSparkType() { return MAGNETITE_SPARK.get(); }
 
     public static void register(IEventBus modEventBus){
         ParticleEntry.REGISTER.register(modEventBus);

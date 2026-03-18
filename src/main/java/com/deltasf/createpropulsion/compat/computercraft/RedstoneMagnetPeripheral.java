@@ -5,8 +5,8 @@ import com.simibubi.create.compat.computercraft.implementation.peripherals.Synce
 
 import dan200.computercraft.api.lua.LuaFunction;
 
-public class MagnetPeripheral extends SyncedPeripheral<RedstoneMagnetBlockEntity> {
-    public MagnetPeripheral(RedstoneMagnetBlockEntity blockEntity) {
+public class RedstoneMagnetPeripheral extends SyncedPeripheral<RedstoneMagnetBlockEntity> {
+    public RedstoneMagnetPeripheral(RedstoneMagnetBlockEntity blockEntity) {
         super(blockEntity);
     }
 
@@ -17,8 +17,9 @@ public class MagnetPeripheral extends SyncedPeripheral<RedstoneMagnetBlockEntity
 
     //Sets the power of the magnet
     @LuaFunction(mainThread = true)
-    public final void setPower(int power) {
-        int clampedPower = Math.max(Math.min(power, 15), 0);
+    public final void setPower(float power) {
+        float clampedPower = Math.max(Math.min(power, 1), 0);
+        //TODO: Rewrite with new attach/detach, not this slop
         blockEntity.overridePower = clampedPower != 0;
         blockEntity.overridenPower = clampedPower;
         blockEntity.scheduleUpdate();

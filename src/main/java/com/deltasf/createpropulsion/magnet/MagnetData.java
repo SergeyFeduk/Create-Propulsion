@@ -13,7 +13,7 @@ import net.minecraft.world.level.Level;
 import java.util.UUID;
 
 public class MagnetData {
-    public MagnetData(UUID id, BlockPos pos, long shipId, Vector3i blockDipoleDir, int power) {
+    public MagnetData(UUID id, BlockPos pos, long shipId, Vector3i blockDipoleDir, float power) {
         this.id = id;
         this.pos = pos;
         this.shipId = shipId;
@@ -27,7 +27,7 @@ public class MagnetData {
     public long shipId = -1;
     private Vector3d worldPosition;
     private final Vector3i blockDipoleDir; 
-    private int power;
+    private float power;
 
     private final Vector3d lastPairedPosition = new Vector3d(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
     public boolean needsRepairing = true;
@@ -35,9 +35,13 @@ public class MagnetData {
     public BlockPos getBlockPos() { return pos; }
     public Vector3d getPosition() { return worldPosition; }
     public Vector3i getBlockDipoleDir() { return blockDipoleDir; }
-    public int getPower() { return power; } 
+    public float getPower() { return power; } 
 
-    public void update(BlockPos newPos, long newShipId, Vector3i newBlockDipoleDir, int newPower) {
+    public void update(BlockPos newPos, long newShipId, Vector3i newBlockDipoleDir, float newPower) {
+        if (this.power != newPower || this.shipId != newShipId || !this.blockDipoleDir.equals(newBlockDipoleDir)) {
+            this.needsRepairing = true;
+        }
+
         this.pos = newPos;
         this.shipId = newShipId;
         this.blockDipoleDir.set(newBlockDipoleDir);

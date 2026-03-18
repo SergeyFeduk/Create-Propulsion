@@ -44,7 +44,7 @@ public class ComputerBehaviour extends AbstractComputerBehaviour {
         register(CreativeThrusterBlockEntity.class, CreativeThrusterPeripheral::new);
         register(OpticalSensorBlockEntity.class, OpticalSensorPeripheral::new);
         register(LodestoneTrackerBlockEntity.class, LodestoneTrackerPeripheral::new);
-        register(RedstoneMagnetBlockEntity.class, MagnetPeripheral::new);
+        register(RedstoneMagnetBlockEntity.class, RedstoneMagnetPeripheral::new);
         register(PhysicsAssemblerBlockEntity.class, PhysicsAssemblerPeripheral::new);
         register(StirlingEngineBlockEntity.class, StirlingEnginePeripheral::new);
         register(RedstoneTransmissionBlockEntity.class, RedstoneTransmissionPeripheral::new);
