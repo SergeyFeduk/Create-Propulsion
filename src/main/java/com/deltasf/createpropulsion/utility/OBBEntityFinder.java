@@ -12,7 +12,6 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
 import com.deltasf.createpropulsion.utility.math.DeltasOBB;
-import com.deltasf.createpropulsion.utility.math.MathUtility;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -34,6 +33,7 @@ public class OBBEntityFinder {
     public static List<LivingEntity> getEntitiesInOrientedBox(Level level, BlockPos pos, Direction boxPrimaryAxis, Direction localDirection, Vec3 boxDimensions, Vec3 boxOffset) {
         TEMP_WORLD_QUATERNION.identity();
         TEMP_OBB_ROTATION.identity();
+        TEMP_LOCAL_QUATERNION.identity();
 
         Vec3i dirA = boxPrimaryAxis.getNormal();
         Vec3i dirB = localDirection.getNormal();
@@ -68,7 +68,7 @@ public class OBBEntityFinder {
         //Narrow phase
         TEMP_OBB_CENTER.set((float) TEMP_VECTOR2.x, (float) TEMP_VECTOR2.y, (float) TEMP_VECTOR2.z);
         TEMP_OBB_HALFEXT.set((float) (boxDimensions.x * 0.5), (float) (boxDimensions.y * 0.5), (float) (boxDimensions.z * 0.5));
-        MathUtility.quaternionToMatrix3f(TEMP_WORLD_QUATERNION, TEMP_OBB_ROTATION);
+        TEMP_OBB_ROTATION.set(TEMP_WORLD_QUATERNION);
 
         List<LivingEntity> intersectingEntities = new ArrayList<>();
         for (LivingEntity entity : candidateEntities) {

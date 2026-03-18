@@ -1,7 +1,5 @@
 package com.deltasf.createpropulsion.utility.math;
 
-import org.joml.Matrix3f;
-import org.joml.Quaterniond;
 import org.joml.Quaterniondc;
 import org.joml.Vector2f;
 import org.joml.Vector3d;
@@ -14,34 +12,6 @@ public class MathUtility {
     //Very cool interpolation function stolen from Freya
     public static float expDecay(float a, float b, float decay, float dt) {
         return b + (a - b) * (float) Math.exp(-decay * dt);
-    }
-
-    public static void quaternionToMatrix3f(Quaterniond q, Matrix3f out) {
-        double qx = q.x, qy = q.y, qz = q.z, qw = q.w;
-        double lenSq = qx*qx + qy*qy + qz*qz + qw*qw;
-        if (lenSq == 0.0) { out.identity(); return; }
-        double inv = 1.0 / Math.sqrt(lenSq);
-        double x = qx*inv, y = qy*inv, z = qz*inv, w = qw*inv;
-
-        double xx = x*x, yy = y*y, zz = z*z;
-        double xy = x*y, xz = x*z, yz = y*z;
-        double wx = w*x, wy = w*y, wz = w*z;
-
-        float m00 = (float)(1.0 - 2.0*(yy + zz));
-        float m01 = (float)(2.0*(xy - wz));
-        float m02 = (float)(2.0*(xz + wy));
-        float m10 = (float)(2.0*(xy + wz));
-        float m11 = (float)(1.0 - 2.0*(xx + zz));
-        float m12 = (float)(2.0*(yz - wx));
-        float m20 = (float)(2.0*(xz - wy));
-        float m21 = (float)(2.0*(yz + wx));
-        float m22 = (float)(1.0 - 2.0*(xx + yy));
-
-        out.set(
-            m00, m01, m02,
-            m10, m11, m12,
-            m20, m21, m22
-        );
     }
 
     public static Vector2f toHorizontalCoordinateSystem(Quaterniondc shipRotation) {

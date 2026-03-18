@@ -26,15 +26,15 @@ public final class DeltasOBB {
         final float aez = obbHalfExtents.z;
 
         final float u0x = obbRot.m00();
-        final float u0y = obbRot.m10();
-        final float u0z = obbRot.m20();
+        final float u0y = obbRot.m01();
+        final float u0z = obbRot.m02();
 
-        final float u1x = obbRot.m01();
+        final float u1x = obbRot.m10();
         final float u1y = obbRot.m11();
-        final float u1z = obbRot.m21();
+        final float u1z = obbRot.m12();
 
-        final float u2x = obbRot.m02();
-        final float u2y = obbRot.m12();
+        final float u2x = obbRot.m20();
+        final float u2y = obbRot.m21();
         final float u2z = obbRot.m22();
 
         final float tx_world = bx - ax;
