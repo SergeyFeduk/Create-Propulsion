@@ -1,24 +1,16 @@
 package com.deltasf.createpropulsion.physics_assembler;
 
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.joml.Quaterniond;
-import org.joml.Quaterniondc;
-import org.joml.Vector2i;
 import org.joml.Vector3d;
-import org.joml.Vector3dc;
-import org.joml.Vector3i;
-import org.valkyrienskies.core.api.bodies.properties.BodyKinematics;
-import org.valkyrienskies.core.api.ships.ServerShip;
-import org.valkyrienskies.core.api.ships.properties.ChunkClaim;
-import org.valkyrienskies.core.impl.game.ships.ShipDataCommon;
+import org.slf4j.Logger;
 
 import net.createmod.catnip.math.VecHelper;
 import net.minecraft.core.BlockPos;
@@ -35,37 +27,32 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.ticks.ScheduledTick;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 
-import org.valkyrienskies.mod.api.ValkyrienSkies;
-import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
-import org.valkyrienskies.mod.common.networking.PacketRestartChunkUpdates;
-import org.valkyrienskies.mod.common.networking.PacketStopChunkUpdates;
-import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
+import org.valkyrienskies.mod.common.assembly.ShipAssembler;
 
 import com.deltasf.createpropulsion.PropulsionConfig;
+import com.deltasf.createpropulsion.compat.VS2AssemblyCompat;
 import com.deltasf.createpropulsion.compat.PropulsionCompatibility;
 import com.deltasf.createpropulsion.compat.computercraft.ComputerBehaviour;
 import com.deltasf.createpropulsion.network.PropulsionPackets;
 import com.deltasf.createpropulsion.physics_assembler.packets.AssemblyFailedPacket;
+import com.mojang.logging.LogUtils;
 import com.simibubi.create.compat.computercraft.AbstractComputerBehaviour;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 
 @SuppressWarnings("null")
 public class PhysicsAssemblerBlockEntity extends SmartBlockEntity {
-    private final BlockState AIR = Blocks.AIR.defaultBlockState();
+    private static final Logger LOGGER = LogUtils.getLogger();
 
     public PhysicsAssemblerBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
@@ -73,218 +60,91 @@ public class PhysicsAssemblerBlockEntity extends SmartBlockEntity {
     //CC
     public AbstractComputerBehaviour computerBehaviour;
 
-    private List<Vector2i> chunkPoses = new ArrayList<Vector2i>();
-    private List<Vector2i> destchunkPoses = new ArrayList<Vector2i>();
+    private boolean assemblyPending;
 
     private final ItemStackHandler itemHandler = createItemHandler();
     private final LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.of(() -> itemHandler);
 
-    //Super secret logic that converts objects spatially restricted to world grid into independent ship entities
-    //I spent like two evenings on this
     public void shipify() {
         Level world = getLevel();
-        if (!(world instanceof ServerLevel level)) return;
-        //Obtain pos from stack
+        if (!(world instanceof ServerLevel level) || assemblyPending) return;
+
         ItemStack gaugeStack = itemHandler.getStackInSlot(0);
-        if (gaugeStack == null) return;
-        if (!(gaugeStack.getItem() instanceof AssemblyGaugeItem)) return;
+        if (gaugeStack.isEmpty() || !(gaugeStack.getItem() instanceof AssemblyGaugeItem)) return;
 
         BlockPos posA = AssemblyGaugeItem.getPosA(gaugeStack);
         BlockPos posB = AssemblyGaugeItem.getPosB(gaugeStack);
 
-        if (posA == null || posB == null) {
+        if (posA == null || posB == null) return;
+
+        CompletableFuture<Void> chunkLoadFuture = requestMissingRegionChunks(level, posA, posB);
+        if (chunkLoadFuture != null) {
+            assemblyPending = true;
+            chunkLoadFuture.whenComplete((unused, throwable) ->
+                level.getServer().execute(() -> {
+                    assemblyPending = false;
+                    if (isRemoved() || getLevel() != level) return;
+                    if (throwable != null) {
+                        LOGGER.error("Failed to load Create Propulsion assembly chunks at {}", worldPosition, throwable);
+                        sendAssemblyFailed(level);
+                        return;
+                    }
+                    shipify();
+                })
+            );
             return;
         }
 
-        //Get region
-        SelectedRegion region = getGeometricCenterOfBlocksInRegion(world, posA, posB);
-        if (!region.hasBlocks) return; //No blocks -> Nothing to convert into ship
-        //Cancel assembly if there are blacklisted blocks
-        for(BlockPos pos : region.blockPositions) {
-            if (AssemblyBlacklistManager.isBlacklisted(world.getBlockState(pos).getBlock())) {
-                PropulsionPackets.sendToTracking(new AssemblyFailedPacket(worldPosition), world.getChunkAt(worldPosition));
-                return;
+        SelectedRegion region = getGeometricCenterOfBlocksInRegion(level, posA, posB);
+        if (region.hasBlacklistedBlocks()) {
+            sendAssemblyFailed(level);
+            return;
+        }
+        if (!region.hasBlocks()) return;
+
+        assemblyPending = true;
+        VS2AssemblyCompat.queueAssemble(level, region.blockPositions(), 1.0)
+            .whenComplete((result, throwable) ->
+                level.getServer().execute(() -> {
+                    assemblyPending = false;
+                    if (isRemoved() || getLevel() != level) return;
+                    if (throwable != null) {
+                        LOGGER.error("Create Propulsion queued assembly failed at {}", worldPosition, throwable);
+                        sendAssemblyFailed(level);
+                    }
+                })
+            );
+    }
+
+    @Nullable
+    private CompletableFuture<Void> requestMissingRegionChunks(ServerLevel level, BlockPos posA, BlockPos posB) {
+        Set<ChunkPos> chunks = new LinkedHashSet<>();
+        int minChunkX = Math.min(posA.getX(), posB.getX()) >> 4;
+        int maxChunkX = Math.max(posA.getX(), posB.getX()) >> 4;
+        int minChunkZ = Math.min(posA.getZ(), posB.getZ()) >> 4;
+        int maxChunkZ = Math.max(posA.getZ(), posB.getZ()) >> 4;
+
+        for (int chunkX = minChunkX; chunkX <= maxChunkX; chunkX++) {
+            for (int chunkZ = minChunkZ; chunkZ <= maxChunkZ; chunkZ++) {
+                chunks.add(new ChunkPos(chunkX, chunkZ));
             }
         }
-
-        //Create ship
-        var parentShip = VSGameUtilsKt.getShipManagingPos(level, worldPosition);
-        String dimensionId = VSGameUtilsKt.getDimensionId(level);
-        Vector3d gc = region.geometricCenter;
-        BlockPos creationAnchorPos = new BlockPos(
-            (int) Math.floor(gc.x),
-            (int) Math.floor(gc.y),
-            (int) Math.floor(gc.z)
-        );
-        ServerShip ship = VSGameUtilsKt.getShipObjectWorld(level).createNewShipAtBlock(
-            VectorConversionsMCKt.toJOML(creationAnchorPos), false, 1, dimensionId);
-        ChunkClaim claim = ship.getChunkClaim();
-        BlockPos newShipInternalCenterPos = VectorConversionsMCKt.toBlockPos(
-                claim.getCenterBlockCoordinates(VSGameUtilsKt.getYRange(level), new Vector3i()));
-        //Get and store affected FROM chunks
-        chunkPoses.clear();
-        var it = region.chunkPosSet.iterator();
-        while (it.hasNext()) {
-            ChunkPos pos = it.next();
-            chunkPoses.add(new Vector2i(pos.x, pos.z));
-        }
-        //Get and store affected TO chunks
-        destchunkPoses.clear();
-        Set<ChunkPos> destSet = new HashSet<>();
-        for (BlockPos pos : region.blockPositions) {
-            BlockPos relative = pos.subtract(creationAnchorPos);
-            BlockPos shipPos = newShipInternalCenterPos.offset(relative);
-            destSet.add(level.getChunk(shipPos).getPos());
-        }
-        var dit = destSet.iterator();
-        while (dit.hasNext()) {
-            ChunkPos pos = dit.next();
-            destchunkPoses.add(new Vector2i(pos.x, pos.z));
-        }
-        //Send packets to stop updating chunks 
-        ValkyrienSkiesMod.getVsCore().getSimplePacketNetworking().sendToAllClients(new PacketStopChunkUpdates(chunkPoses));
-        //Copy blocks from region to shipyard
-        for (BlockPos pos : region.blockPositions) {
-            BlockPos relative = pos.subtract(creationAnchorPos);
-            BlockPos shipPos = newShipInternalCenterPos.offset(relative);
-            copyBlock(level, pos, shipPos);
-        }
-        //Remove original blocks
-        for (BlockPos pos : region.blockPositions) {
-            removeBlock(level, pos);
-        }
-        //Trigger updates 
-        for (BlockPos pos : region.blockPositions) {
-            BlockPos relative = pos.subtract(creationAnchorPos);
-            BlockPos shipPos = newShipInternalCenterPos.offset(relative);
-            updateBlock(level, pos, shipPos, level.getBlockState(shipPos));
-        }
-
-        //Teleport ship to actual location
-        Vector3dc comInShip = ship.getInertiaData().getCenterOfMass();
-        Vector3d finalShipPosInShipyard = new Vector3d(comInShip).add(0.0,0.0,0.0);
-
-        Vector3d newShipInternalCenterPosVec = VectorConversionsMCKt.toJOMLD(newShipInternalCenterPos);
-        Vector3d creationAnchorPosVec = VectorConversionsMCKt.toJOMLD(creationAnchorPos);
-
-        Vector3d shipComInWorld = new Vector3d(comInShip)
-            .sub(newShipInternalCenterPosVec)
-            .add(creationAnchorPosVec);
-
-        Vector3d finalShipPosInWorld = shipComInWorld.add(0.0,0.0,0.0);
-        Quaterniondc finalShipRotation = new Quaterniond();
-        Vector3d finalShipScale = new Vector3d(1, 1, 1);
-
-        /*Vector3d velocity = new Vector3d(0,0,0);
-        Vector3d omega = new Vector3d(0,0,0);*/
-
-        if (parentShip != null) {
-            finalShipPosInWorld = parentShip.getShipToWorld().transformPosition(shipComInWorld, new Vector3d());
-            finalShipRotation = parentShip.getTransform().getShipToWorldRotation();
-            finalShipScale.mul(parentShip.getTransform().getShipToWorldScaling());
-
-            /*parentShip.getVelocity().mul(1.0, velocity);
-            parentShip.getOmega().mul(1.0, omega);
-
-            finalShipPosInWorld.add(parentShip.getVelocity().mul(4/60.0, new Vector3d()) );*/
-        }
-
-        BodyKinematics newShipTransform = ValkyrienSkies.api().newBodyKinematics(
-            new Vector3d(),
-            new Vector3d(),
-            finalShipPosInWorld,
-            finalShipRotation,
-            finalShipScale,
-            finalShipPosInShipyard
-        );
-
-        //final String vsDimName = VSGameUtilsKt.getDimensionId(world);
-
-
-        //ShipTeleportData td = new ShipTeleportDataImpl(finalShipPosInWorld, finalShipRotation, velocity, omega, vsDimName, 1.0);
-
-
-        if (ship instanceof ShipDataCommon shipData) {
-            shipData.setKinematics(newShipTransform);
-
-            /*ServerShipWorldCore sWorld = (ServerShipWorldCore)VSGameUtilsKt.getShipWorldNullable(world);
-            sWorld.teleportShip(ship, td);*/
-
-            //var constaint = new VSAttachmentConstraint(ship.getId(), parentShip.getId(), 0, new Vector3d(0), new Vector3d(0), 10000000, 10);
-
-            //sWorld.createNewConstraint(constaint);
-            //TODO: Inherit linear velocity and angular momentum
-        }
-
-        //Sync FROM chunks to resume updated when TO chunks start to tick
-        VSGameUtilsKt.executeIf(level.getServer(), 
-            () -> destchunkPoses.stream().allMatch(chunkPos -> VSGameUtilsKt.isTickingChunk(level, chunkPos.x, chunkPos.y)), 
-            () -> {
-                ValkyrienSkiesMod.getVsCore().getSimplePacketNetworking().sendToAllClients(new PacketRestartChunkUpdates(chunkPoses));
-                chunkPoses.clear();
-            }
-        );
+        return VS2AssemblyCompat.requestChunks(level, chunks);
     }
 
-    private void copyBlock(Level level, BlockPos from, BlockPos to){
-        BlockState state = level.getBlockState(from);
-        BlockEntity blockEntity = level.getBlockEntity(from);
-        level.getChunk(to).setBlockState(to, state, false);
-        //Transfer scheduled tick from original to a copy. This rises a lot of philosophical concerns but we have a job to do
-        if (level.getBlockTicks().hasScheduledTick(from, state.getBlock())) {
-            level.getBlockTicks().schedule(new ScheduledTick<Block>(state.getBlock(), to, 0, 0));
-        }
-        //Transfer block entity and its data. This is even more concerning as neurocorrelate of consciousness is probably located somewhere in blockEntity
-        //Also, why the fuck do I write this?
-
-        //This approach should be better
-        if (state.hasBlockEntity() && blockEntity != null) {
-            CompoundTag tdata = blockEntity.saveWithFullMetadata();
-            level.setBlockEntity(BlockEntity.loadStatic(to, state, tdata));
-        }
-        //But RelocationUtil.kt does something like that. Not sure why
-        /*if (state.hasBlockEntity() && blockEntity != null) {
-            CompoundTag tdata = blockEntity.saveWithFullMetadata();
-            level.setBlockEntity(blockEntity);
-            BlockEntity newBlockEntity = level.getBlockEntity(to);
-            newBlockEntity.load(tdata);
-        }*/
+    @Nullable
+    private LevelChunk getLoadedChunk(ServerLevel level, int chunkX, int chunkZ) {
+        return level.getChunkSource().getChunkNow(chunkX, chunkZ);
     }
 
-    private void removeBlock(Level level, BlockPos pos){
-        level.removeBlockEntity(pos);
-        level.getChunk(pos).setBlockState(pos, AIR, false);
-    }
-
-    private void updateBlock(Level level, BlockPos from, BlockPos to, BlockState toState){
-        int flags = 11 | Block.UPDATE_MOVE_BY_PISTON | Block.UPDATE_SUPPRESS_DROPS;
-        int recursionLeft = 511;
-
-        //FROM
-        level.setBlocksDirty(from, toState, AIR);
-        level.sendBlockUpdated(from, toState, AIR, flags);
-        level.blockUpdated(from, AIR.getBlock());
-        //Update neighboring blocks
-        AIR.updateIndirectNeighbourShapes(level, from, flags, recursionLeft - 1);
-        AIR.updateNeighbourShapes(level, from, flags, recursionLeft);
-        AIR.updateIndirectNeighbourShapes(level, from, flags, recursionLeft);
-        //And lighting too
-        level.getChunkSource().getLightEngine().checkBlock(from);
-
-        //TO
-        level.setBlocksDirty(to, AIR, toState);
-        level.sendBlockUpdated(to, AIR, toState, flags);
-        level.blockUpdated(to, toState.getBlock());
-        //Redstone
-        if (!level.isClientSide && toState.hasAnalogOutputSignal()) {
-            level.updateNeighbourForOutputSignal(to, toState.getBlock());
+    private void sendAssemblyFailed(ServerLevel level) {
+        LevelChunk chunk = getLoadedChunk(level, worldPosition.getX() >> 4, worldPosition.getZ() >> 4);
+        if (chunk != null) {
+            PropulsionPackets.sendToTracking(new AssemblyFailedPacket(worldPosition), chunk);
         }
-
-        //And lighting too
-        level.getChunkSource().getLightEngine().checkBlock(to);
     }
 
-    private SelectedRegion getGeometricCenterOfBlocksInRegion(Level level, BlockPos posA, BlockPos posB) {
+    private SelectedRegion getGeometricCenterOfBlocksInRegion(ServerLevel level, BlockPos posA, BlockPos posB) {
         int minActualX = Integer.MAX_VALUE, minActualY = Integer.MAX_VALUE, minActualZ = Integer.MAX_VALUE;
         int maxActualX = Integer.MIN_VALUE, maxActualY = Integer.MIN_VALUE, maxActualZ = Integer.MIN_VALUE;
 
@@ -297,22 +157,30 @@ public class PhysicsAssemblerBlockEntity extends SmartBlockEntity {
         int regionMaxZ = Math.max(posA.getZ(), posB.getZ());
 
         boolean blocksFound = false;
-        List<BlockPos> blocksList = new ArrayList<>();
-        Set<ChunkPos> chunkPosSet = new HashSet<ChunkPos>();
+        Set<BlockPos> blocksList = new LinkedHashSet<>();
+        BlockPos.MutableBlockPos currentPos = new BlockPos.MutableBlockPos();
+        long currentChunkKey = Long.MIN_VALUE;
+        LevelChunk currentChunk = null;
 
-        //Iterate through all of the region coordinates
         for (int x = regionMinX; x <= regionMaxX; x++) {
             for (int y = regionMinY; y <= regionMaxY; y++) {
                 for (int z = regionMinZ; z <= regionMaxZ; z++) {
-                    BlockPos currentPos = new BlockPos(x, y, z);
-                    BlockState blockState = level.getBlockState(currentPos);
-                    //If block is valid
+                    long chunkKey = ChunkPos.asLong(x >> 4, z >> 4);
+                    if (chunkKey != currentChunkKey) {
+                        currentChunkKey = chunkKey;
+                        currentChunk = getLoadedChunk(level, x >> 4, z >> 4);
+                    }
+                    if (currentChunk == null) {
+                        return new SelectedRegion(new Vector3d(), false, new LinkedHashSet<>(), false);
+                    }
+                    currentPos.set(x, y, z);
+                    BlockState blockState = currentChunk.getBlockState(currentPos);
                     if (!blockState.isAir()) {
-                        //Update lists
+                        if (AssemblyBlacklistManager.isBlacklisted(blockState.getBlock())) {
+                            return new SelectedRegion(new Vector3d(), false, new LinkedHashSet<>(), true);
+                        }
                         blocksFound = true;
-                        blocksList.add(currentPos);
-                        chunkPosSet.add(level.getChunk(currentPos).getPos());
-                        //Update region bounds
+                        blocksList.add(currentPos.immutable());
                         minActualX = Math.min(minActualX, x);
                         minActualY = Math.min(minActualY, y);
                         minActualZ = Math.min(minActualZ, z);
@@ -323,10 +191,13 @@ public class PhysicsAssemblerBlockEntity extends SmartBlockEntity {
                 }
             }
         }
+        if (!blocksFound) {
+            return new SelectedRegion(new Vector3d(), false, blocksList, false);
+        }
         double actualCenterX = (minActualX + maxActualX) / 2.0;
         double actualCenterY = (minActualY + maxActualY) / 2.0;
         double actualCenterZ = (minActualZ + maxActualZ) / 2.0;
-        return new SelectedRegion(new Vector3d(actualCenterX, actualCenterY, actualCenterZ), blocksFound, blocksList, chunkPosSet);
+        return new SelectedRegion(new Vector3d(actualCenterX, actualCenterY, actualCenterZ), true, blocksList, false);
     }
 
     //Gauge
@@ -555,7 +426,7 @@ public class PhysicsAssemblerBlockEntity extends SmartBlockEntity {
     private record SelectedRegion (
         Vector3d geometricCenter,
         boolean hasBlocks,
-        List<BlockPos> blockPositions,
-        Set<ChunkPos> chunkPosSet
+        Set<BlockPos> blockPositions,
+        boolean hasBlacklistedBlocks
     ) {}
 }
