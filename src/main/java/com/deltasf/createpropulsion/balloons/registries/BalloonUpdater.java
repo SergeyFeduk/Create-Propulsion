@@ -392,7 +392,6 @@ public class BalloonUpdater {
         }
     }
 
-    //TODO: Move somewhere
     private static List<UUID> findOrphanedSupporters(Balloon balloon, List<HaiData> hais) {
         List<UUID> supportersToRemove = new ArrayList<>();
         Map<UUID, HaiData> haiDataMap = new HashMap<>();

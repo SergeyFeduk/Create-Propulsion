@@ -1,9 +1,11 @@
 package com.deltasf.createpropulsion.tilt_adapter;
 
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import com.deltasf.createpropulsion.registries.PropulsionPartialModels;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import com.simibubi.create.content.kinetics.base.IRotate;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntityRenderer;
 
@@ -16,7 +18,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Direction.Axis;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -26,15 +27,21 @@ public class TiltAdapterRenderer extends KineticBlockEntityRenderer<TiltAdapterB
 		super(context);
 	}
 
+    private static final Vector3f AOM_INPUT = new Vector3f();
+    private static final Vector3f AOM_OUTPUT = new Vector3f();
+
+    private static final Quaternionf ROT_Y_270 = Axis.YP.rotationDegrees(270.0f);
+    private static final Quaternionf ROT_Y_180 = Axis.YP.rotationDegrees(180.0f);
+    private static final Quaternionf ROT_Z_180 = Axis.ZP.rotationDegrees(180.0f);
+
+
     @Override
 	protected void renderSafe(TiltAdapterBlockEntity blockEntity, float partialTicks, PoseStack ms, MultiBufferSource buffer, int light, int overlay) {
-        //if (VisualizationManager.supportsVisualization(blockEntity.getLevel())) return;
-
         Level level = blockEntity.getLevel();
         if (level == null) return;
 
         Block block = blockEntity.getBlockState().getBlock();
-		final Axis axis = ((IRotate) block).getRotationAxis(blockEntity.getBlockState());
+		final net.minecraft.core.Direction.Axis axis = ((IRotate) block).getRotationAxis(blockEntity.getBlockState());
 		final BlockPos pos = blockEntity.getBlockPos();
         final BlockState blockState = blockEntity.getBlockState();
         final Direction direction = TiltAdapterBlock.getDirection(blockState);
@@ -49,16 +56,16 @@ public class TiltAdapterRenderer extends KineticBlockEntityRenderer<TiltAdapterB
         float angle = (time * blockEntity.getSpeed() * 3f / 10) % 360;
         float offset = getRotationOffsetForPosition(blockEntity, pos, axis);
         float outputModifier = blockEntity.getRotationSpeedModifier(direction);
-        //TODO: ALLOC 
-        Vector3f aomInput = new Vector3f(angle, offset, 1);
-        Vector3f aomOutput = new Vector3f(angle, offset, outputModifier);
+        
+        AOM_INPUT.set(angle, offset, 1);
+        AOM_OUTPUT.set(angle, offset, outputModifier);
 
-        renderShaft(aomInput, inputShaft, blockEntity, axis, light, ms, buffer);
-        renderShaft(aomOutput, outputShaft, blockEntity, axis, light, ms, buffer);
-        renderOverlays(blockEntity, blockState, invDirection, aomInput, light, ms, buffer, direction, alignedX, positive);
+        renderShaft(AOM_INPUT, inputShaft, blockEntity, axis, light, ms, buffer);
+        renderShaft(AOM_OUTPUT, outputShaft, blockEntity, axis, light, ms, buffer);
+        renderOverlays(blockEntity, blockState, invDirection, AOM_INPUT, light, ms, buffer, direction, alignedX, positive);
     }
 
-    private void renderShaft(Vector3f aom, SuperByteBuffer shaft, TiltAdapterBlockEntity blockEntity, Axis axis, int light, PoseStack ms, MultiBufferSource buffer) {
+    private void renderShaft(Vector3f aom, SuperByteBuffer shaft, TiltAdapterBlockEntity blockEntity, net.minecraft.core.Direction.Axis axis, int light, PoseStack ms, MultiBufferSource buffer) {
         float angle = getAngle(aom);
         kineticRotationTransform(shaft, blockEntity, axis, angle, light);
         shaft.renderInto(ms, buffer.getBuffer(RenderType.solid()));
@@ -80,7 +87,7 @@ public class TiltAdapterRenderer extends KineticBlockEntityRenderer<TiltAdapterB
     private void renderOverlaySide(float redstoneSignal, float angle, SuperByteBuffer gantry, SuperByteBuffer sideOverlay, int light, PoseStack ms, MultiBufferSource buffer, Direction direction, boolean isRight, boolean alignedX, boolean positive) {
         int color = Color.mixColors(0x470102, 0xCD0000, redstoneSignal);
         boolean isHorizontal = direction.getAxis().isHorizontal();
-        com.mojang.math.Axis rotationAxis = isHorizontal ? com.mojang.math.Axis.YP : com.mojang.math.Axis.ZP;
+        Axis rotationAxis = isHorizontal ? Axis.YP : Axis.ZP;
         boolean flipRightCondition = !isHorizontal && (!positive ^ alignedX);
         boolean shouldFlip = isRight ^ flipRightCondition;
         float offset = shouldFlip ? 1/16.0f : -1/16.0f;
@@ -102,14 +109,14 @@ public class TiltAdapterRenderer extends KineticBlockEntityRenderer<TiltAdapterB
         ms.popPose();
     }
 
-    private void applyLocalTransforms(PoseStack ms, boolean alignedX, boolean shouldFlip, com.mojang.math.Axis rotationAxis) {
+    private void applyLocalTransforms(PoseStack ms, boolean alignedX, boolean shouldFlip, Axis rotationAxis) {
         ms.translate(0.5, 0.5, 0.5);
         if (alignedX) {
-            ms.mulPose(com.mojang.math.Axis.YP.rotationDegrees(270.0f));
+            ms.mulPose(ROT_Y_270);
         }
         
         if (shouldFlip) {
-            ms.mulPose(rotationAxis.rotationDegrees(180.0f));
+            ms.mulPose(rotationAxis == com.mojang.math.Axis.YP ? ROT_Y_180 : ROT_Z_180);
         }
         ms.translate(-0.5, -0.5, -0.5);
     }

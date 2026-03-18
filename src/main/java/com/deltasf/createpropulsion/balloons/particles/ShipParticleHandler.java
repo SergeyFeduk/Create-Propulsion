@@ -305,7 +305,6 @@ public class ShipParticleHandler {
         }
     }
 
-    //TODO: Reference directly
     private static long packPos(double x, double y, double z) {
         return packPos(Mth.floor(x), Mth.floor(y), Mth.floor(z));
     }

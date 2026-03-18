@@ -142,9 +142,6 @@ public class LiquidBurnerBlockEntity extends AbstractBurnerBlockEntity {
                 ParticleTypes.SMOKE
             );
         }
-
-        //TODO: Air sucked in
-        //Likely will need a separate particle type with behavior similar to airflow particle ones
     }
 
     private void spawnParticleEffect(Vec3 localOffset, Vec3 localVelocity, ParticleOptions particle) {

@@ -186,10 +186,4 @@ public class BalloonDebug {
             DebugRenderer.drawBox(centroidId, centroidAABB, Color.WHITE, 3);
         }
     }
-
-    //TODO: Move into the DebugRenderer class bruh
-    public static void displayBlockFor(BlockPos pos, int ticks, Color color) {
-        String ident = UUID.randomUUID().toString();
-        DebugRenderer.drawBox(ident, pos, color, ticks);
-    }
 }

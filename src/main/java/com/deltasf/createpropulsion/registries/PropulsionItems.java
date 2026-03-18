@@ -84,10 +84,6 @@ public class PropulsionItems {
         .setData(ProviderType.LANG, FUCK_OFF_LANG())
         .register();
 
-    /*public static final ItemEntry<DesignGogglesItem> DESIGN_GOGGLES = REGISTRATE.item("design_goggles", DesignGogglesItem::new)
-        .model(FUCK_OFF_ITEM())
-        .setData(ProviderType.LANG, FUCK_OFF_LANG())
-        .register();*/
     public static final ItemEntry<AssemblyGaugeItem> ASSEMBLY_GAUGE = REGISTRATE.item("assembly_gauge", AssemblyGaugeItem::new)
         .model(FUCK_OFF_ITEM())
         .setData(ProviderType.LANG, FUCK_OFF_LANG())
