@@ -61,7 +61,6 @@ public abstract class AbstractAreaDamagerBehaviour extends BlockEntityBehaviour 
             if (entity.isRemoved() || entity.fireImmune()) continue;
             applyDamage(entity, damageSource, zone);
         }
-        
     }
 
     protected abstract int getTickFrequency();

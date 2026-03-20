@@ -20,6 +20,7 @@ import org.joml.Vector4d;
 import org.joml.primitives.AABBic;
 import org.lwjgl.opengl.ARBInstancedArrays;
 import org.lwjgl.opengl.GL31;
+import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.core.internal.ships.VsiQueryableShipData;
@@ -309,16 +310,35 @@ public class InstancedParticleRenderer {
         initialized = false;
     }
 
-    //TODO: Move in some utility class
     private static void generateWhitePixelTexture() {
         textureId = GL31.glGenTextures();
         GL31.glBindTexture(GL31.GL_TEXTURE_2D, textureId);
-        ByteBuffer whitePixel = MemoryUtil.memAlloc(4);
-        whitePixel.put((byte)255).put((byte)255).put((byte)255).put((byte)255);
-        whitePixel.flip();
-        GL31.glTexImage2D(GL31.GL_TEXTURE_2D, 0, GL31.GL_RGBA, 1, 1, 0, GL31.GL_RGBA, GL31.GL_UNSIGNED_BYTE, whitePixel);
+
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            ByteBuffer whitePixel = MemoryUtil.memAlloc(4);
+            whitePixel.put((byte)255).put((byte)255).put((byte)255).put((byte)255);
+            whitePixel.flip();
+
+            //Save
+            int prevUnpackBuffer = GL31.glGetInteger(GL31.GL_PIXEL_UNPACK_BUFFER_BINDING);
+            int prevRowLength = GL31.glGetInteger(GL31.GL_UNPACK_ROW_LENGTH);
+            int prevAlignment = GL31.glGetInteger(GL31.GL_UNPACK_ALIGNMENT);
+            
+            GL31.glBindBuffer(GL31.GL_PIXEL_UNPACK_BUFFER, 0);
+            GL31.glPixelStorei(GL31.GL_UNPACK_ROW_LENGTH, 0);
+            GL31.glPixelStorei(GL31.GL_UNPACK_ALIGNMENT, 1);
+            GL31.glPixelStorei(GL31.GL_UNPACK_SKIP_PIXELS, 0);
+            GL31.glPixelStorei(GL31.GL_UNPACK_SKIP_ROWS, 0);
+            
+            GL31.glTexImage2D(GL31.GL_TEXTURE_2D, 0, GL31.GL_RGBA, 1, 1, 0, GL31.GL_RGBA, GL31.GL_UNSIGNED_BYTE, whitePixel);
+
+            //Restore
+            GL31.glBindBuffer(GL31.GL_PIXEL_UNPACK_BUFFER, prevUnpackBuffer);
+            GL31.glPixelStorei(GL31.GL_UNPACK_ROW_LENGTH, prevRowLength);
+            GL31.glPixelStorei(GL31.GL_UNPACK_ALIGNMENT, prevAlignment);
+        }
+        
         GL31.glTexParameteri(GL31.GL_TEXTURE_2D, GL31.GL_TEXTURE_MIN_FILTER, GL31.GL_NEAREST);
         GL31.glTexParameteri(GL31.GL_TEXTURE_2D, GL31.GL_TEXTURE_MAG_FILTER, GL31.GL_NEAREST);
-        MemoryUtil.memFree(whitePixel);
     }
 }
