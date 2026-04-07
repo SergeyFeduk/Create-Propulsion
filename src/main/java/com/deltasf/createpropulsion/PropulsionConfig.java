@@ -97,6 +97,7 @@ public class PropulsionConfig {
     public static final ForgeConfigSpec.ConfigValue<Double> ATMOSPHERE_HEIGHT_FACTOR;
     public static final ForgeConfigSpec.ConfigValue<Double> ATMOSPHERE_NOISE_MAGNITUDE;
     public static final ForgeConfigSpec.ConfigValue<Double> ATMOSPHERE_NOISE_TIME_FACTOR;
+    public static final ForgeConfigSpec.ConfigValue<Boolean> ATMOSPHERE_NOISE_ENABLE;
 
     //Burners
     public static final ForgeConfigSpec.ConfigValue<Boolean> BURNERS_POWER_HEATED_MIXERS;
@@ -219,6 +220,8 @@ public class PropulsionConfig {
                 .define("Noise magnitude", 1.0);
             ATMOSPHERE_NOISE_TIME_FACTOR = SERVER_BUILDER.comment("Speed of atmospheric perlin noise change. Higher values make atmosphere (and therefore balloons and propellers) more unstable.")
                 .define("Noise time factor", 1.0);
+            ATMOSPHERE_NOISE_ENABLE = SERVER_BUILDER.comment("When enabled - adds smooth random noise to atmospheric density simulating variable air density. Disable if you want your balloons to maintain perfect altitude stability.")
+                .define("Enable variable air density", true);
         SERVER_BUILDER.pop();
 
         SERVER_BUILDER.push("Burners");

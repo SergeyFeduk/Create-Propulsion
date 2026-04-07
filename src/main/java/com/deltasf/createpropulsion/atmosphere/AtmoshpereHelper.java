@@ -22,6 +22,7 @@ public class AtmoshpereHelper {
     public static double calculateVariableExternalAirDensity(AtmosphereData atmosphere, double worldX, double worldY, double worldZ, long gameTime, boolean clampAtSea) {
         double baseDensity = calculateExternalAirDensity(atmosphere, worldY, clampAtSea);
         if (baseDensity <= 0) return 0.0;
+        if (!PropulsionConfig.ATMOSPHERE_NOISE_ENABLE.get()) return baseDensity;
 
         VarianceNoiseProperties noiseProperties = atmosphere.varianceNoise();
         if (noiseProperties == null || noiseProperties.octaves().isEmpty()) return baseDensity;
