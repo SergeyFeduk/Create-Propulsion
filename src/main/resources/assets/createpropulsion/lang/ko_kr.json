@@ -126,9 +126,6 @@
     "fluid.createpropulsion.turpentine": "송진유",
     "item.createpropulsion.turpentine_bucket": "송진유 양동이",
 
-	"item.createpropulsion.design_goggles": "디자인 고글",
-	"createpropulsion.design_goggles.tooltip.summary": "현재는 디버그 아이템입니다.",
-
     "item.createpropulsion.optical_lens": "광학 렌즈",
     "item.createpropulsion.fluid_lens": "액체 감지 렌즈",
     "item.createpropulsion.focus_lens": "거리 확장 렌즈",

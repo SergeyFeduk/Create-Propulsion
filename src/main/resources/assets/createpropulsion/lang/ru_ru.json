@@ -126,9 +126,6 @@
     "fluid.createpropulsion.turpentine": "Скипидар",
     "item.createpropulsion.turpentine_bucket": "Ведро скипидара",
 
-    "item.createpropulsion.design_goggles": "Дизайнерские очки",
-    "createpropulsion.design_goggles.tooltip.summary": "Пока что это предмет отладки.",
-
     "item.createpropulsion.optical_lens": "Оптическая линза",
     "item.createpropulsion.fluid_lens": "Жидкостная линза",
     "item.createpropulsion.focus_lens": "Фокусирующая линза",

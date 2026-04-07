@@ -126,9 +126,6 @@
     "fluid.createpropulsion.turpentine": "Turpentin",
     "item.createpropulsion.turpentine_bucket": "Turpentineimer",
 
-    "item.createpropulsion.design_goggles": "Design Brille", 
-    "createpropulsion.design_goggles.tooltip.summary": "Dies ist ein Debug-Item. Für jetzt...", 
-
     "item.createpropulsion.optical_lens": "Optische Linse",
     "item.createpropulsion.fluid_lens": "Flüssigkeitslinse",
     "item.createpropulsion.focus_lens": "Fokusierende Linse",

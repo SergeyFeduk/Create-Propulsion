@@ -126,9 +126,6 @@
     "fluid.createpropulsion.turpentine": "松节油",
     "item.createpropulsion.turpentine_bucket": "松节油桶",
 
-    "item.createpropulsion.design_goggles": "设计师护目镜",
-    "createpropulsion.design_goggles.tooltip.summary": "这是一个调试物品。（目前是这样的）",
-
     "item.createpropulsion.optical_lens": "光学透镜",
     "item.createpropulsion.fluid_lens": "流体透镜",
     "item.createpropulsion.focus_lens": "聚焦透镜",
