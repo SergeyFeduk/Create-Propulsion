@@ -193,13 +193,13 @@ public class PropulsionConfig {
             PROPELLER_MAX_SPEED = SERVER_BUILDER.comment("Propellers stop accelerating ships upon reaching this speed. Defined in blocks per second")
                 .defineInRange("Max speed", 40.0, 10.0, 100.0);
             PROPELLER_POWER_MULTIPLIER = SERVER_BUILDER.comment("Propeller force and torque are multiplied by this number")
-                .defineInRange("Power multiplier", 6.0, 0.01, 100.0);
+                .defineInRange("Power multiplier", 10.0, 0.01, 100.0);
             PROPELLER_OBSTRUCTION_LOGIC = SERVER_BUILDER.comment("Logic for propeller obstruction checks. PRECISE checks against block shapes, APPROXIMATE checks if block is not air, OFF disables checks.")
                 .defineEnum("Obstruction logic", PropellerSpatialHandler.ObstructionCheckLogic.PRECISE);
             PROPELLER_WATER_POWER_MULTIPLIER = SERVER_BUILDER.comment("Propeller force when it is underwater is multiplied by this number")
                 .defineInRange("Underwater power multiplier", 1.5, 0.01, 100.0);
             PROPELLER_TORQUE_EFFECT_MULTIPLIER = SERVER_BUILDER.comment("Propeller torque is multiplied by this number")
-                .defineInRange("Torque effect multiplier", 1.0, 0.0, 100.0);
+                .defineInRange("Torque effect multiplier", 1.5, 0.0, 100.0);
         SERVER_BUILDER.pop();
 
         SERVER_BUILDER.push("Stirling Engine");
