@@ -18,13 +18,17 @@ import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollVa
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fluids.FluidStack;
 
 public class OpticalSensorBlockEntity extends AbstractOpticalSensorBlockEntity {
     private static final int LENS_LIMIT = 2;
@@ -115,18 +119,29 @@ public class OpticalSensorBlockEntity extends AbstractOpticalSensorBlockEntity {
     }
 
     private boolean filterTestBlock(Level level, BlockPos posToTest) {
-        ItemStack filterStack = this.filtering.getFilter();
-        if (filterStack.isEmpty()) {
-            return true;
-        }
+        ItemStack filterStack = filtering.getFilter();
+        if (filterStack.isEmpty()) return true;
 
-        Block block = level.getBlockState(posToTest).getBlock();
+        //Check block
+        BlockState state = level.getBlockState(posToTest);
+        Block block = state.getBlock();
         ItemStack blockAsStack = new ItemStack(block.asItem());
 
-        if (blockAsStack.isEmpty()) {
-            return false;
+        if (!blockAsStack.isEmpty() && filtering.test(blockAsStack)) return true;
+
+        //Check fluid
+        FluidState fluidState = level.getFluidState(posToTest);
+        if (!fluidState.isEmpty()) {
+            FluidStack fluidStack = new FluidStack(fluidState.getType(), 1000);
+            if (filtering.test(fluidStack)) return true;
+
+            Item bucketItem = fluidState.getType().getBucket();
+            if (bucketItem != null && bucketItem != Items.AIR) {
+                ItemStack bucketStack = new ItemStack(bucketItem);
+                if (filtering.test(bucketStack)) return true;
+            }
         }
 
-        return this.filtering.test(blockAsStack);
+        return false;
     }
 }
