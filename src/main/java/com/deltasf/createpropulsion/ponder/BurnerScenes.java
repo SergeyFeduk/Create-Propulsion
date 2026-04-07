@@ -204,7 +204,7 @@ public class BurnerScenes {
         scene.effects().indicateSuccess(stirlingAPos);
 
         scene.overlay().showText(60)
-            .sharedText("shared.burner.activation")
+            .sharedText("burner.activation")
             .pointAt(util.vector().centerOf(stirlingAPos))
             .placeNearTarget();
         scene.idle(70);
