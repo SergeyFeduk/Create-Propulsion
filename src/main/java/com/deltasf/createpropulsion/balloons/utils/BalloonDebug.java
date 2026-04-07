@@ -30,7 +30,6 @@ import java.util.Collection;
 
 @Mod.EventBusSubscriber(modid = CreatePropulsion.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class BalloonDebug {
-    private static final boolean IS_ENABLED = true;
     private static final float GOLDEN_RATIO_CONJUGATE = 0.61803398875f;
 
     private static final Color[] GROUP_COLORS = new Color[] {
@@ -44,11 +43,21 @@ public class BalloonDebug {
 
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
-        if (!IS_ENABLED || event.phase != TickEvent.Phase.END) return;
+        if (event.phase != TickEvent.Phase.END) return;
+        boolean debugAABB = PropulsionDebug.isDebug(BalloonDebugRoute.AABB);
+        boolean debugVolume = PropulsionDebug.isDebug(BalloonDebugRoute.VOLUME);
+        boolean debugHoles = PropulsionDebug.isDebug(BalloonDebugRoute.HOLES);
+        if (!(debugAABB || debugVolume || debugHoles)) return;
 
         Long2ObjectMap<Int2ObjectMap<ClientBalloon>> allData = ClientBalloonRegistry.getAllShipBalloons();
         if (allData.isEmpty()) return;
 
+        try {
+            handleDebugRendering(allData, debugAABB, debugVolume, debugHoles);
+        } catch (RuntimeException e) {} //Almost certainly CME, skip rendering
+    }
+
+    private static void handleDebugRendering(Long2ObjectMap<Int2ObjectMap<ClientBalloon>> allData, boolean debugAABB, boolean debugVolume, boolean debugHoles) {
         for (var entry : allData.long2ObjectEntrySet()) {
             long shipId = entry.getLongKey();
             Map<Integer, ClientBalloon> shipBalloons = entry.getValue();
@@ -57,35 +66,33 @@ public class BalloonDebug {
                 float hue = (balloon.id * GOLDEN_RATIO_CONJUGATE) % 1.0f;
                 Color balloonColor = Color.getHSBColor(hue, 0.8f, 0.95f);
 
-                //Render Client AABB
-                if (PropulsionDebug.isDebug(BalloonDebugRoute.AABB)) {
-                    renderClientAABB(shipId, balloon, balloonColor); 
-                }
-                //Render Client Volume
-                if (PropulsionDebug.isDebug(BalloonDebugRoute.VOLUME)) {
-                    renderClientVolume(balloon, balloonColor);
-                }
-                //Render Client Holes
-                if (PropulsionDebug.isDebug(BalloonDebugRoute.HOLES)) {
-                    renderClientHoles(balloon);
-                }
+                if (debugAABB) renderClientAABB(shipId, balloon, balloonColor); 
+                if (debugVolume) renderClientVolume(balloon, balloonColor);
+                if (debugHoles) renderClientHoles(balloon);
             }
         }
     }
 
     @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
-        if (!IS_ENABLED || event.phase != TickEvent.Phase.END) {
-            return;
-        }
+        if (event.phase != TickEvent.Phase.END) return;
+
+        boolean debugHai = PropulsionDebug.isDebug(BalloonDebugRoute.HAI_AABBS);
+        boolean debugChunks = PropulsionDebug.isDebug(BalloonDebugRoute.FORCE_CHUNKS);
+        if (!(debugHai || debugChunks)) return;
 
         BalloonShipRegistry shipRegistry = BalloonShipRegistry.get();
         if (shipRegistry == null) return;
 
         Collection<BalloonRegistry> allRegistries = shipRegistry.getRegistries();
         
+        try {
+            handleServerSideDebugRendering(allRegistries, debugHai, debugChunks);
+        } catch (RuntimeException e) {} //Almost certainly CME, skip rendering
+    }
+
+    private static void handleServerSideDebugRendering(Collection<BalloonRegistry> allRegistries, boolean debugHai, boolean debugChunks) {
         int groupIndex = 0;
-        
         for (BalloonRegistry registry : allRegistries) {
             List<HaiGroup> groups = registry.getHaiGroups();
             if (groups.isEmpty()) continue;
@@ -93,17 +100,13 @@ public class BalloonDebug {
             for (HaiGroup group : groups) {
                 Color baseColor = GROUP_COLORS[groupIndex % GROUP_COLORS.length];
                 
-                if (PropulsionDebug.isDebug(BalloonDebugRoute.HAI_AABBS)) {
-                    renderHaiGroupBounds(group, baseColor);
-                }
+                if (debugHai) renderHaiGroupBounds(group, baseColor);
 
                 for (Balloon balloon : group.balloons) {
                     float hue = (balloon.id * GOLDEN_RATIO_CONJUGATE) % 1.0f;
                     Color balloonColor = Color.getHSBColor(hue, 0.8f, 0.95f);
 
-                    if (PropulsionDebug.isDebug(BalloonDebugRoute.FORCE_CHUNKS)) {
-                        renderBalloonForceChunks(balloon, balloonColor);
-                    }
+                    if (debugChunks) renderBalloonForceChunks(balloon, balloonColor);
                 }
                 groupIndex++;
             }
